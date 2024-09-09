@@ -1,0 +1,78 @@
+.shop-by-category {
+    padding: 20px;
+    background-color: #f7f2f2;
+}
+
+.shop-by-category h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between items */
+    justify-content: center; /* Center items horizontally */
+}
+
+.category {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: calc(20% - 20px); /* 5 items in a row with gap */
+    transition: transform 0.3s ease; /* Smooth scale effect on hover */
+}
+
+.category a {
+    text-decoration: none; /* Remove underline from links */
+    color: inherit; /* Inherit color from parent */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.category a:hover .category-image {
+    transform: scale(1.05); /* Slightly enlarge image on hover */
+}
+
+.category-image {
+    width: 150px; /* Set the width of the image */
+    height: 150px; /* Set the height of the image */
+    border-radius: 50%; /* Round the image */
+    object-fit: cover; /* Ensure the image covers the circle */
+    margin-bottom: 10px; /* Space between image and text */
+    transition: transform 0.3s ease; /* Smooth scale effect on hover */
+}
+
+.category span {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+    .category {
+        width: calc(25% - 20px); /* 4 items in a row */
+    }
+}
+
+@media (max-width: 900px) {
+    .category {
+        width: calc(33.33% - 20px); /* 3 items in a row */
+    }
+}
+
+@media (max-width: 600px) {
+    .category {
+        width: calc(50% - 20px); /* 2 items in a row */
+    }
+}
+
+@media (max-width: 400px) {
+    .category {
+        width: 100%; /* 1 item in a row */
+    }
+}

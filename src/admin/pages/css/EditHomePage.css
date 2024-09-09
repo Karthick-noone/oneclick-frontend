@@ -1,0 +1,84 @@
+/* EditHomePage.css */
+
+.edit-home-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .edit-home-page h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .edit-home-page form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .edit-home-page label {
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+    color: #555;
+  }
+  
+  .edit-home-page input[type="text"],
+  .edit-home-page textarea,
+  .edit-home-page input[type="file"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .edit-home-page textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .edit-home-page button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .edit-home-page button:hover {
+    background-color: #0056b3;
+  }
+  
+  .edit-home-page .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .edit-home-page .form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .edit-home-page .form-group input[type="file"] {
+    padding: 0;
+    border: none;
+  }
+  
+  .edit-home-page .form-group input[type="text"],
+  .edit-home-page .form-group textarea {
+    width: 100%;
+  }
+  
+  .edit-home-page .form-group textarea {
+    width: 100%;
+  }
+  
+  .edit-home-page .form-group input[type="file"] {
+    display: block;
+    width: 100%;
+  }

@@ -1,0 +1,144 @@
+/* Default Header3 Styles */
+.header3 {
+    background-color: #ffffff;
+    padding: 10px 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid #e0e0e0;
+    position: relative;
+}
+
+.hamburger {
+    display: none;
+    font-size: 24px;
+    cursor: pointer;
+    position: absolute;
+    top: -8px;
+    right: 15px;
+}
+
+.header3 nav {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+
+}
+
+.header3 nav a {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+}
+
+.header3 nav a:hover {
+    color: #ff6600;
+}
+
+
+.fa-icons {
+    font-size: 19px; /* Adjust icon size */
+    margin-right: 5px; /* Space between icon and text */
+    color: #333; /* Adjust icon color */
+}
+.header3 nav .fa-icons:hover {
+    color: #ff6600;
+}
+
+
+/* Dropdown Styles */
+.nav-item {
+    position: relative;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 160px;
+}
+
+.nav-item:hover .dropdown,
+.nav-item .dropdown {
+    display: block;
+}
+
+.dropdown a {
+    display: block;
+    padding: 10px;
+    color: #333;
+    text-decoration: none;
+}
+
+.dropdown a:hover {
+    background-color: #f5f5f5;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    /* Reset Header3 styles for small screens */
+    .header3 {
+        background-color: transparent;
+        border-top: none;
+        padding: 0;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .header3 nav {
+        position: fixed; /* Fixed positioning to cover the entire page */
+        top: 0;
+        left: 0; /* Set left to 0 to align with the screen edge */
+        right: auto; /* Remove auto width control */
+        bottom: 0;
+        background-color: #ffffff;
+        width: 260px; /* Define the width of the navigation menu */
+        flex-direction: column;
+        padding: 50px 20px; /* Add some padding for space */
+        display: flex;
+        justify-content: flex-start; /* Align items to the left */
+        align-items: flex-start; /* Align links to the left */
+        text-align: left;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, width 0.3s ease; /* Smooth transitions for width */
+        opacity: 0; /* Hidden by default */
+        visibility: hidden; /* Hidden by default */
+        z-index: 9000; /* Ensure nav is above other content */
+        overflow: auto;
+        box-shadow: 1px 2px 5px 5px rgba(0, 0, 0, 0.3); /* Add box shadow */
+    }
+    
+    .header3 nav.open {
+        opacity: 1; /* Show when open */
+        visibility: visible; /* Ensure visibility when open */
+    }
+    .header3 nav a {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .dropdown {
+        position: static;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        background-color: #f5f5f5;
+    }
+
+    .dropdown a {
+        padding: 10px;
+    }
+}

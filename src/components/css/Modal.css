@@ -1,0 +1,132 @@
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px; /* Fixed width */
+  height: 500px; /* Fixed height */
+  position: relative;
+  text-align: center;
+  overflow: hidden; /* Ensure arrows are contained within the modal */
+}
+
+/* Fixed Size Image */
+.modal-image {
+  width: 100%; /* Ensure image fills the width */
+  height: 300px; /* Fixed height */
+  object-fit: cover; /* Ensure the image covers the area without distortion */
+  border-radius: 4px; /* Optional: adds rounded corners to the image */
+}
+
+/* Modal Title */
+.modal-title {
+  font-size: 1.25rem; /* Adjusted font size */
+  margin: 10px 0;
+}
+
+/* Modal Description */
+.modal-description {
+  font-size: 0.875rem; /* Adjusted font size */
+  color: #666;
+}
+
+/* Modal Price */
+.modal-price {
+  font-size: 1.125rem; /* Adjusted font size */
+  color: #333;
+  margin: 10px 0;
+}
+
+/* Close Button */
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #f00;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  padding: 8px; /* Adjusted padding */
+  cursor: pointer;
+  font-size: 1.25rem; /* Adjusted font size */
+}
+
+/* Navigation Arrows */
+.modal-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  padding: 8px; /* Adjusted padding */
+  cursor: pointer;
+  font-size: 1.5rem; /* Adjusted font size */
+}
+
+.modal-prev {
+  left: 10px;
+}
+
+.modal-next {
+  right: 10px;
+}
+
+.modal-nav:focus {
+  outline: none;
+}
+
+.modal-nav .arrow {
+  display: inline-block;
+  font-weight: bold;
+}
+
+.modal-prev:before {
+  content: '←';
+}
+
+.modal-next:before {
+  content: '→';
+}
+
+/* Favorite Icon */
+.favorite-iconn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+  font-size: 24px;
+  color: #ccc; /* Light color for empty heart */
+  transition: color 0.3s ease;
+}
+
+.favorite-iconn.filled {
+  color: red; /* Red color for filled heart */
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 90%; /* Adjust width for smaller screens */
+    height: auto; /* Allow height to adjust based on content */
+    max-width: none; /* Remove max-width for small screens */
+  }
+  
+  .modal-image {
+    height: auto; /* Allow image height to adjust based on content */
+  }
+}

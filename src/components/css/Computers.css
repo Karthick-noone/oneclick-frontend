@@ -1,0 +1,155 @@
+
+
+/* Computers Page Styles */
+.computers-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content {
+    display: flex;
+    flex: 1;
+    flex-direction: row; /* Default layout */
+}
+
+.sidebar {
+    width: 250px;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-right: 1px solid #ddd;
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+}
+
+.sidebar h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+    text-decoration: none;
+    color: #333;
+}
+
+.price-filter {
+    margin-top: 20px;
+}
+
+.product-list {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    width: calc(25% - 20px); /* Adjust to fit 4 cards in a row */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    text-align: center;
+    height: 400px; /* Set a fixed height for the card */
+
+    margin-bottom: 20px; /* Space below each card */
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.product-name {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.product-description {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 10px;
+}
+
+.product-price {
+    font-size: 18px;
+    color: #333;
+    margin: 10px 0;
+}
+
+.add-to-cart {
+    background-color: #ff6600;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+}
+
+.add-to-cart:hover {
+    background-color: #e65500;
+}
+
+.product-actions {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+.favorite-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #ccc; /* Light color for empty heart */
+    transition: color 0.3s ease;
+}
+
+.favorite-icon.filled {
+    color: red; /* Red color for filled heart */
+}
+
+
+/* Media Queries for Responsiveness */
+@media (max-width: 1024px) {
+    .product-card {
+        width: calc(33.33% - 20px); /* Fit 3 cards in a row for medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column; /* Stack sidebar and product list */
+    }
+
+    .sidebar {
+        width: 100%; /* Full width on small screens */
+        border-right: none; /* Remove border */
+        border-bottom: 1px solid #ddd; /* Add border at bottom */
+    }
+
+    .product-card {
+        width: calc(50% - 20px); /* Fit 2 cards in a row for small screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .product-card {
+        width: calc(100% - 20px); /* Fit 1 card in a row for very small screens */
+    }
+}

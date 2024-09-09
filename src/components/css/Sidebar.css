@@ -1,0 +1,137 @@
+/* Sidebar Styles */
+.sidebar {
+    position: fixed; /* Keeps the sidebar fixed in place */
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #f8f8f8;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    transform: translateX(-100%); /* Initially hide the sidebar */
+    transition: transform 0.3s ease-in-out; /* Smooth transition */
+    z-index: 1000; /* Ensure it’s above other content */
+}
+
+.sidebar.open {
+    transform: translateX(0); /* Show the sidebar */
+}
+
+.sidebar-content {
+    position: relative; /* Needed for positioning the close button */
+}
+
+.close-button {
+    position: absolute; /* Position absolutely within the sidebar */
+    top: 10px;
+    right: 10px; /* Move close button to the right */
+    font-size: 24px; /* Size of the close button */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+/* Toggle Button Styles */
+.toggle-button {
+    position: fixed; /* Keeps the toggle button fixed in place */
+    top: 280px; /* Distance from the top of the viewport */
+    left: 20px; /* Distance from the left of the viewport */
+    font-size: 22px; /* Size of the icon */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    z-index: 1000; /* Ensure it’s above other content */
+    display: none; /* Hide by default */
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .toggle-button {
+        display: block; /* Show the toggle button on small screens */
+    }
+
+    .sidebar {
+        transform: translateX(-100%); /* Hide sidebar off-screen */
+    }
+
+    .sidebar.open {
+        transform: translateX(0); /* Show sidebar */
+    }
+}
+
+@media (min-width: 769px) {
+    .toggle-button {
+        display: none; /* Hide the toggle button on larger screens */
+    }
+
+    .sidebar {
+        transform: translateX(0); /* Always show sidebar on larger screens */
+        position: static; /* Reset position */
+        width: 250px; /* Reset width */
+    }
+}
+
+/* Sidebar List Styles */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    display: flex;
+    align-items: center; /* Align items vertically */
+    margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+    display: flex;
+    align-items: center; /* Align items vertically */
+    text-decoration: none;
+    color: #333;
+    padding: 10px; /* Add padding for better click area */
+    border-radius: 4px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
+}
+
+.sidebar ul li a:hover {
+    background-color: #ddd; /* Highlight background on hover */
+}
+
+.sidebar ul li a svg {
+    margin-right: 10px; /* Space between icon and text */
+    font-size: 18px; /* Adjust icon size */
+}
+
+@media (max-width: 768px) {
+    .toggle-btn {
+        display: block; /* Show the toggle button on small screens */
+    }
+    .slidebar {
+        transform: translateX(-100%); /* Hide sidebar off-screen */
+    }
+
+    .slidebar.open {
+        transform: translateX(0); /* Show sidebar */
+    }
+
+    .menu-btn {
+        display: block; /* Show the toggle button on small screens */
+    }
+}
+
+@media (min-width: 769px) {
+    .toggle-btn {
+        display: none; /* Hide the toggle button on larger screens */
+    }
+    .menu-btn {
+        display: none; /* Hide the toggle button on larger screens */
+    }
+}
+
+/* Position the hamburger icon */
+.hamburger-icon {
+    position: fixed;
+    top: 26px; /* Adjust as needed */
+    left: 20px; /* Adjust as needed */
+    font-size: 24px; /* Adjust size as needed */
+    color: #ffffff; /* Adjust color as needed */
+    z-index: 1001; /* Ensure it's above other content */
+    cursor: pointer;
+  }

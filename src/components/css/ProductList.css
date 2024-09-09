@@ -1,0 +1,120 @@
+/* Container for the product list */
+.product-list {
+    padding: 20px;
+    text-align: center;
+    background-color: #f4f4f4; /* Light background for contrast */
+}
+
+/* Title styling */
+.title {
+    text-align: center; /* Center the text horizontally */
+    font-size: 26px; /* Adjust the font size as needed */
+    margin: 0 auto; /* Center the element itself if it's a block element */
+    color: #333; /* Adjust the text color as needed */
+}
+
+/* Container for the products */
+.products {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns per row */
+    gap: 15px; /* Gap between cards */
+    margin-top: 20px; /* Space above products */
+}
+
+/* Individual product card styling */
+.product {
+    position: relative; /* Allow absolute positioning of child elements */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px; /* Rounded corners */
+    padding: 15px; /* Padding */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    transition: transform 0.3s, box-shadow 0.3s; /* Smooth transitions */
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center-align items */
+}
+
+/* Favorite icon styling */
+.favorite-icon {
+    position: absolute; /* Position absolutely within the product card */
+    top: 10px; /* Adjust position as needed */
+    right: 10px; /* Adjust position as needed */
+    cursor: pointer;
+    color: #ccc; /* Default color */
+    font-size: 1.5rem; /* Adjust size as needed */
+    transition: color 0.3s ease; /* Smooth color transition */
+    z-index: 1; /* Ensure it's on top of other elements */
+}
+
+/* When the product is favorited */
+.favorite-icon.filled {
+    color: red; /* Color when favorited */
+}
+
+/* Product image styling */
+.product img {
+    max-width: 100%;
+    height: 150px; /* Fixed height for consistency */
+    object-fit: cover; /* Cover the area */
+    border-radius: 8px; /* Rounded corners for images */
+    margin-bottom: 10px; /* Margin below the image */
+}
+
+/* Product name styling */
+.product h3 {
+    font-size: 1.125rem; /* Font size for product name */
+    margin-bottom: 8px; /* Margin below the name */
+    color: #333; /* Text color */
+}
+
+/* Product features and price styling */
+.product p {
+    font-size: 1rem; /* Font size for product details */
+    color: #555; /* Slightly lighter text color */
+    margin-bottom: 12px; /* Margin below the text */
+    text-align: center; /* Center text alignment */
+}
+
+/* Hover effect for product card */
+.product:hover {
+    transform: translateY(-5px); /* Slight lift on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+/* Responsive design adjustments */
+@media (max-width: 1200px) {
+    .products {
+        grid-template-columns: repeat(4, 1fr); /* 4 columns for medium screens */
+    }
+}
+
+@media (max-width: 992px) {
+    .products {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns for smaller screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .products {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns for mobile devices */
+    }
+}
+
+@media (max-width: 480px) {
+    .products {
+        grid-template-columns: 1fr; /* 1 column for very small screens */
+    }
+
+    .title {
+        font-size: 1.25rem; /* Smaller font size for the title */
+    }
+
+    .product img {
+        height: 120px; /* Adjust image height */
+    }
+
+    .product p {
+        font-size: 0.875rem; /* Smaller font size for product details */
+    }
+}

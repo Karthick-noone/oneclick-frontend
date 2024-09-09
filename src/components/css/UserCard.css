@@ -1,0 +1,89 @@
+/* Container for the dropdown menu */
+.dropdownnn-container {
+    position: absolute;
+    top: 80px; /* Adjust based on your layout */
+    right: 8px;
+    width: 200px; /* Adjust width as needed */
+    background-color: #fff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    z-index: 1002; /* Ensure it is above other elements */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+    display: flex;
+    flex-direction: column;
+    max-height: 310px; /* Set a max height for the dropdown */
+}
+
+/* Dropdown menu content styles */
+.dropdownnn-content {
+    display: flex;
+    flex-direction: column;
+    padding: 0; /* Remove padding */
+    margin: 0; /* Remove margin */
+}
+
+/* Dropdown menu items */
+.dropdownnn-content a {
+    display: flex;
+    align-items: center;
+    padding: 12px 25px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.dropdownnn-content i, .dropdownnn-content svg {
+    margin-right: 10px; /* Adjust space between icon and text */
+    font-size: 16px; /* Adjust icon size */
+}
+
+.dropdownnn-content a:hover {
+    background-color: #f0f0f0;
+}
+
+/* Remove border from last item */
+.dropdownnn-content a:last-child {
+    border-bottom: none;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .dropdownnn-container {
+        width: 180px; /* Slightly smaller width on medium screens */
+    }
+
+    .dropdownnn-content a {
+        font-size: 14px; /* Smaller font size on medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .dropdownnn-container {
+        width: 100px; /* Further reduced width on smaller screens */
+        top: 60px; /* Adjust top position for smaller screens */
+    }
+
+    .dropdownnn-content a {
+        font-size: 12px; /* Further reduced font size on smaller screens */
+        padding: 8px 12px; /* Adjust padding for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .dropdownnn-container {
+        width: 50%; /* Full width on very small screens */
+        top: 210px; /* Adjust top position for very small screens */
+        right: 0; /* Align to the right edge on very small screens */
+        border-radius: 5px; /* Remove border radius for very small screens */
+    }
+
+    .dropdownnn-content {
+        padding: 0; /* Adjust padding for very small screens */
+    }
+
+    .dropdownnn-content a {
+        font-size: 14px; /* Adjust font size for very small screens */
+        padding: 10px; /* Adjust padding for very small screens */
+    }
+}

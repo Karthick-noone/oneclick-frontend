@@ -1,0 +1,119 @@
+.card {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Adjust width as needed */
+    overflow-x: auto; /* Enable horizontal scrolling if necessary */
+}
+
+.featuresContainer {
+    display: flex;
+    gap: 70px; /* Space between feature items */
+    align-items: flex-start; /* Align items to the top */
+    flex-wrap: nowrap; /* Prevent wrapping */
+}
+
+.feature {
+    display: flex;
+    align-items: flex-start; /* Align items to the top */
+    gap: 15px; /* Space between icon and text */
+    text-align: left;
+}
+
+.icon {
+    font-size: 24px; /* Adjust icon size as needed */
+    color: #ff6600; /* Adjust icon color as needed */
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Space between title and description */
+}
+
+.text h4 {
+    font-size: 20px; /* Adjust title size as needed */
+    font-weight: bold;
+    margin: 0;
+    color: #333; /* Adjust title color as needed */
+}
+
+.text p {
+    font-size: 14px; /* Adjust description size as needed */
+    margin: 0;
+    color: #666; /* Adjust description color as needed */
+}
+
+/* Center the card within the parent container */
+.parentContainer {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically (optional) */
+    padding: 30px; /* Optional padding around the container */
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 1200px) {
+    .featuresContainer {
+        gap: 50px; /* Reduce space between feature items */
+    }
+}
+
+@media (max-width: 992px) {
+    .featuresContainer {
+        gap: 30px; /* Further reduce space between feature items */
+        flex-wrap: wrap; /* Allow wrapping */
+        justify-content: flex-start; /* Align items to the left */
+    }
+
+    .feature {
+        flex: 1 1 45%; /* Allow features to take up more space */
+        max-width: 400px; /* Limit maximum width */
+    }
+}
+
+@media (max-width: 768px) {
+    .featuresContainer {
+        gap: 20px; /* Further reduce space between feature items */
+    }
+
+    .feature {
+        flex: 1 1 100%; /* Allow features to take up full width */
+        max-width: none; /* Remove maximum width */
+        text-align: left; /* Ensure text is left-aligned */
+        padding-left: 20px; /* Add padding for better alignment */
+    }
+
+    .icon {
+        font-size: 20px; /* Adjust icon size for smaller screens */
+    }
+
+    .text h4 {
+        font-size: 18px; /* Adjust title size for smaller screens */
+    }
+
+    .text p {
+        font-size: 12px; /* Adjust description size for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 20px; /* Reduce padding for very small screens */
+    }
+
+    .icon {
+        font-size: 18px; /* Further adjust icon size for very small screens */
+    }
+
+    .text h4 {
+        font-size: 16px; /* Further adjust title size for very small screens */
+    }
+
+    .text p {
+        font-size: 10px; /* Further adjust description size for very small screens */
+    }
+}

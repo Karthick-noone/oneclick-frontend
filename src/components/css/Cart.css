@@ -1,0 +1,479 @@
+/* General styles */
+.cart-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.cart-header h1 {
+  margin: 0;
+  font-size: 2em;
+}
+
+.cart-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.cart-products {
+  width: 67%;
+}
+
+.cart-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cart-product {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.cart-product-image {
+  width: 100px;
+  height: auto;
+  margin-right: 20px;
+}
+
+.cart-product-details {
+  flex-grow: 1;
+  padding-right: 10px;
+}
+
+.cart-product-name {
+  margin: 0;
+  font-size: 1em;
+}
+
+.cart-product-description {
+  margin: 5px 0 0;
+  color: #666;
+}
+
+.cart-product-price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 250px;
+  position: relative;
+}
+
+.cart-quantity-controls {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.cart-quantity-controls button {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.cart-quantity-controls span {
+  margin: 0 10px;
+}
+
+.cart-remove-btn {
+  color: black;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 17px;
+  margin-left: 15px;
+}
+
+.cart-summary {
+  border-top: 1px solid #ddd;
+  padding: 10px;
+  width: 29%;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+.summary-total {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.summary-place-order-btn {
+  background: #ff5722;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  cursor: pointer;
+  font-size: 1.1em;
+}
+.summary-place-order-btn2 {
+  background: #ff5722;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 300px;
+    cursor: pointer;
+    border-radius: 2px;
+  font-size: 1.1em;
+}
+
+
+/* Styling for the card container */
+.place-order-card {
+  display: flex;
+  justify-content: right;
+  align-items: right;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  max-width: 100%;
+  margin: 20px auto;
+}
+
+/* Styling for the content inside the card */
+.place-order-content {
+  text-align: right;
+}
+/* Responsive styling */
+@media (max-width: 992px) {
+  .cart-products {
+    width: 100%; /* Full width on medium screens */
+  }
+
+  .cart-summary {
+    width: 100%; /* Full width on medium screens */
+  }
+
+  .cart-content {
+    flex-direction: column; /* Stack items vertically */
+  }
+}
+
+@media (max-width: 768px) {
+  .cart-product {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cart-product-image {
+    width: 80px;
+    margin-bottom: 10px;
+  }
+
+  .cart-product-price {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .cart-product-details {
+    padding-right: 0;
+  }
+
+  .cart-header h1 {
+    font-size: 1.5em;
+  }
+
+  .modal4-content {
+    max-width: 90%;
+    padding: 15px;
+  }
+
+  .modal4-close-btn {
+    font-size: 20px;
+  }
+
+  .modal4-confirm-btn {
+    padding: 10px;
+    font-size: 16px;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .modal4-content {
+    max-width: 95%;
+    padding: 10px;
+  }
+
+  .modal4-close-btn {
+    font-size: 18px;
+  }
+
+  .modal4-confirm-btn {
+    padding: 8px;
+    font-size: 14px;
+  }
+}
+@media (max-width: 576px) {
+  .cart-container {
+    padding: 10px;
+  }
+
+  .cart-header h1 {
+    font-size: 1.2em;
+  }
+
+  .cart-product {
+    padding: 10px;
+    flex-direction: column;
+  }
+
+  .cart-product-image {
+    width: 70px;
+  }
+
+  .cart-product-name {
+    font-size: 0.9em;
+  }
+
+  .cart-product-price {
+    width: 100%;
+  }
+
+  .summary-place-order-btn {
+    font-size: 1em;
+  }
+}
+
+/* Address Section */
+.cart-address {
+  margin-bottom: 10px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  background-color: #ffffff;
+  width: 100%; /* Takes up full width of its container */
+  max-width: 780px; /* Set a maximum width */
+  height: 120px;
+  margin-left: auto;
+  margin-right: auto; /* Centers the address section */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 8px;
+
+
+}
+
+.cart-address span {
+  margin-bottom: 15px;
+  font-size: 1.1em;
+}
+
+.cart-address ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cart-address li {
+  margin-bottom: 10px;
+}
+
+.cart-address label {
+  font-size: 1.3em;
+  display: flex;
+  align-items: center;
+}
+
+.cart-address input[type="radio"] {
+  margin-right: 10px;
+}
+
+
+/* Overlay for the modal4 */
+.modal4-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+}
+
+/* Address list styling */
+.address-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px; /* Limit height for scrollable content */
+  overflow-y: auto; /* Add scroll if content exceeds height */
+}
+
+/* Address item styling */
+.address-item {
+  padding: 10px;
+  border-bottom: 1px solid #ddd; /* Light border to separate items */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Address item label styling */
+.address-item label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Radio button styling */
+.address-item input[type="radio"] {
+  margin-right: 10px; /* Space between radio button and text */
+}
+/* Content of the modal4 */
+.modal4-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 90%;
+  width: 550px;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Close button styling */
+.modal4-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+
+.modal4-confirm-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  margin: 5px 0; /* Margin for spacing between buttons */
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  width: 100%; /* Full width for small screens */
+}
+
+/* Container for the buttons */
+.modal4c {
+  /* display: flex; */
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: center; */
+}
+
+/* Media queries for responsiveness */
+@media (min-width: 600px) {
+  /* On screens larger than 600px, place buttons side by side */
+  .modal4-content > div {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .modal4-confirm-btn {
+    width: auto; /* Auto width for larger screens */
+    margin-left: 10px; /* Spacing between buttons */
+  }
+}
+.addr-list {
+  list-style-type: none;
+  padding: 0;
+  font-size: 0.7em;
+}
+
+
+.cart-product-card {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  padding: 15px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Payment method container */
+.payment-methods {
+  margin: 20px 0;
+}
+
+/* Individual payment method styling */
+.summary-item2 {
+  display: flex;
+  align-items: center; /* Vertically center items */
+  padding: 10px;
+  border-bottom: 1px solid #ddd; /* Light border to separate items */
+  gap: 10px; /* Space between icon and text */
+  position: relative; /* To position continue-wrapper absolutely */
+  flex-wrap: wrap; /* Allow items to wrap, especially for the continue button */
+}
+
+/* Payment method icon styling */
+.payment-icon {
+  font-size: 24px; /* Adjust size as needed */
+  color: #333; /* Icon color */
+  margin-right: 10px; /* Space between the icon and the text */
+}
+
+/* Payment method text styling */
+.summary-item2 .methods {
+  flex: 1; /* Allow text to take available space */
+  text-align: left; /* Align text to the left */
+}
+
+/* Payment method radio button styling */
+.summary-item2 input[type="radio"] {
+  margin-left: 10px; /* Space between text and radio button */
+}
+
+/* Wrapper for continue button */
+.continue-wrapper {
+  flex-basis: 100%; /* Take full width of the parent */
+  text-align: right; /* Align continue button to the right */
+  margin-top: 10px; /* Space between the radio button and continue button */
+}
+
+/* Continue button styling */
+.continue-button {
+  background-color: #ff5722; /* Green background */
+  color: white; /* White text */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 1.0em;
+  
+}
+
+
+.change-btn {
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text */
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  cursor: pointer;
+  margin-left: auto; /* Push button to the right */
+}

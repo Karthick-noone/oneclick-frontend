@@ -1,0 +1,71 @@
+.ad-page {
+    padding: 20px;
+    background-color: #f4f4f4;
+    font-family: 'Poppins', sans-serif;
+}
+
+.ads-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Space between ads */
+}
+
+.ad {
+    position: relative;
+    flex: 1;
+    height: 450px; /* Adjust height as needed */
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden; /* Hide overflow */
+}
+
+.ad-image-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden; /* Hide overflow for images */
+}
+
+.add-image {
+    width: 100%;
+    height: 450px;
+    object-fit: cover; /* Cover the entire container */
+}
+
+.ad-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.ad-text h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.ad-text p {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.shop-now-button {
+    font-family: 'Poppins', sans-serif;
+    color: #fff; /* Text color */
+    border: 2px solid #fff; /* White border */
+    border-radius: 50px;
+    padding: 6px 50px;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.shop-now-button:hover {
+    color: #ffffff; /* Text color on hover */
+    background-color: transparent;
+}

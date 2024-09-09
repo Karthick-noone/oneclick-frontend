@@ -1,0 +1,49 @@
+.brands-page {
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #333;
+}
+
+.brands-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* Creates 5 columns for the first row */
+  gap: 10px; /* Adds space between the items */
+  justify-content: center;
+  padding: 0 20;
+}
+
+.brand-item {
+  text-align: center;
+}
+
+.brand-logo {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Adjust layout for smaller screens */
+@media (max-width: 768px) {
+  .brands-container {
+    grid-template-columns: repeat(4, 1fr); /* 4 columns on medium screens */
+  }
+  
+  .brand-logo {
+    width: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brands-container {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns on small screens */
+  }
+
+  .brand-logo {
+    width: 60px;
+  }
+}

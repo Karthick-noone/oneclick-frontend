@@ -1,0 +1,23 @@
+
+
+/* Resetting default browser styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9f9; /* Light background */
+  color: #000000; /* Dark text for contrast */
+}
+
+
+
+
+
+
+/* Add these lines to your global CSS file */
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";

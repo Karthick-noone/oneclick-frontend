@@ -1,0 +1,171 @@
+.productt-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Space between cards */
+  margin-top: 10px;
+  background-color: white; /* Card background color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Card shadow */
+  width: 100%; /* Full width on smaller screens */
+}
+
+.productt-card {
+  background-color: #f9f9f9; /* Card background color */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Card shadow */
+}
+
+.productt-card-content {
+  display: flex; /* Flexbox layout for info and upload sections */
+  justify-content: space-between; /* Space between sections */
+  padding: 15px; /* Padding inside the card */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.productt-info-card {
+  flex: 2; /* Take more space */
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 200px; /* Minimum width for smaller screens */
+}
+
+.upload-section {
+  flex: 1; /* Take less space */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 15px;
+  min-width: 200px; /* Minimum width for smaller screens */
+}
+
+.laptops-card-input {
+  width: 100%;
+}
+
+.laptops-add-btn {
+  background-color: #3085d6;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.laptops-add-btn:hover {
+  background-color: #287bb5;
+}
+
+.laptops-edit-btn {
+  background-color: #3085d6;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.laptops-edit-btn:hover {
+  background-color: #287bb5;
+}
+
+.productt-info-card h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.productt-info-card p {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+.productt-images-container {
+  margin-top: 15px; /* Space between card and images */
+  display: flex;
+  flex-wrap: wrap; /* Allow images to wrap to next line */
+  gap: 10px; /* Space between images */
+}
+
+.productt-image-card {
+  flex: 1 1 200px; /* Adjust based on image size */
+  max-width: 200px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 8px;
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  margin: 8px;
+}
+
+.productt-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Maintain aspect ratio */
+}
+
+.image-actions {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  gap: 5px;
+}
+
+.image-actions .edit-icon,
+.image-actions .delete-icon {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  border-radius: 50%;
+  color: white;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .productt-card-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .upload-section {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+ 
+
+  .productt-info-card,
+  .upload-section {
+    flex: 1 1 auto; /* Allow full-width on small screens */
+    min-width: 100%; /* Take full width */
+  }
+
+  .productt-card-content {
+    flex-direction: column; /* Stack vertically on small screens */
+  }
+
+  .upload-section {
+    align-items: stretch; /* Stretch to full width */
+  }
+}
+
+@media (max-width: 480px) {
+  .productt-card-content {
+    padding: 10px; /* Reduce padding */
+  }
+
+  .productt-info-card h3 {
+    font-size: 1.25rem; /* Smaller font size */
+  }
+
+  .productt-info-card p {
+    font-size: 0.875rem; /* Smaller font size */
+  }
+
+  .productt-image-card {
+    flex: 1 1 150px; /* Smaller image cards */
+    max-width: 150px;
+  }
+}

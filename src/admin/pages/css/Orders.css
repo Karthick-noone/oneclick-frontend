@@ -1,0 +1,108 @@
+/* Assuming that your sidebar and top bar are positioned and styled globally */
+.orders-page {
+    margin-left: 250px; /* Adjust according to the width of the sidebar */
+    margin-top: 60px;   /* Adjust according to the height of the top bar */
+    padding: 20px;
+    overflow-x: auto; /* Add horizontal scrolling to the page if needed */
+  }
+  
+  .orders-header {
+    margin-bottom: 20px;
+  }
+  .orders-page-title{
+
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 24px;
+  }
+  .table-wrapper {
+    overflow-x: auto; /* Add horizontal scrolling to the table container */
+  }
+  
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+  }
+  
+  .orders-table th,
+  .orders-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  .orders-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .orders-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .orders-table .status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
+  .orders-table .status.processing {
+    background-color: #ff9800;
+    color: #fff;
+  }
+  
+  .orders-table .status.shipped {
+    background-color: #3f51b5;
+    color: #fff;
+  }
+  
+  .orders-table .status.delivered {
+    background-color: #4caf50;
+    color: #fff;
+  }
+  
+  .btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: 5px;
+    font-size: 14px; /* Adjust font size for better visibility */
+  }
+  
+  .btn-view {
+    background-color: #2196f3;
+    color: #fff;
+  }
+  
+  .btn-edit {
+    background-color: #ff9800;
+    color: #fff;
+  }
+  
+  .btn-delete {
+    background-color: #f44336;
+    color: #fff;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .orders-table th,
+    .orders-table td {
+      font-size: 12px; /* Adjust font size for smaller screens */
+      padding: 8px; /* Adjust padding for smaller screens */
+    }
+  
+    .btn {
+      font-size: 12px; /* Adjust button font size for smaller screens */
+      padding: 4px 8px; /* Adjust button padding for smaller screens */
+    }
+    .orders-page {
+        margin-left: 0px; /* Adjust according to the width of the sidebar */
+        margin-top: 60px;   /* Adjust according to the height of the top bar */
+        padding: 20px;
+        overflow-x: auto; /* Add horizontal scrolling to the page if needed */
+      }
+      
+  }
