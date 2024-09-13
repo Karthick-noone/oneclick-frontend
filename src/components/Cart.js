@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
+import Footer from "./footer";
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ const CartPage = () => {
   const [addresses, setAddresses] = useState([]); // State for storing fetched addresses
   const [userId, setUserId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [defaultAddress, setDefaultAddress] = useState(null);   // Initially selected address
+  const [isAddressSelected, setIsAddressSelected] = useState(false);
 
 
   const [addressDetails, setAddressDetails] = useState([]);
@@ -49,8 +52,8 @@ useEffect(() => {
   }, []);
 
   const handleConfirm = async () => {
-    fetchAddress(); // Fetch the address immediately when the Confirm button is clicked
-
+    fetchAddress(); // Fetch the latest address data when the Confirm button is clicked
+  
     if (selectedAddress) {
       try {
         const response = await axios.post(`${ApiUrl}/update-current-address`, {
@@ -59,6 +62,9 @@ useEffect(() => {
         });
   
         if (response.status === 200) {
+          // Update the default address to the newly selected address
+          setDefaultAddress(selectedAddress);
+  
           toast.success("Address updated successfully", {
             position: "top-right",
             autoClose: 2000,
@@ -92,6 +98,7 @@ useEffect(() => {
   const handleSelectAddressClick = (addressId) => {
     setSelectedAddress(addressId);
     console.log('Address ID selected:', addressId);
+    setIsAddressSelected(true); // Update the state to reflect that an address has been selected
 
     setIsModalOpen(true);
     fetchAddresses(userId); // Fetch addresses when opening the modal
@@ -191,152 +198,177 @@ useEffect(() => {
   };
 
   const removeFromCart = async (itemId, itemCategory) => {
-    const updatedCartItems = cartItems.filter(
-      (item) => !(item.id === itemId && item.category === itemCategory)
-    );
-    setCartItems(updatedCartItems);
-
-    const storedEmail = localStorage.getItem("email");
-    if (storedEmail) {
-      const cartKey = `${storedEmail}-cart`;
-      localStorage.setItem(cartKey, JSON.stringify(updatedCartItems));
-
-      try {
-        const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
-          email: storedEmail,
-          itemId: itemId,
-          itemCategory: itemCategory,
-        });
-
-        if (response.status === 200) {
-          toast.success("Item removed from cart!", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
+    // Display confirmation dialog
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, remove it!',
+    });
+  
+    if (result.isConfirmed) {
+      // Proceed with removing the item from the cart
+      const updatedCartItems = cartItems.filter(
+        (item) => !(item.id === itemId && item.category === itemCategory)
+      );
+      setCartItems(updatedCartItems);
+  
+      const storedEmail = localStorage.getItem("email");
+      if (storedEmail) {
+        const cartKey = `${storedEmail}-cart`;
+        localStorage.setItem(cartKey, JSON.stringify(updatedCartItems));
+  
+        try {
+          const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
+            email: storedEmail,
+            itemId: itemId,
+            itemCategory: itemCategory,
           });
-        } else {
-          throw new Error("Unexpected response status");
-        }
-      } catch (error) {
-        console.error(
-          "Error removing item from cart:",
-          error.response || error.message || error
-        );
-        toast.error(
-          `An error occurred: ${
-            error.response?.data?.message || error.message
-          }`,
-          {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
+  
+          if (response.status === 200) {
+            toast.success("Item removed from cart!", {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          } else {
+            throw new Error("Unexpected response status");
           }
-        );
+        } catch (error) {
+          console.error(
+            "Error removing item from cart:",
+            error.response || error.message || error
+          );
+          toast.error(
+            `An error occurred: ${
+              error.response?.data?.message || error.message
+            }`,
+            {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+        }
       }
     }
   };
 
-  const handlePlaceOrder = async () => {
-    console.log('handlePlaceOrder function called');
-  
-    if (!selectedAddress) {
-      console.log('No address selected');
-      Swal.fire({
-        icon: 'error',
-        title: 'Address Required',
-        text: 'Please select a shipping address.',
-        timer: 2000,
-        showConfirmButton: false
-      });
-      return;
-    }
-  
-    console.log('Selected Address ID:', selectedAddress);
-    console.log('Address Details:', addressDetails);
-  
-    // Ensure selectedAddress is a string (if that's what your address_id is)
-    const selectedAddressId = String(selectedAddress);
-    console.log('Selected Address Details:', selectedAddressId);
-  
-    // Find the full address details based on selectedAddress ID
-    const selectedAddressDetails = addressDetails.find(
-      (address) => String(address.address_id) === selectedAddressId
-    );
-  
-    if (!selectedAddressDetails) {
-      console.log('Selected address details not found');
-      Swal.fire({
-        icon: 'error',
-        title: 'Address Not Found',
-        text: 'Selected address not found.',
-        timer: 2000,
-        showConfirmButton: false
-      });
-      return;
-    }
-  
-    // Construct the full address string
-    const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}`;
-  
-    // Add product details to cartItems
-    const enrichedCartItems = cartItems.map(item => ({
-      id: item.id,
-      quantity: item.quantity,
-      price: item.price,
-      name: item.name, // Add product name
-      image: item.image, // Add product image
-      description: item.description, // Add product description
-      product_id: item.id, // Ensure product_id is available
-      category: item.category // Ensure category is available
-    }));
-  
-    const orderData = {
-      user_id: userId,
-      total_amount: calculateTotalPrice(),
-      shipping_address: fullAddress, // Use the full address
-      address_id: selectedAddress, // Use selectedAddress directly
-      cartItems: enrichedCartItems, // Include enriched cart items
-    };
-  
-    // Log the orderData for debugging
-    console.log('Order Data:', orderData);
-  
-    try {
-      const response = await axios.post(`${ApiUrl}/place-order`, orderData);
-  
-      if (response.status === 200) {
-        console.log('Order placed successfully');
-        Swal.fire({
-          icon: 'success',
-          title: 'Order Placed',
-          text: 'Your order has been placed successfully!',
-          timer: 2000,
-          showConfirmButton: false
-        });
-        // Clear cart or navigate to a confirmation page
-      } else {
-        console.log('Unexpected response status:', response.status);
-        throw new Error('Unexpected response status');
-      }
-    } catch (error) {
-      console.error('Error placing order:', error.response?.data || error.message);
-      Swal.fire({
-        icon: 'error',
-        title: 'Order Error',
-        text: `An error occurred: ${error.response?.data?.message || error.message}`,
-        timer: 2000,
-        showConfirmButton: false
-      });
-    }
+
+// Assuming addressDetails is already available, you can set the initial address
+useEffect(() => {
+  if (addressDetails.length > 0 && !defaultAddress) {
+    setDefaultAddress(addressDetails[0].address_id);
+  }
+}, [addressDetails]);
+
+
+const handlePlaceOrder = async () => {
+  console.log('handlePlaceOrder function called');
+
+  // Use the selected address if available, otherwise fall back to the default address
+  const addressToUse = selectedAddress || defaultAddress;
+
+  if (!addressToUse) {
+    console.log('No address selected or default address found');
+    Swal.fire({
+      icon: 'error',
+      title: 'Address Required',
+      text: 'Please select a shipping address.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+    return;
+  }
+
+  console.log('Selected or Default Address ID:', addressToUse);
+  console.log('Address Details:', addressDetails);
+
+  // Log all address IDs to verify the correct comparison
+  console.log('All address IDs:', addressDetails.map(address => address.address_id));
+
+  // Find the address details using the address ID (either default or selected)
+  const selectedAddressDetails = addressDetails.find(
+    (address) => String(address.address_id) === String(addressToUse)
+  );
+
+  if (!selectedAddressDetails) {
+    console.log('Selected address details not found');
+    Swal.fire({
+      icon: 'error',
+      title: 'Address Not Found',
+      text: 'Selected address not found.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+    return;
+  }
+
+  // Construct the full address string
+  const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}`;
+
+  // Enrich cart items with additional details
+  const enrichedCartItems = cartItems.map(item => ({
+    id: item.id,
+    quantity: item.quantity,
+    price: item.price,
+    name: item.name,
+    image: item.image,
+    description: item.description,
+    product_id: item.prod_id,
+    category: item.category
+  }));
+
+  const orderData = {
+    user_id: userId,
+    total_amount: calculateTotalPrice(),
+    shipping_address: fullAddress,
+    address_id: addressToUse,
+    cartItems: enrichedCartItems
   };
+
+  console.log('Order Data:', orderData);
+
+  try {
+    const response = await axios.post(`${ApiUrl}/place-order`, orderData);
+
+    if (response.status === 200) {
+      console.log('Order placed successfully');
+      Swal.fire({
+        icon: 'success',
+        title: 'Order Placed',
+        text: 'Your order has been placed successfully!',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      // Clear cart or navigate to a confirmation page
+    } else {
+      console.log('Unexpected response status:', response.status);
+      throw new Error('Unexpected response status');
+    }
+  } catch (error) {
+    console.error('Error placing order:', error.response?.data || error.message);
+    Swal.fire({
+      icon: 'error',
+      title: 'Order Error',
+      text: `An error occurred: ${error.response?.data?.message || error.message}`,
+      timer: 2000,
+      showConfirmButton: false
+    });
+  }
+};
+
   
   return (
     <>
@@ -356,27 +388,31 @@ useEffect(() => {
           <div className="cart-address">
       {/* <h3>Select a Shipping Address</h3> */}
       {addressDetails.length > 0 ? (
-        <ul>
-          {addressDetails.map((address) => (
-            <li
-              className={`addr-list ${selectedAddress === address.address_id ? 'selected' : ''}`}
-              key={address.address_id}
-            >
-              <button style={{float:'right'}} className="change-btn " onClick={() => handleSelectAddressClick(address.address_id)}>
-                Change
-              </button>
-              <span>Delivery to :</span>
-
-              <label>
-               <strong> {address.name} ,{address.postal_code}</strong>
-                
-              </label>
-              <label htmlFor="">{address.street}, {address.city}, {address.state}, , {address.country}</label>
-              <span>Number : {address.phone}</span>
-              
-            </li>
-          ))}
-        </ul>
+      <ul>
+      {addressDetails.map((address) => (
+        <li
+          className={`addr-list ${selectedAddress === address.address_id ? 'selected' : ''}`}
+          key={address.address_id}
+        >
+          <button
+            style={{ float: 'right' }}
+            className="change-btn"
+            onClick={() => handleSelectAddressClick(address.address_id)}
+          >
+            {isAddressSelected && selectedAddress === address.address_id ? 'Change' : 'Confirm This Address'}
+          </button>
+          <span>Delivery to :</span>
+          <label>
+            <strong> {address.name}, {address.postal_code}</strong>
+          </label>
+          <label>
+            {address.street}, {address.city}, {address.state}, {address.country}
+          </label>
+          <span>Number : {address.phone}</span>
+        </li>
+      ))}
+    </ul>
+    
       ) : (
         <div>
           <p> Please add one address during checkout. </p>
@@ -474,8 +510,8 @@ useEffect(() => {
             </div>
             <button
               className="summary-place-order-btn"
-              // onClick={() => navigate("/Checkout")}
-              onClick={handlePlaceOrder}
+              onClick={() => navigate("/Checkout")}
+              // onClick={handlePlaceOrder}
             >
               Place Order
             </button>
@@ -521,7 +557,8 @@ useEffect(() => {
 
           {/* Address Section */}
         </div>
-      </div>
+        
+      </div><Footer />
     </>
   );
 };

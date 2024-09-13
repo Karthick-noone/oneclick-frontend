@@ -7,10 +7,10 @@ const UserCard = ({ onLogout }) => {
     <div className="dropdownnn-container">
       <div className="dropdownnn-content">
         <a href="/UserAddress"><FaAddressBook /> My Addresses</a>
-        <a href="/my-subscription"><FaCalendarCheck /> My Subscription</a>
-        <a href="/my-account"><FaUser /> My Account</a>
-        <a href="/my-orders"><FaBox /> My Orders</a>
-        <a href="/my-wishlist"><FaHeart /> My Wishlist</a>
+        {/* <a href="/my-subscription"><FaCalendarCheck /> My Subscription</a> */}
+        <a href="/MyAccount"><FaUser /> My Account</a>
+        <a href="/MyOrders"><FaBox /> My Orders</a>
+        {/* <a href="/my-wishlist"><FaHeart /> My Wishlist</a> */}
         <hr />
         <a href="#" onClick={onLogout}><FaPowerOff /> Logout</a>
       </div>

@@ -154,6 +154,7 @@ const Computers = () => {
             image: product.prod_img,
             description: product.prod_features,
             category: product.category,
+            product_id: product.prod_id,
             quantity: 1,
           });
   
@@ -377,6 +378,7 @@ const Computers = () => {
                 </button> */}
               </div>
               <h3 className="product-name">{product.prod_name}</h3>
+              <h3 className="product-name">{product.prod_id}</h3>
               <p className="product-description">{product.prod_features}</p>
               <p className="product-price">₹{product.prod_price}</p>
               <button

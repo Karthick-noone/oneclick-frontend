@@ -29,6 +29,8 @@ import CareersForm from './components/CareersForm'; // Adjust path as needed
 import Cart from './components/Cart'; // Adjust path as needed
 import UserAddress from './components/UserAddress'; // Adjust path as needed
 import Checkout from './components/Checkout'; // Adjust path as needed
+import MyAccount from './components/MyAccount'; // Adjust path as needed
+import MyOrders from './components/MyOrders'; // Adjust path as needed
 import AdminMain from './admin/AdminApp'; // Adjust path as needed
 
 const App = () => {
@@ -64,6 +66,8 @@ const App = () => {
                 <Route path="/Cart" element={<Cart />} />
                 <Route path="/UserAddress" element={<UserAddress />} />
                 <Route path="/Checkout" element={<Checkout />} />
+                <Route path="/MyAccount" element={<MyAccount />} />
+                <Route path="/MyOrders" element={<MyOrders />} />
                 <Route path="/Admin/*" element={<AdminMain />} /> {/* Ensure correct path */}
             </Routes>
         </Router>

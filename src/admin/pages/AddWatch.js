@@ -59,6 +59,41 @@ const AddWatch = () => {
   };
 
   const handleAddProduct = async () => {
+
+     // Basic validation checks
+  if (!newProduct.name.trim()) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation Error',
+      text: 'Product name is required.',
+    });
+    return;
+  }
+  if (!newProduct.features.trim()) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation Error',
+      text: 'Product features are required.',
+    });
+    return;
+  }
+  if (!newProduct.price || isNaN(newProduct.price) || Number(newProduct.price) <= 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation Error',
+      text: 'A valid product price is required.',
+    });
+    return;
+  }
+  if (!newProduct.image) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation Error',
+      text: 'Product image is required.',
+    });
+    return;
+  }
+
     const formData = new FormData();
     formData.append('name', newProduct.name);
     formData.append('features', newProduct.features);
@@ -112,6 +147,33 @@ const AddWatch = () => {
   };
   
   const handleUpdateProduct = async () => {
+
+     // Validation checks
+  if (!editingProduct.name.trim()) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation Error',
+      text: 'Product name is required.',
+    });
+    return;
+  }
+  if (!editingProduct.features.trim()) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation Error',
+      text: 'Product features are required.',
+    });
+    return;
+  }
+  if (!editingProduct.price || isNaN(editingProduct.price) || Number(editingProduct.price) <= 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Validation Error',
+      text: 'A valid product price is required.',
+    });
+    return;
+  }
+
     console.log('Editing Product State:', editingProduct);
   
     // Check if id is set correctly

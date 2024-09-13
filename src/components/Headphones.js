@@ -154,6 +154,7 @@ const Headphones = () => {
             image: product.prod_img,
             description: product.prod_features,
             category: product.category,
+            product_id: product.prod_id,
             quantity: 1,
           });
   

@@ -106,3 +106,49 @@
       }
       
   }
+
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .pagination-button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  
+  .pagination-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+  
+  .pagination-button.active {
+    background-color: #0056b3;
+    font-weight: bold;
+  }
+  
+  .pagination-button:disabled {
+    background-color: #d6d6d6;
+    cursor: not-allowed;
+  }
+  
+  .pagination-button[disabled] {
+    pointer-events: none;
+  }
+  
+  /* Additional styling for ellipses */
+  .pagination-button.ellipsis {
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    cursor: default;
+  }

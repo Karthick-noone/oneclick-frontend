@@ -1,35 +1,44 @@
+/* Main footer styling with card-like effect */
 .footer {
     display: flex;
     flex-wrap: wrap; /* Allows wrapping on smaller screens */
     justify-content: space-around; /* Distributes space evenly */
     padding: 20px;
-    background-color: #333;
-    color: #fff;
-    text-align: left; /* Align text to the left */
-    /* font-family: calibri; */
-    font-family: 'Poppins', sans-serif;
+    background-color: #fff; /* White background for the card effect */
+    color: #000; /* Black text color */
+    text-align: left;
+    font-family: 'Poppins', sans-serif; /* Font family */
 
+    /* Add box-shadow for card effect */
+    box-shadow: 10px 10px 10px 8px rgba(0, 0, 0, 0.3);
+    border-radius: 8px; /* Slight rounding for card corners */
+    margin: 0px; /* Optional: Add margin to separate from other content */
 }
 
+/* Individual sections inside the footer */
 .footer-section {
     flex: 1;
     min-width: 200px; /* Ensures sections are not too narrow */
     margin: 10px;
 }
-.footer-section a{
-    text-decoration: none;
+
+.footer-section a {
+    text-decoration: none; /* Remove underline */
+    color: #000; /* Links also in black */
 }
 
 .footer-section h4 {
     margin-bottom: 10px;
     font-size: 16px;
     font-weight: bold;
+    color: #000; /* Headings in black */
 }
 
 .footer-section p {
     margin: 5px 0;
+    margin-left: 20px;
     font-size: 14px;
-    color: white;
+    color: #000; /* Regular text in black */
     text-decoration: none;
 }
 
@@ -38,10 +47,15 @@
     display: block;
 }
 
+/* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     .footer {
-        flex-direction: column;
+        flex-direction: column; /* Stack sections vertically */
         align-items: center;
         text-align: center;
+    }
+
+    .footer-section {
+        margin: 10px 0; /* Space out sections when stacked */
     }
 }

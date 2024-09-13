@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import './css/Dashboard.css'; // Ensure you have this CSS file for styles
+import './css/Dashboard.css';
 import { FaBox, FaChartLine, FaUsers, FaTag, FaMoneyBillWave } from 'react-icons/fa';
 import axios from 'axios';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement, ArcElement } from 'chart.js';
 import { ApiUrl } from "../../components/ApiUrl";
 
-// Register ChartJS components
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineElement, PointElement, ArcElement);
 
 const Dashboard = () => {
@@ -18,6 +17,18 @@ const Dashboard = () => {
   const [totalCustomers, setTotalCustomers] = useState(0);
   const [totalCategories, setTotalCategories] = useState(0);
   const [pendingPayments, setPendingPayments] = useState(0);
+  const [monthlySales, setMonthlySales] = useState([]);
+
+  // Helper function to get last 6 months
+  const getLast6Months = () => {
+    const months = [];
+    const today = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      months.push(date.toLocaleString('default', { month: 'long' }));
+    }
+    return months;
+  };
 
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -26,7 +37,6 @@ const Dashboard = () => {
         const ordersData = ordersResponse.data;
         setOrderData(ordersData);
 
-        // Calculate metrics
         const totalOrders = ordersData.length;
         const totalSales = ordersData.reduce((acc, order) => acc + order.total_amount, 0);
         const totalCustomers = new Set(ordersData.map(order => order.user_id)).size;
@@ -37,7 +47,16 @@ const Dashboard = () => {
         setTotalCustomers(totalCustomers);
         setTotalCategories(totalCategories);
 
-        // Prepare sales data for Bar chart
+        // Calculate monthly sales for the last 6 months
+        const monthlySales = getLast6Months().map(month => {
+          const salesForMonth = ordersData.filter(order => {
+            const orderDate = new Date(order.order_date); // Ensure you have an 'order_date' field in your orders
+            return orderDate.toLocaleString('default', { month: 'long' }) === month;
+          }).reduce((acc, order) => acc + order.total_amount, 0);
+          return salesForMonth;
+        });
+        setMonthlySales(monthlySales);
+
         const categorySales = ordersData.reduce((acc, order) => {
           acc[order.shipping_address] = (acc[order.shipping_address] || 0) + order.total_amount;
           return acc;
@@ -56,7 +75,6 @@ const Dashboard = () => {
           ],
         });
 
-        // Prepare pie chart data
         const categoriesResponse = await axios.get(`${ApiUrl}/fetchcategories`);
         const categoriesData = categoriesResponse.data;
 
@@ -140,14 +158,14 @@ const Dashboard = () => {
         </div>
         <div className="dashboard-charts">
           <div className="chart small-chart">
-            <h2>Sales Overview</h2>
+            <h2>Sales Overview (Last 6 Months)</h2>
             <Line
               data={{
-                labels: ['January', 'February', 'March', 'April', 'May'], // Example data
+                labels: getLast6Months(),
                 datasets: [
                   {
                     label: 'Sales Overview',
-                    data: [12, 19, 3, 5, 2], // Replace with actual data
+                    data: monthlySales,
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1,

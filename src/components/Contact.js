@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-// import Header1 from "./Header1";
 import Header2 from "./Header2";
-// import Header3 from "./Header3";
 import Footer from "./footer";
 import { ApiUrl } from "./ApiUrl";
 import Swal from "sweetalert2";
@@ -15,6 +13,7 @@ const Contact = () => {
     email: "",
     subject: "",
     message: "",
+    number: ""  // Added for number input
   });
 
   const [errors, setErrors] = useState({
@@ -23,6 +22,7 @@ const Contact = () => {
     email: "",
     subject: "",
     message: "",
+    number: ""  // Added for number input
   });
 
   const handleChange = (e) => {
@@ -30,26 +30,20 @@ const Contact = () => {
 
     if (name === "number") {
       // Validate number input
-      // Accept only digits and limit to 10 characters
       const sanitizedValue = value.replace(/\D/g, "").slice(0, 10);
-      // Ensure the number starts with 6-9
       if (
         sanitizedValue.length > 0 &&
         !(sanitizedValue[0] >= "6" && sanitizedValue[0] <= "9")
       ) {
-        // If the first character is not 6-9, remove it
         setFormData({ ...formData, [name]: sanitizedValue.slice(1) });
       } else {
         setFormData({ ...formData, [name]: sanitizedValue });
       }
     } else if (name === "name") {
       // Validate name input
-      // Reject input containing numbers and special characters
       const sanitizedValue = value.replace(/[^a-zA-Z\s]/g, "");
-      // Update state only if the input is valid
       setFormData({ ...formData, [name]: sanitizedValue });
     } else {
-      // For other fields, update state directly
       setFormData({ ...formData, [name]: value });
     }
   };
@@ -86,6 +80,11 @@ const Contact = () => {
       isValid = false;
     }
 
+    if (formData.number && formData.number.length !== 10) {
+      newErrors.number = "Number field must have exactly 10 digits.";
+      isValid = false;
+    }
+
     setErrors(newErrors);
     return isValid;
   };
@@ -93,81 +92,64 @@ const Contact = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+  
     if (validateForm()) {
-        // Form is valid, handle form submission here
-        console.log("Form data:", formData);
-      }
-
-    // Check if the number field has exactly 10 digits
-    if (formData.number && formData.number.length !== 10) {
-      // Show an error message if the number field doesn't have 10 digits
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Number field must have exactly 10 digits.",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!formData.email) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Recipient email address is required.",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    fetch(`${ ApiUrl }/send-email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          setFormData({
-            name: "",
-            number: "",
-            email: "",
-            subject: "",
-            message: "",
-          });
+      // Combine firstName and lastName into a single name field
+      const { firstName, lastName, ...rest } = formData;
+      const formDataWithRecipient = {
+        ...rest,
+        name: `${firstName} ${lastName}`, // Combine names
+        recipientEmail: "karthicknoone@gmail.com", // Hardcoded recipient email
+      };
+  
+      fetch(`${ApiUrl}/send-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formDataWithRecipient),
+      })
+        .then((response) => {
+          if (response.ok) {
+            setFormData({
+              firstName: "",
+              lastName: "",
+              email: "",
+              subject: "",
+              message: "",
+              number: "", // Reset number field
+            });
+            Swal.fire({
+              icon: "success",
+              title: "Success!",
+              text: "Message sent successfully!",
+            });
+          } else {
+            response.text().then((text) => {
+              throw new Error(
+                `Failed to send message. Status: ${response.status}, Message: ${text}`
+              );
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error sending message:", error);
           Swal.fire({
-            icon: "success",
-            title: "Success!",
-            text: "Message sent successfully!",
+            icon: "error",
+            title: "Oops...",
+            text: "Failed to send message. Please try again later.",
           });
-        } else {
-          response.text().then((text) => {
-            throw new Error(
-              `Failed to send message. Status: ${response.status}, Message: ${text}`
-            );
-          });
-        }
-      })
-      .catch((error) => {
-        console.error("Error sending message:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Failed to send message. Please try again later.",
+        })
+        .finally(() => {
+          setIsSubmitting(false);
         });
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
+    }
   };
-
+  
 
   return (
     <div>
-      {/* <Header1 /> */}
       <Header2 />
-      {/* <Header3 /> */}
       <div style={styles.container}>
         <div style={styles.imageContainer}>
           <h2 style={styles.title}>Get in Touch</h2>
@@ -201,28 +183,24 @@ const Contact = () => {
               <div style={styles.inputWrapper}>
                 <input
                   type="text"
-                  name="name"
-                  id="name"
-                  placeholder="Name"
-                  value={formData.name}
+                  name="firstName"
+                  placeholder="First Name"
+                  value={formData.firstName}
                   onChange={handleChange}
                   style={styles.inputLine}
                 />
-                {errors.name && <span style={styles.error}>{errors.name}</span>}
+                {errors.firstName && <span style={styles.error}>{errors.firstName}</span>}
               </div>
               <div style={styles.inputWrapper}>
                 <input
-                  type="tel"
-                  name="number"
-                  id="number"
-                  placeholder="Number"
-                  value={formData.number}
+                  type="text"
+                  name="lastName"
+                  placeholder="Last Name"
+                  value={formData.lastName}
                   onChange={handleChange}
                   style={styles.inputLine}
                 />
-                {errors.number && (
-                  <span style={styles.error}>{errors.number}</span>
-                )}
+                {errors.lastName && <span style={styles.error}>{errors.lastName}</span>}
               </div>
             </div>
             <div style={styles.formGroup}>
@@ -230,15 +208,12 @@ const Contact = () => {
                 <input
                   type="email"
                   name="email"
-                  id="email"
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
                   style={styles.inputLine}
                 />
-                {errors.email && (
-                  <span style={styles.error}>{errors.email}</span>
-                )}
+                {errors.email && <span style={styles.error}>{errors.email}</span>}
               </div>
               <div style={styles.inputWrapper}>
                 <input
@@ -249,9 +224,20 @@ const Contact = () => {
                   onChange={handleChange}
                   style={styles.inputLine}
                 />
-                {errors.subject && (
-                  <span style={styles.error}>{errors.subject}</span>
-                )}
+                {errors.subject && <span style={styles.error}>{errors.subject}</span>}
+              </div>
+            </div>
+            <div style={styles.formGroup}>
+              <div style={styles.inputWrapper}>
+                <input
+                  type="tel"
+                  name="number"
+                  placeholder="Number (10 digits)"
+                  value={formData.number}
+                  onChange={handleChange}
+                  style={styles.inputLine}
+                />
+                {errors.number && <span style={styles.error}>{errors.number}</span>}
               </div>
             </div>
             <div style={styles.formGroup}>
@@ -263,13 +249,10 @@ const Contact = () => {
                   onChange={handleChange}
                   style={styles.textarea}
                 ></textarea>
-                {errors.message && (
-                  <span style={styles.error}>{errors.message}</span>
-                )}
+                {errors.message && <span style={styles.error}>{errors.message}</span>}
               </div>
             </div>
             <button type="submit" style={styles.button}>
-              {" "}
               {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </form>
@@ -319,58 +302,65 @@ const styles = {
     fontSize: "1em",
     lineHeight: "1.6",
     color: "#555",
-    textAlign: "justify",
+    textAlign: "left",
     marginBottom: "20px",
   },
   form: {
     display: "flex",
     flexDirection: "column",
+    fontFamily:'Poppins'
+
   },
   formGroup: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
     marginBottom: "15px",
   },
   inputWrapper: {
     flex: "1",
-    position: "relative",
-    marginRight: "10px",
+    marginRight: "15px",
   },
   inputLine: {
     width: "100%",
-    padding: "10px 5px",
-    border: "none",
-    borderBottom: "2px solid #ccc",
+    padding: "10px",
     fontSize: "1em",
-    outline: "none",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+    boxSizing: "border-box",
+    marginBottom: "10px",
+    fontFamily:'Poppins'
+
   },
   textarea: {
     width: "100%",
+    height: "150px",
     padding: "10px",
-    border: "none",
-    borderBottom: "2px solid #ccc",
     fontSize: "1em",
-    height: "100px",
-    resize: "none",
-    outline: "none",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+    boxSizing: "border-box",
+    marginBottom: "10px",
+    resize: "vertical",
+    fontFamily:'Poppins'
+
   },
   button: {
     padding: "10px 20px",
-    backgroundColor: "#ff6600",
-    color: "#fff",
+    fontSize: "1em",
     border: "none",
-    borderRadius: "5px",
+    borderRadius: "4px",
+    backgroundColor: "#007bff",
+    color: "#fff",
     cursor: "pointer",
-    fontSize: "1.2em",
-    alignSelf: "flex-start",
+    transition: "background-color 0.3s",
+  },
+  buttonDisabled: {
+    backgroundColor: "#ccc",
+    cursor: "not-allowed",
   },
   error: {
     color: "red",
     fontSize: "0.875em",
-    position: "absolute",
-    bottom: "-20px",
-    left: "0",
   },
 };
 

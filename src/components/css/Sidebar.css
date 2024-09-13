@@ -46,6 +46,11 @@
         display: block; /* Show the toggle button on small screens */
     }
 
+        /* .sidebar {
+        width: 80%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    } */
     .sidebar {
         transform: translateX(-100%); /* Hide sidebar off-screen */
     }

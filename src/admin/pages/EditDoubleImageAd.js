@@ -139,14 +139,14 @@ const EditDoubleImageAd = () => {
       return;
     }
   
-    if (editingProduct.images.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'No Images',
-        text: 'Please select at least one image.',
-      });
-      return;
-    }
+    // if (editingProduct.images.length === 0) {
+    //   Swal.fire({
+    //     icon: 'warning',
+    //     title: 'No Images',
+    //     text: 'Please select at least one image.',
+    //   });
+    //   return;
+    // }
 
     const formData = new FormData();
     formData.append('title', editingProduct.title);

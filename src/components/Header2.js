@@ -67,7 +67,7 @@ const Header2 = () => {
             } else {
               setSuggestions([data.category]);
               setErrorMessage("");
-              setIsDropdownOpen(true);
+              // setIsDropdownOpen(true);
             }
           } else {
             console.error("Failed to fetch suggestions");
@@ -482,6 +482,7 @@ const Header2 = () => {
                     />
                     <div className="item-details">
                       <h3>{item.name}</h3>
+                      {/* <h3>{item.product_id}</h3> */}
                       <p>{item.description}</p>
                     </div>
                     <div className="item-price">

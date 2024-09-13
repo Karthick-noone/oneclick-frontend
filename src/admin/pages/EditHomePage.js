@@ -134,14 +134,14 @@ const EditHomePage = () => {
       return;
     }
   
-    if (editingProduct.images.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'No Images',
-        text: 'Please select at least one image.',
-      });
-      return;
-    }
+    // if (editingProduct.images.length === 0) {
+    //   Swal.fire({
+    //     icon: 'warning',
+    //     title: 'No Images',
+    //     text: 'Please select at least one image.',
+    //   });
+    //   return;
+    // }
     if (!editingProduct.id) {
       console.error('Error: Product ID is missing.');
       return;

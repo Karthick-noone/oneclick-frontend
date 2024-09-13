@@ -3,6 +3,7 @@ import './css/UserAddress.css';
 import Header2 from './Header2';
 import { ApiUrl } from './ApiUrl';
 import Swal from 'sweetalert2';
+import Footer from './footer';
 
 const AddressPage = () => {
   const [userId, setUserId] = useState(null);
@@ -584,6 +585,7 @@ const handleDeleteClick = async (addr) => {
           </div>
         )}
       </div>
+      <Footer />
     </>
   );
 };

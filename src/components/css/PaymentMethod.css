@@ -1,0 +1,91 @@
+/* Styling for the Payment Methods Page */
+.payment-methods-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: #f9f9f9; /* Light background for contrast */
+    min-height: 10vh;
+}
+
+.payment-methods-page h2 {
+    font-size: 18px; /* Increased font size for better readability on larger screens */
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+    text-align: center;
+}
+
+.payment-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px; /* Reduced gap for better fit on smaller screens */
+    justify-content: center;
+}
+
+.payment-images img {
+    width: 55px;
+    height: auto; /* Maintain aspect ratio */
+    object-fit: contain; /* Ensure image is contained within the given dimensions */
+    transition: transform 0.3s ease;
+}
+
+.payment-images img:hover {
+    transform: scale(1.1); /* Add a hover effect to slightly enlarge images */
+}
+
+/* Responsive design adjustments for tablets and mobile devices */
+@media (max-width: 1024px) {
+    .payment-images {
+        gap: 30px; /* Further reduced gap for tablets */
+    }
+
+    .payment-images img {
+        width: 50px; /* Slightly smaller image width for tablets */
+    }
+}
+
+@media (max-width: 768px) {
+    .payment-methods-page {
+        padding: 5px; /* Reduced padding for smaller screens */
+    }
+
+    .payment-methods-page h2 {
+        font-size: 16px; /* Adjust font size for smaller screens */
+    }
+
+    .payment-images {
+        gap: 20px; /* Reduced gap for mobile screens */
+    }
+
+    .payment-images img {
+        width: 40px; /* Smaller image width for mobile screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .payment-methods-page {
+        padding: 2px; /* Minimal padding for very small screens */
+    }
+
+    .payment-methods-page h2 {
+        font-size: 14px; /* Adjust font size for very small screens */
+    }
+
+    .payment-images {
+        gap: 10px; /* Minimal gap for very small screens */
+    }
+
+    .payment-images img {
+        width: 30px; /* Smallest image width for very small screens */
+    }
+}
+
+/* Copyright styling */
+.copyright {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #111111;
+    text-align: center;
+}
