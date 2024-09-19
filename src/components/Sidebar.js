@@ -33,20 +33,20 @@ const Sidebar = () => {
                         <li><a href="/Watch"><FaClock /> Wearable Tech</a></li>
                         <li><a href="/Printers"><FaPrint /> Printers</a></li>
                     </ul>
-                    <h3>Filter by</h3>
+                    {/* <h3>Filter by</h3>
                     <div className="price-filter">
                         <label>
                             Price
                             <input type="range" min="0" max="100000" /><br />
                             <span>₹39,499.00 - ₹72,999.00</span>
                         </label>
-                    </div>
+                    </div> */}
                 </div>
             </aside>
 
             {/* Fixed toggle button */}
             <div className={`toggle-button ${isOpen ? 'open' : ''}`} onClick={toggleSidebar}>
-                {isOpen ? '' : <FaSearch />} {/* <span>{isOpen ? '' : 'Browse By'}</span> */}
+                {isOpen ? '' : ''} {/* <span>{isOpen ? '' : 'Browse By'}</span> */}
             </div>
         </div>
     );

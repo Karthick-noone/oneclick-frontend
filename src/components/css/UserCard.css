@@ -12,6 +12,8 @@
     display: flex;
     flex-direction: column;
     max-height: 310px; /* Set a max height for the dropdown */
+  border: 1px solid #ccc;
+
 }
 
 /* Dropdown menu content styles */

@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCart } from "../components/CartContext";
+import { Link } from "react-router-dom";
 
 const WishlistSidebar = ({
   isOpen,
@@ -150,28 +151,55 @@ const WishlistSidebar = ({
         </div>
         <div className="wishlist-sidebar-body">
           {wishlistItems.length === 0 ? (
-            <p>Your wishlist is empty.</p>
+            <p className="empty-wishlist">Your wishlist is empty.</p>
           ) : (
             <ul>
               {wishlistItems.map((product) => (
                 <li key={product.id} className="wishlist-item">
+                                    <Link style={{textDecoration:'none'}} to={`/${product.category}`}>
+
                   <img
                     src={`${ApiUrl}/uploads/${product.category}/${product.prod_img}`}
                     alt={product.name}
                     className="item-image"
                   />
+                                          </Link>
+
                   <div className="item-details">
+                  <Link style={{textDecoration:'none'}} to={`/${product.category}`}>
+
                     <h3 className="item-name">{product.prod_name}</h3>
                     <p className="item-features">{product.prod_features}</p>
+                    </Link>
+
                   </div>
                   <div className="item-actions">
                     <p className="item-price">₹{product.prod_price}</p>
-                    <button
-                      onClick={(event) => handleAddToCart(product, event)}
-                      className="add-to-cart-btn"
-                    >
-                      Add to Cart
-                    </button>
+                    {product.status === "unavailable" ? (
+                      <p
+                        style={{
+                          color: "red",
+                          fontWeight: "bold",
+                          fontSize: "12px",
+                          textAlign: "center",
+                          // marginTop: '10px',
+                          // padding: '10px',
+                          // border: '2px solid red',
+                          borderRadius: "5px",
+                          // backgroundColor: '#fdd',
+                        }}
+                        className="out-of-stock"
+                      >
+                        Out of Stock
+                      </p>
+                    ) : (
+                      <button
+                        onClick={(event) => handleAddToCart(product, event)}
+                        className="add-to-cart-btn"
+                      >
+                        Add to Cart
+                      </button>
+                    )}
                     <button
                       onClick={() =>
                         removeFromWishlist(product.id, product.category)

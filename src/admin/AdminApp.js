@@ -19,6 +19,7 @@ import EditHomePage from './pages/EditHomePage'; // Example page
 import EditDoubleImageAd from './pages/EditDoubleImageAd'; // Example page
 import EditSingleImageAd from './pages/EditSingleAdPage'; // Example page
 import Dashboard from './pages/Dashboard'; // Example page
+import CareersTable from './pages/CareersTable'; // Example page
 import { ThemeProvider } from './ThemeContext'; // Import ThemeProvider
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
           <Route path="/EditDoubleImageAd" element={<EditDoubleImageAd />} />
           <Route path="/EditSingleImageAd" element={<EditSingleImageAd />} />
           <Route path="/Dashboard" element={<Dashboard />} />
+          <Route path="/CareersTable" element={<CareersTable />} />
         </Routes>
       </AdminMain>
     </ThemeProvider>

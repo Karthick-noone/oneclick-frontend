@@ -19,6 +19,7 @@ import Adminregister from './components/AdminSignup'; // Adjust path as needed
 import ClientLogin from './components/ClientLogin'; // Adjust path as needed
 import ClientSignup from './components/ClientSignup'; // Adjust path as needed
 import ForgotPassword from './components/ForgotPassword'; // Adjust path as needed
+import ChangePassword from './components/ChangePassword'; // Adjust path as needed
 import AdminForgotPassword from './components/AdminForgotPassword'; // Adjust path as needed
 import About from './components/About'; // Adjust path as needed
 import Contact from './components/Contact'; // Adjust path as needed
@@ -56,6 +57,7 @@ const App = () => {
                 <Route path="/Login" element={<ClientLogin />} />
                 <Route path="/Signup" element={<ClientSignup />} />
                 <Route path="/ForgotPassword" element={<ForgotPassword />} />
+                <Route path="/ChangePassword" element={<ChangePassword />} />
                 <Route path="/AdminForgotPassword" element={<AdminForgotPassword />} />
                 <Route path="/About" element={<About />} />
                 <Route path="/Contact" element={<Contact />} />

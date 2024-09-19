@@ -110,7 +110,7 @@ const Reports = () => {
 
   return (
     <div className="reports-container">
-      <h1 className="page-title">Admin Reports</h1>
+      {/* <h1 className="page-title">Admin Reports</h1> */}
 
       {/* Sales Report */}
       <section className="report-section">

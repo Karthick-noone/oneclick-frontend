@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback  } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./css/Cart.css";
 import { ApiUrl } from "./ApiUrl";
@@ -19,30 +19,29 @@ const CartPage = () => {
   const [addresses, setAddresses] = useState([]); // State for storing fetched addresses
   const [userId, setUserId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [defaultAddress, setDefaultAddress] = useState(null);   // Initially selected address
+  const [defaultAddress, setDefaultAddress] = useState(null); // Initially selected address
   const [isAddressSelected, setIsAddressSelected] = useState(false);
-
 
   const [addressDetails, setAddressDetails] = useState([]);
 
- // Memoize fetchAddress function using useCallback to avoid re-creating it on each render
- const fetchAddress = useCallback(async () => {
-  try {
-    const response = await axios.get(`${ApiUrl}/singleaddress/${userId}`);
-    setAddressDetails(response.data || []); // Ensure it's an array even if response is null
-  } catch (error) {
-    console.error('Error fetching address:', error);
-  }
-}, [ApiUrl, userId]); // Include dependencies ApiUrl and userId
+  // Memoize fetchAddress function using useCallback to avoid re-creating it on each render
+  const fetchAddress = useCallback(async () => {
+    try {
+      const response = await axios.get(`${ApiUrl}/singleaddress/${userId}`);
+      setAddressDetails(response.data || []); // Ensure it's an array even if response is null
+    } catch (error) {
+      console.error("Error fetching address:", error);
+    }
+  }, [ApiUrl, userId]); // Include dependencies ApiUrl and userId
 
-useEffect(() => {
-  // Fetch the address every 10 seconds
-  const interval = setInterval(fetchAddress, 100);
+  useEffect(() => {
+    // Fetch the address every 10 seconds
+    const interval = setInterval(fetchAddress, 100);
 
-  // Clean up interval on component unmount
-  return () => clearInterval(interval);
-}, [fetchAddress]); // Add fetchAddress as a dependency
-  
+    // Clean up interval on component unmount
+    return () => clearInterval(interval);
+  }, [fetchAddress]); // Add fetchAddress as a dependency
+
   useEffect(() => {
     // Fetch the selected address from local storage
     const storedAddressId = localStorage.getItem("selectedAddressId");
@@ -53,18 +52,18 @@ useEffect(() => {
 
   const handleConfirm = async () => {
     fetchAddress(); // Fetch the latest address data when the Confirm button is clicked
-  
+
     if (selectedAddress) {
       try {
         const response = await axios.post(`${ApiUrl}/update-current-address`, {
           userId: userId, // Ensure userId is set correctly
           addressId: selectedAddress,
         });
-  
+
         if (response.status === 200) {
           // Update the default address to the newly selected address
           setDefaultAddress(selectedAddress);
-  
+
           toast.success("Address updated successfully", {
             position: "top-right",
             autoClose: 2000,
@@ -91,13 +90,13 @@ useEffect(() => {
         });
       }
     } else {
-      alert('Please select an address.');
+      alert("Please select an address.");
     }
   };
   // Function to open the modal
   const handleSelectAddressClick = (addressId) => {
     setSelectedAddress(addressId);
-    console.log('Address ID selected:', addressId);
+    console.log("Address ID selected:", addressId);
     setIsAddressSelected(true); // Update the state to reflect that an address has been selected
 
     setIsModalOpen(true);
@@ -132,7 +131,6 @@ useEffect(() => {
     }
   };
 
- 
   useEffect(() => {
     const fetchLocalStorageData = () => {
       const storedEmail = localStorage.getItem("email");
@@ -200,34 +198,34 @@ useEffect(() => {
   const removeFromCart = async (itemId, itemCategory) => {
     // Display confirmation dialog
     const result = await Swal.fire({
-      title: 'Are you sure?',
+      title: "Are you sure?",
       text: "You won't be able to revert this!",
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, remove it!',
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, remove it!",
     });
-  
+
     if (result.isConfirmed) {
       // Proceed with removing the item from the cart
       const updatedCartItems = cartItems.filter(
         (item) => !(item.id === itemId && item.category === itemCategory)
       );
       setCartItems(updatedCartItems);
-  
+
       const storedEmail = localStorage.getItem("email");
       if (storedEmail) {
         const cartKey = `${storedEmail}-cart`;
         localStorage.setItem(cartKey, JSON.stringify(updatedCartItems));
-  
+
         try {
           const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
             email: storedEmail,
             itemId: itemId,
             itemCategory: itemCategory,
           });
-  
+
           if (response.status === 200) {
             toast.success("Item removed from cart!", {
               position: "top-right",
@@ -265,115 +263,120 @@ useEffect(() => {
     }
   };
 
+  // Assuming addressDetails is already available, you can set the initial address
+  useEffect(() => {
+    if (addressDetails.length > 0 && !defaultAddress) {
+      setDefaultAddress(addressDetails[0].address_id);
+    }
+  }, [addressDetails]);
 
-// Assuming addressDetails is already available, you can set the initial address
-useEffect(() => {
-  if (addressDetails.length > 0 && !defaultAddress) {
-    setDefaultAddress(addressDetails[0].address_id);
-  }
-}, [addressDetails]);
+  const handlePlaceOrder = async () => {
+    console.log("handlePlaceOrder function called");
 
+    // Use the selected address if available, otherwise fall back to the default address
+    const addressToUse = selectedAddress || defaultAddress;
 
-const handlePlaceOrder = async () => {
-  console.log('handlePlaceOrder function called');
+    if (!addressToUse) {
+      console.log("No address selected or default address found");
+      Swal.fire({
+        icon: "error",
+        title: "Address Required",
+        text: "Please select a shipping address.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
-  // Use the selected address if available, otherwise fall back to the default address
-  const addressToUse = selectedAddress || defaultAddress;
+    console.log("Selected or Default Address ID:", addressToUse);
+    console.log("Address Details:", addressDetails);
 
-  if (!addressToUse) {
-    console.log('No address selected or default address found');
-    Swal.fire({
-      icon: 'error',
-      title: 'Address Required',
-      text: 'Please select a shipping address.',
-      timer: 2000,
-      showConfirmButton: false
-    });
-    return;
-  }
+    // Log all address IDs to verify the correct comparison
+    console.log(
+      "All address IDs:",
+      addressDetails.map((address) => address.address_id)
+    );
 
-  console.log('Selected or Default Address ID:', addressToUse);
-  console.log('Address Details:', addressDetails);
+    // Find the address details using the address ID (either default or selected)
+    const selectedAddressDetails = addressDetails.find(
+      (address) => String(address.address_id) === String(addressToUse)
+    );
 
-  // Log all address IDs to verify the correct comparison
-  console.log('All address IDs:', addressDetails.map(address => address.address_id));
+    if (!selectedAddressDetails) {
+      console.log("Selected address details not found");
+      Swal.fire({
+        icon: "error",
+        title: "Address Not Found",
+        text: "Selected address not found.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
-  // Find the address details using the address ID (either default or selected)
-  const selectedAddressDetails = addressDetails.find(
-    (address) => String(address.address_id) === String(addressToUse)
-  );
+    // Construct the full address string
+    const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}`;
 
-  if (!selectedAddressDetails) {
-    console.log('Selected address details not found');
-    Swal.fire({
-      icon: 'error',
-      title: 'Address Not Found',
-      text: 'Selected address not found.',
-      timer: 2000,
-      showConfirmButton: false
-    });
-    return;
-  }
+    // Enrich cart items with additional details
+    const enrichedCartItems = cartItems.map((item) => ({
+      id: item.id,
+      quantity: item.quantity,
+      price: item.price,
+      name: item.name,
+      image: item.image,
+      description: item.description,
+      product_id: item.prod_id,
+      category: item.category,
+    }));
 
-  // Construct the full address string
-  const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}`;
+    const orderData = {
+      user_id: userId,
+      total_amount: calculateTotalPrice(),
+      shipping_address: fullAddress,
+      address_id: addressToUse,
+      cartItems: enrichedCartItems,
+    };
 
-  // Enrich cart items with additional details
-  const enrichedCartItems = cartItems.map(item => ({
-    id: item.id,
-    quantity: item.quantity,
-    price: item.price,
-    name: item.name,
-    image: item.image,
-    description: item.description,
-    product_id: item.prod_id,
-    category: item.category
-  }));
+    console.log("Order Data:", orderData);
 
-  const orderData = {
-    user_id: userId,
-    total_amount: calculateTotalPrice(),
-    shipping_address: fullAddress,
-    address_id: addressToUse,
-    cartItems: enrichedCartItems
+    try {
+      const response = await axios.post(`${ApiUrl}/place-order`, orderData);
+
+      if (response.status === 200) {
+        console.log("Order placed successfully");
+        Swal.fire({
+          icon: "success",
+          title: "Order Placed",
+          text: "Your order has been placed successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        // Clear cart or navigate to a confirmation page
+      } else {
+        console.log("Unexpected response status:", response.status);
+        throw new Error("Unexpected response status");
+      }
+    } catch (error) {
+      console.error(
+        "Error placing order:",
+        error.response?.data || error.message
+      );
+      Swal.fire({
+        icon: "error",
+        title: "Order Error",
+        text: `An error occurred: ${
+          error.response?.data?.message || error.message
+        }`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
   };
 
-  console.log('Order Data:', orderData);
-
-  try {
-    const response = await axios.post(`${ApiUrl}/place-order`, orderData);
-
-    if (response.status === 200) {
-      console.log('Order placed successfully');
-      Swal.fire({
-        icon: 'success',
-        title: 'Order Placed',
-        text: 'Your order has been placed successfully!',
-        timer: 2000,
-        showConfirmButton: false
-      });
-      // Clear cart or navigate to a confirmation page
-    } else {
-      console.log('Unexpected response status:', response.status);
-      throw new Error('Unexpected response status');
-    }
-  } catch (error) {
-    console.error('Error placing order:', error.response?.data || error.message);
-    Swal.fire({
-      icon: 'error',
-      title: 'Order Error',
-      text: `An error occurred: ${error.response?.data?.message || error.message}`,
-      timer: 2000,
-      showConfirmButton: false
-    });
-  }
-};
-
-  
   return (
     <>
       {/* <Header1 /> */}
-      <Header2 /> 
+      <Header2 />
       <div className="cart-container">
         <div className="cart-header">
           <center>
@@ -381,106 +384,121 @@ const handlePlaceOrder = async () => {
           </center>
         </div>
         <div className="cart-content row">
-          
           <div className="cart-products">
-
-            
-          <div className="cart-address">
-      {/* <h3>Select a Shipping Address</h3> */}
-      {addressDetails.length > 0 ? (
-      <ul>
-      {addressDetails.map((address) => (
-        <li
-          className={`addr-list ${selectedAddress === address.address_id ? 'selected' : ''}`}
-          key={address.address_id}
-        >
-          <button
-            style={{ float: 'right' }}
-            className="change-btn"
-            onClick={() => handleSelectAddressClick(address.address_id)}
-          >
-            {isAddressSelected && selectedAddress === address.address_id ? 'Change' : 'Confirm This Address'}
-          </button>
-          <span>Delivery to :</span>
-          <label>
-            <strong> {address.name}, {address.postal_code}</strong>
-          </label>
-          <label>
-            {address.street}, {address.city}, {address.state}, {address.country}
-          </label>
-          <span>Number : {address.phone}</span>
-        </li>
-      ))}
-    </ul>
-    
-      ) : (
-        <div>
-          <p> Please add one address during checkout. </p>
-          <a href="/Useraddress">
-            <button className="">Add</button>
-          </a>
-        </div>
-      )}
-    </div>
-    <div className="cart-product-card">
-            <ul className="cart-list">
-              {cartItems.map((item) => (
-                <li
-                  key={item.id}
-                  className="cart-product d-flex align-items-center"
-                >
-                  <img
-                    src={`${ApiUrl}/uploads/${item.category}/${item.image}`}
-                    alt={item.name}
-                    loading="lazy"
-                    className="cart-product-image"
-                    name="image"
-                  />
-                  <div className="cart-product-details">
-                    <p className="cart-product-name">{item.name}</p>
-                    <p className="cart-product-description">
-                      {item.description}
-                    </p>
-                  </div>
-                  <div className="cart-product-price">
-                    <div className="cart-quantity-controls">
+            <div className="cart-address">
+              {/* <h3>Select a Shipping Address</h3> */}
+              {addressDetails.length > 0 ? (
+                <ul>
+                  {addressDetails.map((address) => (
+                    <li
+                      className={`addr-list ${
+                        selectedAddress === address.address_id ? "selected" : ""
+                      }`}
+                      key={address.address_id}
+                    >
                       <button
+                        style={{ float: "right" }}
+                        className="change-btn"
                         onClick={() =>
-                          updateCartItemQuantity(
-                            item.id,
-                            item.category,
-                            Math.max(item.quantity - 1, 1)
-                          )
+                          handleSelectAddressClick(address.address_id)
                         }
                       >
-                        -
+                        {isAddressSelected &&
+                        selectedAddress === address.address_id
+                          ? "Change"
+                          : "Confirm This Address"}
                       </button>
-                      <span>{item.quantity}</span>
-                      <button
-                        onClick={() =>
-                          updateCartItemQuantity(
-                            item.id,
-                            item.category,
-                            item.quantity + 1
-                          )
-                        }
-                      >
-                        +
-                      </button>
-                      <FaTrash
-                        className="cart-remove-btn"
-                        onClick={() => removeFromCart(item.id, item.category)}
+                      <strong>Delivery to :</strong>
+                      <label>
+                        <span style={{ fontSize: "15px", marginTop: "5px" }}>
+                          {" "}
+                          {address.name}, {address.street}, {address.city},{" "}
+                          {address.state}, {address.country},{" "}
+                          {address.postal_code}, {address.phone}
+                        </span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div>
+                  <p> Please add one address during checkout. </p>
+                  <a href="/Useraddress">
+                    <button className="change-btn">Add Address</button>
+                  </a>
+                </div>
+              )}
+            </div>
+            <div className="cart-product-card">
+              <ul className="cart-list">
+                {cartItems.length === 0 ? (
+                  <li className="empty-cart-message">
+                    <p>Your cart is empty</p>
+                    <a href="/">
+                      <button className="change-btn">Browse products</button>
+                    </a>
+                  </li>
+                ) : (
+                  cartItems.map((item) => (
+                    <li
+                      key={item.id}
+                      className="cart-product d-flex align-items-center"
+                    >
+                      <img
+                        src={`${ApiUrl}/uploads/${item.category}/${item.image}`}
+                        alt={item.name}
+                        loading="lazy"
+                        className="cart-product-image"
+                        name="image"
                       />
-                    </div>
-                    <p>₹{item.price * item.quantity}</p>
-                  </div>
-                </li>
-              ))}
-            </ul></div>
+                      <div className="cart-product-details">
+                        <p className="cart-product-name">{item.name}</p>
+                        <p className="cart-product-description">
+                          {item.description}
+                        </p>
+                      </div>
+                      <div className="cart-product-price">
+                        <div className="cart-quantity-controls">
+                          <button
+                            onClick={() =>
+                              updateCartItemQuantity(
+                                item.id,
+                                item.category,
+                                Math.max(item.quantity - 1, 1)
+                              )
+                            }
+                          >
+                            -
+                          </button>
+                          <span>{item.quantity}</span>
+                          <button
+                            onClick={() =>
+                              updateCartItemQuantity(
+                                item.id,
+                                item.category,
+                                item.quantity + 1
+                              )
+                            }
+                          >
+                            +
+                          </button>
+                          <FaTrash
+                            className="cart-remove-btn"
+                            onClick={() =>
+                              removeFromCart(item.id, item.category)
+                            }
+                          />
+                        </div>
+                        <p>₹{item.price * item.quantity}</p>
+                      </div>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
           </div>
 
           <div className="cart-summary">
-      
             <div className="summary-item">
               <span>Price ({getTotalItemsCount()} items)</span>
               <span>₹{calculateTotalPrice()}</span>
@@ -517,48 +535,61 @@ const handlePlaceOrder = async () => {
             </button>
 
             {isModalOpen && (
-  <div className="modal4-overlay">
-    <div className="modal4-content">
-      <h3>Select a Shipping Address</h3>
-      <button onClick={handleCloseModal} className="modal4-close-btn">
-        &times;
-      </button>
-      {addresses.length > 0 ? (
-        <ul className="address-list">
-          {addresses.map((address) => (
-            <li key={address.address_id} className="address-item">
-              <label>
-                <input
-                  type="radio"
-                  name="selectedAddress"
-                  value={address.address_id}
-                  checked={selectedAddress === address.address_id}
-                  onChange={() => setSelectedAddress(address.address_id)}
-                />
-                {address.name}, {address.street}, {address.city}, {address.state}, {address.postal_code}, {address.country}, {address.phone}
-              </label>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No addresses found. Please add one during checkout.</p>
-      )}
-      <div style={{display:'flex',}}>
-      <button onClick={handleConfirm} className="modal4-confirm-btn">
-        Confirm Address
-      </button>
-      <a style={{textDecoration:'none'}} href="/Useraddress">
-            <button className="modal4-confirm-btn" >Add new address</button>
-          </a></div>
-    </div>
-  </div>
-)}
+              <div className="modal4-overlay">
+                <div className="modal4-content">
+                  <h3>Select a Shipping Address</h3>
+                  <button
+                    onClick={handleCloseModal}
+                    className="modal4-close-btn"
+                  >
+                    &times;
+                  </button>
+                  {addresses.length > 0 ? (
+                    <ul className="address-list">
+                      {addresses.map((address) => (
+                        <li key={address.address_id} className="address-item">
+                          <label>
+                            <input
+                              type="radio"
+                              name="selectedAddress"
+                              value={address.address_id}
+                              checked={selectedAddress === address.address_id}
+                              onChange={() =>
+                                setSelectedAddress(address.address_id)
+                              }
+                            />
+                            {address.name}, {address.street}, {address.city},{" "}
+                            {address.state}, {address.postal_code},{" "}
+                            {address.country}, {address.phone}
+                          </label>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No addresses found. Please add one during checkout.</p>
+                  )}
+                  <div style={{ display: "flex" }}>
+                    <button
+                      onClick={handleConfirm}
+                      className="modal4-confirm-btn"
+                    >
+                      Confirm Address
+                    </button>
+                    <a style={{ textDecoration: "none" }} href="/Useraddress">
+                      <button className="modal4-confirm-btn">
+                        Add new address
+                      </button>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Address Section */}
         </div>
-        
-      </div><Footer />
+      </div>
+      <Footer />
     </>
   );
 };

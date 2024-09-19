@@ -4,7 +4,7 @@ import { ApiUrl } from './ApiUrl';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons
 import logo from './img/logo3.png';
 
-const ForgotPasswordPage = () => {
+const ChangePasswordPage = () => {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -169,4 +169,4 @@ const styles = {
   },
 };
 
-export default ForgotPasswordPage;
+export default ChangePasswordPage;

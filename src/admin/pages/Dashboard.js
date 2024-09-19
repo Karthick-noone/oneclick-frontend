@@ -200,20 +200,21 @@ const Dashboard = () => {
               <div className="chart-placeholder">Loading...</div>
             )}
           </div>
-          <div className="chart small-chart">
-            <h2>Category Distribution</h2>
-            {pieData ? (
-              <Pie
-                data={pieData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                }}
-              />
-            ) : (
-              <div className="chart-placeholder">Loading...</div>
-            )}
-          </div>
+          <div className="chart small-chart pie-chart-container">
+  <h2>Category Distribution</h2>
+  {pieData ? (
+    <Pie
+      data={pieData}
+      options={{
+        responsive: true,
+        maintainAspectRatio: false,
+      }}
+    />
+  ) : (
+    <div className="chart-placeholder">Loading...</div>
+  )}
+</div>
+
         </div>
       </div>
     </div>

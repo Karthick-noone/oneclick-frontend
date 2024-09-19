@@ -10,13 +10,22 @@ const CareersForm = () => {
     phone: '',
     position: '',
     startDate: '',
-    resumeLink: ''
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+  const [resumeFile, setResumeFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setResumeFile(file); // Update the state with the selected file
+
+    setErrors({
+      ...errors,
+      resumeFile: '',  // Clear the error message related to the file input
+  });
+    
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -30,13 +39,13 @@ const CareersForm = () => {
     }
     if (!formData.phone) {
       newErrors.phone = 'Phone number is required.';
-    } else if (!/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = 'Phone number must be 10 digits.';
+    } else if (!/^[6-9]\d{9}$/.test(formData.phone)) {
+      newErrors.phone = 'Phone number must be 10 digits starting with 6-9.';
     }
     if (!formData.position) newErrors.position = 'Position is required.';
     if (!formData.startDate) newErrors.startDate = 'Start date is required.';
-    if (!formData.resumeLink) newErrors.resumeLink = 'Resume link is required.';
-    
+    if (!resumeFile) newErrors.resumeFile = 'Resume file is required.';
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -66,96 +75,88 @@ const CareersForm = () => {
       // Handle other inputs
       setFormData({ ...formData, [name]: value });
     }
+    setErrors({
+      ...errors,
+      [name]: '',  // Clear the specific error message for the field being changed
+  });
   };
-  
-
-  
+ 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-  
+
     if (validateForm()) {
-      const { firstName, lastName, ...rest } = formData;
-      const formDataWithName = {
-        ...rest,
-        name: `${firstName} ${lastName}`, // Combine names
-      };
-  
-      fetch(`${ApiUrl}/submit-careers-form`, { // Update with your server endpoint
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formDataWithName),
-      })
+        const formDataToSend = new FormData();
+
+        // Combine firstName and lastName into a single name variable
+        const fullName = `${formData.firstName} ${formData.lastName}`;
+        
+        // Add combined name and other fields to FormData
+        formDataToSend.append('name', fullName);
+        formDataToSend.append('email', formData.email);
+        formDataToSend.append('phone', formData.phone);
+        formDataToSend.append('position', formData.position);
+        formDataToSend.append('startDate', formData.startDate);
+
+        // Add the resume file to FormData
+        if (resumeFile) {
+            formDataToSend.append('resume', resumeFile);
+        }
+
+        // Send data via fetch
+        fetch(`${ApiUrl}/submit-careers-form`, {
+            method: 'POST',
+            body: formDataToSend,
+        })
         .then((response) => {
-          if (response.ok) {
-            setFormData({
-              firstName: '',
-              lastName: '',
-              email: '',
-              phone: '',
-              position: '',
-              startDate: '',
-              resumeLink: ''
-            });
-            setErrors({});
-            Swal.fire({
-              title: 'Success!',
-              text: 'Form submitted successfully!',
-              icon: 'success',
-              confirmButtonText: 'OK',
-            });
-          } else {
-            return response.json().then((data) => {
-              if (data.message === 'Email already exists.') {
-                Swal.fire({
-                  title: 'Error!',
-                  text: 'The email you provided is already registered. Please use a different email.',
-                  icon: 'error',
-                  confirmButtonText: 'OK',
+            if (response.ok) {
+                Swal.fire('Success!', 'Form submitted successfully!', 'success');
+                
+                // Clear the form data and resume file
+                setFormData({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    phone: '',
+                    position: '',
+                    startDate: ''
                 });
+                document.querySelector('input[type="file"]').value = '';
               } else {
-                throw new Error(data.message || 'Failed to submit form');
-              }
-            });
-          }
+                return response.json().then((data) => {
+                    Swal.fire('Error!', data.message || 'Failed to submit the form.', 'error');
+                });
+            }
         })
         .catch((error) => {
-          console.error('Error submitting form:', error);
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to submit form. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK',
-          });
+            Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
         })
         .finally(() => {
-          setIsSubmitting(false);
+            setIsSubmitting(false);
         });
     } else {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
     }
-  };
-  
+};
+
+
 
   const getTodayDate = () => {
     const today = new Date();
-    const day = today.getDate();
-    const month = today.getMonth() + 1; // Months are zero-based
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
     const year = today.getFullYear();
-    return `${year}-${month < 10 ? `0${month}` : month}-${day < 10 ? `0${day}` : day}`;
+    return `${year}-${month}-${day}`;
   };
-  
+
   const getMaxDate = () => {
     const today = new Date();
-    today.setMonth(today.getMonth() + 4); // Add 4 months
-    const day = today.getDate();
-    const month = today.getMonth() + 1; // Months are zero-based
+    today.setMonth(today.getMonth() + 4);
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
     const year = today.getFullYear();
-    return `${year}-${month < 10 ? `0${month}` : month}-${day < 10 ? `0${day}` : day}`;
+    return `${year}-${month}-${day}`;
   };
-  
 
   const todayDate = getTodayDate();
   const maxDate = getMaxDate();
@@ -163,7 +164,9 @@ const CareersForm = () => {
   return (
     <div style={formStyles.container}>
       <h2 style={formStyles.title}>Careers</h2>
-      <p style={formStyles.description}>Check out our job postings & opportunities waiting for you</p>
+      <p style={formStyles.description}>
+        Check out our job postings & opportunities waiting for you
+      </p>
       <form onSubmit={handleSubmit} style={formStyles.form}>
         <div style={formStyles.inputRow}>
           <label style={formStyles.label}>
@@ -223,11 +226,11 @@ const CareersForm = () => {
               style={formStyles.select}
             >
               <option value="">Select Position</option>
-              <option value="developer">In-store Sales</option>
-              <option value="designer">Store Leadership</option>
-              <option value="manager">In-store Operations</option>
-              <option value="manager">Warehouse & Logistics</option>
-              <option value="manager">eCommerce</option>
+              <option value="inStoreSales">In-store Sales</option>
+              <option value="storeLeadership">Store Leadership</option>
+              <option value="inStoreOperations">In-store Operations</option>
+              <option value="warehouseLogistics">Warehouse & Logistics</option>
+              <option value="eCommerce">eCommerce</option>
             </select>
             {errors.position && <p style={formStyles.error}>{errors.position}</p>}
           </label>
@@ -236,9 +239,9 @@ const CareersForm = () => {
             <input
               type="date"
               name="startDate"
-              value={formData.startDate}
               min={todayDate}
               max={maxDate}
+              value={formData.startDate}
               onChange={handleChange}
               style={formStyles.input}
             />
@@ -247,33 +250,26 @@ const CareersForm = () => {
         </div>
         <div style={formStyles.inputRow}>
           <label style={formStyles.label}>
-            Link to Resume
+            Upload Resume (PDF or Word)
             <input
-              type="url"
-              name="resumeLink"
-              value={formData.resumeLink}
-              onChange={handleChange}
+              type="file"
+              name="resume"
+              accept=".pdf,.doc,.docx"
+              onChange={handleFileChange}
               style={formStyles.input}
-              placeholder="Enter URL"
             />
-            {errors.resumeLink && <p style={formStyles.error}>{errors.resumeLink}</p>}
+            {errors.resumeFile && <p style={formStyles.error}>{errors.resumeFile}</p>}
           </label>
-        
         </div>
-        <center><button
-  type="submit"
-  style={{
-    ...formStyles.button,
-    ...(isHovered ? formStyles.buttonHover : {}),
-    ...(isFocused ? formStyles.buttonFocus : {}),
-  }}
-  onMouseEnter={() => setIsHovered(true)}
-  onMouseLeave={() => setIsHovered(false)}
-  onFocus={() => setIsFocused(true)}
-  onBlur={() => setIsFocused(false)}
->
-  Submit
-</button></center>
+        <center>
+          <button
+            type="submit"
+            style={formStyles.button}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
+        </center>
       </form>
     </div>
   );
@@ -346,7 +342,7 @@ const formStyles = {
     marginTop: '10px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Shadow effect
     outline: 'none',
-    width:'200px'
+    width:'200px',
   },
   buttonHover: {
     backgroundColor: '#0056b3', // Darker blue on hover

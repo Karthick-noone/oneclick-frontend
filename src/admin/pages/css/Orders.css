@@ -1,154 +1,326 @@
-/* Assuming that your sidebar and top bar are positioned and styled globally */
+/* General Styles */
 .orders-page {
-    margin-left: 250px; /* Adjust according to the width of the sidebar */
-    margin-top: 60px;   /* Adjust according to the height of the top bar */
-    padding: 20px;
-    overflow-x: auto; /* Add horizontal scrolling to the page if needed */
-  }
-  
-  .orders-header {
-    margin-bottom: 20px;
-  }
-  .orders-page-title{
+  margin-left: 250px; /* Adjust according to the width of the sidebar */
+  margin-top: 60px;   /* Adjust according to the height of the top bar */
+  padding: 20px;
+  overflow-x: auto; /* Add horizontal scrolling to the page if needed */
+  background-color: #f9f9f9; /* Light background for better contrast */
+}
 
-    text-align: center;
-    margin-bottom: 20px;
-    color: #2c3e50;
-    font-size: 24px;
+@media (max-width: 1024px) {
+  .orders-page {
+    margin-left: 0; /* Adjust for smaller screens */
   }
-  .table-wrapper {
-    overflow-x: auto; /* Add horizontal scrolling to the table container */
-  }
-  
-  .orders-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: white;
-  }
-  
+}
+
+.orders-header {
+  margin-bottom: 20px;
+}
+
+.orders-page-title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  font-size: 24px;
+}
+
+.table-wrapper {
+  overflow-x: auto; /* Add horizontal scrolling to the table container */
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.orders-table th {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.orders-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.orders-table tbody tr:hover {
+  background-color: #f0f0f0; /* Highlight row on hover */
+}
+
+.orders-table .status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  text-transform: capitalize;
+  /* color: #fff; */
+}
+
+.orders-table .status.processing {
+  background-color: #ff9800;
+}
+
+.orders-table .status.shipped {
+  background-color: #3f51b5;
+}
+
+.orders-table .status.delivered {
+  background-color: #4caf50;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn-view {
+  background-color: #2196f3;
+  color: #fff;
+}
+
+.btn-edit {
+  background-color: #ff9800;
+  color: #fff;
+}
+
+.btn-delete {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.btn-view:hover {
+  background-color: #1976d2;
+}
+
+.btn-edit:hover {
+  background-color: #f57c00;
+}
+
+.btn-delete:hover {
+  background-color: #c62828;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
   .orders-table th,
   .orders-table td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #ddd;
-  }
-  
-  .orders-table th {
-    background-color: #f2f2f2;
-  }
-  
-  .orders-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  .orders-table .status {
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: bold;
-  }
-  
-  .orders-table .status.processing {
-    background-color: #ff9800;
-    color: #fff;
-  }
-  
-  .orders-table .status.shipped {
-    background-color: #3f51b5;
-    color: #fff;
-  }
-  
-  .orders-table .status.delivered {
-    background-color: #4caf50;
-    color: #fff;
-  }
-  
-  .btn {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    margin-right: 5px;
-    font-size: 14px; /* Adjust font size for better visibility */
-  }
-  
-  .btn-view {
-    background-color: #2196f3;
-    color: #fff;
-  }
-  
-  .btn-edit {
-    background-color: #ff9800;
-    color: #fff;
-  }
-  
-  .btn-delete {
-    background-color: #f44336;
-    color: #fff;
-  }
-  
-  /* Responsive Styles */
-  @media (max-width: 768px) {
-    .orders-table th,
-    .orders-table td {
-      font-size: 12px; /* Adjust font size for smaller screens */
-      padding: 8px; /* Adjust padding for smaller screens */
-    }
-  
-    .btn {
-      font-size: 12px; /* Adjust button font size for smaller screens */
-      padding: 4px 8px; /* Adjust button padding for smaller screens */
-    }
-    .orders-page {
-        margin-left: 0px; /* Adjust according to the width of the sidebar */
-        margin-top: 60px;   /* Adjust according to the height of the top bar */
-        padding: 20px;
-        overflow-x: auto; /* Add horizontal scrolling to the page if needed */
-      }
-      
+    font-size: 12px; /* Adjust font size for smaller screens */
+    padding: 8px; /* Adjust padding for smaller screens */
   }
 
-  .pagination-controls {
-    display: flex;
-    justify-content: center;
+  .btn {
+    font-size: 12px; /* Adjust button font size for smaller screens */
+    padding: 4px 8px; /* Adjust button padding for smaller screens */
+  }
+
+  .orders-page {
+    padding: 10px;
+  }
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination-button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.pagination-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.pagination-button.active {
+  background-color: #0056b3;
+  font-weight: bold;
+}
+
+.pagination-button:disabled {
+  background-color: #d6d6d6;
+  cursor: not-allowed;
+}
+
+.pagination-button[disabled] {
+  pointer-events: none;
+}
+
+.pagination-button.ellipsis {
+  background-color: transparent;
+  border: none;
+  color: #007bff;
+  cursor: default;
+}
+
+.custom-modal10 {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px; /* Adjust width for larger content */
+  margin: auto;
+  position: relative;
+  margin-top: 90px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+  display: flex; /* Flex layout to align items */
+  flex-direction: column; /* Stack content vertically */
+  gap: 20px; /* Space between content */
+}
+
+.details-and-image10 {
+  display: flex; /* Flex layout to align details and image */
+  justify-content: space-between; /* Space between details and image */
+  align-items: center; /* Center items vertically */
+}
+
+.product-info10 {
+  flex: 1; /* Allow the details to take available space */
+  margin-right: 20px; /* Space between details and image */
+}
+
+.product-image10 {
+  width: 150px;
+  height: auto; /* Maintain aspect ratio */
+}
+
+/* Modal close button styles */
+.modal-close-button10 {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  /* margin-top: 5px; */
+  font-size: 16px;
+  width: 100px;
+}
+
+.modal-close-button10:hover {
+  background-color: #0056b3;
+}
+
+/* Modal styles */
+.custom-modal10 {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 450px;
+  margin: auto;
+  position: relative;
+  margin-top: 50px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+/* Details layout */
+.order-details10 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.details-and-image10 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.product-info10 {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.product-image10 {
+  width: 150px;
+  height: auto;
+}
+
+/* Align label and value pairs */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  font-weight: bold;
+  width: 150px; /* Adjust width as needed for alignment */
+}
+
+.info-value {
+  flex: 1;
+  text-align: left;
+  margin-left: 20px; /* Adjust margin for spacing */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .custom-modal10 {
+    max-width: 90%;
+    margin-top: 20px; /* Reduced top margin for smaller screens */
+    padding: 15px; /* Reduced padding for better fit */
+  }
+
+  .details-and-image10 {
+    flex-direction: column;
     align-items: center;
-    margin-top: 20px;
   }
-  
-  .pagination-button {
-    background-color: #007bff;
-    border: none;
-    color: white;
-    padding: 10px 15px;
-    margin: 0 5px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 14px;
-    transition: background-color 0.3s, transform 0.3s;
+
+  .product-info10 {
+    flex: 1;
+    margin-right: 10px;
   }
-  
-  .pagination-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
+
+  .product-image10 {
+    width: 100px; /* Adjusted image width for smaller screens */
+    margin-bottom: 15px; /* Added margin for spacing */
   }
-  
-  .pagination-button.active {
-    background-color: #0056b3;
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .info-label {
     font-weight: bold;
+  width: 150px; /* Adjust width as needed for alignment */
   }
-  
-  .pagination-button:disabled {
-    background-color: #d6d6d6;
-    cursor: not-allowed;
+
+  .info-value {
+    margin-left: 0; /* Reset margin for smaller screens */
+    padding-left: 20px; /* Added padding for spacing */
   }
-  
-  .pagination-button[disabled] {
-    pointer-events: none;
-  }
-  
-  /* Additional styling for ellipses */
-  .pagination-button.ellipsis {
-    background-color: transparent;
-    border: none;
-    color: #007bff;
-    cursor: default;
-  }
+}
+.statuss{
+  color: #2c2c2e;
+}

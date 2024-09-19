@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './css/Slidebar.css'; // Ensure you create this CSS file
-import { FaHome, FaBox, FaTags, FaUser,FaBars, FaChartLine, FaCog, FaSignOutAlt, FaChevronDown, FaChevronRight, FaEdit } from 'react-icons/fa';
+import { FaHome,FaBriefcase, FaBox, FaTags, FaUser,FaBars, FaChartLine, FaCog, FaSignOutAlt, FaChevronDown, FaChevronRight, FaEdit } from 'react-icons/fa';
 import logoImage from './img/oneclick.png'; // Replace with the path to your image
 import { useNavigate } from 'react-router-dom';
 import logo2 from './img/logo3.png';
@@ -10,10 +10,10 @@ const Slidebar = () => {
   const [isProductsOpen, setIsProductsOpen] = useState(false); // State to handle Products submenu
   const [isEditPageOpen, setIsEditPageOpen] = useState(false); // State to handle Edit Pages submenu
 
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    navigate("/AdminLogin");
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("isLoggedIn");
+  //   navigate("/AdminLogin");
+  // };
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -112,8 +112,9 @@ const Slidebar = () => {
           </li>
           <li><a href="/Admin/customers"><FaUser className="menu-icon" /> {isOpen && 'Customers'}</a></li>
           <li><a href="/Admin/reports"><FaChartLine className="menu-icon" /> {isOpen && 'Reports'}</a></li>
-          <li><a href="#"><FaCog className="menu-icon" /> {isOpen && 'Settings'}</a></li>
-          <li onClick={handleLogout}><a href="#"><FaSignOutAlt  className="menu-icon" /> {isOpen && 'Logout'}</a></li>
+          <li><a href="/Admin/CareersTable"><FaBriefcase className="menu-icon" /> {isOpen && 'Careers'}</a></li>
+          {/* <li><a href="#"><FaCog className="menu-icon" /> {isOpen && 'Settings'}</a></li> */}
+          {/* <li onClick={handleLogout}><a href="#"><FaSignOutAlt  className="menu-icon" /> {isOpen && 'Logout'}</a></li> */}
         </ul>
       </div>
     </>

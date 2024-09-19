@@ -50,7 +50,7 @@ const TermsAndConditions = () => {
             great place for you to tell a story and let your users know a little
             more about you.
           </p>
-          <h4 style={styles.subtitle}>Payment Methods</h4>
+          <h4  id="PaymentMethod" style={styles.subtitle}>Payment Methods</h4>
           <ul style={styles.list}>
             <li style={styles.listItem}>- Credit / Debit Cards</li>
             <li style={styles.listItem}>- PAYPAL</li>

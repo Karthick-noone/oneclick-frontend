@@ -462,23 +462,17 @@
   outline: none; /* Remove outline on focus */
 }
 
-/* Styling for the button */
-.search-box button {
-  border: none; /* Remove default border */
-  background-color: #007bff; /* Button background color */
-  color: #fff; /* Button text color */
-  padding: 10px 15px; /* Add padding for spacing */
+/* Styling for the search icon */
+.search-box .search-icon {
+  margin-right: 12px;
   cursor: pointer; /* Pointer cursor on hover */
-  font-size: 1rem; /* Font size */
-  display: flex; /* Center icon */
-  align-items: center; /* Center icon vertically */
-  justify-content: center; /* Center icon horizontally */
+  font-size: 1.2rem; /* Adjust size as needed */
 }
 
 /* Suggestions dropdown container */
 .suggestions-dropdown {
   position: absolute; /* Position dropdown relative to search box */
-  top: 100%; /* Position it below the search box */
+  top: 100%; /* Position it directly below the search box */
   left: 0;
   width: 100%;
   border: 1px solid #ddd; /* Border for the dropdown */
@@ -495,6 +489,8 @@
   padding: 10px 15px; /* Padding for items */
   cursor: pointer; /* Pointer cursor on hover */
   list-style: none; /* Remove default list style */
+  font-size: 0.875rem; /* Font size for suggestions */
+  transition: background-color 0.3s; /* Smooth background color transition */
 }
 
 /* Hover state for suggestion items */
@@ -503,8 +499,18 @@
 }
 
 /* Error message styling */
-.error-message {
+.no-suggestions {
+  padding: 10px 15px; /* Padding for error message */
   color: red; /* Red text color for errors */
+  font-size: 0.875rem; /* Slightly smaller font size */
+  text-align: center; /* Center text alignment */
+  list-style: none; /* Remove default list style */
+  background-color: #fff; /* Background color for error message */
+}
+
+/* Error message styling */
+.error-message {
+  color: rgb(53, 49, 49); /* Red text color for errors */
   font-size: 0.875rem; /* Slightly smaller font size */
   margin-top: 10px; /* Space above the error message */
 }

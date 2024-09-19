@@ -291,8 +291,31 @@ const Modal = ({ isOpen, onClose, /* category ,*/ product, onNext, onPrev }) => 
         </div>
         <p className="modal-description">{product.prod_features}</p>
         <p className="modal-price">${product.prod_price}</p>
-        <button className="add-to-cart" onClick={(event) => handleAddToCart(product, event)}
-        >Add to Cart</button>
+        {product.status === 'unavailable' ? (
+  <center><p style={{
+    color: 'red',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    textAlign: 'center',
+    marginTop: '10px',
+    padding: '10px',
+    border: '2px solid red',
+    borderRadius: '5px',
+    backgroundColor: '#fdd',
+    width:'200px'
+  }} className="out-of-stock">
+    Out of Stock
+  </p></center>
+) : (
+  <button
+  
+    onClick={(event) => handleAddToCart(product, event)}
+    className="add-to-cart"
+  >
+    Add to Cart
+  </button>
+)}
+
       </div>
       {/* <ToastContainer /> */}
     </div>

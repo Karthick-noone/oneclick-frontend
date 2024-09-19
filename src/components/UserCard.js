@@ -1,6 +1,6 @@
 import React from 'react';
 import './css/UserCard.css'; // Add styles for dropdown
-import { FaAddressBook, FaCalendarCheck, FaUser, FaBox, FaHeart,  FaPowerOff } from 'react-icons/fa';
+import { FaAddressBook, FaCalendarCheck, FaUser, FaBox, FaHeart,  FaPowerOff, FaShoppingBag } from 'react-icons/fa';
 
 const UserCard = ({ onLogout }) => {
   return (
@@ -10,7 +10,7 @@ const UserCard = ({ onLogout }) => {
         {/* <a href="/my-subscription"><FaCalendarCheck /> My Subscription</a> */}
         <a href="/MyAccount"><FaUser /> My Account</a>
         <a href="/MyOrders"><FaBox /> My Orders</a>
-        {/* <a href="/my-wishlist"><FaHeart /> My Wishlist</a> */}
+        <a href="/Cart"><FaShoppingBag/>Cart</a>
         <hr />
         <a href="#" onClick={onLogout}><FaPowerOff /> Logout</a>
       </div>

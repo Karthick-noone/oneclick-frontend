@@ -35,7 +35,7 @@ const Footer = () => {
                 <h4><FaGavel /> Policy</h4>
                 <a href="/ShippingAndReturns"><p>Shipping & Returns</p></a>
                 <a href="/TermsAndConditions"><p>Terms & Conditions</p></a>
-                <a href="TermsAndConditions#PaymentMethod"><p>Payment Methods</p></a>
+                <a href="/TermsAndConditions#PaymentMethod"><p>Payment Methods</p></a>
                 <a href="/HelpCenter"><p>FAQ</p></a>
                 <a href="/Adminlogin"><p style={{color:'black',textDecoration:'none'}}>ADMIN</p></a>
             </div>

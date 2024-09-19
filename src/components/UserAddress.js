@@ -4,6 +4,7 @@ import Header2 from './Header2';
 import { ApiUrl } from './ApiUrl';
 import Swal from 'sweetalert2';
 import Footer from './footer';
+import { useNavigate } from 'react-router-dom';
 
 const AddressPage = () => {
   const [userId, setUserId] = useState(null);
@@ -18,7 +19,23 @@ const AddressPage = () => {
   });
   const [submittedAddresses, setSubmittedAddresses] = useState([]);
   const [editingAddress, setEditingAddress] = useState(null);
+  const [isSelecting, setIsSelecting] = useState(false); // Toggle selection mode
+  const [selectedAddresses, setSelectedAddresses] = useState(new Set()); // Store selected addresses
+  const [selectAllChecked, setSelectAllChecked] = useState(false); // State for "Select All" checkbox
 
+  const handleSelectAllChange = () => {
+    if (selectAllChecked) {
+      // Deselect all
+      setSelectedAddresses(new Set());
+    } else {
+      // Select all
+      setSelectedAddresses(new Set(submittedAddresses.map(addr => addr.address_id)));
+    }
+    setSelectAllChecked(!selectAllChecked); // Toggle "Select All" checkbox state
+  };
+
+  const navigate =useNavigate();
+  
   useEffect(() => {
     const storedUserId = localStorage.getItem('user_id');
     if (storedUserId) {
@@ -195,7 +212,14 @@ const handleSubmit = async (e) => {
   }
 
   if (!userId) {
-    alert('User ID is missing');
+    // alert('User ID is missing');
+    // Swal.fire({
+    //   title: 'Login Needed',
+    //   text: 'You are not logged in',
+    //   icon: 'error',
+    //   confirmButtonText: 'OK'
+    // });
+    navigate('/login')
     return;
   }
 
@@ -214,6 +238,8 @@ const handleSubmit = async (e) => {
         text: 'Address added successfully',
         icon: 'success',
         confirmButtonText: 'OK'
+      }).then(() => {
+        window.location.reload();
       });
 
       setSubmittedAddresses([ { ...address, address_id: Date.now() }, ...submittedAddresses,]); // Simulate address with ID
@@ -292,9 +318,9 @@ const handleUpdate = async (e) => {
   }
 };
 
-const handleDeleteClick = async (addr) => {
+ const handleDeleteClick = async (addr) => {
     console.log('Address to delete:', addr); // Debugging line
-  
+
     if (!addr || !addr.address_id) {
       Swal.fire({
         title: 'Error',
@@ -304,7 +330,7 @@ const handleDeleteClick = async (addr) => {
       });
       return;
     }
-  
+
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to delete this address?',
@@ -314,11 +340,11 @@ const handleDeleteClick = async (addr) => {
       cancelButtonText: 'No, keep it',
       reverseButtons: true, // This will reverse the buttons for a better UX
     });
-  
+
     if (!result.isConfirmed) {
       return; // If the user cancels, simply return without proceeding
     }
-  
+
     try {
       const response = await fetch(`${ApiUrl}/deleteuseraddress/${addr.address_id}`, {
         method: 'DELETE',
@@ -326,7 +352,7 @@ const handleDeleteClick = async (addr) => {
           'Content-Type': 'application/json',
         },
       });
-  
+
       if (response.ok) {
         Swal.fire({
           title: 'Deleted!',
@@ -334,7 +360,7 @@ const handleDeleteClick = async (addr) => {
           icon: 'success',
           confirmButtonText: 'OK',
         });
-  
+
         // Update the state to reflect the deletion
         setSubmittedAddresses(submittedAddresses.filter(address => address.address_id !== addr.address_id));
       } else {
@@ -356,9 +382,107 @@ const handleDeleteClick = async (addr) => {
       });
     }
   };
+
+
+  // const handleSelectModeToggle = () => {
+  //   setIsSelecting(!isSelecting);
+  //   if (isSelecting) {
+  //     setSelectedAddresses(new Set()); // Clear selection when exiting select mode
+  //   }
+  // };
+
+  const handleCheckboxChange = (addressId) => {
+    setSelectedAddresses(prev => {
+      const newSelected = new Set(prev);
+      if (newSelected.has(addressId)) {
+        newSelected.delete(addressId);
+      } else {
+        newSelected.add(addressId);
+      }
+      return newSelected;
+    });
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedAddresses.size === 0) {
+      Swal.fire({
+        title: 'No Selection',
+        text: 'No addresses selected for deletion.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+      });
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete the selected addresses?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete them!',
+      cancelButtonText: 'No, keep them',
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) {
+      return; // If the user cancels, simply return without proceeding
+    }
+
+    try {
+      // Perform batch delete
+      const responses = await Promise.all([...selectedAddresses].map(addressId =>
+        fetch(`${ApiUrl}/deleteuseraddress/${addressId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      ));
+
+      const allResponsesOk = responses.every(response => response.ok);
+
+      if (allResponsesOk) {
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Selected addresses deleted successfully',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
+
+        // Update the state to reflect the deletion
+        setSubmittedAddresses(submittedAddresses.filter(address => !selectedAddresses.has(address.address_id)));
+        setSelectedAddresses(new Set()); // Clear selection
+        setIsSelecting(false); // Exit selection mode
+        setSelectAllChecked(false); // Uncheck "Select All" checkbox
+      } else {
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to delete some addresses',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire({
+        title: 'Error',
+        text: 'An error occurred while deleting the addresses',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+    }
+  };
   
   // In your component's render method or return statement
   
+  const handleSelectModeToggle = () => {
+    setIsSelecting(!isSelecting);
+    
+    if (isSelecting) {
+      setSelectedAddresses(new Set()); // Clear selection when exiting select mode
+      setSelectAllChecked(false); // Clear the "Select All" checkbox
+    }
+  };
   
   return (
     <>
@@ -464,31 +588,67 @@ const handleDeleteClick = async (addr) => {
 </form>
         </div>
 
-        <div className="submitted-addresses-container">
-          <h2>Submitted Addresses:</h2>
-          {submittedAddresses.length > 0 ? (
-            submittedAddresses.map((addr) => (
-              <div className="address-card" key={addr.id}>
-                <p><strong>Name:</strong> {addr.name}</p>
-                <p><strong>Street Address:</strong> {addr.street}</p>
-                <p><strong>City:</strong> {addr.city}</p>
-                <p><strong>State:</strong> {addr.state}</p>
-                <p><strong>Postal Code:</strong> {addr.postal_code}</p>
-                <p><strong>Country:</strong> {addr.country}</p>
-                <p><strong>Phone Number:</strong> {addr.phone}</p>
-                
-                <div className="button-container">
-                <button className='adr-btn'  onClick={() => handleEditClick(addr)}>Edit</button>
-                <button className='adr-btn' onClick={() => handleDeleteClick(addr)}>Delete</button>
-                {/* <button className='adr-btn' >Use this address</button> */}
+     <div className="submitted-addresses-container">
+     {submittedAddresses.length > 0 && (
+        <h2 className="headerrr-container">
+          Submitted Addresses:
+          <div className="headerrr-controls">
+            {submittedAddresses.length > 0 && (
+              <button className="select-toggle-btn" onClick={handleSelectModeToggle}>
+                {isSelecting ? 'Cancel' : 'Select Multiple'}
+              </button>
+            )}
+            {isSelecting && (
+              <input
+                type="checkbox"
+                checked={selectAllChecked}
+                onChange={handleSelectAllChange}
+                className="select-all-checkbox"
+              />
+            )}
+          </div>
+        </h2>
+      )}
+   
+      {submittedAddresses.length > 0 ? (
+        <div>
+          {submittedAddresses.map((addr) => (
+            <div className="address-card" key={addr.address_id}>
+              <p><strong>Name:</strong> {addr.name}</p>
+              <p><strong>Street Address:</strong> {addr.street}</p>
+              <p><strong>City:</strong> {addr.city}</p>
+              <p><strong>State:</strong> {addr.state}</p>
+              <p><strong>Postal Code:</strong> {addr.postal_code}</p>
+              <p><strong>Country:</strong> {addr.country}</p>
+              <p><strong>Phone Number:</strong> {addr.phone}</p>
 
-        </div>
+              <div className="button-container">
+                {isSelecting && (
+                  <input
+                    type="checkbox"
+                    checked={selectedAddresses.has(addr.address_id)}
+                    onChange={() => handleCheckboxChange(addr.address_id)}
+                  />
+                )}
+                {!isSelecting && (
+                  <>
+                    <button className='adr-btn' onClick={() => handleEditClick(addr)}>Edit</button>
+                    <button className='adr-btn' onClick={() => handleDeleteClick(addr)}>Delete</button>
+                  </>
+                )}
               </div>
-            ))
-          ) : (
-            <p>No addresses added yet.</p>
-          )}
+            </div>
+          ))}
         </div>
+      ) : (
+        <p>No addresses added yet.</p>
+      )}
+      {isSelecting && (
+        <button className="delete-selected-btn" onClick={handleDeleteSelected}>
+          Delete Selected Addresses
+        </button>
+      )}
+    </div>
 
         {editingAddress && (
           <div className="model">

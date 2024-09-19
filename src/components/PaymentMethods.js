@@ -26,7 +26,7 @@ const PaymentMethods = () => {
                 <img src={upi} alt="UPI" />
             </div>
             <div className="copyright">
-                <p>&copy; {new Date().getFullYear()} by One CLick. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} by One Click. All rights reserved.</p>
             </div>
         </div>
     );

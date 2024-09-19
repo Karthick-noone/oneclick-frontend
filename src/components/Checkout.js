@@ -7,7 +7,7 @@ import Header2 from "./Header2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaTrash } from "react-icons/fa";
+import { FaTicketAlt, FaTrash, FaCheck } from "react-icons/fa";
 // import '@fortawesome/fontawesome-free/css/all.min.css';
 // import { FaCashRegister, FaCreditCard, FaUniversity, FaPaypal } from 'react-icons/fa';
 import Swal from "sweetalert2";
@@ -25,9 +25,17 @@ const Checkout = () => {
   const [addressDetails, setAddressDetails] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [defaultAddress, setDefaultAddress] = useState(null);   // Initially selected address
+  const [defaultAddress, setDefaultAddress] = useState(null); // Initially selected address
   const [isAddressSelected, setIsAddressSelected] = useState(false);
+  const [username, setUsername] = useState("");
 
+  useEffect(() => {
+    // Fetch the username from local storage when the component mounts
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
 
   // Calculate total items
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -69,18 +77,18 @@ const Checkout = () => {
 
   const handleConfirm = async () => {
     fetchAddress(); // Fetch the latest address data when the Confirm button is clicked
-  
+
     if (selectedAddress) {
       try {
         const response = await axios.post(`${ApiUrl}/update-current-address`, {
           userId: userId, // Ensure userId is set correctly
           addressId: selectedAddress,
         });
-  
+
         if (response.status === 200) {
           // Update the default address to the newly selected address
           setDefaultAddress(selectedAddress);
-  
+
           toast.success("Address updated successfully", {
             position: "top-right",
             autoClose: 2000,
@@ -107,7 +115,7 @@ const Checkout = () => {
         });
       }
     } else {
-      alert('Please select an address.');
+      alert("Please select an address.");
     }
   };
   // Function to open the modal
@@ -214,34 +222,34 @@ const Checkout = () => {
   const removeFromCart = async (itemId, itemCategory) => {
     // Display confirmation dialog
     const result = await Swal.fire({
-      title: 'Are you sure?',
+      title: "Are you sure?",
       text: "You won't be able to revert this!",
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, remove it!',
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, remove it!",
     });
-  
+
     if (result.isConfirmed) {
       // Proceed with removing the item from the cart
       const updatedCartItems = cartItems.filter(
         (item) => !(item.id === itemId && item.category === itemCategory)
       );
       setCartItems(updatedCartItems);
-  
+
       const storedEmail = localStorage.getItem("email");
       if (storedEmail) {
         const cartKey = `${storedEmail}-cart`;
         localStorage.setItem(cartKey, JSON.stringify(updatedCartItems));
-  
+
         try {
           const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
             email: storedEmail,
             itemId: itemId,
             itemCategory: itemCategory,
           });
-  
+
           if (response.status === 200) {
             toast.success("Item removed from cart!", {
               position: "top-right",
@@ -280,6 +288,28 @@ const Checkout = () => {
   };
 
   const handlePayment = () => {
+    if (!selectedAddress) {
+      Swal.fire({
+        icon: "error",
+        title: "No Address Selected",
+        text: "Please select a delivery address before proceeding with payment.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Cart is Empty",
+        text: "Please add items to your cart before proceeding with payment.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
     const options = {
       key: "rzp_test_kC33Z7vi53JGv8", // Replace with your Razorpay Test Key ID
       key_secret: "8veH77CBoEMbvEKcijS5vCQh", // Replace with your Razorpay Test Key ID
@@ -288,17 +318,17 @@ const Checkout = () => {
       name: "One CLick",
       description: "Order Payment",
       handler: async function (response) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Payment Successful',
-          text: `Your payment was successful. Payment ID: ${response.razorpay_payment_id}`,
-          timer: 2000,
-          showConfirmButton: false
-        });
-  
+        // Swal.fire({
+        //   icon: 'success',
+        //   title: 'Payment Successful',
+        //   text: `Your payment was successful. Payment ID: ${response.razorpay_payment_id}`,
+        //   timer: 2000,
+        //   showConfirmButton: false
+        // });
+
         try {
           await handlePlaceOrder();
-  
+
           // Swal.fire({
           //   icon: 'success',
           //   title: 'Order Placed',
@@ -307,13 +337,13 @@ const Checkout = () => {
           //   showConfirmButton: false
           // });
         } catch (error) {
-          console.error('Error while placing order after payment:', error);
+          console.error("Error while placing order after payment:", error);
           Swal.fire({
-            icon: 'error',
-            title: 'Order Error',
+            icon: "error",
+            title: "Order Error",
             text: `An error occurred while placing the order: ${error.message}`,
             timer: 2000,
-            showConfirmButton: false
+            showConfirmButton: false,
           });
         }
       },
@@ -326,120 +356,126 @@ const Checkout = () => {
         color: "#3399cc",
       },
     };
-  
+
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
   };
 
-
-
   // Assuming addressDetails is already available, you can set the initial address
-useEffect(() => {
-  if (addressDetails.length > 0 && !defaultAddress) {
-    setDefaultAddress(addressDetails[0].address_id);
-  }
-}, [addressDetails]);
+  useEffect(() => {
+    if (addressDetails.length > 0 && !defaultAddress) {
+      setDefaultAddress(addressDetails[0].address_id);
+    }
+  }, [addressDetails]);
 
+  const handlePlaceOrder = async () => {
+    console.log("handlePlaceOrder function called");
 
-const handlePlaceOrder = async () => {
-  console.log('handlePlaceOrder function called');
+    // Use the selected address if available, otherwise fall back to the default address
+    const addressToUse = selectedAddress || defaultAddress;
 
-  // Use the selected address if available, otherwise fall back to the default address
-  const addressToUse = selectedAddress || defaultAddress;
+    if (!addressToUse) {
+      console.log("No address selected or default address found");
+      Swal.fire({
+        icon: "error",
+        title: "Address Required",
+        text: "Please select a shipping address.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
-  if (!addressToUse) {
-    console.log('No address selected or default address found');
-    Swal.fire({
-      icon: 'error',
-      title: 'Address Required',
-      text: 'Please select a shipping address.',
-      timer: 2000,
-      showConfirmButton: false
-    });
-    return;
-  }
+    console.log("Selected or Default Address ID:", addressToUse);
+    console.log("Address Details:", addressDetails);
 
-  console.log('Selected or Default Address ID:', addressToUse);
-  console.log('Address Details:', addressDetails);
+    // Log all address IDs to verify the correct comparison
+    console.log(
+      "All address IDs:",
+      addressDetails.map((address) => address.address_id)
+    );
 
-  // Log all address IDs to verify the correct comparison
-  console.log('All address IDs:', addressDetails.map(address => address.address_id));
+    // Find the address details using the address ID (either default or selected)
+    const selectedAddressDetails = addressDetails.find(
+      (address) => String(address.address_id) === String(addressToUse)
+    );
 
-  // Find the address details using the address ID (either default or selected)
-  const selectedAddressDetails = addressDetails.find(
-    (address) => String(address.address_id) === String(addressToUse)
-  );
+    if (!selectedAddressDetails) {
+      console.log("Selected address details not found");
+      Swal.fire({
+        icon: "error",
+        title: "Address Not Found",
+        text: "Selected address not found.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
-  if (!selectedAddressDetails) {
-    console.log('Selected address details not found');
-    Swal.fire({
-      icon: 'error',
-      title: 'Address Not Found',
-      text: 'Selected address not found.',
-      timer: 2000,
-      showConfirmButton: false
-    });
-    return;
-  }
+    // Construct the full address string
+    const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}`;
 
-  // Construct the full address string
-  const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}`;
+    // Enrich cart items with additional details
+    const enrichedCartItems = cartItems.map((item) => ({
+      id: item.id,
+      quantity: item.quantity,
+      price: item.price,
+      name: item.name,
+      image: item.image,
+      description: item.description,
+      product_id: item.product_id,
+      category: item.category,
+    }));
 
-  // Enrich cart items with additional details
-  const enrichedCartItems = cartItems.map(item => ({
-    id: item.id,
-    quantity: item.quantity,
-    price: item.price,
-    name: item.name,
-    image: item.image,
-    description: item.description,
-    product_id: item.product_id,
-    category: item.category
-  }));
+    const orderData = {
+      user_id: userId,
+      total_amount: calculateTotalPrice(),
+      shipping_address: fullAddress,
+      address_id: addressToUse,
+      cartItems: enrichedCartItems,
+    };
 
-  
-  const orderData = {
-    user_id: userId,
-    total_amount: calculateTotalPrice(),
-    shipping_address: fullAddress,
-    address_id: addressToUse,
-    cartItems: enrichedCartItems
+    console.log("Order Data:", orderData);
+
+    try {
+      const response = await axios.post(`${ApiUrl}/place-order`, orderData);
+
+      if (response.status === 200) {
+        console.log("Order placed successfully");
+        Swal.fire({
+          icon: "success",
+          title: "Order Placed",
+          text: "Your order has been placed successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => {
+          navigate("/MyOrders");
+        });
+        // Clear cart or navigate to a confirmation page
+      } else {
+        console.log("Unexpected response status:", response.status);
+        throw new Error("Unexpected response status");
+      }
+    } catch (error) {
+      console.error(
+        "Error placing order:",
+        error.response?.data || error.message
+      );
+      Swal.fire({
+        icon: "error",
+        title: "Order Error",
+        text: `An error occurred: ${
+          error.response?.data?.message || error.message
+        }`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
   };
 
-  console.log('Order Data:', orderData);
-
-  try {
-    const response = await axios.post(`${ApiUrl}/place-order`, orderData);
-
-    if (response.status === 200) {
-      console.log('Order placed successfully');
-      Swal.fire({
-        icon: 'success',
-        title: 'Order Placed',
-        text: 'Your order has been placed successfully!',
-        timer: 2000,
-        showConfirmButton: false
-      }).then(() => {
-        navigate('/MyOrders')
-      })
-      // Clear cart or navigate to a confirmation page
-    } else {
-      console.log('Unexpected response status:', response.status);
-      throw new Error('Unexpected response status');
-    }
-  } catch (error) {
-    console.error('Error placing order:', error.response?.data || error.message);
-    Swal.fire({
-      icon: 'error',
-      title: 'Order Error',
-      text: `An error occurred: ${error.response?.data?.message || error.message}`,
-      timer: 2000,
-      showConfirmButton: false
-    });
-  }
-};
-
-
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
 
   return (
     <>
@@ -454,8 +490,11 @@ const handlePlaceOrder = async () => {
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
-             <strong>LOGIN</strong><br />
-             <span style={{fontSize:'14px'}}>Username</span>
+              <strong>LOGIN</strong> <FaCheck style={{ color: "green" }} />
+              <br />
+              <span style={{ fontSize: "14px" }}>
+                {capitalizeFirstLetter(username)}
+              </span>
             </div>{" "}
             <div className="cart-address">
               {/* <h3>Select a Shipping Address</h3> */}
@@ -475,19 +514,23 @@ const handlePlaceOrder = async () => {
                           handleSelectAddressClick(address.address_id)
                         }
                       >
-                        Change
+                        {isAddressSelected &&
+                        selectedAddress === address.address_id
+                          ? "Change"
+                          : "Confirm This Address"}
                       </button>
-                      <strong style={{fontSize:'1.0rem'}}>DELIVERY ADDRESS</strong>
+                      <strong style={{ fontSize: "1.0rem" }}>
+                        DELIVERY ADDRESS <FaCheck style={{ color: "green" }} />
+                      </strong>
 
                       <label>
-                        <span style={{fontSize:'14px',marginTop:'5px'}}>
+                        <span style={{ fontSize: "14px", marginTop: "5px" }}>
                           {" "}
-                          {address.name},  {address.street}, {address.city}, {address.state}, {" "}
-                        {address.country}, {address.postal_code}, {address.phone}
-                        </span> 
-                        
+                          {address.name}, {address.street}, {address.city},{" "}
+                          {address.state}, {address.country},{" "}
+                          {address.postal_code}, {address.phone}
+                        </span>
                       </label>
-                      
                     </li>
                   ))}
                 </ul>
@@ -503,7 +546,10 @@ const handlePlaceOrder = async () => {
             <div className="cart-product-card">
               {!isExpanded ? (
                 <div>
-                    <strong style={{fontSize:'1.0rem'}}>ORDER SUMMARY</strong><br />
+                  <strong style={{ fontSize: "1.0rem" }}>
+                    ORDER SUMMARY <FaCheck style={{ color: "green" }} />
+                  </strong>
+                  <br />
                   <p>{totalItems} items in cart</p>{" "}
                   <button
                     className="change-btn"
@@ -765,7 +811,8 @@ const handlePlaceOrder = async () => {
 
           {/* Address Section */}
         </div>
-      </div><Footer />
+      </div>
+      <Footer />
     </>
   );
 };

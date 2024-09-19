@@ -92,3 +92,22 @@
   .login-footer a:hover {
     text-decoration: underline;
   }
+
+
+  .password-wrapper {
+    position: relative;
+  }
+  
+  .password-wrapper input {
+    width: 100%;
+    padding-right: 40px; /* Adjust for eye icon space */
+  }
+  
+  .eye-icon {
+    position: absolute;
+    right: 15px;
+    top: 60%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  

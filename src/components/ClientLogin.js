@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { useNavigate } from 'react-router-dom';
 import { ApiUrl } from "./ApiUrl";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 import logo from './img/logo3.png';
 
 const LoginPage = () => {
@@ -10,6 +11,7 @@ const LoginPage = () => {
     password: "",
   });
 
+  const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -28,14 +30,14 @@ const LoginPage = () => {
       return;
     }
   
-    if (formData.password.length < 6) {
-      Swal.fire({
-        icon: "error",
-        title: "Password too short",
-        text: "Password should be at least 6 characters long.",
-      });
-      return;
-    }
+    // if (formData.password.length < 5) {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Password too short",
+    //     text: "Password should be at least 5 characters long.",
+    //   });
+    //   return;
+    // }
   
     try {
       const response = await fetch(`${ApiUrl}/login`, {
@@ -50,7 +52,6 @@ const LoginPage = () => {
   
       if (response.ok) {
         const { username, email, user_id } = result;
-        // console.log("userid",)
   
         // Store user details in localStorage
         localStorage.setItem('username', username);
@@ -84,9 +85,17 @@ const LoginPage = () => {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible); // Toggle password visibility
+  };
+
   return (
     <div style={styles.container}>
-             <center> <a href="/"> <img src={logo} width={'200px'} alt="" /></a></center>
+      <center> 
+        <a href="/"> 
+          <img src={logo} width={'200px'} alt="Logo" />
+        </a>
+      </center>
 
       <h2 style={styles.title}>User Login</h2>
       <form style={styles.form} onSubmit={handleSubmit}>
@@ -99,15 +108,22 @@ const LoginPage = () => {
           style={styles.input}
           required
         />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          style={styles.input}
-          required
-        />
+
+        <div style={styles.passwordContainer}>
+          <input
+            type={passwordVisible ? "text" : "password"}
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            style={styles.passwordInput}
+            required
+          />
+          <span onClick={togglePasswordVisibility} style={styles.eyeIcon}>
+            {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        </div>
+
         <button type="submit" style={styles.button}>
           Login
         </button>
@@ -150,6 +166,25 @@ const styles = {
     borderRadius: "5px",
     border: "1px solid #ccc",
     fontSize: "16px",
+  },
+  passwordContainer: {
+    position: "relative",
+    width: "100%",
+  },
+  passwordInput: {
+    width: "100%",
+    padding: "10px",
+    borderRadius: "5px",
+    border: "1px solid #ccc",
+    fontSize: "16px",
+    paddingRight: "40px", // Add space for the eye icon
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: "10px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    cursor: "pointer",
   },
   button: {
     padding: "10px",

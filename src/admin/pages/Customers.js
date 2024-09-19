@@ -90,6 +90,9 @@ const Customers = () => {
     return pages;
   };
 
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
   return (
     <div className="customers-container">
       <h3 className="page-titlee">Customer Details</h3>
@@ -101,10 +104,10 @@ const Customers = () => {
             <thead>
               <tr>
                 <th>S.No</th>
-                <th>User ID</th>
+                {/* <th>User ID</th> */}
                 <th>Username</th>
                 <th>Email</th>
-                <th>Address Name</th>
+                <th>Address</th>
                 {/* <th>Street</th>
                 <th>City</th>
                 <th>State</th>
@@ -117,8 +120,8 @@ const Customers = () => {
               {currentUsers.map((user, index) => (
                 <tr key={user.user_id}>
                   <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                  <td>{user.user_id}</td>
-                  <td>{user.username}</td>
+                  {/* <td>{user.user_id}</td> */}
+                  <td>{capitalizeFirstLetter(user.username)}</td>
                   <td>{user.email}</td>
                   <td>{user.address_name || 'N/A'}, {user.street || 'N/A'}, {user.city || 'N/A'}, {user.state || 'N/A'}, {user.postal_code || 'N/A'}, {user.country || 'N/A'}</td>
                  

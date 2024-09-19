@@ -95,6 +95,7 @@ const HelpCenter = () => {
   );
 };
 
+// General FAQs
 const faqGeneral = [
   {
     question: 'What is an FAQ section?',
@@ -106,10 +107,31 @@ const faqGeneral = [
   },
   {
     question: 'Where can I add my FAQs?',
-    answer: 'FAQs can be added to any page on your site or to your Wix mobile app, giving access to members on the go.'
-  }
+    answer: 'FAQs can be added to any page on your site or to your mobile app, giving access to members on the go.'
+  },
+  // {
+  //   question: 'What is the return policy?',
+  //   answer: 'Our return policy allows you to return items within 30 days of receipt. Please check our Returns & Exchanges page for more details.'
+  // },
+  // {
+  //   question: 'How can I track my order?',
+  //   answer: 'You can track your order by logging into your account and visiting the "Order History" section. You will also receive tracking updates via email.'
+  // },
+  // // {
+  // //   question: 'Do you offer international shipping?',
+  // //   answer: 'Yes, we offer international shipping to most countries. Shipping rates and delivery times vary based on the destination.'
+  // // },
+  // {
+  //   question: 'How do I contact customer support?',
+  //   answer: 'You can contact our customer support team via email at enquiryoneclick@gmail.com or through our contact form on the website.'
+  // },
+  // {
+  //   question: 'Are there any ongoing promotions?',
+  //   answer: 'Please visit our Promotions page to see the latest offers and discounts available on our site.'
+  // }
 ];
 
+// Setup FAQs
 const faqSetup = [
   {
     question: 'How do I add a new question & answer?',
@@ -120,8 +142,16 @@ const faqSetup = [
     answer: 'Yes. To add media follow these steps: \n\n1. Manage FAQs from your site dashboard or in the Editor \n\n2. Create a new FAQ or edit an existing one \n\n3. From the answer text box click on the video, image or GIF icon \n\n4. Add media from your library and save.'
   },
   {
-    question: 'How do I edit or remove the \'Frequently Asked Questions\' title?',
-    answer: 'You can edit the title from the FAQ \'Settings\' tab in the Editor. \nTo remove the title from your mobile app go to the \'Site & App\' tab in your Owner\'s app and customize.'
+    question: 'How do I edit or remove the "Frequently Asked Questions" title?',
+    answer: 'You can edit the title from the FAQ "Settings" tab in the Editor. \nTo remove the title from your mobile app go to the "Site & App" tab in your Owner\'s app and customize.'
+  },
+  {
+    question: 'Can I change the layout of the FAQ section?',
+    answer: 'Yes, you can customize the layout and appearance of the FAQ section through the design settings in your site editor.'
+  },
+  {
+    question: 'How do I add or remove categories for FAQs?',
+    answer: 'Categories can be managed through the FAQ settings in the site editor. You can add new categories or remove existing ones as needed.'
   }
 ];
 

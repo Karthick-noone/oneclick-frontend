@@ -48,9 +48,9 @@ const Topbar = () => {
         <FaHamburger style={{ fontSize: '24px' }} />
       </button> */}
       <div className="topbar-content">
-        <button className="action-btn">
+        {/* <button className="action-btn">
           <FaBell style={{ fontSize: '24px' }} />
-        </button>
+        </button> */}
         <button className="action-btn">
           <FaUserCircle onClick={toggleMenu} style={{ fontSize: '24px' }} />
         </button>
@@ -68,12 +68,12 @@ const Topbar = () => {
             <h3 className="profile-username">Admin</h3>
           </div>
           <hr />
-          <button className="menu-item" onClick={toggleMenu}>
+          {/* <button className="menu-item" onClick={toggleMenu}>
             <FaBell /> Notifications
           </button>
           <button className="menu-item" onClick={toggleMenu}>
             <FaUserCircle /> Profile
-          </button>
+          </button> */}
           <a style={{ textDecoration: "none" }} href="/admin/ChangePassword">
             <button className="menu-item" onClick={toggleMenu}>
               <FaUserCircle /> Change Password

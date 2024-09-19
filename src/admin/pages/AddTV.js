@@ -123,6 +123,9 @@ const AddTeleVision = () => {
         features: '',
         price: ''
       });
+
+      document.querySelector('input[type="file"]').value = '';
+
     } catch (error) {
       console.error('Error adding product:', error);
       Swal.fire({
@@ -426,8 +429,8 @@ const AddTeleVision = () => {
       onChange={(e) => setEditingProduct({ ...editingProduct, status: e.target.value })}
       className="adminmodal-input"
     >
-      <option value="active">Active</option>
-      <option value="inactive">Inactive</option>
+        <option value="available">Active</option>
+        <option value="unavailable">Inactive</option>
     </select>
     <button onClick={handleUpdateProduct} className="adminmodal-update-btn">Update</button>
     <button onClick={() => setModalIsOpen(false)} className="adminmodal-cancel-btn">Cancel</button>

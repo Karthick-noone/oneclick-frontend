@@ -322,8 +322,29 @@ const ProductList = () => {
                    <h3>{product.prod_name}</h3>
                    <p>{product.prod_features}</p>
                    <p>${product.prod_price}</p>
-                   <button className="add-to-cart" onClick={(e) => handleAddToCart(product, e)}>Add to Cart</button>
-               </div>
+ {product.status === 'unavailable' ? (
+  <p style={{
+    color: 'red',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    textAlign: 'center',
+    marginTop: '10px',
+    padding: '10px',
+    border: '2px solid red',
+    borderRadius: '5px',
+    backgroundColor: '#fdd',
+  }} className="out-of-stock">
+    Out of Stock
+  </p>
+) : (
+  <button
+  
+    onClick={(event) => handleAddToCart(product, event)}
+    className="add-to-cart"
+  >
+    Add to Cart
+  </button>
+)}               </div>
                 ))}
             </div>
             <ToastContainer />

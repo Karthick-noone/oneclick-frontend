@@ -27,6 +27,7 @@
 
 }
 
+
 .header3 nav a {
     color: #333;
     font-size: 14px;
@@ -40,6 +41,9 @@
 }
 
 .header3 nav a:hover {
+    color: #ff6600;
+}
+.activelink:hover {
     color: #ff6600;
 }
 
@@ -143,4 +147,32 @@
     .dropdown a {
         padding: 10px;
     }
+}
+.nav-link.active {
+    color: #ff6600; /* Change text color for active links */
+}
+
+.nav-item.active > span {
+    color: #ff6600; /* Change text color for active parent item */
+}
+
+.fa-icons.active {
+    color: #ff6600; /* Change icon color when active */
+}
+
+.dropdown .nav-link.active {
+    color: #ff6600; /* Active state for dropdown items */
+}
+
+
+.activelink {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
 }

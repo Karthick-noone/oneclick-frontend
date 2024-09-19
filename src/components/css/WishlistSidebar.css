@@ -54,8 +54,16 @@
   justify-content: center;
   align-items: center;
   color: #555;
-}
 
+  
+}
+.empty-wishlist{
+
+  margin-top: 50%; /* Remove default margin */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center vertically if needed */
+}
 .wishlist-sidebar-body ul {
   list-style: none;
   padding: 0;

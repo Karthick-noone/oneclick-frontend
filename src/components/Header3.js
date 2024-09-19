@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaHome, FaLaptop,FaUsb, FaMobileAlt, FaVideo,FaPrint, FaHeadphones, FaVolumeUp, FaTv, FaAppleAlt,  FaCog } from 'react-icons/fa';
+import { NavLink, useLocation } from 'react-router-dom';
+import { FaHome, FaLaptop, FaUsb, FaMobileAlt, FaVideo, FaPrint, FaHeadphones, FaVolumeUp, FaTv, FaAppleAlt, FaCog } from 'react-icons/fa';
 import './css/Header3.css'; // Adjust path as needed
 
 const Header3 = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [showHeadphones, setShowHeadphones] = useState(false);
     const [showMore, setShowMore] = useState(false);
+
+    const location = useLocation(); // To get the current URL
 
     const headerRef = useRef(null); // Reference to the header
 
@@ -38,6 +41,14 @@ const Header3 = () => {
         };
     }, []);
 
+    // Determine if any of the links are active
+    const isAudioActive = ['/Headphones', '/Speaker'].some((path) => location.pathname.includes(path));
+    const isAccessoriesActive = ['/ComputerAccessories', '/MobileAccessories'].some((path) => location.pathname.includes(path));
+
+    // Determine which specific accessory is active
+    const isComputerAccessoriesActive = location.pathname === '/ComputerAccessories';
+    const isMobileAccessoriesActive = location.pathname === '/MobileAccessories';
+
     return (
         <header className="header3" ref={headerRef}>
             <div
@@ -48,30 +59,56 @@ const Header3 = () => {
                 {isOpen ? '✖' : '☰'}
             </div>
             <nav className={`nav ${isOpen ? 'open' : ''}`}>
-                <a href="/"><FaHome className='fa-icons'/> {isOpen ? 'Home' : ''}</a>
-                <a href="/Computers"><FaLaptop className='fa-icons' /> Computers</a>
-                <a href="/Mobiles"><FaMobileAlt className='fa-icons' /> Mobile</a>
-                <a href="/CCTV"><FaVideo className='fa-icons' /> CCTV</a>
-                <div className="nav-item" onClick={toggleHeadphonesDropdown}>
-                    <a href="#"><FaHeadphones className='fa-icons' /> Audio</a>
+                <NavLink to="/" exact className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+                    <FaHome className={`fa-icons ${location.pathname === '/' ? 'active' : ''}`} /> {isOpen ? 'Home' : ''}
+                </NavLink>
+                <NavLink to="/Computers" className={`nav-link ${location.pathname === '/Computers' ? 'active' : ''}`}>
+                    <FaLaptop className={`fa-icons ${location.pathname === '/Computers' ? 'active' : ''}`} /> Computers
+                </NavLink>
+                <NavLink to="/Mobiles" className={`nav-link ${location.pathname === '/Mobiles' ? 'active' : ''}`}>
+                    <FaMobileAlt className={`fa-icons ${location.pathname === '/Mobiles' ? 'active' : ''}`} /> Mobile
+                </NavLink>
+                <NavLink to="/CCTV" className={`nav-link ${location.pathname === '/CCTV' ? 'active' : ''}`}>
+                    <FaVideo className={`fa-icons ${location.pathname === '/CCTV' ? 'active' : ''}`} /> CCTV
+                </NavLink>
+                {/* Parent Audio link */}
+         <div className={`nav-item ${isAudioActive ? 'active' : ''}`} onClick={toggleHeadphonesDropdown}>
+                    <span className='activelink'>
+                        <FaHeadphones className={`fa-icons ${isAudioActive ? 'active' : ''}`} /> Audio
+                    </span>
                     {showHeadphones && (
                         <div className="dropdown">
-                            <a href="/Headphones"><FaHeadphones className='fa-icons' /> Headphones</a>
-                            <a href="/Speaker"><FaVolumeUp className='fa-icons' /> Speakers</a>
+                            <NavLink to="/Headphones" className={`nav-link ${location.pathname === '/Headphones' ? 'active' : ''}`}>
+                                <FaHeadphones className={`fa-icons ${location.pathname === '/Headphones' ? 'active' : ''}`} /> Headphones
+                            </NavLink>
+                            <NavLink to="/Speaker" className={`nav-link ${location.pathname === '/Speaker' ? 'active' : ''}`}>
+                                <FaVolumeUp className={`fa-icons ${location.pathname === '/Speaker' ? 'active' : ''}`} /> Speakers
+                            </NavLink>
                         </div>
                     )}
-                </div>
-                <a href="/Television"><FaTv className='fa-icons' /> T.V & Home Cinema</a>
-                <a href="/Watch"><FaAppleAlt className='fa-icons' /> Wearable Tech</a>
-                <a href="/Printers"><FaPrint  className='fa-icons'/> Printers</a>
-                <div className="nav-item" onClick={toggleMoreDropdown}>
-                    <a href="#"><FaCog className='fa-icons' />Accessories</a>
+                </div>   
+                <NavLink to="/Television" className={`nav-link ${location.pathname === '/Television' ? 'active' : ''}`}>
+                    <FaTv className={`fa-icons ${location.pathname === '/Television' ? 'active' : ''}`} /> T.V & Home Cinema
+                </NavLink>
+                <NavLink to="/Watch" className={`nav-link ${location.pathname === '/Watch' ? 'active' : ''}`}>
+                    <FaAppleAlt className={`fa-icons ${location.pathname === '/Watch' ? 'active' : ''}`} /> Wearable Tech
+                </NavLink>
+                <NavLink to="/Printers" className={`nav-link ${location.pathname === '/Printers' ? 'active' : ''}`}>
+                    <FaPrint className={`fa-icons ${location.pathname === '/Printers' ? 'active' : ''}`} /> Printers
+                </NavLink>
+                {/* Parent Accessories link */}
+                <div className={`nav-item ${isAccessoriesActive ? 'active' : ''}`} onClick={toggleMoreDropdown}>
+                    <span className='activelink'>
+                        <FaCog className={`fa-icons ${isAccessoriesActive ? 'active' : ''}`} /> Accessories
+                    </span>
                     {showMore && (
                         <div className="dropdown">
-                            <a href="/ComputerAccessories"><FaUsb className='fa-icons' /> Computer Accessories</a>
-                            <a href="/MobileAccessories"><FaMobileAlt className='fa-icons' /> Mobile Accessories</a>
-                            {/* <a href="/"> Gadgets</a> */}
-                            {/* <a href="/More/Featured">Featured</a> */}
+                            <NavLink to="/ComputerAccessories" className={`nav-link ${isComputerAccessoriesActive ? 'active' : ''}`}>
+                                <FaUsb className={`fa-icons ${isComputerAccessoriesActive ? 'active' : ''}`} /> Computer Accessories
+                            </NavLink>
+                            <NavLink to="/MobileAccessories" className={`nav-link ${isMobileAccessoriesActive ? 'active' : ''}`}>
+                                <FaMobileAlt className={`fa-icons ${isMobileAccessoriesActive ? 'active' : ''}`} /> Mobile Accessories
+                            </NavLink>
                         </div>
                     )}
                 </div>

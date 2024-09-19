@@ -350,6 +350,40 @@ const EditHomePage = () => {
   };
 
 
+  const handleDeleteProduct = async () => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`${ApiUrl}/api/deletehomepagead/${editingProduct.id}`, {
+            method: 'DELETE',
+          });
+  
+          if (response.ok) {
+            Swal.fire('Deleted!', 'Your product has been deleted.', 'success');
+            // Optionally, refresh the product list or close the modal here
+            setModalIsOpen(false); // Close modal
+            // Refresh or update the product list here
+          } else {
+            Swal.fire('Error', 'Failed to delete product', 'error');
+          }
+        } catch (error) {
+          console.error('Error deleting product:', error);
+          Swal.fire('Error', 'An error occurred while deleting the product', 'error');
+        }
+      }
+    });
+  };
+
+
   return (
     <div className="laptops-page">
       <div className="laptops-content">
@@ -532,7 +566,13 @@ const EditHomePage = () => {
       <option value="MobileAccessories">Mobile Accessories</option>
     </select>
           <button onClick={handleUpdateProduct} className="adminmodal-update-btn">Update</button>
-          <button onClick={() => setModalIsOpen(false)} className="adminmodal-cancel-btn">Cancel</button>
+          <button
+            onClick={handleDeleteProduct}
+            className="adminmodal-cancel-btn"
+          >
+            Delete
+          </button>
+          {/* <button onClick={() => setModalIsOpen(false)} className="adminmodal-cancel-btn">Cancel</button> */}
         </Modal>
       )}
 

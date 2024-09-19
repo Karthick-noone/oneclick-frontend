@@ -336,7 +336,7 @@ const Speakers = () => {
       {/* <Header1 /> */}
       <Header2 category={category}/>
       {/* <Header3 /> */}
-      <span style={{ marginLeft: "20px",padding:'10px' }}>Home &gt; Speakers</span>
+      <span style={{ marginLeft: "20px",padding:'10px' }}><a style={{textDecoration:'none', color:'black'}} href="/">Home </a> &gt; Speakers</span>
       <div className="main-content">
         <Sidebar />
         <div className="product-list">
@@ -379,12 +379,29 @@ const Speakers = () => {
               <h3 className="product-name">{product.prod_name}</h3>
               <p className="product-description">{product.prod_features}</p>
               <p className="product-price">₹{product.prod_price}</p>
-              <button
-                onClick={(event) => handleAddToCart(product, event)}
-                className="add-to-cart"
-              >
-                Add to Cart
-              </button>
+              {product.status === 'unavailable' ? (
+  <p style={{
+    color: 'red',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    textAlign: 'center',
+    marginTop: '10px',
+    padding: '10px',
+    border: '2px solid red',
+    borderRadius: '5px',
+    backgroundColor: '#fdd',
+  }} className="out-of-stock">
+    Out of Stock
+  </p>
+) : (
+  <button
+  
+    onClick={(event) => handleAddToCart(product, event)}
+    className="add-to-cart"
+  >
+    Add to Cart
+  </button>
+)}
             </div>
           ))}
         </div>

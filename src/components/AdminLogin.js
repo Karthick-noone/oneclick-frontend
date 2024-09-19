@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { ApiUrl } from './ApiUrl';
 import './css/LoginPage.css';
-import logo from './img/logo3.png'
-import { FaSignOutAlt } from 'react-icons/fa';
+import logo from './img/logo3.png';
+import { FaSignOutAlt, FaEye, FaEyeSlash } from 'react-icons/fa'; // Import eye icons
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +12,7 @@ const LoginPage = () => {
     password: ''
   });
 
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,6 +21,10 @@ const LoginPage = () => {
       ...formData,
       [name]: value
     });
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword); // Toggle password visibility
   };
 
   const handleSubmit = async (e) => {
@@ -34,14 +39,14 @@ const LoginPage = () => {
       return;
     }
 
-    if (formData.password.length < 5) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Password too short',
-        text: 'Password should be at least 5 characters long.',
-      });
-      return;
-    }
+    // if (formData.password.length < 5) {
+    //   Swal.fire({
+    //     icon: 'error',
+    //     title: 'Password too short',
+    //     text: 'Password should be at least 5 characters long.',
+    //   });
+    //   return;
+    // }
 
     try {
       const response = await fetch(`${ApiUrl}/adminlogin`, {
@@ -84,9 +89,8 @@ const LoginPage = () => {
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
-        <a href="/"> <img src={logo} width={'200px'} alt="" /></a>
-      <a href="/"><button style={{color:'black'}} className="close-btn" ><FaSignOutAlt /></button></a>
-
+          <a href="/"> <img src={logo} width={'200px'} alt="" /></a>
+          <a href="/"><button style={{ color: 'black' }} className="close-btn"><FaSignOutAlt /></button></a>
           <h1>Admin Login</h1>
           <p>Enter your credentials to access your account</p>
         </div>
@@ -105,22 +109,23 @@ const LoginPage = () => {
           </div>
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-            />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'} // Toggle input type between 'text' and 'password'
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                required
+              />
+              <span onClick={togglePasswordVisibility} className="eye-icon">
+                {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Toggle between eye icons */}
+              </span>
+            </div>
           </div>
           <button type="submit" className="button">Login</button>
         </form>
-        {/* <div className="login-footer">
-          <p>Don't have an account? <a href="/Adminregister">Sign up</a></p>
-          <p><a href="/AdminForgotPassword">Forgot Password?</a></p>
-        </div> */}
       </div>
     </div>
   );

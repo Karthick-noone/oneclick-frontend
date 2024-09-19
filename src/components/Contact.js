@@ -27,7 +27,8 @@ const Contact = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
+  
+    // Update form data
     if (name === "number") {
       // Validate number input
       const sanitizedValue = value.replace(/\D/g, "").slice(0, 10);
@@ -46,8 +47,16 @@ const Contact = () => {
     } else {
       setFormData({ ...formData, [name]: value });
     }
+  
+    // Clear error message for the specific field if there's a value
+    if (value) {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [name]: ""
+      }));
+    }
   };
-
+  
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
@@ -79,6 +88,10 @@ const Contact = () => {
       newErrors.message = "Message is required";
       isValid = false;
     }
+    if (!formData.number) {
+      newErrors.number = "Contact Number is required";
+      isValid = false;
+    }
 
     if (formData.number && formData.number.length !== 10) {
       newErrors.number = "Number field must have exactly 10 digits.";
@@ -91,6 +104,13 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+      // Validate the form
+  const isValid = validateForm();
+  if (!isValid) {
+    return; // Stop submission if validation fails
+  }
+
     setIsSubmitting(true);
   
     if (validateForm()) {
@@ -122,7 +142,7 @@ const Contact = () => {
             Swal.fire({
               icon: "success",
               title: "Success!",
-              text: "Message sent successfully!",
+              text: "Message sent successfully! We will get back to you soon",
             });
           } else {
             response.text().then((text) => {
@@ -252,9 +272,11 @@ const Contact = () => {
                 {errors.message && <span style={styles.error}>{errors.message}</span>}
               </div>
             </div>
-            <button type="submit" style={styles.button}>
+            <center><button type="submit" style={styles.button}>
               {isSubmitting ? "Submitting..." : "Submit"}
-            </button>
+            </button></center>
+     
+
           </form>
         </div>
       </div>
@@ -345,14 +367,24 @@ const styles = {
 
   },
   button: {
-    padding: "10px 20px",
-    fontSize: "1em",
-    border: "none",
-    borderRadius: "4px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    cursor: "pointer",
-    transition: "background-color 0.3s",
+    padding: '12px 30px',
+    border: 'none',
+    borderRadius: '50px',
+    backgroundColor: '#007BFF', // Blue background
+    color: '#fff',
+    cursor: 'pointer',
+    fontSize: '1.1em',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    transition: 'background-color 0.3s, transform 0.2s', // Smooth transitions
+    marginTop: '10px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Shadow effect
+    outline: 'none',
+    width:'200px',
+  },
+  buttonHover: {
+    backgroundColor: '#0056b3', // Darker blue on hover
+    transform: 'scale(1.05)', // Slightly enlarge on hover
   },
   buttonDisabled: {
     backgroundColor: "#ccc",

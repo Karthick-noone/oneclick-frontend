@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa";
 import "./../styles.css"; // Adjust path as needed
 import "./css/Header2.css"; // Adjust path as needed
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import UserCard from "./UserCard"; // Import UserCard component
 import WishlistSidebar from "./WishlistSidebar"; // Import WishlistSidebar component
 import logo from "./img/logo3.png";
@@ -33,6 +33,7 @@ const Header2 = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDropdownOpen3, setIsDropdownOpen3] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // State to hold error message
   const dropdownRef = useRef(null);
 
@@ -47,40 +48,38 @@ const Header2 = () => {
   };
   const navigate = useNavigate();
 
-  // Fetch suggestions from API
   useEffect(() => {
-    if (searchQuery.trim()) {
-      const fetchSuggestions = async () => {
-        try {
-          const response = await fetch(
-            `${ApiUrl}/api/suggestions?query=${encodeURIComponent(
-              searchQuery.trim()
-            )}`
-          );
-          if (response.ok) {
-            const data = await response.json();
-            if (data.message) {
-              // Handle case where no product was found
-              setErrorMessage(data.message);
-              setSuggestions([]);
-              setIsDropdownOpen(false);
-            } else {
-              setSuggestions([data.category]);
-              setErrorMessage("");
-              // setIsDropdownOpen(true);
-            }
+    const fetchSuggestions = async () => {
+      try {
+        const response = await fetch(
+          `${ApiUrl}/api/suggestions?query=${encodeURIComponent(
+            searchQuery.trim()
+          )}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.message) {
+            setSuggestions([]);
+            setErrorMessage(data.message);
+            setIsDropdownOpen3(true);
           } else {
-            console.error("Failed to fetch suggestions");
+            setSuggestions([data.category]);
+            setErrorMessage("");
+            setIsDropdownOpen3(true);
           }
-        } catch (error) {
-          console.error("Error fetching suggestions:", error);
+        } else {
+          console.error("Failed to fetch suggestions");
         }
-      };
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+      }
+    };
 
+    if (searchQuery.trim()) {
       fetchSuggestions();
     } else {
       setSuggestions([]);
-      setIsDropdownOpen(false);
+      setIsDropdownOpen3(false);
       setErrorMessage(""); // Clear error message if input is empty
     }
   }, [searchQuery]);
@@ -94,7 +93,8 @@ const Header2 = () => {
       if (suggestions.length > 0) {
         navigate(`/${encodeURIComponent(suggestions[0])}`);
       } else {
-        setErrorMessage("Product not found"); // Set error message if no suggestions are available
+        setErrorMessage("Product not found");
+        setIsDropdownOpen3(true);
       }
     }
   };
@@ -107,7 +107,7 @@ const Header2 = () => {
 
   const handleSuggestionClick = (suggestion) => {
     setSearchQuery(suggestion);
-    setIsDropdownOpen(false);
+    setIsDropdownOpen3(false);
     navigate(`/${encodeURIComponent(suggestion)}`);
   };
 
@@ -269,6 +269,10 @@ const Header2 = () => {
   const handleLogout = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("email");
+    localStorage.removeItem("email-wishlist");
+    localStorage.removeItem("email-cart");
+    localStorage.removeItem("favourites");
+    localStorage.removeItem("user_id");
     setUser(null);
     setIsUserCardOpen(false);
     navigate("/login");
@@ -289,6 +293,7 @@ const Header2 = () => {
         !event.target.closest(".users")
       ) {
         setIsUserCardOpen(false);
+        setIsDropdownOpen3(false);
       }
 
       if (
@@ -396,7 +401,7 @@ const Header2 = () => {
             <img src={logo} width={"230px"} alt="Company Logo" />
           </a>
         </div>
-        <div className="search-box">
+        <div className="search-box" ref={dropdownRef}>
           <input
             type="text"
             value={searchQuery}
@@ -405,21 +410,25 @@ const Header2 = () => {
             placeholder="Search for products..."
           />
           <FaSearch className="search-icon" onClick={handleSearch} />
-          {/* <button  >Search</button> */}
-          {isDropdownOpen && suggestions.length > 0 && (
+
+          {isDropdownOpen3 && (
             <ul className="suggestions-dropdown">
-              {suggestions.map((suggestion, index) => (
-                <li
-                  key={index}
-                  onClick={() => handleSuggestionClick(suggestion)}
-                >
-                  {suggestion}
-                </li>
-              ))}
+              {suggestions.length > 0 ? (
+                suggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    {suggestion}
+                  </li>
+                ))
+              ) : (
+                <li className="no-suggestions">Product not found</li>
+              )}
             </ul>
           )}
-          {errorMessage && <div className="error-message">{errorMessage}</div>}
         </div>
+
         <div className="icons">
           <FaUser className="users" title="Login" onClick={toggleUserCard} />
           <FaHeart title="Wish List" onClick={toggleWishlist} />
@@ -433,25 +442,34 @@ const Header2 = () => {
 
             {isDropdownOpen && (
               <div className="dropdown-menu" ref={dropdownRef}>
-              <a href="/About">
-                <div className="dropdown-item" onClick={() => handleMenuClick("About")}>
-                  <FaInfoCircle className="dropdown-icon" />
-                  <span>About</span>
-                </div>
-              </a>
-              <a href="/Contact">
-                <div className="dropdown-item" onClick={() => handleMenuClick("Contact")}>
-                  <FaEnvelope className="dropdown-icon" />
-                  <span>Contact</span>
-                </div>
-              </a>
-              <a href="/HelpCenter">
-                <div className="dropdown-item" onClick={() => handleMenuClick("Help Center")}>
-                  <FaQuestionCircle className="dropdown-icon" />
-                  <span>Help Center</span>
-                </div>
-              </a>
-            </div>
+                <a href="/About">
+                  <div
+                    className="dropdown-item"
+                    onClick={() => handleMenuClick("About")}
+                  >
+                    <FaInfoCircle className="dropdown-icon" />
+                    <span>About</span>
+                  </div>
+                </a>
+                <a href="/Contact">
+                  <div
+                    className="dropdown-item"
+                    onClick={() => handleMenuClick("Contact")}
+                  >
+                    <FaEnvelope className="dropdown-icon" />
+                    <span>Contact</span>
+                  </div>
+                </a>
+                <a href="/HelpCenter">
+                  <div
+                    className="dropdown-item"
+                    onClick={() => handleMenuClick("Help Center")}
+                  >
+                    <FaQuestionCircle className="dropdown-icon" />
+                    <span>Help Center</span>
+                  </div>
+                </a>
+              </div>
             )}
           </div>
           {isMobileView && <Header3 />}
@@ -473,61 +491,75 @@ const Header2 = () => {
             ) : (
               <ul>
                 {cartItems.map((item) => (
-                  <li key={item.id} className="cart-item">
-                    <img
-                      src={`${ApiUrl}/uploads/${item.category}/${item.image}`}
-                      alt={item.name}
-                      loading="lazy"
-                      name="image"
-                    />
-                    <div className="item-details">
-                      <h3>{item.name}</h3>
-                      {/* <h3>{item.product_id}</h3> */}
-                      <p>{item.description}</p>
-                    </div>
-                    <div className="item-price">
-                      <p>₹{item.price * item.quantity}</p>
-                      <div className="quantity-controls">
+                    <li key={item.id} className="cart-item">
+                  <Link style={{textDecoration:'none'}} to={`/${item.category}`}>
+
+                      <img
+                        src={`${ApiUrl}/uploads/${item.category}/${item.image}`}
+                        alt={item.name}
+                        loading="lazy"
+                        name="image"
+                      />
+                        </Link>
+
+                      <div className="item-details">
+                  <Link style={{textDecoration:'none'}} to={`/${item.category}`}>
+
+                        <h3>{item.name}</h3>
+                        {/* <h3>{item.product_id}</h3> */}
+                        <p>{item.description}</p>
+                        </Link>
+
+                      </div>
+
+                      <div className="item-price">
+                        <p style={{color:'#333'}}>₹{item.price * item.quantity}</p>
+                        <div className="quantity-controls">
+                          <button
+                            onClick={() =>
+                              updateCartItemQuantity(
+                                item.id,
+                                item.category,
+                                Math.max(item.quantity - 1, 1)
+                              )
+                            }
+                          >
+                            -
+                          </button>
+                          <span>{item.quantity}</span>
+                          <button
+                            onClick={() =>
+                              updateCartItemQuantity(
+                                item.id,
+                                item.category,
+                                item.quantity + 1
+                              )
+                            }
+                          >
+                            +
+                          </button>
+                        </div>
                         <button
-                          onClick={() =>
-                            updateCartItemQuantity(
-                              item.id,
-                              item.category,
-                              Math.max(item.quantity - 1, 1)
-                            )
-                          }
+                          onClick={() => removeFromCart(item.id, item.category)}
+                          className="remove-btn"
                         >
-                          -
-                        </button>
-                        <span>{item.quantity}</span>
-                        <button
-                          onClick={() =>
-                            updateCartItemQuantity(
-                              item.id,
-                              item.category,
-                              item.quantity + 1
-                            )
-                          }
-                        >
-                          +
+                          Remove
                         </button>
                       </div>
-                      <button
-                        onClick={() => removeFromCart(item.id, item.category)}
-                        className="remove-btn"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </li>
+                    </li>
                 ))}
               </ul>
             )}
             <div className="cart-total">
               <div className="sidebarcart-footer">
                 <p>Total Price: ₹{calculateTotalPrice()}</p>
-                <a style={{textDecoration:'none', color:'black'}} href="/Cart">
-                  <span>View Cart <FaShoppingCart  /> </span>
+                <a
+                  style={{ textDecoration: "none", color: "black" }}
+                  href="/Cart"
+                >
+                  <span>
+                    View Cart <FaShoppingCart />{" "}
+                  </span>
                 </a>
               </div>
             </div>
