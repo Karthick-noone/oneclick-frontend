@@ -1,0 +1,278 @@
+.offer-ad-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping for multiple ads */
+  justify-content: center; /* Center the ads in the container */
+  gap: 20px; /* Space between the ads */
+}
+.banner-container {
+  width: 880px; /* Width of the banner */
+  height: 280px; /* Height of the banner */
+  background-size: 10px 10px; /* Adjust size for spacing of slashes */
+  border: none; /* Remove regular border */
+  margin-top: 20px; /* Add space between products and banner */
+  display: flex; /* Center the image inside the container */
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
+  flex-direction: column; /* Arrange children in a column */
+  position: relative; /* Position relative for pseudo-elements */
+}
+
+/* Optional: You can add a pseudo-element for added styling if needed */
+.banner-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px dashed #000; /* Add dashed border inside */
+  pointer-events: none; /* Allows clicks to pass through */
+}
+/* Title styling */
+.banner-title {
+  margin-bottom: 30px; /* Space below the title */
+  font-size: 20px; /* Font size for the title */
+  font-weight: bold; /* Bold font weight */
+  color: #333; /* Color for the title text */
+  text-align: center; /* Center align the title */
+}
+
+/* Input group to align elements in a row */
+.input-groupp {
+  display: flex; /* Use flexbox for the input group */
+  align-items: center; /* Center items vertically */
+  gap: 10px; /* Space between elements */
+}
+
+.laptops-cardd-input {
+  padding: 10px; /* Inner padding for input field */
+  border: 1px solid #ccc; /* Border for input */
+  border-radius: 4px; /* Slightly rounded corners */
+  font-size: 16px; /* Font size for better readability */
+  flex: 1; /* Allow input field to grow */
+}
+
+.filee-input {
+  padding: 10px; /* Inner padding for file input */
+  border: 1px solid #ccc; /* Border for file input */
+  border-radius: 4px; /* Slightly rounded corners */
+  flex: 1; /* Allow file input to grow */
+}
+
+.laptops-add-btn {
+  padding: 10px 15px; /* Button padding */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Rounded corners */
+  background-color: #007bff; /* Button background color */
+  color: white; /* Text color */
+  cursor: pointer; /* Pointer cursor */
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.laptops-add-btn:hover {
+  background-color: #0056b3; /* Darker background on hover */
+}
+
+.selected-image {
+  margin-top: 10px; /* Space above the selected image text */
+  font-size: 14px; /* Font size for the selected image text */
+  color: #333; /* Color for the text */
+}
+
+.laptops-add-btn {
+  padding: 10px 15px; /* Button padding */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Rounded corners */
+  background-color: #007bff; /* Button background color */
+  color: white; /* Text color */
+  cursor: pointer; /* Pointer cursor */
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.laptops-add-btn:hover {
+  background-color: #0056b3; /* Darker background on hover */
+}
+
+.selected-image {
+  margin-top: 10px; /* Space above the selected image text */
+  font-size: 14px; /* Font size for the selected image text */
+  color: #333; /* Color for the text */
+}
+  
+.single-ad-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px; /* Maximum width for each ad container */
+  margin: 10px;
+  overflow: hidden; /* Ensures the content doesn't overflow */
+}
+
+.image-wrapper {
+  position: relative;
+  display: flex; /* Use flexbox to position product image and details side by side */
+  align-items: center; /* Center vertically */
+}
+
+.offer-ad {
+  width: 100%;
+  height: auto;
+}
+
+.offer-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #f39c12;
+  color: white;
+  padding: 15px 11px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.brand-name {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #36b4e6;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.laptops-edit-btnn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.product-overlay {
+  display: flex; /* Use flexbox to layout product image and details */
+  align-items: center; /* Align items vertically */
+  justify-content: space-between; /* Space out the image and details */
+  position: absolute; /* Overlay within the offerAd */
+  top: 17%; /* Position the overlay */
+  left: 5%; /* Position the overlay */
+  right: 5%; /* Position the overlay */
+  color: white; /* Text color for visibility */
+  border-radius: 8px; /* Rounded corners for overlay */
+  padding: 10px; /* Padding around the text */
+}
+
+.ad-imagee {
+  width: 130px; /* Set size for product image */
+  height: 130px; /* Set size for product image */
+  margin-right: 10px; /* Space between image and text */
+  border-radius: 8px; /* Rounded corners for the product image */
+}
+
+/* Image actions styles */
+.image-action {
+  position: absolute; /* Position it absolutely within the product image wrapper */
+  top: -25px; /* Distance from the top of the image */
+  right: 25px; /* Distance from the right of the image */
+  
+  gap: 5px; /* Space between icons */
+  z-index: 1; /* Ensure it stays on top of other elements */
+}
+
+.image-action span {
+  cursor: pointer; /* Pointer cursor for clickable icons */
+  color: white; /* Icon color for visibility */
+  font-size: 16px; /* Adjust icon size */
+  transition: color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Hover effect for icons */
+.image-action span:hover {
+  color: #f39c12; /* Change color on hover (orange) */
+}
+
+.text-details {
+  flex: 1; /* Take remaining space for text details */
+  text-align: left; /* Left align text */
+}
+
+.text-details h3 {
+  font-size: 23px; /* Adjust font size */
+  margin-bottom: 5px; /* Space below the title */
+  font-family: 'Dancing Script', cursive; /* Graceful handwritten font */
+  text-align: center;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-details p {
+  font-size: 14px; /* Adjust font size */
+  line-height: 1.4; /* Space between lines */
+  margin: 0; /* Remove default margins */
+  font-family: 'Poppins', cursive; /* Delicate, elegant script for paragraph */
+  margin-bottom: 5px;
+  /* white-space: nowrap; */
+  text-align: center;
+
+  display: -webkit-box;             /* Fallback for old browsers */
+  -webkit-box-orient: vertical;     /* Enable vertical layout */
+  overflow: hidden;                  /* Hide overflow */
+  text-overflow: ellipsis;          /* Show ellipsis for overflow text */
+  height: 4em;                    /* Set height for 4 lines (1.4em * 4) */
+  max-height: 4em;                /* Ensure max-height matches */
+
+}
+
+.laptops-edit-btnn {
+  background-color: #2ecc71;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.laptops-edit-btnn:hover {
+  background-color: #27ae60;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .single-ad-container {
+    max-width: 100%;
+  }
+
+  .ad-imagee {
+    width: 80px; /* Smaller image size on mobile */
+    height: 80px;
+  }
+
+  .text-details h3 {
+    font-size: 16px; /* Slightly smaller title size */
+  }
+
+  .text-details p {
+    font-size: 12px; /* Smaller description */
+  }
+
+  .laptops-edit-btnn {
+    font-size: 12px; /* Adjust button size */
+    padding: 6px 10px;
+  }
+}
+
+
+.product-image-wrapper {
+  position: relative; /* Relative positioning for the image action */
+}

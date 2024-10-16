@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios'; // Import axios for making API requests
 import './css/ChangePassword.css'; // Import the CSS file for styling
 import { ApiUrl } from '../../components/ApiUrl';
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 
 const ChangePassword = () => {
   const navigate = useNavigate();
@@ -139,7 +140,8 @@ const ChangePassword = () => {
                     className="toggle-password"
                     onClick={() => togglePasswordVisibility('old')}
                   >
-                    {showPassword.old ? '🙈' : '👁️'}
+                    {showPassword.old ? <FaEye /> : <FaEyeSlash />}
+                    {/* {showPassword.old ? '🙈' : '👁️'} */}
                   </button>
                 </div>
               </div>
@@ -160,7 +162,8 @@ const ChangePassword = () => {
                     className="toggle-password"
                     onClick={() => togglePasswordVisibility('new')}
                   >
-                    {showPassword.new ? '🙈' : '👁️'}
+                    {showPassword.new ? <FaEye /> : <FaEyeSlash />}
+                    {/* {showPassword.new ? '🙈' : '👁️'} */}
                   </button>
                 </div>
               </div>
@@ -181,7 +184,8 @@ const ChangePassword = () => {
                     className="toggle-password"
                     onClick={() => togglePasswordVisibility('confirm')}
                   >
-                    {showPassword.confirm ? '🙈' : '👁️'}
+                    {showPassword.confirm ? <FaEye /> : <FaEyeSlash />}
+                    {/* {showPassword.confirm ? '🙈' : '👁️'} */}
                   </button>
                 </div>
               </div>

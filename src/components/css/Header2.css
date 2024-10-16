@@ -1,7 +1,32 @@
 /* Header2.css */
 
 /* Header2.css */
+.item-features {
+  display: -webkit-box; /* Use a box layout for controlling text lines */
+  -webkit-box-orient: vertical; /* Set orientation to vertical */
+  overflow: hidden; /* Hide any overflowing content */
+  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+  white-space: normal; /* Allow text to wrap */
 
+  font-size: 16px; /* Adjust as per your design */
+  line-height: 1.5; /* Set line height */
+  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+}
+
+
+
+/* Header2.css */
+.item-name {
+  display: -webkit-box; /* Use a box layout for controlling text lines */
+  -webkit-box-orient: vertical; /* Set orientation to vertical */
+  overflow: hidden; /* Hide any overflowing content */
+  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+  white-space: normal; /* Allow text to wrap */
+
+  font-size: 16px; /* Adjust as per your design */
+  line-height: 1.5; /* Set line height */
+  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+}
 
 
 
@@ -36,8 +61,8 @@
 .header2 {
   position: sticky;
   top: 0;
-  z-index: 1000;
-  background-color: white; /* Ensure the header has a background to cover content underneath */
+  z-index: 1008;
+  background-color: rgb(36, 35, 35); /* Ensure the header has a background to cover content underneath */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -76,27 +101,35 @@
   cursor: pointer;
 }
 
-.header2 .icons {
+.header2 .iconss {
   display: flex;
   align-items: center;
   gap:15px;
 }
 
-.header2 .icons svg {
-  color: #333; /* Dark icons for contrast */
+.header2 .iconss svg {
+  color: white; /* Dark iconss for contrast */
   font-size: 20px; /* Reduced icon size */
   cursor: pointer;
 }
-.header2 .icons .cart-count {
+.header2 .iconss .cart-count {
   position: absolute;
   top: -10px;
   right: 25px;
   background-color: red;
   color: white;
-  padding: 2px 6px;
-  border-radius: 50%;
+  padding: 2px; /* Adjust padding as needed */
+  width: 20px; /* Set a fixed width */
+  height: 20px; /* Set a fixed height */
+  border-radius: 50%; /* Make it round */
   font-size: 12px;
+  display: flex; /* Use flexbox to center the text */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  text-align: center; /* Center text */
 }
+
+
 /* .dots{
   margin-left: 18px;
 } */
@@ -162,7 +195,7 @@
       align-items: center;
   }
 
-  .header2 .icons {
+  .header2 .iconss {
       justify-content: center;
   }
 
@@ -515,7 +548,7 @@
   margin-top: 10px; /* Space above the error message */
 }
 
-.icons {
+.iconss {
   display: flex;
   align-items: center;
   margin-left: 30px;
@@ -581,3 +614,6 @@
   background-color: #f1f1f1; /* Color of the track */
   border-radius: 10px; /* Rounded corners for the track */
 }
+
+
+

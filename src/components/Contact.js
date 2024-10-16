@@ -28,34 +28,37 @@ const Contact = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
   
-    // Update form data
     if (name === "number") {
       // Validate number input
       const sanitizedValue = value.replace(/\D/g, "").slice(0, 10);
-      if (
-        sanitizedValue.length > 0 &&
-        !(sanitizedValue[0] >= "6" && sanitizedValue[0] <= "9")
-      ) {
+      if (sanitizedValue.length > 0 && !(sanitizedValue[0] >= "6" && sanitizedValue[0] <= "9")) {
         setFormData({ ...formData, [name]: sanitizedValue.slice(1) });
       } else {
         setFormData({ ...formData, [name]: sanitizedValue });
       }
-    } else if (name === "name") {
-      // Validate name input
+    } else if (name === "firstName" || name === "lastName") {
+      // Validate name input (allow only alphabetic characters and spaces)
       const sanitizedValue = value.replace(/[^a-zA-Z\s]/g, "");
       setFormData({ ...formData, [name]: sanitizedValue });
+  
+      // Error handling if the name is empty
+      if (!sanitizedValue) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: `${name === "firstName" ? "First" : "Last"} Name is required`,
+        }));
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: "",
+        }));
+      }
     } else {
       setFormData({ ...formData, [name]: value });
     }
-  
-    // Clear error message for the specific field if there's a value
-    if (value) {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [name]: ""
-      }));
-    }
   };
+  
+  
   
   const validateForm = () => {
     const newErrors = {};
@@ -74,8 +77,8 @@ const Contact = () => {
     if (!formData.email) {
       newErrors.email = "Email is required";
       isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email) || !formData.email.endsWith('.com')) {
+      newErrors.email = "Enter a valid email address.";
       isValid = false;
     }
 
@@ -101,72 +104,80 @@ const Contact = () => {
     setErrors(newErrors);
     return isValid;
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-
-      // Validate the form
-  const isValid = validateForm();
-  if (!isValid) {
-    return; // Stop submission if validation fails
-  }
-
+  
+    // Validate the form
+    const isValid = validateForm();
+    if (!isValid) {
+      return; // Stop submission if validation fails
+    }
+  
     setIsSubmitting(true);
   
-    if (validateForm()) {
-      // Combine firstName and lastName into a single name field
-      const { firstName, lastName, ...rest } = formData;
-      const formDataWithRecipient = {
-        ...rest,
-        name: `${firstName} ${lastName}`, // Combine names
-        recipientEmail: "karthicknoone@gmail.com", // Hardcoded recipient email
-      };
+    // Combine firstName and lastName into a single name field
+    const { firstName, lastName, email, subject, message, number } = formData;
+    const formDataToSend = {
+      name: `${firstName} ${lastName}`, // Combine names
+      email: email,                    // Include email
+      subject: subject,                // Include subject
+      message: message,                // Include message
+      number: number                   // Include number
+    };
   
-      fetch(`${ApiUrl}/send-email`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formDataWithRecipient),
-      })
-        .then((response) => {
-          if (response.ok) {
-            setFormData({
-              firstName: "",
-              lastName: "",
-              email: "",
-              subject: "",
-              message: "",
-              number: "", // Reset number field
-            });
-            Swal.fire({
-              icon: "success",
-              title: "Success!",
-              text: "Message sent successfully! We will get back to you soon",
-            });
-          } else {
-            response.text().then((text) => {
+    fetch(`${ApiUrl}/contact`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formDataToSend), // Send the correct data structure
+    })
+      .then((response) => {
+        if (response.ok) {
+          setFormData({
+            firstName: "",
+            lastName: "",
+            email: "",
+            subject: "",
+            message: "",
+            number: "", // Reset number field
+          });
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: "Message sent successfully! We will get back to you soon.",
+          });
+        } else {
+          // Handle different error messages based on response
+          return response.text().then((text) => {
+            if (response.status === 409) {
+              // If conflict due to existing email or phone
+              Swal.fire({
+                icon: "warning",
+                title: "Already Exists!",
+                text: text, // Use the error message from the server
+              });
+            } else {
               throw new Error(
                 `Failed to send message. Status: ${response.status}, Message: ${text}`
               );
-            });
-          }
-        })
-        .catch((error) => {
-          console.error("Error sending message:", error);
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Failed to send message. Please try again later.",
+            }
           });
-        })
-        .finally(() => {
-          setIsSubmitting(false);
+        }
+      })
+      .catch((error) => {
+        console.error("Error sending message:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Failed to send message. Please try again later.",
         });
-    }
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   };
   
-
   return (
     <div>
       <Header2 />

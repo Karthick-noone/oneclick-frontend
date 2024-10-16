@@ -21,6 +21,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ApiUrl } from "./ApiUrl";
 import axios from "axios";
 import Header3 from "./Header3";
+import Swal from "sweetalert2";
 const Header2 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
@@ -36,6 +37,18 @@ const Header2 = () => {
   const [isDropdownOpen3, setIsDropdownOpen3] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // State to hold error message
   const dropdownRef = useRef(null);
+  const [username, setUsername] = useState("");
+
+
+  useEffect(() => {
+    // Fetch the username from local storage
+    const storedUsername = localStorage.getItem("username");
+    
+    // Update state with the stored username
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
 
   const handleToggleDropdown = () => {
     setIsDropdownOpen((prevState) => !prevState);
@@ -88,16 +101,88 @@ const Header2 = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      if (suggestions.length > 0) {
-        navigate(`/${encodeURIComponent(suggestions[0])}`);
-      } else {
-        setErrorMessage("Product not found");
-        setIsDropdownOpen3(true);
+  const keywordMapping = [
+    { term: "Computers", keywords: ["laptop", "laptops", "desktop", "desktops", "computer", "computers", "notebook"] },
+    { term: "Mobiles", keywords: ["mobile", "mobiles", "smartphone", "smartphones", "phones", "phone", "android"] },
+    { term: "Headphones", keywords: ["headphone", "headphones", "earphone", "earphones", "earbuds", "headset", "wireless headphone", "wired headphone", "wired headphones"] },
+    { term: "Printers", keywords: ["printer", "scanner", "fax"] },
+    { term: "Speaker", keywords: ["speaker", "speakers", "bluetooth speaker", "audio", "home theatre"] },
+    { term: "Television", keywords: ["television", "tv", "tele"] },
+    { term: "Watch", keywords: ["watch", "smart watch", "time", "clock", "wall clock"] },
+    { term: "CCTV", keywords: ["cctv", "security camera", "surveillance"] },
+    { term: "ComputerAccessories", keywords: ["keyboard", "mouse", "monitor", "webcam", "laptop charger", "adapter"] },
+    { term: "MobileAccessories", keywords: ["charger", "mobile charger", "back cover", "back case", "flip cover", "case", "screen protector", "power bank", "c type charger"] }
+];
+// Function to handle search and navigate
+// Function to handle search and navigate
+// Function to handle search and navigate
+const handleSearch = async () => {
+  const searchTerm = searchQuery.trim().toLowerCase(); // Convert input to lowercase for comparison
+
+  if (searchTerm) {
+    // 1. First, check locally using keyword mapping
+    const foundCategory = keywordMapping.find(mapping => 
+      mapping.keywords.some(keyword => searchTerm === keyword.toLowerCase()) // Use exact match, not includes
+    );
+
+    if (foundCategory) {
+      let category = foundCategory.term;
+
+      // Explicitly handle "TV" search
+      if (searchTerm === 'tv') {
+        category = 'TeleVision';
+      }
+
+      // If a local match is found, navigate to the category with search query
+      navigate(`/${encodeURIComponent(category)}?search=${encodeURIComponent(searchTerm)}`);
+    } else {
+      // 2. If no local match, call the backend API for suggestions
+      try {
+        const response = await fetch(`${ApiUrl}/api/suggestions?query=${encodeURIComponent(searchQuery.trim())}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.category) {
+            let category = data.category;
+
+            // Explicitly handle backend response for "tv"
+            if (category.toLowerCase() === 'tv') {
+              category = 'TeleVision';
+            } else if (searchQuery.trim().toLowerCase() === 'cctv') {
+              category = 'CCTV';
+            }
+
+            // Navigate to the product's category page with search query
+            navigate(`/${encodeURIComponent(category)}?search=${encodeURIComponent(searchTerm)}`);
+          } else {
+            // If the backend doesn't return a category, show "Product not found"
+            Swal.fire({
+              title: 'Product not found',
+              text: 'We could not find any products matching your search.',
+              icon: 'warning',
+              confirmButtonText: 'OK'
+            });
+          }
+        } else {
+          Swal.fire({
+            title: 'Product not found',
+            text: 'We could not find any products matching your search.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          });
+        }
+      } catch (error) {
+        console.error("Error during search:", error);
+        Swal.fire({
+          title: 'Error',
+          text: 'An error occurred while searching.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       }
     }
-  };
+  }
+};
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -105,11 +190,11 @@ const Header2 = () => {
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    setSearchQuery(suggestion);
-    setIsDropdownOpen3(false);
-    navigate(`/${encodeURIComponent(suggestion)}`);
-  };
+  // const handleSuggestionClick = (suggestion) => {
+  //   setSearchQuery(suggestion);
+  //   setIsDropdownOpen3(false);
+  //   navigate(`/${encodeURIComponent(suggestion)}`);
+  // };
 
   useEffect(() => {
     const handleResize = () => {
@@ -158,7 +243,7 @@ const Header2 = () => {
   }, []);
 
   const calculateTotalPrice = () => {
-    console.log(cartItems); // Before passing to Cart
+    // console.log(cartItems); // Before passing to Cart
 
     return cartItems
       .reduce((total, item) => {
@@ -167,6 +252,20 @@ const Header2 = () => {
       }, 0)
       .toFixed(2);
   };
+
+  const discount = () => {
+    return cartItems
+      .reduce((total, item) => {
+        const actual_price = parseFloat(item.actual_price);
+        const price = parseFloat(item.price);
+        const discountPerItem = actual_price - price;
+        return (
+          total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
+        );
+      }, 0)
+      .toFixed(2);
+  };
+
 
   const getTotalItemsCount = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0); // Ensure quantity is a valid number
@@ -390,10 +489,18 @@ const Header2 = () => {
   //   console.log("Wishlist Items:", wishlistItems);
   // }, [cartItems, wishlistItems]);
 
+
+  // const categoryMap = {
+  //   TV: 'Television',
+  //   Speakers: 'Speaker',
+  //   // Add other mappings as needed
+  // };
+
+
   return (
     <>
       <header
-        style={{ position: "sticky", top: 0, zIndex: 1000 }}
+        style={{ position: "sticky", top: 0, zIndex: 1001 }}
         className="header2"
       >
         <div className="company-name">
@@ -410,8 +517,9 @@ const Header2 = () => {
             placeholder="Search for products..."
           />
           <FaSearch className="search-icon" onClick={handleSearch} />
+          {errorMessage && <div className="error-message">{errorMessage}</div>}
 
-          {isDropdownOpen3 && (
+          {/* {isDropdownOpen3 && (
             <ul className="suggestions-dropdown">
               {suggestions.length > 0 ? (
                 suggestions.map((suggestion, index) => (
@@ -426,15 +534,15 @@ const Header2 = () => {
                 <li className="no-suggestions">Product not found</li>
               )}
             </ul>
-          )}
+          )} */}
         </div>
 
-        <div className="icons">
-          <FaUser className="users" title="Login" onClick={toggleUserCard} />
-          <FaHeart title="Wish List" onClick={toggleWishlist} />
+        <div className="iconss">
+          <FaUser  title={username || "Login"} style={{color:'white'}} className="users"  onClick={toggleUserCard} />
+          <FaHeart style={{color:'white'}} title="Wish List" onClick={toggleWishlist} />
           <div className="cart-icon-container">
-            <FaShoppingCart title="Cart" onClick={toggleSidebar} />
-            <FaEllipsisV className="dots" onClick={handleToggleDropdown} />
+            <FaShoppingCart style={{color:'white',marginTop:'5px'}} title="Cart" onClick={toggleSidebar} />
+            <FaEllipsisV style={{color:'white'}} className="dots" onClick={handleToggleDropdown} />
 
             {getTotalItemsCount() > 0 && (
               <span className="cart-count">{getTotalItemsCount()}</span>
@@ -447,7 +555,7 @@ const Header2 = () => {
                     className="dropdown-item"
                     onClick={() => handleMenuClick("About")}
                   >
-                    <FaInfoCircle className="dropdown-icon" />
+                    <FaInfoCircle style={{color:'#333'}} className="dropdown-icon" />
                     <span>About</span>
                   </div>
                 </a>
@@ -456,7 +564,7 @@ const Header2 = () => {
                     className="dropdown-item"
                     onClick={() => handleMenuClick("Contact")}
                   >
-                    <FaEnvelope className="dropdown-icon" />
+                    <FaEnvelope style={{color:'#333'}}className="dropdown-icon" />
                     <span>Contact</span>
                   </div>
                 </a>
@@ -465,7 +573,7 @@ const Header2 = () => {
                     className="dropdown-item"
                     onClick={() => handleMenuClick("Help Center")}
                   >
-                    <FaQuestionCircle className="dropdown-icon" />
+                    <FaQuestionCircle style={{color:'#333'}}className="dropdown-icon" />
                     <span>Help Center</span>
                   </div>
                 </a>
@@ -486,84 +594,98 @@ const Header2 = () => {
             <h3>Cart</h3>
           </div>
           <div className="sidebarcart-body">
-            {cartItems.length === 0 ? (
-              <p>Your cart is empty.</p>
-            ) : (
-              <ul>
-                {cartItems.map((item) => (
-                    <li key={item.id} className="cart-item">
-                  <Link style={{textDecoration:'none'}} to={`/${item.category}`}>
+  {cartItems.length === 0 ? (
+    <p>Your cart is empty.</p>
+  ) : (
+    <ul>
+      {cartItems.slice().reverse().map((item) => {
+        // Check if image is an array or a string
+        const images = Array.isArray(item.image) 
+          ? item.image 
+          : JSON.parse(item.image || '[]'); // Handle JSON string
+        const firstImage = images.length > 0 ? images[0] : null; // Get the first image or null if not available
 
-                      <img
-                        src={`${ApiUrl}/uploads/${item.category}/${item.image}`}
-                        alt={item.name}
-                        loading="lazy"
-                        name="image"
-                      />
-                        </Link>
+        return (
+          <li key={item.id} className="cart-item">
+            {/* <Link style={{ textDecoration: 'none' }} to={`/${categoryMap[item.category] || item.category}`}> */}
 
-                      <div className="item-details">
-                  <Link style={{textDecoration:'none'}} to={`/${item.category}`}>
+            <Link style={{ textDecoration: 'none' }} to={`/product/${item.id}`}>
+            {firstImage ? (
+                <img
+                  src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
+                  alt={item.name}
+                  loading="lazy"
+                  name="image"
+                />
+              ) : (
+                <div className="placeholder-image">No image available</div> // Fallback message
+              )}
+            </Link>
 
-                        <h3>{item.name}</h3>
-                        {/* <h3>{item.product_id}</h3> */}
-                        <p>{item.description}</p>
-                        </Link>
-
-                      </div>
-
-                      <div className="item-price">
-                        <p style={{color:'#333'}}>₹{item.price * item.quantity}</p>
-                        <div className="quantity-controls">
-                          <button
-                            onClick={() =>
-                              updateCartItemQuantity(
-                                item.id,
-                                item.category,
-                                Math.max(item.quantity - 1, 1)
-                              )
-                            }
-                          >
-                            -
-                          </button>
-                          <span>{item.quantity}</span>
-                          <button
-                            onClick={() =>
-                              updateCartItemQuantity(
-                                item.id,
-                                item.category,
-                                item.quantity + 1
-                              )
-                            }
-                          >
-                            +
-                          </button>
-                        </div>
-                        <button
-                          onClick={() => removeFromCart(item.id, item.category)}
-                          className="remove-btn"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </li>
-                ))}
-              </ul>
-            )}
-            <div className="cart-total">
-              <div className="sidebarcart-footer">
-                <p>Total Price: ₹{calculateTotalPrice()}</p>
-                <a
-                  style={{ textDecoration: "none", color: "black" }}
-                  href="/Cart"
-                >
-                  <span>
-                    View Cart <FaShoppingCart />{" "}
-                  </span>
-                </a>
-              </div>
+            <div className="item-details">
+              <Link style={{ textDecoration: 'none' }} to={`/product/${item.id}`}>
+                <h3 className="item-name">{item.name}</h3>
+                <p className="item-features">{item.description}</p>
+              </Link>
             </div>
-          </div>
+
+            <div className="item-price">
+            <p style={{ color: 'red',textDecoration:"line-through", fontSize:'12px' }}>₹{item.actual_price}</p>
+
+              <p style={{ color: '#27ae60' }}> ₹{item.price * item.quantity}</p>
+              <div className="quantity-controls">
+                <button
+                  onClick={() =>
+                    updateCartItemQuantity(
+                      item.id,
+                      item.category,
+                      Math.max(item.quantity - 1, 1)
+                    )
+                  }
+                >
+                  -
+                </button>
+                <span>{item.quantity}</span>
+                <button
+                  onClick={() =>
+                    updateCartItemQuantity(
+                      item.id,
+                      item.category,
+                      item.quantity + 1
+                    )
+                  }
+                >
+                  +
+                </button>
+              </div>
+              <button
+                onClick={() => removeFromCart(item.id, item.category)}
+                className="remove-btn"
+              >
+                Remove
+              </button>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  )}
+  <div className="cart-total">
+    <div className="sidebarcart-footer">
+    <span style={{fontSize:'14px', textDecoration:'line-through'}}>{discount()} </span>  
+      <p>₹{calculateTotalPrice()}</p>
+      <a
+        style={{ textDecoration: "none", color: "black" }}
+        href="/Cart"
+      >
+        <button className="change-btn">
+          View Cart <FaShoppingCart />{" "}
+        </button>
+      </a>
+    </div>
+  </div>
+</div>
+
         </div>
         <WishlistSidebar
           isOpen={isWishlistOpen}

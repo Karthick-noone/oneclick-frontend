@@ -3,12 +3,24 @@
     background-color: #f0f2f5;
   }
   
+ 
   .my-orders h2 {
     margin-bottom: 20px;
     font-size: 28px;
     color: #333;
     text-align: center;
   }
+  .info-value {
+    display: -webkit-box;              /* Required for WebKit-based browsers */
+    display: box;                       /* Fallback for other browsers */
+    -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
+    box-orient: vertical;              /* Fallback for other browsers */
+    overflow: hidden;                   /* Hide overflow content */
+    -webkit-line-clamp: 2;             /* Limit to 2 lines in WebKit-based browsers */
+    line-clamp: 2;                     /* Future proofing for standard implementation */
+    text-overflow: ellipsis;           /* Show ellipsis when text overflows */
+  }
+  
   
   .order-container {
     display: flex;
@@ -67,10 +79,11 @@
     color: #fff;
     border: none;
     border-radius: 5px;
-    padding: 12px 20px;
+    padding: 10px 15px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     transition: background-color 0.3s;
+
   }
   
   .view-details-button:hover {
@@ -82,3 +95,46 @@
     font-size: 18px;
     color: #555;
   }
+
+  .order-status {
+    padding: 6px 15px; /* Increased padding for a more prominent look */
+    border-radius: 8px; /* More rounded corners for a modern feel */
+    font-weight: bold; /* Keep bold text */
+    color: white; /* White text for better contrast */
+    background-color: #28a745; /* Green background for successful status */
+    display: inline-block; /* Make the status label inline-block */
+    text-align: center; /* Center the text */
+    font-size: 12px; /* Slightly increased font size */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transitions */
+  }
+  
+  .order-status:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: scale(1.05); /* Slight zoom effect on hover */
+  }
+  
+  .order-status.shipped {
+    background-color: #ffc107; /* Yellow background for 'Shipped' status */
+    color: #212529; /* Dark text for better contrast on yellow */
+  }
+  
+  .order-status.out-for-delivery {
+    background-color: #17a2b8; /* Blue background for 'Out for Delivery' status */
+  }
+  
+  .order-status.delivered {
+    background-color: #007bff; /* Blue background for 'Delivered' status */
+  }
+  
+  .order-status.pending {
+    background-color: #dc3545; /* Red background for 'Pending' or error status */
+  }
+  
+  /* Additional styles for no orders message */
+  .no-orders {
+    text-align: center;
+    font-size: 1.2em;
+    color: #555; /* Slightly darker text for contrast */
+  }
+  

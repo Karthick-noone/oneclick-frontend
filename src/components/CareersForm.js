@@ -27,28 +27,68 @@ const CareersForm = () => {
     
   };
 
+  // const validateForm = () => {
+  //   const newErrors = {};
+
+  //   if (!formData.firstName) newErrors.firstName = 'First name is required.';
+  //   if (!formData.lastName) newErrors.lastName = 'Last name is required.';
+  //   if (!formData.email) {
+  //     newErrors.email = 'Email is required.';
+  //   } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+  //     newErrors.email = 'Email address is invalid.';
+  //   }
+  //   if (!formData.phone) {
+  //     newErrors.phone = 'Phone number is required.';
+  //   } else if (!/^[6-9]\d{9}$/.test(formData.phone)) {
+  //     newErrors.phone = 'Phone number must be 10 digits starting with 6-9.';
+  //   }
+  //   if (!formData.position) newErrors.position = 'Position is required.';
+  //   if (!formData.startDate) newErrors.startDate = 'Start date is required.';
+  //   if (!resumeFile) newErrors.resumeFile = 'Resume file is required.';
+
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
+
   const validateForm = () => {
     const newErrors = {};
-
+  
+    // First name validation
     if (!formData.firstName) newErrors.firstName = 'First name is required.';
+  
+    // Last name validation
     if (!formData.lastName) newErrors.lastName = 'Last name is required.';
+  
+    // Email validation
     if (!formData.email) {
       newErrors.email = 'Email is required.';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email address is invalid.';
+    } else if (!formData.email.endsWith('.com')) {
+      newErrors.email = 'Enter a valid email address.';
     }
+  
+    // Phone number validation
     if (!formData.phone) {
       newErrors.phone = 'Phone number is required.';
     } else if (!/^[6-9]\d{9}$/.test(formData.phone)) {
       newErrors.phone = 'Phone number must be 10 digits starting with 6-9.';
     }
+  
+    // Position validation
     if (!formData.position) newErrors.position = 'Position is required.';
+  
+    // Start date validation
     if (!formData.startDate) newErrors.startDate = 'Start date is required.';
+  
+    // Resume file validation
     if (!resumeFile) newErrors.resumeFile = 'Resume file is required.';
-
+  
+    // Set errors state and return boolean for form validity
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -83,60 +123,70 @@ const CareersForm = () => {
  
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    if (validateForm()) {
-        const formDataToSend = new FormData();
-
-        // Combine firstName and lastName into a single name variable
-        const fullName = `${formData.firstName} ${formData.lastName}`;
-        
-        // Add combined name and other fields to FormData
-        formDataToSend.append('name', fullName);
-        formDataToSend.append('email', formData.email);
-        formDataToSend.append('phone', formData.phone);
-        formDataToSend.append('position', formData.position);
-        formDataToSend.append('startDate', formData.startDate);
-
-        // Add the resume file to FormData
-        if (resumeFile) {
-            formDataToSend.append('resume', resumeFile);
-        }
-
-        // Send data via fetch
-        fetch(`${ApiUrl}/submit-careers-form`, {
-            method: 'POST',
-            body: formDataToSend,
-        })
-        .then((response) => {
-            if (response.ok) {
-                Swal.fire('Success!', 'Form submitted successfully!', 'success');
-                
-                // Clear the form data and resume file
-                setFormData({
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    phone: '',
-                    position: '',
-                    startDate: ''
-                });
-                document.querySelector('input[type="file"]').value = '';
-              } else {
-                return response.json().then((data) => {
-                    Swal.fire('Error!', data.message || 'Failed to submit the form.', 'error');
-                });
-            }
-        })
-        .catch((error) => {
-            Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
-        })
-        .finally(() => {
-            setIsSubmitting(false);
-        });
-    } else {
+    // Perform client-side validation
+    if (!validateForm()) {
+        Swal.fire('Error!', 'Please fill in the required fields.', 'error');
         setIsSubmitting(false);
+        return; // Prevent further execution if validation fails
     }
+
+    setIsSubmitting(true); // Set the button state to 'Submitting...' only when validation passes
+
+    const formDataToSend = new FormData();
+
+    // Combine firstName and lastName into a single name variable
+    const fullName = `${formData.firstName} ${formData.lastName}`;
+    
+    // Add combined name and other fields to FormData
+    formDataToSend.append('name', fullName);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('phone', formData.phone);
+    formDataToSend.append('position', formData.position);
+    formDataToSend.append('startDate', formData.startDate);
+    
+    // Add the resume file to FormData
+    if (resumeFile) {
+        formDataToSend.append('resume', resumeFile);
+    }
+
+    // Send data via fetch
+    fetch(`${ApiUrl}/submit-careers-form`, {
+        method: 'POST',
+        body: formDataToSend,
+    })
+    .then((response) => {
+        if (response.ok) {
+            Swal.fire('Success!', 'Form submitted successfully!', 'success');
+            
+            // Clear the form data and resume file
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                position: '',
+                startDate: ''
+            });
+            document.querySelector('input[type="file"]').value = '';
+        } else {
+            return response.json().then((data) => {
+                // Handle specific response errors
+                Swal.fire({
+                    title: 'You already applied',
+                    text: data.message || 'Failed to submit the form.',
+                    icon: 'info' // Info icon added
+                });
+            });
+        }
+    })
+    .catch((error) => {
+        Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
+    })
+    .finally(() => {
+        // Always reset the button to 'Submit' regardless of success or failure
+        setIsSubmitting(false);
+    });
 };
 
 

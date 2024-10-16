@@ -1,171 +1,363 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { useNavigate } from 'react-router-dom';
 import { ApiUrl } from "./ApiUrl";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 import logo from './img/logo3.png';
+import confetti from 'canvas-confetti'; // Import the confetti package
+import axios from 'axios';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    contact_number: "",
     password: "",
+    username: "",
   });
 
   const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
+  const [backgroundImage, setBackgroundImage] = useState('');
+
+  // Fetch the background image from the server
+  useEffect(() => {
+    console.log('Fetching background image from:', `${ApiUrl}/fetchloginbg`); // Log the API URL being used
+
+    axios.get(`${ApiUrl}/fetchloginbg`)
+      .then((response) => {
+        console.log('Response data:', response.data); // Log the data received from the server
+        
+        if (response.data.length > 0) {
+          console.log('Background image found:', response.data[0].image); // Log the image being used
+          setBackgroundImage(response.data[0].image); // Only set the filename, base path is handled in style
+        } else {
+          console.log('No background image found, using gradient instead');
+          setBackgroundImage(''); // No image, fallback to gradient
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching background image:', error); // Log any errors that occur
+      });
+  }, []);
+
+
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
   const navigate = useNavigate();
+// Function to inject keyframes
+const injectKeyframes = () => {
+  const styleSheet = document.styleSheets[0];
+  styleSheet.insertRule(bounceKeyframes, styleSheet.cssRules.length);
+};
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    // Basic frontend validation
-    if (formData.username === "" || formData.password === "") {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "All fields are required!",
+// Call the function to inject the keyframes when the component mounts
+React.useEffect(() => {
+  injectKeyframes();
+}, []);
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Basic frontend validation
+  if (formData.contact_number === "" || formData.password === "") {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      html: '<div style="font-size: 2rem;">👎</div> All fields are required!',
+      customClass: {
+        popup: 'shake-popup',
+      },
+    });
+    return;
+  }
+
+  try {
+    const response = await fetch(`${ApiUrl}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      const { contact_number, email, user_id, username } = result;
+
+      // Store user details in localStorage
+      localStorage.setItem('contact_number', contact_number);
+      localStorage.setItem('username', username);
+      localStorage.setItem('email', email);
+      localStorage.setItem('user_id', user_id); // Store user_id in localStorage
+
+      // Fire confetti burst for success
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        startVelocity: 30,
+        zIndex: 9999, // Ensure confetti is on top
+        origin: { y: 0.5 },
       });
-      return;
-    }
-  
-    // if (formData.password.length < 5) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Password too short",
-    //     text: "Password should be at least 5 characters long.",
-    //   });
-    //   return;
-    // }
-  
-    try {
-      const response = await fetch(`${ApiUrl}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+
+      Swal.fire({
+        icon: 'success',
+        title: '🎉Success!',
+        text: 'Login successful! Welcome back!',
+        customClass: {
+          popup: 'my-popup',
         },
-        body: JSON.stringify(formData),
+        willOpen: () => {
+          const popupElement = Swal.getPopup();
+          Object.assign(popupElement.style, swalStyles.popup);
+          const titleElement = popupElement.querySelector('.swal2-title');
+          if (titleElement) {
+            Object.assign(titleElement.style, swalStyles.title);
+          }
+          const textElement = popupElement.querySelector('.swal2-content');
+          if (textElement) {
+            Object.assign(textElement.style, swalStyles.text);
+          }
+        },
+        showCloseButton: true,
+      })
+      .then(() => {
+        navigate('/', { state: { user_id } });
       });
-  
-      const result = await response.json();
-  
-      if (response.ok) {
-        const { username, email, user_id } = result;
-  
-        // Store user details in localStorage
-        localStorage.setItem('username', username);
-        localStorage.setItem('email', email);
-        localStorage.setItem('user_id', user_id); // Store user_id in localStorage
-  
-        // Success feedback
-        Swal.fire({
-          icon: "success",
-          title: "Login successful",
-          text: "You have logged in successfully!",
-        }).then(() => {
-          // Navigate to home page and pass user_id to address page
-          navigate('/', { state: { user_id } });
-        });
-      } else {
-        // Error feedback
-        Swal.fire({
-          icon: "error",
-          title: "Login failed",
-          text: result.message || "Invalid credentials!",
-        });
-      }
-    } catch (error) {
-      // Network or server error
+
+    } else {
+      // Error feedback with thumbs down icon and shake effect
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Something went wrong. Please try again later.",
+        title: "Login failed 👎",
+        html: '<div style="font-size: 2rem;"></div> Invalid credentials!',
+        customClass: {
+          popup: 'shake-popup', // Custom shake animation class
+        },
+        willOpen: () => {
+          const popupElement = Swal.getPopup();
+          Object.assign(popupElement.style, swalErrorStyles.popup);
+
+          const titleElement = popupElement.querySelector('.swal2-title');
+          if (titleElement) {
+            Object.assign(titleElement.style, swalErrorStyles.title);
+          }
+          
+          // Apply text styles
+          const textElement = popupElement.querySelector('.swal2-content');
+          if (textElement) {
+            Object.assign(textElement.style, swalErrorStyles.text);
+          }
+        },
       });
     }
-  };
+  } catch (error) {
+    // Network or server error feedback
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      html: '<div style="font-size: 2rem;">👎</div> Something went wrong. Please try again later.',
+      customClass: {
+        popup: 'shake-popup',
+      },
+    });
+  }
+};
+
+
+// Add styles for shake animation and error popup
+const swalErrorStyles = {
+  popup: {
+    background: 'rgba(255, 255, 255, 0.9)', 
+    border: 'none',
+    boxShadow: '0 0 15px rgba(255, 0, 0, 0.9)', // Red shadow for error
+    width:'500px'
+  },
+  title: {
+    color: '#FF0000', // Red title color
+    fontWeight: 'bold', 
+  },
+  text: {
+    color: '#333', // Darker text for message
+  },
+};
+
+// Inject the shake styles into the head of the document
+const styleElement = document.createElement('style');
+styleElement.innerHTML = styles;
+document.head.appendChild(styleElement);
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible); // Toggle password visibility
   };
 
   return (
-    <div style={styles.container}>
-      <center> 
-        <a href="/"> 
-          <img src={logo} width={'200px'} alt="Logo" />
-        </a>
-      </center>
-
-      <h2 style={styles.title}>User Login</h2>
-      <form style={styles.form} onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          style={styles.input}
-          required
+    <div style={styles.background}>
+      {backgroundImage && (
+        <div
+          style={{
+            ...styles.blurredBackground,
+            backgroundImage: `url(${ApiUrl}/uploads/singleadpage/${backgroundImage})`, // Set the blurred background image
+          }}
         />
+      )}
+    {/* Optional overlay for the blur effect */}
+    {backgroundImage && <div style={styles.blurOverlay} />}
+      <div style={styles.container}>
+        <center>
+          <a href="/">
+            <img src={logo} width={'200px'} alt="Logo" />
+          </a>
+        </center>
 
-        <div style={styles.passwordContainer}>
+        <h2 style={styles.title}>User Login</h2>
+        <form style={styles.form} onSubmit={handleSubmit}>
+          <label style={styles.label} htmlFor="name">Mobile Number</label>
+
           <input
-            type={passwordVisible ? "text" : "password"}
-            name="password"
-            placeholder="Password"
-            value={formData.password}
+            type="tel"
+            name="contact_number"
+            placeholder="Mobile Number"
+            value={formData.contact_number}
             onChange={handleChange}
-            style={styles.passwordInput}
+            style={styles.input}
             required
           />
-          <span onClick={togglePasswordVisibility} style={styles.eyeIcon}>
-            {passwordVisible ? <FaEyeSlash /> : <FaEye />}
-          </span>
-        </div>
+          <label style={styles.label} htmlFor="name">Password</label>
 
-        <button type="submit" style={styles.button}>
-          Login
-        </button>
-      </form>
-      <div style={styles.linksContainer}>
-        <a href="/ForgotPassword" style={styles.link}>
-          Forgot Password?
-        </a>
-        <a href="/signup" style={styles.link}>
-          Don't have an account? Sign Up
-        </a>
+          <div style={styles.passwordContainer}>
+            <input
+              type={passwordVisible ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              style={styles.passwordInput}
+              required
+            />
+            <span onClick={togglePasswordVisibility} style={styles.eyeIcon}>
+              {passwordVisible ? <FaEye /> : <FaEyeSlash />}
+            </span>
+          </div>
+
+          <button type="submit" style={styles.button}>
+            Login
+          </button>
+        </form>
+        <div style={styles.linksContainer}>
+          <a href="/ForgotPassword" style={styles.link}>
+            Forgot Password? 
+          </a>
+          <a href="/signup" style={styles.link}>
+            Don't have an account? Sign Up
+          </a>
+        </div>
       </div>
     </div>
   );
+}
+
+
+
+const swalStyles = {
+  popup: {
+    background: 'rgba(255, 255, 255, 0.9)', 
+    border: 'none',
+    boxShadow: '0 0 15px rgba(76, 175, 80, 0.7)', // Green shadow with some transparency
+    width: '500px',
+  },
+  title: {
+    color: '#4CAF50', // Green color for title
+    fontWeight: 'bold', 
+  },
+  text: {
+    color: '#333', // Darker text color for content
+  },
 };
 
+// Keyframes for the bounce animation
+const bounceKeyframes = `
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+`;
+
+
+
+
+
 const styles = {
+  background: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh', // Full height of the viewport
+    background: 'linear-gradient(to bottom right, #add8e6, #ffffff)', // Default gradient
+    backgroundSize: 'cover', // Ensure the background covers the entire area
+    position: 'relative', // To position the overlay
+    overflow: 'hidden', // Hide overflow to keep blur contained
+  },
+  blurredBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundSize: 'cover', // Ensure the background covers the entire area
+    filter: 'blur(4px)', // Adjust the blur effect here
+    zIndex: 1, // Place behind other content
+  },
+  content: {
+    position: 'relative', // Position content above the blur
+    zIndex: 2,
+    textAlign: 'center',
+    color: 'white',
+  },
+  label: {
+    color: 'white',
+    marginTop: '5px'
+  },
   container: {
     maxWidth: "400px",
-    margin: "50px auto",
-    padding: "20px",
+    margin: "30px auto",
+    padding: "15px",
     borderRadius: "10px",
     boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    marginTop: '100px',
+    zIndex: 2,
+
   },
   title: {
     textAlign: "center",
-    marginBottom: "20px",
-    fontSize: "24px",
+    marginBottom: "15px",
+    fontSize: "20px",
     fontWeight: "bold",
-    color: "#333",
+    color: "white",
   },
   form: {
     display: "flex",
     flexDirection: "column",
   },
   input: {
-    padding: "10px",
-    margin: "10px 0",
+    width: "100%",
+    padding: "8px",
+    margin: "8px 0",
     borderRadius: "5px",
-    border: "1px solid #ccc",
-    fontSize: "16px",
+    border:'1px solid grey',
+    fontSize: "14px",
+    backgroundColor: "black",
+    color: "white",
+    background:'transparent',
   },
   passwordContainer: {
     position: "relative",
@@ -173,27 +365,33 @@ const styles = {
   },
   passwordInput: {
     width: "100%",
-    padding: "10px",
+    padding: "8px",
     borderRadius: "5px",
-    border: "1px solid #ccc",
-    fontSize: "16px",
-    paddingRight: "40px", // Add space for the eye icon
+    border: "1px solid grey",
+    fontSize: "14px",
+    paddingRight: "35px",
+    marginTop: "10px",
+    backgroundColor: "black",
+    color: "white",
+    background:'transparent',
+
   },
   eyeIcon: {
     position: "absolute",
-    right: "10px",
-    top: "50%",
+    right: "15px",
+    top: "60%",
     transform: "translateY(-50%)",
     cursor: "pointer",
+    color: 'white',
   },
   button: {
-    padding: "10px",
-    margin: "20px 0",
+    padding: "8px",
+    margin: "15px 0",
     borderRadius: "5px",
     border: "none",
     backgroundColor: "#007BFF",
     color: "#fff",
-    fontSize: "18px",
+    fontSize: "16px",
     cursor: "pointer",
   },
   linksContainer: {
@@ -203,8 +401,9 @@ const styles = {
   },
   link: {
     fontSize: "14px",
-    color: "#007BFF",
+    color: "white",
     textDecoration: "none",
+    marginLeft:"5px"
   },
 };
 

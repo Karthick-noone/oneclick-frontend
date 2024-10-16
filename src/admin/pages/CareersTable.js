@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './css/CareersTable.css'; // Import the CSS file
 import { ApiUrl } from '../../components/ApiUrl';
+import { FaDownload } from 'react-icons/fa';
 
 const CareersTable = () => {
   const [careers, setCareers] = useState([]);
@@ -9,6 +10,9 @@ const CareersTable = () => {
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentResumeUrl, setCurrentResumeUrl] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     axios.get(`${ApiUrl}/api/careers`)
@@ -20,6 +24,11 @@ const CareersTable = () => {
         setError(error);
         setLoading(false);
       });
+
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   if (loading) return <p>Loading...</p>;
@@ -34,14 +43,102 @@ const CareersTable = () => {
     return `${day} ${month} ${year}`;
   };
 
+  const handleDownload = (resumeUrl) => {
+    fetch(resumeUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/octet-stream',
+      },
+    })
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = resumeUrl.split('/').pop(); // Extract file name
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('Download failed:', error);
+      });
+  };
+
   const openModal = (resumeUrl) => {
-    setCurrentResumeUrl(resumeUrl);
-    setModalOpen(true);
+    if (isMobile) {
+      handleDownload(resumeUrl); // Handle download on mobile
+    } else {
+      setCurrentResumeUrl(resumeUrl);
+      setModalOpen(true);
+    }
   };
 
   const closeModal = () => {
     setModalOpen(false);
     setCurrentResumeUrl('');
+  };
+
+  // Pagination logic
+  const indexOfLastCareer = currentPage * itemsPerPage;
+  const indexOfFirstCareer = indexOfLastCareer - itemsPerPage;
+  const currentCareers = careers.slice(indexOfFirstCareer, indexOfLastCareer);
+
+  const totalPages = Math.ceil(careers.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const getPaginationPages = () => {
+    const pages = [];
+    const maxPagesToShow = 6; // Total number of page numbers to show at a time
+    
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const leftBoundary = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+      const rightBoundary = Math.min(totalPages, currentPage + Math.floor(maxPagesToShow / 2));
+
+      if (leftBoundary > 2) {
+        pages.push(1, '...');
+      } else {
+        for (let i = 1; i < leftBoundary; i++) {
+          pages.push(i);
+        }
+      }
+
+      for (let i = leftBoundary; i <= rightBoundary; i++) {
+        pages.push(i);
+      }
+
+      if (rightBoundary < totalPages - 1) {
+        pages.push('...', totalPages);
+      } else {
+        for (let i = rightBoundary + 1; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      }
+    }
+
+    return pages;
   };
 
   return (
@@ -60,9 +157,9 @@ const CareersTable = () => {
           </tr>
         </thead>
         <tbody>
-          {careers.map((career, index) => (
+          {currentCareers.map((career, index) => (
             <tr key={career.id}>
-              <td>{index + 1}</td>
+              <td>{index + 1 + indexOfFirstCareer}</td>
               <td>{career.name}</td>
               <td>{career.email}</td>
               <td>{career.phone}</td>
@@ -70,8 +167,11 @@ const CareersTable = () => {
               <td>{formatDate(career.startDate)}</td>
               <td>
                 {career.resumeLink && (
-                  <button className='resume-btn' onClick={() => openModal(`${ApiUrl}/uploads/resumes/${career.resumeLink}`)}>
-                    View Resume
+                  <button
+                    className={isMobile ? 'download-btn' : 'resume-btn'}
+                    onClick={() => openModal(`${ApiUrl}/uploads/resumes/${career.resumeLink}`)}
+                  >
+                    {isMobile ? <FaDownload /> : 'View'}
                   </button>
                 )}
               </td>
@@ -81,14 +181,38 @@ const CareersTable = () => {
       </table>
 
       {/* Inline Modal */}
-      {modalOpen && (
+      {modalOpen && !isMobile && (
         <div className="modall-overlay">
           <div className="modall-content">
             <button className="modall-close" onClick={closeModal}>×</button>
+            <FaDownload className="download-btn"/>
             <iframe src={currentResumeUrl} title="Resume" className="modall-iframe"></iframe>
           </div>
         </div>
       )}
+
+      {/* Pagination Controls */}
+      <div className="pagination-controls">
+        <button onClick={handlePrevPage} disabled={currentPage === 1}>
+          &lt;
+        </button>
+        {getPaginationPages().map((page, index) =>
+          page === '...' ? (
+            <span key={index}>...</span>
+          ) : (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={page === currentPage ? 'active' : ''}
+            >
+              {page}
+            </button>
+          )
+        )}
+        <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+        &gt;
+        </button>
+      </div>
     </div>
   );
 };

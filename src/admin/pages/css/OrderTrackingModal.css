@@ -1,0 +1,102 @@
+.vertical-tracking-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  
+  .tracking-step {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 10px 0;
+    position: relative;
+  }
+  
+  .tracking-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 10px;
+    z-index: 2; /* Ensure dots are above the lines */
+    /* left: 1px; */
+
+  }
+  
+  .tracking-line {
+    position: absolute;
+    left: 6px; /* Position the line to match the dot */
+    top: 0;
+    width: 2px;
+    height: 100%; /* Full height of the parent */
+    background-color: grey; /* Set the line color to grey */
+    z-index: 0; /* Line should be below the dot */
+  }
+  
+  /* This line will represent the completed status */
+  .tracking-line-completed {
+    position: absolute;
+    left: 6px; /* Position the line to match the dot */
+    top: 0;
+    width: 2px;
+    background-color: green; /* Set completed line color to green */
+    z-index: 1; /* Completed line should be above the grey line */
+    /* Remove the height property */
+  }
+  
+  .tracking-step:last-child .tracking-line {
+    display: none; /* Optionally hide line for the last step */
+  }
+  
+  .tracking-step p {
+    margin: 0;
+    font-size: 14px;
+    text-align: left;
+  }
+  
+  .tracking-dot2 {
+    position: absolute;
+    left: 3px; /* Position the dot to match the line */
+    width: 8px; /* Width of the dot */
+    height: 8px; /* Height of the dot */
+    background-color: green; /* Dot color */
+    border-radius: 50%; /* Make the dot circular */
+    z-index: 2; /* Ensure dot is above the completed line */
+    animation: blink 1s infinite; /* Blink animation */
+  }
+  
+  /* Keyframes for blinking effect */
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1; /* Fully visible */
+    }
+    50% {
+      opacity: 0; /* Fully transparent */
+    }
+  }
+  
+
+  .blinking-dot {
+    width: 8px; /* Width of the blinking dot */
+    height: 8px; /* Height of the blinking dot */
+    border-radius: 50%; /* Make it circular */
+    background-color: green; /* Color of the blinking dot */
+    position: absolute; /* Position it absolutely */
+    left: 6px; /* Align it with the tracking line */
+    top: calc(100% - 4px); /* Position it at the end of the tracking line */
+    animation: blink 1s infinite; /* Apply the blinking animation */
+  }
+  
+  /* Animation for blinking effect */
+  @keyframes blink {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+    }
+  }

@@ -122,3 +122,64 @@
       font-size: 12px;
     }
   }
+
+  .user-details-modal {
+    content: "User Details";
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    max-width: 500px;
+    margin: auto;
+    margin-top: 150px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2); /* Adding shadow for depth */
+    transition: all 0.3s ease; /* Smooth transition for modal */
+  }
+  
+  .view-button {
+    background-color: #3085d6;
+    color: white;
+    border: none;
+    padding: 8px 12px; /* Increased padding for better click area */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px; /* Increased font size */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Adding transitions */
+  }
+  
+  .view-button:hover {
+    background-color: #2673a4;
+    transform: scale(1.05); /* Slight scaling on hover for effect */
+  }
+  
+  .view-button:active {
+    transform: scale(0.95); /* Slight shrink on click for feedback */
+  }
+  
+  /* Additional styles for modal content */
+  .user-details-modal h2 {
+    margin-bottom: 15px;
+    font-size: 24px;
+    color: #333; /* Darker title color */
+  }
+  
+  .user-details-modal p {
+    margin: 5px 0; /* Spacing between paragraphs */
+    font-size: 16px; /* Consistent font size for details */
+    line-height: 1.5; /* Better readability */
+  }
+  
+  /* Add a close button style */
+  .user-details-modal button {
+    background-color: #f44336; /* Red background for close button */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth transition for close button */
+  }
+  
+  .user-details-modal button:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+  }
+  

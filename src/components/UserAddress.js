@@ -1,43 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import './css/UserAddress.css';
-import Header2 from './Header2';
-import { ApiUrl } from './ApiUrl';
-import Swal from 'sweetalert2';
-import Footer from './footer';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import "./css/UserAddress.css";
+import Header2 from "./Header2";
+import { ApiUrl } from "./ApiUrl";
+import Swal from "sweetalert2";
+import Footer from "./footer";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { FaCheck, FaShoppingCart } from "react-icons/fa";
 
 const AddressPage = () => {
   const [userId, setUserId] = useState(null);
   const [address, setAddress] = useState({
-    name: '',
-    street: '',
-    city: '',
-    state: '',
-    postal_code: '',
-    country: '',
-    phone: '',
+    name: "",
+    street: "",
+    city: "",
+    state: "",
+    postal_code: "",
+    country: "",
+    phone: "",
   });
   const [submittedAddresses, setSubmittedAddresses] = useState([]);
   const [editingAddress, setEditingAddress] = useState(null);
   const [isSelecting, setIsSelecting] = useState(false); // Toggle selection mode
   const [selectedAddresses, setSelectedAddresses] = useState(new Set()); // Store selected addresses
   const [selectAllChecked, setSelectAllChecked] = useState(false); // State for "Select All" checkbox
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+ // Handle the "Select All" checkbox change
+ const handleSelectAllChange = () => {
+  if (selectAllChecked) {
+    // Deselect all
+    setSelectedAddresses(new Set());
+  } else {
+    // Select all
+    setSelectedAddresses(new Set(submittedAddresses.map((addr) => addr.address_id)));
+  }
+  setSelectAllChecked(!selectAllChecked); // Toggle "Select All" checkbox state
+};
 
-  const handleSelectAllChange = () => {
-    if (selectAllChecked) {
-      // Deselect all
-      setSelectedAddresses(new Set());
-    } else {
-      // Select all
-      setSelectedAddresses(new Set(submittedAddresses.map(addr => addr.address_id)));
-    }
-    setSelectAllChecked(!selectAllChecked); // Toggle "Select All" checkbox state
-  };
 
-  const navigate =useNavigate();
-  
+  const navigate = useNavigate();
+
   useEffect(() => {
-    const storedUserId = localStorage.getItem('user_id');
+    const storedUserId = localStorage.getItem("user_id");
     if (storedUserId) {
       setUserId(storedUserId);
       fetchAddresses(storedUserId);
@@ -51,106 +57,115 @@ const AddressPage = () => {
         const data = await response.json();
         setSubmittedAddresses(data);
       } else {
-        console.error('Error fetching addresses:', await response.text());
+        console.error("Error fetching addresses:", await response.text());
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const response = await fetch(`/backend/singleaddress/${userId}`);
+        const data = await response.json();
+        setSubmittedAddresses(data);
+      } catch (error) {
+        console.error("Error fetching addresses:", error);
+      }
+    };
+
+    fetchAddresses();
+  }, [userId]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
 
-    
     // Handle clearing the phone number field
-    if (name === 'phone' && value === '') {
+    if (name === "phone" && value === "") {
       setAddress({
         ...address,
-        [name]: '', // Clear the phone number field
+        [name]: "", // Clear the phone number field
       });
       return;
     }
-  
+
     // Validate fields based on their name
-    if (name === 'phone') {
+    if (name === "phone") {
       if (!/^[6-9]\d{0,9}$/.test(value) || value.length > 10) {
         return; // Prevent setting invalid phone number
       }
-    } else if (name === 'postal_code') {
+    } else if (name === "postal_code") {
       if (!/^\d*$/.test(value) || value.length > 6) {
         return; // Prevent setting invalid postal code
       }
-    } else if (['name', 'city', 'state', 'country'].includes(name)) {
+    } else if (["name", "city", "state", "country"].includes(name)) {
       if (!/^[a-zA-Z\s]*$/.test(value)) {
         return; // Prevent setting invalid value containing special characters
       }
     }
-  
+
     setAddress({
       ...address,
       [name]: value,
     });
   };
-  
 
-//     // Effect to validate fields when `editingAddress` changes
-//     useEffect(() => {
-//         if (editingAddress) {
-//           // Validate phone number
-//           if (editingAddress.phone && !/^[6-9]\d{0,9}$/.test(editingAddress.phone)) {
-//             // Prevent invalid phone number from being set
-//             setEditingAddress(prev => ({
-//               ...prev,
-//               phone: prev.phone, // Keep the previous valid phone number
-//             }));
-//           }
-//       // Validate postal code
-//       if (editingAddress.postal_code && (!/^\d*$/.test(editingAddress.postal_code) || editingAddress.postal_code.length > 6)) {
-//         setEditingAddress(prev => ({
-//           ...prev,
-//           postal_code: '', // Clear postal code if invalid
-//         }));
-//       }
+  //     // Effect to validate fields when `editingAddress` changes
+  //     useEffect(() => {
+  //         if (editingAddress) {
+  //           // Validate phone number
+  //           if (editingAddress.phone && !/^[6-9]\d{0,9}$/.test(editingAddress.phone)) {
+  //             // Prevent invalid phone number from being set
+  //             setEditingAddress(prev => ({
+  //               ...prev,
+  //               phone: prev.phone, // Keep the previous valid phone number
+  //             }));
+  //           }
+  //       // Validate postal code
+  //       if (editingAddress.postal_code && (!/^\d*$/.test(editingAddress.postal_code) || editingAddress.postal_code.length > 6)) {
+  //         setEditingAddress(prev => ({
+  //           ...prev,
+  //           postal_code: '', // Clear postal code if invalid
+  //         }));
+  //       }
 
-//       // Validate other fields
-//       const textFields = ['name', 'city', 'state', 'country'];
-//       textFields.forEach(field => {
-//         if (editingAddress[field] && !/^[a-zA-Z\s]*$/.test(editingAddress[field])) {
-//           setEditingAddress(prev => ({
-//             ...prev,
-//             [field]: '', // Clear field if invalid
-//           }));
-//         }
-//       });
-//     }
-//   }, [editingAddress]);
+  //       // Validate other fields
+  //       const textFields = ['name', 'city', 'state', 'country'];
+  //       textFields.forEach(field => {
+  //         if (editingAddress[field] && !/^[a-zA-Z\s]*$/.test(editingAddress[field])) {
+  //           setEditingAddress(prev => ({
+  //             ...prev,
+  //             [field]: '', // Clear field if invalid
+  //           }));
+  //         }
+  //       });
+  //     }
+  //   }, [editingAddress]);
 
-
-const handleChange2 = (e) => {
+  const handleChange2 = (e) => {
     const { name, value } = e.target;
 
     // Validation for phone number
-    if (name === 'phone') {
-      if (/^[6-9]\d{0,9}$/.test(value) || value === '') {
-        setEditingAddress(prev => ({
+    if (name === "phone") {
+      if (/^[6-9]\d{0,9}$/.test(value) || value === "") {
+        setEditingAddress((prev) => ({
           ...prev,
           phone: value,
         }));
       }
-    }
-    else if (name === 'postal_code') {
-        if (/^\d{0,6}$/.test(value)) {
-          setEditingAddress(prev => ({
-            ...prev,
-            postal_code: value.length === 6 ? value : value.slice(0, 6),
-          }));
-        }
+    } else if (name === "postal_code") {
+      if (/^\d{0,6}$/.test(value)) {
+        setEditingAddress((prev) => ({
+          ...prev,
+          postal_code: value.length === 6 ? value : value.slice(0, 6),
+        }));
       }
+    }
     // Validation for text fields (name, city, state, country)
-    else if (['name', 'city', 'state', 'country'].includes(name)) {
+    else if (["name", "city", "state", "country"].includes(name)) {
       if (/^[a-zA-Z\s]*$/.test(value)) {
-        setEditingAddress(prev => ({
+        setEditingAddress((prev) => ({
           ...prev,
           [name]: value,
         }));
@@ -158,186 +173,238 @@ const handleChange2 = (e) => {
     }
     // For other fields, update state without validation
     else {
-      setEditingAddress(prev => ({
+      setEditingAddress((prev) => ({
         ...prev,
         [name]: value,
       }));
     }
   };
 
-
-
- const handleEditClick = (addr) => {
+  const handleEditClick = (addr) => {
     setEditingAddress(addr);
   };
 
-const validateAddress = (address) => {
-  const nameRegex = /^[a-zA-Z\s]+$/;
-  const phoneRegex = /^[0-9]{10}$/;
+  const validateAddress = (address) => {
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    const phoneRegex = /^[0-9]{10}$/;
+    const postalCodeRegex = /^[0-9]{6}$/; // Postal code validation (6 digits)
 
-  // Validate name, city, state, and country
-  if (!nameRegex.test(address.name)) {
-    return 'Name, City, State, and Country fields must contain only letters.';
-  }
-  if (!nameRegex.test(address.city)) {
-    return 'City field must contain only letters.';
-  }
-  if (!nameRegex.test(address.state)) {
-    return 'State field must contain only letters.';
-  }
-  if (!nameRegex.test(address.country)) {
-    return 'Country field must contain only letters.';
-  }
-
-  // Validate phone number
-  if (!phoneRegex.test(address.phone)) {
-    return 'Phone number must be exactly 10 digits.';
-  }
-
-  return null;
-};
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const validationError = validateAddress(address);
-  if (validationError) {
-    Swal.fire({
-      title: 'Validation Error',
-      text: validationError,
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
-
-  if (!userId) {
-    // alert('User ID is missing');
-    // Swal.fire({
-    //   title: 'Login Needed',
-    //   text: 'You are not logged in',
-    //   icon: 'error',
-    //   confirmButtonText: 'OK'
-    // });
-    navigate('/login')
-    return;
-  }
-
-  try {
-    const response = await fetch(`${ApiUrl}/useraddress`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId, address }),
-    });
-
-    if (response.ok) {
-      Swal.fire({
-        title: 'Success',
-        text: 'Address added successfully',
-        icon: 'success',
-        confirmButtonText: 'OK'
-      }).then(() => {
-        window.location.reload();
-      });
-
-      setSubmittedAddresses([ { ...address, address_id: Date.now() }, ...submittedAddresses,]); // Simulate address with ID
-      setAddress({
-        name: '',
-        street: '',
-        city: '',
-        state: '',
-        postal_code: '',
-        country: '',
-        phone: '',
-      });
-    } else {
-      console.error('Error submitting address:', await response.text());
+    // Validate name, city, state, and country
+    if (!nameRegex.test(address.name)) {
+      return "Name, City, State, and Country fields must contain only letters.";
     }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
+    if (!nameRegex.test(address.city)) {
+      return "City field must contain only letters.";
+    }
+    if (!nameRegex.test(address.state)) {
+      return "State field must contain only letters.";
+    }
+    if (!nameRegex.test(address.country)) {
+      return "Country field must contain only letters.";
+    }
 
-const handleUpdate = async (e) => {
-  e.preventDefault();
+    // Validate phone number
+    if (!phoneRegex.test(address.phone)) {
+      return "Phone number must be exactly 10 digits.";
+    }
 
-  const validationError = validateAddress(editingAddress);
-  if (validationError) {
-    Swal.fire({
-      title: 'Validation Error',
-      text: validationError,
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-    return;
-  }
-
-  if (!userId || !editingAddress) {
-    alert('User ID is missing or no address selected for update');
-    return;
+    // Validate postal code
+  if (!postalCodeRegex.test(address.postal_code)) {
+    return "Please enter a valid postal code";
   }
 
-  try {
-    const response = await fetch(`${ApiUrl}/updateuseraddress/${editingAddress.address_id}`, {
-      method: 'PUT',
+    return null;
+  };
+
+  const checkPhoneNumberExists = async (phone, userId) => {
+    const response = await fetch(`${ApiUrl}/checkPhoneNumber`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(editingAddress),
+      body: JSON.stringify({ phone, userId }), // Send userId with the phone number
     });
-
+    
     if (response.ok) {
+      return true; // Phone number exists for a different user
+    } else if (response.status === 404) {
+      return false; // Phone number does not exist for a different user
+    }
+    
+    throw new Error('Server error');
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const validationError = validateAddress(address);
+    if (validationError) {
       Swal.fire({
-        title: 'Success',
-        text: 'Address updated successfully',
-        icon: 'success',
-        confirmButtonText: 'OK'
+        title: "Validation Error",
+        text: validationError,
+        icon: "error",
+        confirmButtonText: "OK",
       });
-
-      setSubmittedAddresses(submittedAddresses.map(addr => addr.address_id === editingAddress.address_id ? editingAddress : addr));
-      setEditingAddress(null);
-    } else {
-      console.error('Error updating address:', await response.text());
+      return;
+    }
+  
+    if (!userId) {
+      navigate("/login");
+      return;
+    }
+  
+     // Check if phone number already exists for a different user
+  const phoneExists = await checkPhoneNumberExists(address.phone, userId);
+  if (phoneExists) {
+    Swal.fire({
+      title: "Phone Number Exists",
+      text: "This phone number is already in use by another user. Please use a different number.",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
+    return;
+  }
+  
+    try {
+      const response = await fetch(`${ApiUrl}/useraddress`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, address }),
+      });
+  
+      if (response.ok) {
+        Swal.fire({
+          title: "Success",
+          text: "Address added successfully",
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => {
+          window.location.reload();
+        });
+  
+        setSubmittedAddresses([
+          { ...address, address_id: Date.now() },
+          ...submittedAddresses,
+        ]);
+        setAddress({
+          name: "",
+          street: "",
+          city: "",
+          state: "",
+          postal_code: "",
+          country: "",
+          phone: "",
+        });
+      } else {
+        console.error("Error submitting address:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+  
+    const validationError = validateAddress(editingAddress);
+    if (validationError) {
       Swal.fire({
-        title: 'Error',
-        text: 'Failed to update address. Please try again.',
-        icon: 'error',
-        confirmButtonText: 'OK'
+        title: "Validation Error",
+        text: validationError,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+  
+    if (!userId || !editingAddress) {
+      alert("User ID is missing or no address selected for update");
+      return;
+    }
+   // Check if phone number already exists for a different user
+   const phoneExists = await checkPhoneNumberExists(editingAddress.phone, userId);
+   if (phoneExists) {
+     Swal.fire({
+       title: "Phone Number Exists",
+       text: "This phone number is already in use by another user. Please use a different number.",
+       icon: "error",
+       confirmButtonText: "OK",
+     });
+     return;
+   }
+  
+  
+    try {
+      const response = await fetch(
+        `${ApiUrl}/updateuseraddress/${editingAddress.address_id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editingAddress),
+        }
+      );
+  
+      if (response.ok) {
+        Swal.fire({
+          title: "Success",
+          text: "Address updated successfully",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+  
+        setSubmittedAddresses(
+          submittedAddresses.map((addr) =>
+            addr.address_id === editingAddress.address_id
+              ? editingAddress
+              : addr
+          )
+        );
+        setEditingAddress(null);
+      } else {
+        console.error("Error updating address:", await response.text());
+        Swal.fire({
+          title: "Error",
+          text: "Failed to update address. Please try again.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire({
+        title: "Error",
+        text: "An unexpected error occurred. Please try again later.",
+        icon: "error",
+        confirmButtonText: "OK",
       });
     }
-  } catch (error) {
-    console.error('Error:', error);
-    Swal.fire({
-      title: 'Error',
-      text: 'An unexpected error occurred. Please try again later.',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-  }
-};
+  };
+  
 
- const handleDeleteClick = async (addr) => {
-    console.log('Address to delete:', addr); // Debugging line
+  const handleDeleteClick = async (addr) => {
+    console.log("Address to delete:", addr); // Debugging line
 
     if (!addr || !addr.address_id) {
       Swal.fire({
-        title: 'Error',
-        text: 'Invalid address ID',
-        icon: 'error',
-        confirmButtonText: 'OK',
+        title: "Error",
+        text: "Invalid address ID",
+        icon: "error",
+        confirmButtonText: "OK",
       });
       return;
     }
 
     const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this address?',
-      icon: 'warning',
+      title: "Are you sure?",
+      text: "Do you want to delete this address?",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, keep it',
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, keep it",
       reverseButtons: true, // This will reverse the buttons for a better UX
     });
 
@@ -346,43 +413,49 @@ const handleUpdate = async (e) => {
     }
 
     try {
-      const response = await fetch(`${ApiUrl}/deleteuseraddress/${addr.address_id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `${ApiUrl}/deleteuseraddress/${addr.address_id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         Swal.fire({
-          title: 'Deleted!',
-          text: 'Address deleted successfully',
-          icon: 'success',
-          confirmButtonText: 'OK',
+          title: "Deleted!",
+          text: "Address deleted successfully",
+          icon: "success",
+          confirmButtonText: "OK",
         });
 
         // Update the state to reflect the deletion
-        setSubmittedAddresses(submittedAddresses.filter(address => address.address_id !== addr.address_id));
+        setSubmittedAddresses(
+          submittedAddresses.filter(
+            (address) => address.address_id !== addr.address_id
+          )
+        );
       } else {
-        console.error('Error deleting address:', await response.text());
+        console.error("Error deleting address:", await response.text());
         Swal.fire({
-          title: 'Error',
-          text: 'Failed to delete address',
-          icon: 'error',
-          confirmButtonText: 'OK',
+          title: "Error",
+          text: "Failed to delete address",
+          icon: "error",
+          confirmButtonText: "OK",
         });
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       Swal.fire({
-        title: 'Error',
-        text: 'An error occurred while deleting the address',
-        icon: 'error',
-        confirmButtonText: 'OK',
+        title: "Error",
+        text: "An error occurred while deleting the address",
+        icon: "error",
+        confirmButtonText: "OK",
       });
     }
   };
-
 
   // const handleSelectModeToggle = () => {
   //   setIsSelecting(!isSelecting);
@@ -391,36 +464,36 @@ const handleUpdate = async (e) => {
   //   }
   // };
 
-  const handleCheckboxChange = (addressId) => {
-    setSelectedAddresses(prev => {
-      const newSelected = new Set(prev);
-      if (newSelected.has(addressId)) {
-        newSelected.delete(addressId);
-      } else {
-        newSelected.add(addressId);
-      }
-      return newSelected;
-    });
+   // Handle individual checkbox change
+   const handleCheckboxChange = (addressId) => {
+    const newSelectedAddresses = new Set(selectedAddresses);
+    if (newSelectedAddresses.has(addressId)) {
+      newSelectedAddresses.delete(addressId); // Deselect the checkbox
+    } else {
+      newSelectedAddresses.add(addressId); // Select the checkbox
+    }
+    setSelectedAddresses(newSelectedAddresses);
+    // If all individual checkboxes are selected, check the "Select All" checkbox
+    setSelectAllChecked(newSelectedAddresses.size === submittedAddresses.length);
   };
-
   const handleDeleteSelected = async () => {
     if (selectedAddresses.size === 0) {
       Swal.fire({
-        title: 'No Selection',
-        text: 'No addresses selected for deletion.',
-        icon: 'warning',
-        confirmButtonText: 'OK',
+        title: "No Selection",
+        text: "No addresses selected for deletion.",
+        icon: "warning",
+        confirmButtonText: "OK",
       });
       return;
     }
 
     const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete the selected addresses?',
-      icon: 'warning',
+      title: "Are you sure?",
+      text: "Do you want to delete the selected addresses?",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'Yes, delete them!',
-      cancelButtonText: 'No, keep them',
+      confirmButtonText: "Yes, delete them!",
+      cancelButtonText: "No, keep them",
       reverseButtons: true,
     });
 
@@ -430,234 +503,331 @@ const handleUpdate = async (e) => {
 
     try {
       // Perform batch delete
-      const responses = await Promise.all([...selectedAddresses].map(addressId =>
-        fetch(`${ApiUrl}/deleteuseraddress/${addressId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-      ));
+      const responses = await Promise.all(
+        [...selectedAddresses].map((addressId) =>
+          fetch(`${ApiUrl}/deleteuseraddress/${addressId}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+        )
+      );
 
-      const allResponsesOk = responses.every(response => response.ok);
+      const allResponsesOk = responses.every((response) => response.ok);
 
       if (allResponsesOk) {
         Swal.fire({
-          title: 'Deleted!',
-          text: 'Selected addresses deleted successfully',
-          icon: 'success',
-          confirmButtonText: 'OK',
+          title: "Deleted!",
+          text: "Selected addresses deleted successfully",
+          icon: "success",
+          confirmButtonText: "OK",
         });
 
         // Update the state to reflect the deletion
-        setSubmittedAddresses(submittedAddresses.filter(address => !selectedAddresses.has(address.address_id)));
+        setSubmittedAddresses(
+          submittedAddresses.filter(
+            (address) => !selectedAddresses.has(address.address_id)
+          )
+        );
         setSelectedAddresses(new Set()); // Clear selection
         setIsSelecting(false); // Exit selection mode
         setSelectAllChecked(false); // Uncheck "Select All" checkbox
       } else {
         Swal.fire({
-          title: 'Error',
-          text: 'Failed to delete some addresses',
-          icon: 'error',
-          confirmButtonText: 'OK',
+          title: "Error",
+          text: "Failed to delete some addresses",
+          icon: "error",
+          confirmButtonText: "OK",
         });
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       Swal.fire({
-        title: 'Error',
-        text: 'An error occurred while deleting the addresses',
-        icon: 'error',
-        confirmButtonText: 'OK',
+        title: "Error",
+        text: "An error occurred while deleting the addresses",
+        icon: "error",
+        confirmButtonText: "OK",
       });
     }
   };
-  
+
   // In your component's render method or return statement
-  
+
   const handleSelectModeToggle = () => {
     setIsSelecting(!isSelecting);
-    
+
     if (isSelecting) {
       setSelectedAddresses(new Set()); // Clear selection when exiting select mode
       setSelectAllChecked(false); // Clear the "Select All" checkbox
     }
   };
-  
+
+  const handleAddClick = async (address) => {
+    try {
+      // Set the selected address ID
+      setSelectedAddressId(address.address_id);
+
+      // Make an API call to update the current_address in the user_address table
+      const response = await axios.post(`${ApiUrl}/update-current-address`, {
+        userId: userId,
+        addressId: address.address_id,
+      });
+
+      if (response.status === 200) {
+        toast.success("Address added successfully", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        window.location.reload();
+      } else {
+        throw new Error("Failed to update address.");
+      }
+    } catch (error) {
+      console.error("Error updating address:", error);
+      toast.error(`An error occurred: ${error.message}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  };
+
   return (
     <>
       <Header2 />
+      <a href="/Checkout"><button className="back-to-cart-button"><FaShoppingCart /> Checkout </button></a>
+
       <div className="address-page-container">
         <div className="address-form-container">
           <h1>Add New Address</h1>
           <form className="address-form" onSubmit={handleSubmit}>
-  <div className="form-group-row">
-    <div className="form-group">
-      <label htmlFor="name">Name</label>
-      <input
-        type="text"
-        id="name"
-        name="name"
-        value={address.name}
-        onChange={handleChange}
-        pattern="[A-Za-z\s]+"
-        title="Name should only contain letters and spaces"
-        required
-      />
-    </div>
-    <div className="form-group">
-      <label htmlFor="street">Street Address</label>
-      <input
-        type="text"
-        id="street"
-        name="street"
-        value={address.street}
-        onChange={handleChange}
-        required
-      />
-    </div>
-  </div>
-  <div className="form-group-row">
-    <div className="form-group">
-      <label htmlFor="city">City</label>
-      <input
-        type="text"
-        id="city"
-        name="city"
-        value={address.city}
-        onChange={handleChange}
-        pattern="[A-Za-z\s]+"
-        title="City should only contain letters and spaces"
-        required
-      />
-    </div>
-    <div className="form-group">
-      <label htmlFor="state">State</label>
-      <input
-        type="text"
-        id="state"
-        name="state"
-        value={address.state}
-        onChange={handleChange}
-        pattern="[A-Za-z\s]+"
-        title="State should only contain letters and spaces"
-        required
-      />
-    </div>
-  </div>
-  <div className="form-group-row">
-    <div className="form-group">
-      <label htmlFor="postalCode">Postal Code</label>
-      <input
-        type="text"
-        id="postal_code"
-        name="postal_code"
-        value={address.postal_code}
-        onChange={handleChange}
-        required
-      />
-    </div>
-    <div className="form-group">
-      <label htmlFor="country">Country</label>
-      <input
-        type="text"
-        id="country"
-        name="country"
-        value={address.country}
-        onChange={handleChange}
-        pattern="[A-Za-z\s]+"
-        title="Country should only contain letters and spaces"
-        required
-      />
-    </div>
-  </div>
-  <div className="form-group">
-    <label htmlFor="phone">Phone Number</label>
-    <input
-      type="text"
-      id="phone"
-      name="phone"
-      value={address.phone}
-      onChange={handleChange}
-      pattern="[0-9]{10}"
-      title="Phone number should be exactly 10 digits"
-      required
-    />
-  </div>
-  <button className='adr-btn' type="submit">Save Address</button>
-</form>
+            <div className="form-group2-row">
+              <div className="form-group2">
+                <label htmlFor="name">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={address.name}
+                  onChange={handleChange}
+                  pattern="[A-Za-z\s]+"
+                  title="Name should only contain letters and spaces"
+                  required
+                />
+              </div>
+              <div className="form-group2">
+                <label htmlFor="street">Street Address</label>
+                <input
+                  type="text"
+                  id="street"
+                  name="street"
+                  value={address.street}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+            <div className="form-group2-row">
+              <div className="form-group2">
+                <label htmlFor="city">City</label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  value={address.city}
+                  onChange={handleChange}
+                  pattern="[A-Za-z\s]+"
+                  title="City should only contain letters and spaces"
+                  required
+                />
+              </div>
+              <div className="form-group2">
+                <label htmlFor="state">State</label>
+                <input
+                  type="text"
+                  id="state"
+                  name="state"
+                  value={address.state}
+                  onChange={handleChange}
+                  pattern="[A-Za-z\s]+"
+                  title="State should only contain letters and spaces"
+                  required
+                />
+              </div>
+            </div>
+            <div className="form-group2-row">
+              <div className="form-group2">
+                <label htmlFor="postalCode">Postal Code</label>
+                <input
+                  type="text"
+                  id="postal_code"
+                  name="postal_code"
+                  value={address.postal_code}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group2">
+                <label htmlFor="country">Country</label>
+                <input
+                  type="text"
+                  id="country"
+                  name="country"
+                  value={address.country}
+                  onChange={handleChange}
+                  pattern="[A-Za-z\s]+"
+                  title="Country should only contain letters and spaces"
+                  required
+                />
+              </div>
+            </div>
+            <div className="form-group2">
+              <label htmlFor="phone">Phone Number</label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                value={address.phone}
+                onChange={handleChange}
+                pattern="[0-9]{10}"
+                title="Phone number should be exactly 10 digits"
+                required
+              />
+            </div>
+            <button className="adr-btn" type="submit">
+              Save Address
+            </button>
+          </form>
         </div>
 
-     <div className="submitted-addresses-container">
-     {submittedAddresses.length > 0 && (
-        <h2 className="headerrr-container">
-          Submitted Addresses:
-          <div className="headerrr-controls">
-            {submittedAddresses.length > 0 && (
-              <button className="select-toggle-btn" onClick={handleSelectModeToggle}>
-                {isSelecting ? 'Cancel' : 'Select Multiple'}
-              </button>
-            )}
-            {isSelecting && (
-              <input
-                type="checkbox"
-                checked={selectAllChecked}
-                onChange={handleSelectAllChange}
-                className="select-all-checkbox"
-              />
-            )}
-          </div>
-        </h2>
-      )}
-   
-      {submittedAddresses.length > 0 ? (
-        <div>
-          {submittedAddresses.map((addr) => (
-            <div className="address-card" key={addr.address_id}>
-              <p><strong>Name:</strong> {addr.name}</p>
-              <p><strong>Street Address:</strong> {addr.street}</p>
-              <p><strong>City:</strong> {addr.city}</p>
-              <p><strong>State:</strong> {addr.state}</p>
-              <p><strong>Postal Code:</strong> {addr.postal_code}</p>
-              <p><strong>Country:</strong> {addr.country}</p>
-              <p><strong>Phone Number:</strong> {addr.phone}</p>
-
-              <div className="button-container">
+        <div className="submitted-addresses-container">
+          {submittedAddresses.length > 0 && (
+            <h2 className="headerrr-container">
+              Submitted Addresses:
+              <div className="headerrr-controls">
+                {submittedAddresses.length > 0 && (
+                  <button
+                    className="select-toggle-btn"
+                    onClick={handleSelectModeToggle}
+                  >
+                    {isSelecting ? "Cancel" : "Select Multiple"}
+                  </button>
+                )}
                 {isSelecting && (
                   <input
                     type="checkbox"
-                    checked={selectedAddresses.has(addr.address_id)}
-                    onChange={() => handleCheckboxChange(addr.address_id)}
+                    checked={selectAllChecked}
+                    onChange={handleSelectAllChange}
+                    className="select-all-checkbox"
                   />
                 )}
-                {!isSelecting && (
-                  <>
-                    <button className='adr-btn' onClick={() => handleEditClick(addr)}>Edit</button>
-                    <button className='adr-btn' onClick={() => handleDeleteClick(addr)}>Delete</button>
-                  </>
-                )}
               </div>
-            </div>
-          ))}
+            </h2>
+          )}
+
+          {submittedAddresses.length > 0 ? (
+            submittedAddresses.map((addr) => (
+              <div className="address-card" key={addr.address_id}>
+                 {isSelecting && (
+                    <input
+                      type="checkbox"
+                      checked={selectedAddresses.has(addr.address_id)}
+                      onChange={() => handleCheckboxChange(addr.address_id)}
+                    />
+                  )}
+                <p>
+                  <strong>Name:</strong> <span>{addr.name}{" "}</span>
+                  {addr.current_address === 1 && (
+                    <FaCheck title="This is your current address" style={{ color: "green", marginLeft: "10px" }} />
+                  )}
+                </p>
+
+                <p>
+                  <strong>Street Address:</strong> <span>{addr.street}</span>
+                </p>
+                <p>
+                  <strong>City:</strong> <span>{addr.city}</span>
+                </p>
+                <p>
+                  <strong>State:</strong> <span>{addr.state}</span>
+                </p>
+                <p>
+                  <strong>Postal Code:</strong> <span>{addr.postal_code}</span>
+                </p>
+                <p>
+                  <strong>Country:</strong> <span>{addr.country}</span>
+                </p>
+                <p>
+                  <strong>Phone Number:</strong> <span>{addr.phone}</span>
+                </p>
+
+                <div className="button-container">
+                  {/* {isSelecting && (
+                    <input
+                      type="checkbox"
+                      checked={selectedAddresses.has(addr.address_id)}
+                      onChange={() => handleCheckboxChange(addr.address_id)}
+                    />
+                  )} */}
+                  {!isSelecting && (
+                    <>
+                      <button
+                        className="adr-btn"
+                        title="Add this address as your current address"
+                        onClick={() => handleAddClick(addr)}
+                      >
+                        Add
+                      </button>
+                      <button
+                        className="adr-btn"
+                        onClick={() => handleEditClick(addr)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="adr-btn"
+                        onClick={() => handleDeleteClick(addr)}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No addresses added yet.</p>
+          )}
+          {isSelecting && (
+            <button
+              className="delete-selected-btn"
+              onClick={handleDeleteSelected}
+            >
+              Delete Selected Addresses
+            </button>
+          )}
         </div>
-      ) : (
-        <p>No addresses added yet.</p>
-      )}
-      {isSelecting && (
-        <button className="delete-selected-btn" onClick={handleDeleteSelected}>
-          Delete Selected Addresses
-        </button>
-      )}
-    </div>
 
         {editingAddress && (
           <div className="model">
             <div className="model-content">
-            <span className="closee" onClick={() => setEditingAddress(null)}>&times;</span>
-            <h2>Edit Address</h2>
+              <span className="closee" onClick={() => setEditingAddress(null)}>
+                &times;
+              </span>
+              <h2>Edit Address</h2>
               <form onSubmit={handleUpdate}>
-                <div className="form-group-row">
-                  <div className="form-group">
+                <div className="form-group2-row">
+                  <div className="form-group2">
                     <label htmlFor="name">Name</label>
                     <input
                       type="text"
@@ -668,7 +838,7 @@ const handleUpdate = async (e) => {
                       required
                     />
                   </div>
-                  <div className="form-group">
+                  <div className="form-group2">
                     <label htmlFor="street">Street Address</label>
                     <input
                       type="text"
@@ -680,8 +850,8 @@ const handleUpdate = async (e) => {
                     />
                   </div>
                 </div>
-                <div className="form-group-row">
-                  <div className="form-group">
+                <div className="form-group2-row">
+                  <div className="form-group2">
                     <label htmlFor="city">City</label>
                     <input
                       type="text"
@@ -692,7 +862,7 @@ const handleUpdate = async (e) => {
                       required
                     />
                   </div>
-                  <div className="form-group">
+                  <div className="form-group2">
                     <label htmlFor="state">State</label>
                     <input
                       type="text"
@@ -704,8 +874,8 @@ const handleUpdate = async (e) => {
                     />
                   </div>
                 </div>
-                <div className="form-group-row">
-                  <div className="form-group">
+                <div className="form-group2-row">
+                  <div className="form-group2">
                     <label htmlFor="postalCode">Postal Code</label>
                     <input
                       type="text"
@@ -716,7 +886,7 @@ const handleUpdate = async (e) => {
                       required
                     />
                   </div>
-                  <div className="form-group">
+                  <div className="form-group2">
                     <label htmlFor="country">Country</label>
                     <input
                       type="text"
@@ -728,7 +898,7 @@ const handleUpdate = async (e) => {
                     />
                   </div>
                 </div>
-                <div className="form-group">
+                <div className="form-group2">
                   <label htmlFor="phone">Phone Number</label>
                   <input
                     type="text"
@@ -739,7 +909,9 @@ const handleUpdate = async (e) => {
                     required
                   />
                 </div>
-                <button className='adr-btn' type="submit">Update Address</button>
+                <button className="adr-btn" type="submit">
+                  Update Address
+                </button>
               </form>
             </div>
           </div>

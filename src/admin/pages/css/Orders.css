@@ -97,6 +97,7 @@
 .btn-delete {
   background-color: #f44336;
   color: #fff;
+  margin-left: 10px;
 }
 
 .btn:hover {
@@ -178,19 +179,6 @@
   cursor: default;
 }
 
-.custom-modal10 {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 400px; /* Adjust width for larger content */
-  margin: auto;
-  position: relative;
-  margin-top: 90px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
-  display: flex; /* Flex layout to align items */
-  flex-direction: column; /* Stack content vertically */
-  gap: 20px; /* Space between content */
-}
 
 .details-and-image10 {
   display: flex; /* Flex layout to align details and image */
@@ -205,39 +193,42 @@
 
 .product-image10 {
   width: 150px;
-  height: auto; /* Maintain aspect ratio */
+  height: 150px; /* Maintain aspect ratio */
+  object-fit: cover;
 }
 
-/* Modal close button styles */
 .modal-close-button10 {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 5px;
-  cursor: pointer;
-  /* margin-top: 5px; */
-  font-size: 16px;
-  width: 100px;
+  position: absolute; /* Position the button absolutely within the modal */
+  top: 15px; /* Adjust as needed */
+  right: 15px; /* Adjust as needed */
+  background: transparent; /* No background */
+  border: none; /* No border */
+  font-size: 24px; /* Size of the icon */
+  cursor: pointer; /* Pointer cursor on hover */
+  color: #333; /* Color of the icon */
+  z-index: 1000; /* Ensure it is above other elements */
 }
 
 .modal-close-button10:hover {
-  background-color: #0056b3;
+  color: #e74c3c; /* Change color on hover for feedback */
 }
+
 
 /* Modal styles */
 .custom-modal10 {
   background-color: #fff;
-  padding: 20px;
+  padding: 10px;
   border-radius: 8px;
-  max-width: 450px;
+  max-width: 550px;
   margin: auto;
   position: relative;
-  margin-top: 50px;
+  margin-top: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 20px;
+  zoom: 0.9;
+  z-index: 9999;
 }
 
 
@@ -259,16 +250,13 @@
   margin-right: 20px;
 }
 
-.product-image10 {
-  width: 150px;
-  height: auto;
-}
 
-/* Align label and value pairs */
+
 .info-row {
+  flex: 1 1 45%; /* Take up to 45% of width, adjust as necessary */
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-between; /* Space out label and value */
+  padding: 3px 0; /* Vertical padding */
 }
 
 .info-label {

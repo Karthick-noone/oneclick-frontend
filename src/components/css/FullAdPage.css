@@ -1,0 +1,99 @@
+/* FullAdPage.css */
+.full-page-container {
+    width: 100%;
+  max-height: 65vh; 
+  height: auto; /* Let the height be determined by the content/image size */
+  overflow: hidden;
+  position: relative;
+}
+
+.ad-image-container {
+    width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Ensure positioning context for the overlay */
+}
+
+.full-page-image {
+    width: 100%;
+  height: auto; /* Keep the height auto to maintain aspect ratio */
+  max-height: 400px; /* Set a max height for the image */
+  object-fit: cover; /* Ensures the image covers the entire area */
+  background-color: #f4f4f4;
+  background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.overlay-content {
+    position: absolute; /* Overlay on top of the image */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 40px 60px;
+    border-radius: 15px;
+    max-width: 85%;
+    color: #fff;
+    text-align: center;
+}
+
+.shop-now-button {
+    padding: 18px 36px;
+    background-color: #ff6600;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .full-page-container {
+        height: auto !important; /* Adjust height to auto for responsiveness */
+    }
+
+    .ad-image-container {
+        margin-top: 10px !important; /* Adjust margin for smaller screens */
+    }
+
+    .full-page-image {
+        height: auto !important; /* Allow the image height to scale automatically on smaller screens */
+        width: 100% !important; /* Full width for mobile */
+        max-width: none !important; /* Remove max-width limit for small screens */
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .overlay-content {
+        padding: 20px 30px !important; /* Reduce padding for smaller screens */
+        font-size: 14px !important;
+    }
+
+    .shop-now-button {
+        padding: 12px 24px !important; /* Smaller padding for mobile view */
+        font-size: 16px !important; /* Adjust button font size */
+    }
+}
+
+@media (max-width: 480px) {
+    .full-page-image {
+        height: auto !important; /* Further adjustments for very small screens */
+        width: 100% !important;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .overlay-content {
+        padding: 10px 20px !important; /* Further reduce for extra small screens */
+    }
+
+    .shop-now-button {
+        padding: 10px 18px !important; /* Further adjustments for very small screens */
+        font-size: 14px !important;
+    }
+}

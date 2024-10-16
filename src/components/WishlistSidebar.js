@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { FaTimes } from "react-icons/fa";
 import "./css/WishlistSidebar.css";
 import { ApiUrl } from "./ApiUrl";
@@ -15,6 +15,22 @@ const WishlistSidebar = ({
   removeFromWishlist,
 }) => {
   const { addToCart, updateCartItemQuantity, cartItems } = useCart();
+  const [, setWishlistItems] = useState([]);
+
+
+  const handleAddToWishlist = (product) => {
+    // Check if the product already exists in the wishlist
+    const isProductInWishlist = wishlistItems.some((item) => item.id === product.id);
+  
+    if (isProductInWishlist) {
+      // If the product is already in the wishlist, do not add it again
+      alert("This product is already in your wishlist.");
+      return;
+    }
+  
+    // If the product is not in the wishlist, add it
+    setWishlistItems([...wishlistItems, product]);
+  };
 
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent event bubbling
@@ -106,6 +122,8 @@ const WishlistSidebar = ({
             image: product.prod_img,
             description: product.prod_features,
             category: product.category,
+            product_id: product.prod_id,
+            actual_price: product.actual_price,
             quantity: 1,
           });
         }
@@ -136,87 +154,105 @@ const WishlistSidebar = ({
     }
   };
 
+  // const categoryMap = {
+  //   TV: "Television",
+  //   Speakers: "Speaker",
+  //   // Add other mappings as needed
+  // };
+
   return (
-    <>
-      <div className={`wishlist-sidebar ${isOpen ? "open" : ""}`}>
-        <button
-          style={{ color: "black" }}
-          className="close-btn"
-          onClick={toggleWishlist}
-        >
-          <FaTimes />
-        </button>
-        <div className="wishlist-sidebar-header">
-          <h3>Wishlist</h3>
-        </div>
-        <div className="wishlist-sidebar-body">
-          {wishlistItems.length === 0 ? (
-            <p className="empty-wishlist">Your wishlist is empty.</p>
-          ) : (
-            <ul>
-              {wishlistItems.map((product) => (
-                <li key={product.id} className="wishlist-item">
-                                    <Link style={{textDecoration:'none'}} to={`/${product.category}`}>
+  <>
+    <div className={`wishlist-sidebar ${isOpen ? "open" : ""}`}>
+      <button
+        style={{ color: "black" }}
+        className="close-btn"
+        onClick={toggleWishlist}
+      >
+        <FaTimes />
+      </button>
+      <div className="wishlist-sidebar-header">
+        <h3>Wishlist</h3>
+      </div>
+      <div className="wishlist-sidebar-body">
+        {wishlistItems.length === 0 ? (
+          <p className="empty-wishlist">Your wishlist is empty.</p>
+        ) : (
+          <ul>
+            {wishlistItems
+              .slice()
+              .reverse()
+              .map((product) => {
+                // Check if prod_img is in a valid format
+                const images = Array.isArray(product.prod_img) 
+                  ? product.prod_img 
+                  : JSON.parse(product.prod_img || '[]');
+                const firstImage = images.length > 0 ? images[0] : null; // Get the first image or null if not available
 
-                  <img
-                    src={`${ApiUrl}/uploads/${product.category}/${product.prod_img}`}
-                    alt={product.name}
-                    className="item-image"
-                  />
-                                          </Link>
+                return (
+                  <li key={product.id} className="wishlist-item">
+                    {/* <Link
+                      style={{ textDecoration: "none" }}
+                      to={`/${categoryMap[product.category] || product.category}`}
+                    > */}
+                                          <Link style={{ textDecoration: 'none' }} to={`/product/${product.id}`}>
 
-                  <div className="item-details">
-                  <Link style={{textDecoration:'none'}} to={`/${product.category}`}>
-
-                    <h3 className="item-name">{product.prod_name}</h3>
-                    <p className="item-features">{product.prod_features}</p>
+                      {firstImage ? (
+                        <img
+                          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                          alt={product.prod_name}
+                          className="item-image"
+                        />
+                      ) : (
+                        <div className="placeholder-image">No image available</div> // Fallback message
+                      )}
                     </Link>
 
-                  </div>
-                  <div className="item-actions">
-                    <p className="item-price">₹{product.prod_price}</p>
-                    {product.status === "unavailable" ? (
-                      <p
-                        style={{
-                          color: "red",
-                          fontWeight: "bold",
-                          fontSize: "12px",
-                          textAlign: "center",
-                          // marginTop: '10px',
-                          // padding: '10px',
-                          // border: '2px solid red',
-                          borderRadius: "5px",
-                          // backgroundColor: '#fdd',
-                        }}
-                        className="out-of-stock"
-                      >
-                        Out of Stock
-                      </p>
-                    ) : (
+                    <div className="item-details">
+                      <Link style={{ textDecoration: 'none' }} to={`/product/${product.id}`}>
+                        <h3 className="item-name">{product.prod_name}</h3>
+                        <p className="item-features">{product.prod_features}</p>
+                      </Link>
+                    </div>
+                    <div className="item-actions">
+                      <p className="item-price" style={{ color: 'red',textDecoration:"line-through", fontSize:'12px' }}>₹{product.actual_price}</p>
+                      <p className="item-price">₹{product.prod_price}</p>
+                      {product.status === "unavailable" ? (
+                        <p
+                          style={{
+                            color: "red",
+                            fontWeight: "bold",
+                            fontSize: "12px",
+                            textAlign: "center",
+                            borderRadius: "5px",
+                          }}
+                          className="out-of-stock"
+                        >
+                          Out of Stock
+                        </p>
+                      ) : (
+                        <button
+                          onClick={(event) => handleAddToCart(product, event)}
+                          className="add-to-cart-btn"
+                        >
+                          Add to cart
+                        </button>
+                      )}
                       <button
-                        onClick={(event) => handleAddToCart(product, event)}
-                        className="add-to-cart-btn"
+                        onClick={() => removeFromWishlist(product.id, product.category)}
+                        className="remove-btn"
                       >
-                        Add to Cart
+                        Remove
                       </button>
-                    )}
-                    <button
-                      onClick={() =>
-                        removeFromWishlist(product.id, product.category)
-                      }
-                      className="remove-btn"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                    </div>
+                  </li>
+                );
+              })}
+          </ul>
+        )}
       </div>
-    </>
-  );
+    </div>
+  </>
+);
 };
 
 export default WishlistSidebar;

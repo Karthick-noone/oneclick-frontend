@@ -55,6 +55,31 @@
   margin: 5px 0 0;
   color: #666;
 }
+.cart-product-description {
+  display: -webkit-box; /* Use a box layout for controlling text lines */
+  -webkit-box-orient: vertical; /* Set orientation to vertical */
+  overflow: hidden; /* Hide any overflowing content */
+  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+  white-space: normal; /* Allow text to wrap */
+
+  font-size: 16px; /* Adjust as per your design */
+  line-height: 1.5; /* Set line height */
+  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+}
+.cart-product-name {
+  display: -webkit-box; /* Use a box layout for controlling text lines */
+  -webkit-box-orient: vertical; /* Set orientation to vertical */
+  overflow: hidden; /* Hide any overflowing content */
+  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+  white-space: normal; /* Allow text to wrap */
+
+  font-size: 16px; /* Adjust as per your design */
+  line-height: 1.5; /* Set line height */
+  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+}
+
+
+
 
 .cart-product-price {
   display: flex;
@@ -105,6 +130,35 @@
   justify-content: space-between;
   padding: 5px 0;
 }
+
+.summary-item input {
+  padding: 5px; /* Add padding for comfort */
+  border: 1px solid #ccc; /* Border color */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Font size */
+  outline: none; /* Remove outline on focus */
+  transition: border-color 0.3s; /* Smooth transition for border color */
+}
+
+.summary-item input:focus {
+  border-color: #0056b3; /* Darker border on focus */
+}
+
+.summary-item button {
+  padding: 5px 10px; /* Add padding for button */
+  background-color: #007bff; /* Button color */
+  color: white; /* Text color */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 14px; /* Font size */
+  cursor: pointer; /* Cursor pointer on hover */
+  transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+.summary-item button:hover {
+  background-color: #0056b3; /* Darker button color on hover */
+}
+
 
 .summary-total {
   font-weight: bold;

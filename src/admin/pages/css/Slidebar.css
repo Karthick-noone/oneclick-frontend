@@ -55,7 +55,7 @@
 }
 
 .slidebar-menu li {
-  padding: 15px;
+  padding: 10px;
   color: #333;
 }
 
@@ -72,7 +72,7 @@
 }
 
 .slidebar.collapsed .menu-icon {
-  margin-left: 20px;
+  margin-left: 10px;
   margin-right: 0; /* Remove right margin when collapsed */
 }
 
@@ -90,9 +90,9 @@
   display: none;
 }
 
-.submenu-items li {
+/* .submenu-items li {
   padding: 10px 0;
-}
+} */
 
 .submenu-items li a {
   color: #333;
@@ -172,4 +172,85 @@
 
 .hamburger-icon{
   color: black;
+}
+/* Link styles */
+.slidebar-menu a {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: #ecf0f1; /* Light text color */
+  text-decoration: none;
+  transition: color 0.3s; /* Removed background color transition */
+}
+
+/* Active link styles */
+.slidebar-menu a.active {
+  color: #fff; /* Active link text color when sidebar is open */
+  background-color: #2980b9; /* Active link background color when open */
+}
+
+/* Hover styles */
+.slidebar-menu a:hover {
+  background-color: #3498db; /* Hover color */
+  color: #fff; /* Hover text color */
+}
+
+/* Menu icon styles */
+.menu-icon {
+  margin-right: 10px;
+}
+
+/* Submenu styles */
+.submenu {
+  padding-left: 15px; /* Indentation for submenus */
+}
+
+/* Submenu item styles */
+.submenu-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Submenu item link styles */
+.submenu-items a {
+  padding: 5px 15px; /* Indentation for submenu links */
+}
+
+/* Submenu item hover styles */
+.submenu-items a:hover {
+  background-color: #2980b9; /* Hover color for submenu items */
+}
+
+/* Hamburger icon styles */
+.hamburger-icon {
+  font-size: 24px;
+  color: #ecf0f1; /* Icon color */
+  cursor: pointer;
+  margin: 10px; /* Margin for better clickability */
+}
+
+/* Close button styles */
+.close-btn {
+  background: none;
+  border: none;
+  color: #ecf0f1;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+/* When sidebar is collapsed */
+.collapsed .slidebar-menu li a {
+  color: #333; /* Default color when collapsed */
+}
+
+/* Active link color when sidebar is collapsed */
+.collapsed .slidebar-menu li a.active {
+  color: #3498db; /* Change this to your preferred active color for icons when collapsed */
+  background-color: transparent; /* Remove background color when collapsed */
+}
+
+/* Ensure the active link doesn't change background color when collapsed */
+.collapsed .slidebar-menu a.active {
+  background-color: transparent; /* Remove background color when sidebar is collapsed */
 }

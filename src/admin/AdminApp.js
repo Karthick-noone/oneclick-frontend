@@ -11,6 +11,8 @@ import Watch from './pages/AddWatch'; // Example page
 import Printers from './pages/AddPrinters'; // Example page
 import ComputerAccessories from './pages/AddComputerAccessories'; // Example page
 import MobileAccessories from './pages/AddMobileAccessories'; // Example page
+import CCTVAccessories from './pages/AddCCTVAccessories'; // Example page
+import PrinterAccessories from './pages/AddPrinterAccessories'; // Example page
 import Orders from './pages/Orders'; // Example page
 import Customers from './pages/Customers'; // Example page
 import Reports from './pages/Reports'; // Example page
@@ -18,8 +20,13 @@ import ChangePassword from './pages/ChangePassword'; // Example page
 import EditHomePage from './pages/EditHomePage'; // Example page
 import EditDoubleImageAd from './pages/EditDoubleImageAd'; // Example page
 import EditSingleImageAd from './pages/EditSingleAdPage'; // Example page
+import EditLoginpageBG from './pages/EditLoginPageBG'; // Example page
 import Dashboard from './pages/Dashboard'; // Example page
+import ContactsTable from './pages/ContactsTable'; // Example page
 import CareersTable from './pages/CareersTable'; // Example page
+import ComputersAd from './pages/ComputersAd'; // Example page
+import MobileAd from './pages/MobileAd'; // Example page
+import CCTVAd from './pages/CCTVAd'; // Example page
 import { ThemeProvider } from './ThemeContext'; // Import ThemeProvider
 
 function App() {
@@ -52,6 +59,8 @@ function App() {
           <Route path="/Printers" element={<Printers />} />
           <Route path="/ComputerAccessories" element={<ComputerAccessories />} />
           <Route path="/MobileAccessories" element={<MobileAccessories />} />
+          <Route path="/PrinterAccessories" element={<PrinterAccessories />} />
+          <Route path="/CCTVAccessories" element={<CCTVAccessories />} />
           <Route path="/Orders" element={<Orders />} />
           <Route path="/Customers" element={<Customers />} />
           <Route path="/Reports" element={<Reports />} />
@@ -59,8 +68,13 @@ function App() {
           <Route path="/EditHomePage" element={<EditHomePage />} />
           <Route path="/EditDoubleImageAd" element={<EditDoubleImageAd />} />
           <Route path="/EditSingleImageAd" element={<EditSingleImageAd />} />
+          <Route path="/EditLoginBackgroundImage" element={<EditLoginpageBG />} />
           <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/CareersTable" element={<CareersTable />} />
+          <Route path="/ContactsTable" element={<ContactsTable />} />
+          <Route path="/ComputersAd" element={<ComputersAd />} />
+          <Route path="/MobileAd" element={<MobileAd />} />
+          <Route path="/CCTVAd" element={<CCTVAd />} />
         </Routes>
       </AdminMain>
     </ThemeProvider>

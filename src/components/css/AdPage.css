@@ -6,41 +6,57 @@
 
 .ads-container {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    justify-content: space-evenly;
     gap: 20px; /* Space between ads */
 }
 
+
 .ad {
     position: relative;
-    flex: 1;
-    height: 450px; /* Adjust height as needed */
+    flex: 1 1 calc(33.333% - 20px); /* Responsive: 3 items per row with gap */
+    max-width: calc(33.333% - 20px); /* Limit max width for larger screens */
+    height: 450px; /* Fixed height for the ad container */
     background-color: #fff;
     border-radius: 10px;
     overflow: hidden; /* Hide overflow */
+    transition: transform 0.3s ease; /* Animation for hover effect */
+}
+
+.ad:hover {
+    transform: scale(1.02); /* Slightly scale on hover */
 }
 
 .ad-image-card {
     width: 100%;
-    height: 100%;
+    height: auto;
+    min-height: 350px;
     position: relative;
     overflow: hidden; /* Hide overflow for images */
+
 }
 
 .add-image {
     width: 100%;
-    height: 450px;
-    object-fit: cover; /* Cover the entire container */
+    max-width: 100%;
+    max-height: 450px;
+    height: 100%; /* Ensure it fills the entire height */
+    object-fit: cover; /* Cover to show the entire image */
+    display: block; /* Remove extra space below images */
+    object-position: 50% 50%;
 }
 
 .ad-text {
     position: absolute;
     top: 50%;
     left: 50%;
+    width: 70%;
     transform: translate(-50%, -50%);
     color: #fff;
     text-align: center;
     padding: 20px;
     border-radius: 10px;
+    background: rgba(0, 0, 0, 0.5); /* Optional: Background for text */
 }
 
 .ad-text h2 {
@@ -53,19 +69,54 @@
     margin-bottom: 15px;
 }
 
-.shop-now-button {
+.shop-now-button2 {
     font-family: 'Poppins', sans-serif;
     color: #fff; /* Text color */
     border: 2px solid #fff; /* White border */
     border-radius: 50px;
     padding: 6px 50px;
     color: black;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-.shop-now-button:hover {
-    color: #ffffff; /* Text color on hover */
-    background-color: transparent;
+.shop-now-button2:hover {
+   
+        background-color: transparent;
+        border: 2px solid white;
+    color: white;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 1200px) {
+    .ad {
+        flex: 1 1 calc(50% - 20px); /* 2 items per row */
+        max-width: calc(50% - 20px);
+    }
+}
+
+@media (max-width: 768px) {
+    .ad {
+        flex: 1 1 100%; /* 1 item per row */
+        max-width: 100%;
+        height: auto; /* Allow height to adjust automatically */
+    }
+
+    .ad-text h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .ad-text p {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+}
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Full height of the container */
 }

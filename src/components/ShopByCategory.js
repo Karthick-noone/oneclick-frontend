@@ -18,13 +18,13 @@ const ShopByCategory = () => {
       <h2>Shop by Category</h2>
       <div className="categories">
         <div className="category">
-          <a href="/Computers">
+          <a href="/ComputerAdBanner">
             <img loading="lazy" src={computerImg} alt="Computers" className="category-image" />
             <span>Computers</span>
           </a>
         </div>
         <div className="category">
-          <a href="/Mobiles">
+          <a href="/MobileAdBanner">
             <img loading="lazy" src={mobileImg} alt="Mobile" className="category-image" />
             <span>Mobile</span>
           </a>
@@ -40,7 +40,7 @@ const ShopByCategory = () => {
           </a>
         </div>
         <div className="category">
-          <a href="/CCTV">
+          <a href="/CCTVAdBanner">
             <img loading="lazy" src={cctvImg} alt="CCTV" className="category-image" />
             <span>CCTV</span>
           </a>

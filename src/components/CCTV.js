@@ -12,6 +12,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ApiUrl } from "./ApiUrl";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Define a fallback image URL
 // const fallbackImage = require('./img/laptop.jpg'); // Replace with a valid fallback image
@@ -20,7 +21,35 @@ const CCTV = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [favorites, setFavorites] = useState({});
-  const { cartItems, addToCart, updateCartItemQuantity, addToWishlist, removeFromWishlist } = useCart();
+  const {
+    cartItems,
+    addToCart,
+    updateCartItemQuantity,
+    addToWishlist,
+    removeFromWishlist,
+  } = useCart();
+
+  const navigate = useNavigate();
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const searchQuery = queryParams.get("search");
+
+  // Use searchQuery in your component
+  console.log("Search Query:", searchQuery);
+
+  // Filter products based on the search query
+  const filteredProducts = searchQuery
+    ? products.filter((product) => {
+        const nameMatches = product.prod_name
+          .toLowerCase()
+          .includes(searchQuery);
+        const featuresMatch = product.prod_features
+          .toLowerCase()
+          .includes(searchQuery);
+        return nameMatches || featuresMatch; // Return products that match either the name or features
+      })
+    : products; // If no search query, return all products
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -29,7 +58,7 @@ const CCTV = () => {
 
         setProducts(response.data);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error("Error fetching products:", error);
         toast.error("Failed to fetch products.", {
           position: "top-right",
           autoClose: 2000,
@@ -47,31 +76,41 @@ const CCTV = () => {
 
   useEffect(() => {
     const updateFavorites = () => {
-      const favouritesKey = 'favourites';
+      const favouritesKey = "favourites";
       const currentFavourites = localStorage.getItem(favouritesKey) || "";
-      const favouriteProducts = currentFavourites.split(',').reduce((acc, item) => {
-        if (item.startsWith('faredheart-')) {
-          const [_, productName, productId] = item.split('-');
-          acc[`${productName}-${productId}`] = true;
-        }
-        return acc;
-      }, {});
-  
+      const favouriteProducts = currentFavourites
+        .split(",")
+        .reduce((acc, item) => {
+          if (item.startsWith("faredheart-")) {
+            const [_, productName, productId] = item.split("-");
+            acc[`${productName}-${productId}`] = true;
+          }
+          return acc;
+        }, {});
+
       setFavorites(favouriteProducts);
     };
-  
+
     // Initial fetch
     updateFavorites();
-  
+
     // Set interval to fetch favorites every second
     const intervalId = setInterval(updateFavorites, 1000);
-  
+
     // Clear interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
 
+  // const handleCardClick = (product) => {
+  //   setSelectedProduct(product);
+  // };
   const handleCardClick = (product) => {
-    setSelectedProduct(product);
+    // Check if product is defined and has an id
+    if (product && product.id) {
+      navigate(`/product/${product.id}`); // Navigate to the product details page
+    } else {
+      console.error("Product is undefined or missing ID:", product);
+    }
   };
 
   const handleCloseModal = () => {
@@ -100,10 +139,10 @@ const CCTV = () => {
 
   const handleAddToCart = async (product, event) => {
     event.stopPropagation();
-  
+
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
-  
+
     if (!email || !username) {
       toast.error("User is not logged in!", {
         position: "top-right",
@@ -117,34 +156,37 @@ const CCTV = () => {
       window.location.href = "/login";
       return;
     }
-  
+
     try {
       const response = await axios.post(`${ApiUrl}/verify-user`, {
         email,
         username,
       });
-  
+
       if (response.data.exists) {
         const cartKey = `${email}-cart`;
         const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
-  
+
         // Find existing item by id and category
         const existingItem = cartItems.find(
           (item) => item.id === product.id && item.category === product.category
         );
-  
+
         if (existingItem) {
           // Increase the quantity if the product already exists in the cart
           existingItem.quantity += 1;
-          toast.info(`Increased quantity of ${product.prod_name} in your cart!`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
+          toast.info(
+            `Increased quantity of ${product.prod_name} in your cart!`,
+            {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
         } else {
           // Add new product to the cart
           cartItems.push({
@@ -155,10 +197,11 @@ const CCTV = () => {
             description: product.prod_features,
             category: product.category,
             product_id: product.prod_id,
-
+            actual_price: product.actual_price,
+            coupon: product.coupon,
             quantity: 1,
           });
-  
+
           toast.success(`${product.prod_name} has been added to your cart!`, {
             position: "top-right",
             autoClose: 2000,
@@ -169,7 +212,7 @@ const CCTV = () => {
             progress: undefined,
           });
         }
-  
+
         // Save the updated cart in localStorage
         localStorage.setItem(cartKey, JSON.stringify(cartItems));
       } else {
@@ -197,13 +240,12 @@ const CCTV = () => {
     }
   };
 
-
   const handleToggleFavorite = async (product, event) => {
     event.stopPropagation();
     const isFavorite = favorites[`${product.prod_name}-${product.id}`];
 
-    const email = localStorage.getItem('email');
-    const username = localStorage.getItem('username');
+    const email = localStorage.getItem("email");
+    const username = localStorage.getItem("username");
 
     if (!email || !username) {
       toast.error("User is not logged in!", {
@@ -252,7 +294,8 @@ const CCTV = () => {
           });
 
           const wishlistKey = `${email}-wishlist`;
-          const wishlistData = JSON.parse(localStorage.getItem(wishlistKey)) || [];
+          const wishlistData =
+            JSON.parse(localStorage.getItem(wishlistKey)) || [];
           const updatedWishlistData = wishlistData.filter(
             (item) => item.id !== product.id
           );
@@ -261,14 +304,15 @@ const CCTV = () => {
             JSON.stringify(updatedWishlistData)
           );
 
-          const favouritesKey = 'favourites';
+          const favouritesKey = "favourites";
           const currentFavourites = localStorage.getItem(favouritesKey) || "";
           const newFavourites = currentFavourites
-            .split(',')
-            .filter(item => item !== `faredheart-${product.prod_name}-${product.id}`)
-            .join(',');
+            .split(",")
+            .filter(
+              (item) => item !== `faredheart-${product.prod_name}-${product.id}`
+            )
+            .join(",");
           localStorage.setItem(favouritesKey, newFavourites);
-
         } else {
           setFavorites((prevFavorites) => ({
             ...prevFavorites,
@@ -294,13 +338,13 @@ const CCTV = () => {
           });
 
           const wishlistKey = `${email}-wishlist`;
-          const wishlistData = JSON.parse(localStorage.getItem(wishlistKey)) || [];
-         
+          const wishlistData =
+            JSON.parse(localStorage.getItem(wishlistKey)) || [];
 
- wishlistData.push(product);
+          wishlistData.push(product);
           localStorage.setItem(wishlistKey, JSON.stringify(wishlistData));
 
-          const favouritesKey = 'favourites';
+          const favouritesKey = "favourites";
           const currentFavourites = localStorage.getItem(favouritesKey) || "";
           const newFavourites = `${currentFavourites},faredheart-${product.prod_name}-${product.id}`;
           localStorage.setItem(favouritesKey, newFavourites);
@@ -331,83 +375,199 @@ const CCTV = () => {
   };
 
   // Define the category variable
-  const category = 'cctv';
+  const category = "cctv";
+
+  // offerPercentage = ((actual_price - prod_price) / actual_price) * 100
 
   return (
     <div className="computers-page">
       {/* <Header1 /> */}
       <Header2 category={category} />
       {/* <Header3 /> */}
-      <span style={{ marginLeft: "20px",padding:'10px' }}><a style={{textDecoration:'none', color:'black'}} href="/">Home </a>&gt; CCTV</span>
+      <span style={{ marginLeft: "20px", padding: "10px" }}>
+        <a style={{ textDecoration: "none", color: "black" }} href="/">
+          Home{" "}
+        </a>
+        &gt; CCTV
+      </span>
       <div className="main-content">
         <Sidebar />
         <div className="product-list">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="product-card"
-              onClick={() => handleCardClick(product)}
-            >
-              <div className="product-actions">
-                <img
-                  src={`${ApiUrl}/uploads/${product.category}/${product.prod_img}`} 
-                  alt={product.prod_name}
-                  className="product-image"
-                />
-                <span
-                  title="Add to Wishlist"
-                  className={`favorite-icon ${
-                    favorites[product.prod_name] ? "filled" : ""
-                  }`}
-                  onClick={(event) => handleToggleFavorite(product, event)}
-                >
-                  {favorites[`${product.prod_name}-${product.id}`] ? (
-                    <FaHeart style={{color:'red'}}/>
-                  ) : (
-                    <FaRegHeart  />
-                  )}
-                </span>
-                {/* <button
-                  className="toggle-favorite"
-                  onClick={(event) => handleToggleFavorite(product, event)}
-                >
-                  {favorites[`${product.prod_name}-${product.id}`] ? (
-                    <FaHeart />
-                  ) : (
-                    <FaRegHeart />
-                  )}
-                </button> */}
-              </div>
-              <h3 className="product-name">{product.prod_name}</h3>
-              <p className="product-description">{product.prod_features}</p>
-              <p className="product-price">₹{product.prod_price}</p>
-              {product.status === 'unavailable' ? (
-  <p style={{
-    color: 'red',
-    fontWeight: 'bold',
-    fontSize: '16px',
-    textAlign: 'center',
-    marginTop: '10px',
-    padding: '10px',
-    border: '2px solid red',
-    borderRadius: '5px',
-    backgroundColor: '#fdd',
-  }} className="out-of-stock">
-    Out of Stock
-  </p>
-) : (
-  <button
-  
-    onClick={(event) => handleAddToCart(product, event)}
-    className="add-to-cart"
-  >
-    Add to Cart
-  </button>
-)}
-            </div>
-          ))}
+          {filteredProducts.length === 0
+            ? // If filteredProducts is empty, fallback to using all products
+              products.map((product) => {
+                // Parse the prod_img if it's a JSON string; assuming it's an array
+                const images = Array.isArray(product.prod_img)
+                  ? product.prod_img
+                  : JSON.parse(product.prod_img);
+                const firstImage = images[0]; // Get the first image
+
+                return (
+                  <div
+                    key={product.id}
+                    className="product-card"
+                    onClick={() => handleCardClick(product)}
+                  >
+                    <div className="product-actions">
+                      <img
+                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                        alt={product.prod_name}
+                        className="product-image"
+                      />
+                      <span
+                        title="Add to Wishlist"
+                        className={`favorite-icon ${
+                          favorites[product.prod_name] ? "filled" : ""
+                        }`}
+                        onClick={(event) =>
+                          handleToggleFavorite(product, event)
+                        }
+                      >
+                        {favorites[`${product.prod_name}-${product.id}`] ? (
+                          <FaHeart style={{ color: "red" }} />
+                        ) : (
+                          <FaRegHeart />
+                        )}
+                      </span>
+                    </div>
+                    <h3 className="product-name">{product.prod_name}</h3>
+                    {/* <p className="product-description">
+                      {product.prod_features}
+                    </p> */}
+                   <p className="product-price">₹{product.prod_price}</p>
+                    <p className="product-actual-price">
+                      <span style={{ textDecoration: "line-through" }}>
+                        ₹{product.actual_price}{" "}
+                      </span>
+                      <span style={{ color: "green", marginLeft: "10px" }}>
+                        (
+                        {Math.round(
+                          ((product.actual_price - product.prod_price) /
+                            product.actual_price) *
+                            100
+                        )}
+                        % OFF)
+                      </span>
+                    </p>{" "}
+                    {product.status === "unavailable" ? (
+                      <p
+                        style={{
+                          color: "red",
+                          fontWeight: "bold",
+                          fontSize: "16px",
+                          textAlign: "center",
+                          marginTop: "10px",
+                          padding: "10px",
+                          // border: "2px solid red",
+                          // borderRadius: "5px",
+                          // backgroundColor: "#fdd",
+                        }}
+                        className="out-of-stock"
+                      >
+                        Out of Stock
+                      </p>
+                    ) : (
+                      <button
+                        onClick={(event) => handleAddToCart(product, event)}
+                        className="add-to-cart"
+                      >
+                        Add to cart
+                      </button>
+                    )}
+                  </div>
+                );
+              })
+            : // If filteredProducts has results, display them
+              filteredProducts.map((product) => {
+                const images = Array.isArray(product.prod_img)
+                  ? product.prod_img
+                  : JSON.parse(product.prod_img);
+                const firstImage = images[0];
+
+                return (
+                  <div
+                    key={product.id}
+                    className="product-card"
+                    onClick={() => handleCardClick(product)}
+                  >
+                    {product.offer_label && (
+                      <div className="product-label">{product.offer_label}</div>
+                    )}
+
+                    <div className="product-actions">
+                      <img
+                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                        alt={product.prod_name}
+                        className="product-image"
+                      />
+                      <span
+                        title="Add to Wishlist"
+                        className={`favorite-icon ${
+                          favorites[product.prod_name] ? "filled" : ""
+                        }`}
+                        onClick={(event) =>
+                          handleToggleFavorite(product, event)
+                        }
+                      >
+                        {favorites[`${product.prod_name}-${product.id}`] ? (
+                          <FaHeart style={{ color: "red" }} />
+                        ) : (
+                          <FaRegHeart />
+                        )}
+                      </span>
+                    </div>
+                    <h3 className="product-name">{product.prod_name}</h3>
+                    {/* <p className="product-description">
+                      {product.prod_features}
+                    </p> */}
+
+                    <p className="product-price">₹{product.prod_price}</p>
+                    <p className="product-actual-price">
+                      <span style={{ textDecoration: "line-through" }}>
+                        ₹{product.actual_price}{" "}
+                      </span>
+                      <span style={{ color: "green", marginLeft: "10px" }}>
+                        (
+                        {Math.round(
+                          ((product.actual_price - product.prod_price) /
+                            product.actual_price) *
+                            100
+                        )}
+                        % OFF)
+                      </span>
+                    </p>
+
+                    {product.status === "unavailable" ? (
+                      <p
+                        style={{
+                          color: "red",
+                          fontWeight: "bold",
+                          fontSize: "16px",
+                          textAlign: "center",
+                          marginTop: "10px",
+                          padding: "10px",
+                          // border: "2px solid red",
+                          // borderRadius: "5px",
+                          // backgroundColor: "#fdd",
+                        }}
+                        className="out-of-stock"
+                      >
+                        Out of Stock
+                      </p>
+                    ) : (
+                      <button
+                        onClick={(event) => handleAddToCart(product, event)}
+                        className="add-to-cart"
+                      >
+                        Add to cart
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
         </div>
       </div>
+
       <Footer />
       {selectedProduct && (
         <Modal

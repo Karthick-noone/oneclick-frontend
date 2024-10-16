@@ -25,30 +25,39 @@ const CartPage = () => {
   const [addressDetails, setAddressDetails] = useState([]);
 
   // Memoize fetchAddress function using useCallback to avoid re-creating it on each render
-  const fetchAddress = useCallback(async () => {
-    try {
-      const response = await axios.get(`${ApiUrl}/singleaddress/${userId}`);
-      setAddressDetails(response.data || []); // Ensure it's an array even if response is null
-    } catch (error) {
-      console.error("Error fetching address:", error);
-    }
-  }, [ApiUrl, userId]); // Include dependencies ApiUrl and userId
+const fetchAddress = useCallback(async (userId) => {
+  try {
+    const response = await axios.get(`${ApiUrl}/singleaddress/${userId}`);
+    setAddressDetails(response.data || []); // Ensure it's an array even if response is null
+  } catch (error) {
+    console.error("Error fetching address:", error);
+  }
+}, [ApiUrl]); // Include dependencies ApiUrl
 
-  useEffect(() => {
-    // Fetch the address every 10 seconds
-    const interval = setInterval(fetchAddress, 100);
+useEffect(() => {
+  // Fetch the selected address from local storage
+  const storedAddressId = localStorage.getItem("selectedAddressId");
+  if (storedAddressId) {
+    setSelectedAddress(storedAddressId);
+  }
+}, []);
 
-    // Clean up interval on component unmount
-    return () => clearInterval(interval);
-  }, [fetchAddress]); // Add fetchAddress as a dependency
+useEffect(() => {
+  const storedUserId = localStorage.getItem("user_id");
+  if (storedUserId) {
+    setUserId(storedUserId);
+    fetchAddress(storedUserId); // Call fetchAddress with userId
+  }
+}, [fetchAddress]); // Add fetchAddress as a dependency
 
-  useEffect(() => {
-    // Fetch the selected address from local storage
-    const storedAddressId = localStorage.getItem("selectedAddressId");
-    if (storedAddressId) {
-      setSelectedAddress(storedAddressId);
-    }
-  }, []);
+
+  // useEffect(() => {
+  //   // Fetch the selected address from local storage
+  //   const storedAddressId = localStorage.getItem("selectedAddressId");
+  //   if (storedAddressId) {
+  //     setSelectedAddress(storedAddressId);
+  //   }
+  // }, []);
 
   const handleConfirm = async () => {
     fetchAddress(); // Fetch the latest address data when the Confirm button is clicked
@@ -59,6 +68,7 @@ const CartPage = () => {
           userId: userId, // Ensure userId is set correctly
           addressId: selectedAddress,
         });
+        window.location.reload();
 
         if (response.status === 200) {
           // Update the default address to the newly selected address
@@ -74,6 +84,7 @@ const CartPage = () => {
             progress: undefined,
           });
           handleCloseModal(); // Close the modal after confirming
+          
         } else {
           throw new Error("Unexpected response status");
         }
@@ -174,7 +185,24 @@ const CartPage = () => {
       }, 0)
       .toFixed(2);
   };
-
+  const calculateActualPrice = () => {
+    return cartItems
+      .reduce((total, item) => {
+        const actual_price = parseFloat(item.actual_price);
+        return total + (isNaN(actual_price) ? 0 : actual_price * item.quantity);
+      }, 0)
+      .toFixed(2);
+  };
+  const discount = () => {
+    return cartItems
+      .reduce((total, item) => {
+        const actual_price = parseFloat(item.actual_price);
+        const price = parseFloat(item.price);
+        const discountPerItem = actual_price - price;
+        return total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity);
+      }, 0)
+      .toFixed(2);
+  };
   const getTotalItemsCount = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
@@ -373,6 +401,12 @@ const CartPage = () => {
     }
   };
 
+
+  const handleProductClick = (productId) => {
+    // Navigate to the product detail page
+    navigate(`/product/${productId}`);
+  };
+  
   return (
     <>
       {/* <Header1 /> */}
@@ -385,127 +419,158 @@ const CartPage = () => {
         </div>
         <div className="cart-content row">
           <div className="cart-products">
-            <div className="cart-address">
-              {/* <h3>Select a Shipping Address</h3> */}
-              {addressDetails.length > 0 ? (
-                <ul>
-                  {addressDetails.map((address) => (
-                    <li
-                      className={`addr-list ${
-                        selectedAddress === address.address_id ? "selected" : ""
-                      }`}
-                      key={address.address_id}
-                    >
-                      <button
-                        style={{ float: "right" }}
-                        className="change-btn"
-                        onClick={() =>
-                          handleSelectAddressClick(address.address_id)
-                        }
-                      >
-                        {isAddressSelected &&
-                        selectedAddress === address.address_id
-                          ? "Change"
-                          : "Confirm This Address"}
-                      </button>
-                      <strong>Delivery to :</strong>
-                      <label>
-                        <span style={{ fontSize: "15px", marginTop: "5px" }}>
-                          {" "}
-                          {address.name}, {address.street}, {address.city},{" "}
-                          {address.state}, {address.country},{" "}
-                          {address.postal_code}, {address.phone}
-                        </span>
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div>
-                  <p> Please add one address during checkout. </p>
-                  <a href="/Useraddress">
-                    <button className="change-btn">Add Address</button>
-                  </a>
-                </div>
-              )}
+          <div className="cart-address">
+    {/* <h3>Select a Shipping Address</h3> */}
+    {addressDetails.length > 0 ? (
+      <ul>
+        {addressDetails.map((address) => (
+          <li
+            className={`addr-list ${
+              selectedAddress === address.address_id ? "selected" : ""
+            }`}
+            key={address.address_id}
+          >
+            <button
+              style={{ float: "right" }}
+              className="change-btn"
+              onClick={() => handleSelectAddressClick(address.address_id)}
+            >
+              {selectedAddress === address.address_id ? "Change" : "Change"}
+            </button>
+            <strong>Delivery to :</strong>
+            <label>
+              <span style={{ fontSize: "15px", marginTop: "5px" }}>
+                {address.name}, {address.street}, {address.city},{" "}
+                {address.state}, {address.country},{" "}
+                {address.postal_code}, {address.phone}
+              </span>
+            </label>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div>
+        <p> Please add one address during checkout. </p>
+        <a href="/Useraddress">
+          <button className="change-btn">Add Address</button>
+        </a>
+      </div>
+    )}
+  </div>
+  <div className="cart-product-card">
+  <ul className="cart-list">
+  {cartItems.length === 0 ? (
+    <li className="empty-cart-message">
+      <p>Your cart is empty</p>
+      <a href="/">
+        <button className="change-btn">Browse products</button>
+      </a>
+    </li>
+  ) : (
+    cartItems.slice().reverse().map((item) => {
+      let firstImage = '';
+
+      try {
+        // Check if item.image is a string representation of an array or just a string
+        if (typeof item.image === 'string') {
+          // Attempt to parse as JSON
+          const images = JSON.parse(item.image); // Parse the JSON string
+
+          // Handle case where images is an array
+          if (Array.isArray(images) && images.length > 0) {
+            firstImage = images[0].replace(/&quot;/g, ''); // Get the first image and remove &quot;
+          } else {
+            firstImage = item.image.replace(/&quot;/g, ''); // Treat it as a plain string if not an array
+          }
+        } else if (Array.isArray(item.image)) {
+          // Handle case where item.image is already an array
+          firstImage = item.image[0]; // Get the first image from the array
+        }
+      } catch (error) {
+        console.error("Error parsing image:", error);
+        firstImage = ''; // Reset firstImage on error
+      }
+
+      return (
+        <li key={item.id} className="cart-product d-flex align-items-center">
+          
+          {firstImage ? ( // Check if firstImage exists
+          <div
+          key={item.id}
+          onClick={() => handleProductClick(item.id)}
+          style={{cursor:'pointer'}}
+          >
+
+            <img
+              src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
+              alt={item.name}
+              loading="lazy"
+              className="cart-product-image"
+              name="image"
+            /></div>
+          ) : (
+            <div className="placeholder-image">No image available</div> // Fallback message
+          )}
+          <div style={{cursor:'pointer'}} className="cart-product-details"  key={item.id}
+          onClick={() => handleProductClick(item.id)}>
+            <p className="cart-product-name">{item.name}</p>
+            {/* <p className="cart-product-name">{item.coupon}</p> */}
+            <p className="cart-product-description">{item.description}</p>
+          </div>
+          <div className="cart-product-price">
+            <div className="cart-quantity-controls">
+              <button
+                onClick={() =>
+                  updateCartItemQuantity(
+                    item.id,
+                    item.category,
+                    Math.max(item.quantity - 1, 1)
+                  )
+                }
+              >
+                -
+              </button>
+              <span>{item.quantity}</span>
+              <button
+                onClick={() =>
+                  updateCartItemQuantity(
+                    item.id,
+                    item.category,
+                    item.quantity + 1
+                  )
+                }
+              >
+                +
+              </button>
+              <FaTrash
+                className="cart-remove-btn"
+                onClick={() => removeFromCart(item.id, item.category)}
+              />
             </div>
-            <div className="cart-product-card">
-              <ul className="cart-list">
-                {cartItems.length === 0 ? (
-                  <li className="empty-cart-message">
-                    <p>Your cart is empty</p>
-                    <a href="/">
-                      <button className="change-btn">Browse products</button>
-                    </a>
-                  </li>
-                ) : (
-                  cartItems.map((item) => (
-                    <li
-                      key={item.id}
-                      className="cart-product d-flex align-items-center"
-                    >
-                      <img
-                        src={`${ApiUrl}/uploads/${item.category}/${item.image}`}
-                        alt={item.name}
-                        loading="lazy"
-                        className="cart-product-image"
-                        name="image"
-                      />
-                      <div className="cart-product-details">
-                        <p className="cart-product-name">{item.name}</p>
-                        <p className="cart-product-description">
-                          {item.description}
-                        </p>
-                      </div>
-                      <div className="cart-product-price">
-                        <div className="cart-quantity-controls">
-                          <button
-                            onClick={() =>
-                              updateCartItemQuantity(
-                                item.id,
-                                item.category,
-                                Math.max(item.quantity - 1, 1)
-                              )
-                            }
-                          >
-                            -
-                          </button>
-                          <span>{item.quantity}</span>
-                          <button
-                            onClick={() =>
-                              updateCartItemQuantity(
-                                item.id,
-                                item.category,
-                                item.quantity + 1
-                              )
-                            }
-                          >
-                            +
-                          </button>
-                          <FaTrash
-                            className="cart-remove-btn"
-                            onClick={() =>
-                              removeFromCart(item.id, item.category)
-                            }
-                          />
-                        </div>
-                        <p>₹{item.price * item.quantity}</p>
-                      </div>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div>
+            <p style={{ color: 'red',textDecoration:"line-through", fontSize:'13px',marginRight:'5px' }}>₹{item.actual_price} </p>
+            <p> ₹{item.price * item.quantity}</p>
+          </div>
+        </li>
+      );
+    })
+  )}
+</ul>
+
+
+
+
+</div>
+
           </div>
 
           <div className="cart-summary">
             <div className="summary-item">
-              <span>Price ({getTotalItemsCount()} items)</span>
-              <span>₹{calculateTotalPrice()}</span>
+            <span>Price ({getTotalItemsCount() === 1 ? '1 item' : `${getTotalItemsCount()} items`})</span>
+              <span>₹{calculateActualPrice()}</span>
             </div>
             <div className="summary-item">
               <span>Discount</span>
-              <span>-</span>
+              <span style={{color:'green'}}>- ₹{discount()}</span>
             </div>
             <div className="summary-item">
               <span>Platform fee</span>
@@ -514,17 +579,23 @@ const CartPage = () => {
             <div className="summary-item">
               <span>Delivery charge</span>
               <span>
-                <span style={{ textDecoration: "line-through" }}>₹40</span> FREE
-                Delivery
+                <span style={{ textDecoration: "line-through" }}>₹40</span> <span style={{color:'green'}}>FREE Delivery</span>
+               
               </span>
             </div>
-            <div className="summary-item">
+            {/* <div className="summary-item">
               <span>You will save on this order</span>
               <span>₹10000</span>
-            </div>
+            </div> */} <hr />
             <div className="summary-item">
               <strong>Total Amount</strong>
-              <span>₹{calculateTotalPrice()}</span>
+              <span style={{fontWeight:'bold'}}>₹{calculateTotalPrice()}</span>
+            </div>
+            <hr />
+
+            <div className="summary-item">
+              <span style={{color:'green'}}>You will save ₹{discount()} on this order</span>
+              {/* <span>₹10000</span> */}
             </div>
             <button
               className="summary-place-order-btn"

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './css/Customers.css'; // Import external CSS
 import { ApiUrl } from '../../components/ApiUrl';
+import Modal from 'react-modal'; // Importing Modal
 
 const Customers = () => {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ const Customers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Fetch Users Data
   const fetchUsers = async () => {
@@ -93,6 +96,19 @@ const Customers = () => {
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
+
+  // Function to handle opening the modal with user details
+  const openModal = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  // Function to handle closing the modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+  };
+
   return (
     <div className="customers-container">
       <h3 className="page-titlee">Customer Details</h3>
@@ -104,28 +120,24 @@ const Customers = () => {
             <thead>
               <tr>
                 <th>S.No</th>
-                {/* <th>User ID</th> */}
                 <th>Username</th>
                 <th>Email</th>
-                <th>Address</th>
-                {/* <th>Street</th>
-                <th>City</th>
-                <th>State</th>
-                <th>Postal Code</th>
-                <th>Country</th> */}
-                <th>Phone</th>
+                <th>Number</th>
+                <th>View</th> {/* New View column */}
               </tr>
             </thead>
             <tbody>
               {currentUsers.map((user, index) => (
                 <tr key={user.user_id}>
                   <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                  {/* <td>{user.user_id}</td> */}
                   <td>{capitalizeFirstLetter(user.username)}</td>
                   <td>{user.email}</td>
-                  <td>{user.address_name || 'N/A'}, {user.street || 'N/A'}, {user.city || 'N/A'}, {user.state || 'N/A'}, {user.postal_code || 'N/A'}, {user.country || 'N/A'}</td>
-                 
-                  <td>{user.phone || 'N/A'}</td>
+                  <td>{user.contact_number}</td>
+                  <td>
+                    <button onClick={() => openModal(user)} className="view-button">
+                      View
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -162,6 +174,46 @@ const Customers = () => {
           &gt;
         </button>
       </div>
+
+      {/* Modal for Viewing User Details */}
+    {/* Modal for Viewing User Details */}
+<Modal
+  isOpen={isModalOpen}
+  onRequestClose={closeModal}
+  contentLabel="User Details"
+  ariaHideApp={false}
+  className="user-details-modal"
+>
+  <h2>User Details</h2>
+  {selectedUser && (
+    <div>
+      <p><strong>Username:</strong> {capitalizeFirstLetter(selectedUser.username)}</p>
+      <p><strong>Email:</strong> {selectedUser.email}</p>
+      <p><strong>Number:</strong> {selectedUser.contact_number}</p>
+      <p><strong>Addresses:</strong></p>
+      {selectedUser.address_names && selectedUser.address_names.split(', ').map((address, i) => {
+        const street = selectedUser.streets?.split(', ')[i] || 'N/A';
+        const city = selectedUser.cities?.split(', ')[i] || 'N/A';
+        const state = selectedUser.states?.split(', ')[i] || 'N/A';
+        const postalCode = selectedUser.postal_codes?.split(', ')[i] || 'N/A';
+        const country = selectedUser.countries?.split(', ')[i] || 'N/A';
+        const phone = selectedUser.phones?.split(', ')[i] || 'N/A'; // Corresponding phone number
+
+        return (
+          <div key={i}>
+            <p>
+              {i + 1}. {address}, {street}, {city}, {state}, {postalCode}, {country} 
+              <br />
+              <strong>Phone:</strong> {phone}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  )}
+  <button onClick={closeModal}>Close</button>
+</Modal>
+
     </div>
   );
 };

@@ -1,152 +1,209 @@
 /* CareersTable.css */
 
+/* Container styles */
 .careers-table-container {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    background-color: #fff;
-    margin-left: 270px;
-    margin-top: 90px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: #fff;
+  margin-left: 270px;
+  margin-top: 90px;
+}
+
+/* Heading styles */
+.careers-table-container h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+}
+
+/* Table styles */
+.careers-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto; /* Allows columns to adjust based on content */
+}
+
+.careers-table thead {
+  background-color: #007bff;
+  color: white;
+}
+
+.careers-table th, .careers-table td {
+  padding: 12px;
+  text-align: left;
+  font-size: 16px;
+}
+
+.careers-table th {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.careers-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.careers-table tr:hover {
+  background-color: #e0e0e0;
+}
+
+.resume-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.resume-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive Table Design */
+@media (max-width: 768px) {
+  .careers-table-container {
+    margin-left: 0; /* Remove left margin */
+    padding: 10px; /* Add some padding */
   }
-  
-  .careers-table-container h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-    text-align: center;
-  }
-  
+
   .careers-table {
     width: 100%;
-    border-collapse: collapse;
+    overflow-x: auto;
+    display: block; /* Make table scrollable horizontally */
+    border-collapse: separate;
+    border-spacing: 0; /* Avoid collapsing borders */
   }
-  
-  .careers-table thead {
-    background-color: #007bff;
-    color: white;
-  }
-  
+
   .careers-table th, .careers-table td {
-    padding: 12px;
-    text-align: left;
+    padding: 10px 8px;
+    font-size: 14px; /* Reduce font size for smaller screens */
   }
-  
+
+  .careers-table th, .careers-table td {
+    white-space: nowrap; /* Prevent text wrapping */
+  }
+
   .careers-table th {
-    font-weight: bold;
-    text-transform: uppercase;
+    font-size: 14px; /* Reduce header font size */
+    text-transform: none; /* Remove text transformation */
   }
-  
-  .careers-table tr:nth-child(even) {
-    background-color: #f2f2f2;
+
+  .careers-table tr {
+    display: table-row; /* Retain table row structure */
   }
-  
+
   .careers-table tr:hover {
-    background-color: #e0e0e0;
+    background-color: transparent; /* Remove hover effect on mobile */
   }
   
-  .careers-table a {
-    color: #007bff;
-    text-decoration: none;
-  }
-  
-  .careers-table a:hover {
-    text-decoration: underline;
-  }
-  
-  @media (max-width: 768px) {
-    .careers-table {
-      display: block;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-  
-    .careers-table thead {
-      display: none;
-    }
-  
-    .careers-table tr {
-      display: block;
-      margin-bottom: 15px;
-      border-bottom: 2px solid #ddd;
-    }
-  
-    .careers-table td {
-      display: block;
-      text-align: right;
-      padding: 10px;
-      position: relative;
-      border: 1px solid #ddd;
-    }
-  
-    .careers-table td::before {
-      content: attr(data-label);
-      position: absolute;
-      left: 0;
-      width: 50%;
-      padding-right: 10px;
-      font-weight: bold;
-      text-align: left;
-      background-color: #f2f2f2;
-      color: #333;
-      border-right: 1px solid #ddd;
-      white-space: nowrap;
-    }
-  }
-  
-
-  /* CareersTable.css */
-  .modall-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000; /* Ensure it appears above other content */
-}
-
-/* Modal content styles */
-.modall-content {
-    background: white;
-    padding: 15px; /* Reduced padding */
-    border-radius: 8px;
-    position: relative;
-    width: 70%; /* Reduced width */
-    max-width: 600px; /* Reduced max-width */
-}
-
-/* Close button styles */
-.modall-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    border: none;
-    background: none;
-    font-size: 20px; /* Reduced font size */
-    cursor: pointer;
-}
-
-/* Iframe styles */
-.modall-iframe {
-    width: 100%; /* Full width within the modal */
-    height: 530px; /* Reduced height */
-    border: none;
-}
   .resume-btn {
-    background-color: #007bff; /* Example resume-btn color */
+    font-size: 12px; /* Reduce button size */
+    padding: 6px 10px;
+  }
+}
+/* Modal styles */
+.modall-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure it appears above other content */
+}
+
+.modall-content {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  position: relative;
+  width: 70%; /* Adjust width for modal */
+  max-width: 600px; /* Adjust max-width for modal */
+}
+
+.modall-close {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  border: none;
+  background: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: rgb(255, 255, 255);
+  border-radius: 50%;
+  width: 4%;
+  background-color: red;
+}
+.download-btn {
+  position: absolute;
+  top: 2px;
+  right: 25px;
+  border: none;
+  background: none;
+  display: none;
+  font-size: 20px;
+  cursor: pointer;
+  /* color: #007bff; */
+  color: rgb(8, 141, 250);
+  /* border-radius: 50%; */
+  width: 4%;
+  /* background-color: rgb(40, 94, 245); */
+}
+
+.modall-iframe {
+  width: 100%; /* Full width within the modal */
+  height: 530px; /* Adjust height for modal */
+  border: none;
+}
+
+/* Responsive table design */
+@media (max-width: 768px) {
+  .modall-content {
+    width: 90%; /* Adjust width for smaller screens */
+    max-width: 100%; /* Full width on smaller screens */
+  }
+
+  .modall-iframe {
+    display: none; /* Hide iframe on small screens */
+  }
+
+  .resume-btn {
+    display: inline-block; /* Ensure button is visible */
+    background-color: #007bff;
     color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
   }
-  
+
   .resume-btn:hover {
-    background-color: #0056b3; /* Darker color on hover */
+    background-color: #0056b3;
   }
+
+  /* Change resume button to a download link */
+  .download-btn {
+    display: block;
+    text-align: center;
+    font-size: 16px;
+    padding: 10px;
+    color: #007bff;
+    text-decoration: none;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+  }
+
+  .download-btn:hover {
+    background-color: #f0f0f0;
+  }
+}
+

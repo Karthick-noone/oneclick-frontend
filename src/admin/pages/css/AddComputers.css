@@ -1,4 +1,143 @@
-/* AddLaptops.css */
+.laptops-product-coupon {
+  display: inline-block; /* Makes the box only as wide as its content */
+  padding: 8px 10px; /* Adds padding inside the box */
+  background-color: #f8f9fa; /* Light background color */
+  border: 1px solid #007bff; /* Blue border color */
+  border-radius: 5px; /* Rounded corners */
+  color: #007bff; /* Text color to match the border */
+  font-weight: bold; /* Make the text bold */
+  margin: 10px 0; /* Adds margin above and below the box */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  font-size: 14px;
+}
+
+
+.upload-container {
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0; /* Spacing around the container */
+  margin-left: 70px;
+  /* border-top: 1px solid #ccc; */
+}
+
+
+.upload-button {
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding for button */
+  margin-top: 10px; /* Space between input and button */
+  margin-left: 20px; /* Space between input and button */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.upload-button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+
+
+.slider-container {
+  position: relative; /* Make the container relative for absolute positioning of arrows */
+}
+
+.image-wrapper {
+  position: relative; /* Make the wrapper relative for proper image positioning */
+}
+
+.custom-arrow {
+  width: 40px; /* Set width for arrows */
+  height: 40px; /* Set height for arrows */
+  background-color: rgba(255, 255, 255, 0.6); /* Semi-transparent background */
+  border: 2px solid rgba(0, 0, 0, 0.4); /* Add border for visibility */
+  border-radius: 50%; /* Make it round */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10; /* Ensure arrows are on top */
+  cursor: pointer; /* Change cursor to pointer */
+  transition: background-color 0.3s, border-color 0.3s; /* Add transitions for smooth effects */
+}
+
+.custom-arrow:hover {
+  background-color: rgb(255, 0, 0); /* Change background on hover */
+  border-color: rgba(0, 0, 0, 0.8); /* Darken border on hover */
+}
+
+
+.slick-dots {
+  bottom: 10px; /* Position dots */
+}
+
+.slick-dots li button:before {
+  font-size: 12px; /* Size of the dots */
+  color: black; /* Color of the dots */
+}
+
+.slick-dots li.slick-active button:before {
+  color: red; /* Color of the active dot */
+}
+.image-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 5px;
+}
+
+.action-icon {
+  cursor: pointer;
+  font-size: 15px;
+  color: #333333;
+  transition: color 0.3s;
+}
+
+.action-icon:hover {
+  color: #007bff; /* Change color on hover */
+}
+
+
+
+.adminmodal-input1 {
+  width: 100%;   
+  height: 100px;                    /* Full width */
+  padding: 12px 16px;               /* Padding for comfort */
+  border: 1px solid #ddd;        /* Border color */
+  border-radius: 8px;               /* Rounded corners */
+  background-color: #ffffff;        /* Light background */
+  color: #333;                      /* Text color */
+  font-size: 16px;                  /* Font size */
+  font-family: 'Arial', sans-serif; /* Font family */
+  resize: none;  
+                     /* Disable resizing */
+}
+
+
+
+/* Style for textarea */
+.laptops-card-input1 {
+  width: 100%; /* Full width */
+  min-height: 19px; /* Minimum height to start with */
+  max-height: 300px; /* Optional: Maximum height to prevent overflow */
+  padding: 10px; /* Comfortable padding */
+  border-radius: 4px; /* Rounded corners */
+  background-color: white; /* Light background */
+  font-size: 14px; /* Font size */
+  box-sizing: border-box;
+  border: 1px solid #ddd; /* Border style */
+  resize: vertical; /* Allow vertical resizing */
+  transition: border-color 0.3s ease; /* Smooth transition */
+}
+
+/* Container for icons */
+.icons-container {
+  display: flex; /* Align icons in a row */
+  align-items: center; /* Center icons vertically */
+}
+
+
 
 .laptops-page {
     display: flex;
@@ -11,6 +150,40 @@
     padding: 20px;
   }
   
+  .product-label {
+    position: absolute; /* Use absolute positioning */
+    top: 10px; /* Distance from the top */
+    left: 10px; /* Distance from the left */
+    background-color: #00A098; /* Background color */
+    color: white; /* Text color */
+    padding: 5px 10px; /* Padding around the label */
+    border-radius: 3px; /* Rounded corners */
+    font-size: 12px; /* Font size */
+    font-weight: bold; /* Bold text */
+    z-index: 1; /* Ensure label is on top of the image */
+    box-shadow: 0 4px 15px rgba(0, 160, 152, 0.75); /* Glow effect */
+    text-transform: uppercase; /* Make label uppercase */
+    letter-spacing: 1px; /* Add letter spacing for style */
+    /* transform: rotate(-30deg);  */
+    animation: shine 2s infinite linear; /* Add a shine animation */
+  }
+  
+  /* Create a shining effect */
+  @keyframes shine {
+    0% {
+      background-color: #00A098; /* Starting color */
+      box-shadow: 0 0 10px rgba(0, 160, 152, 0.5), 0 0 20px rgba(0, 160, 152, 0.3);
+    }
+    50% {
+      background-color: #00D6C1; /* Lighter shining color */
+      box-shadow: 0 0 20px rgba(0, 214, 193, 0.8), 0 0 30px rgba(0, 214, 193, 0.6);
+    }
+    100% {
+      background-color: #00A098; /* Back to original color */
+      box-shadow: 0 4px 15px rgba(0, 160, 152, 0.75);
+    }
+  }
+  
   .laptops-page-title {
     text-align: center;
     margin-bottom: 20px;
@@ -19,7 +192,7 @@
   }
   
   .laptops-card {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
     background-color: #fff;
     padding: 20px;
@@ -28,14 +201,14 @@
   }
   
   .laptops-card-header,
-  .laptops-card-row {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 15px;
-  }
-  
+.laptops-card-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* Update to 7 columns */
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
   .laptops-card-item {
     font-weight: bold;
     color: #34495e;
@@ -44,6 +217,24 @@
   .laptops-card-input {
     width: 100%;
     padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .laptops-card-input2 {
+    width: 25%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .laptops-card-inputt {
+    width: 100%;
+    padding-top: 8px;
+    padding-left: 2px;
+    padding-bottom: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
@@ -70,8 +261,25 @@
     gap: 20px;
     justify-content: center;
   }
+
+  .laptops-product-actual-price {
+    color: #e74c3c; /* Red color for actual price */
+    font-size: 14px;
+  }
+
+  .actual-price{
+    text-decoration: line-through; /* Strike through for the actual price */
+
+  }
+  
+  .laptops-product-pricee {
+    font-weight: bold; /* Make selling price bold */
+    color: #27ae60; /* Green color for the selling price */
+    font-size: 16px;
+  }
   
   .laptops-product-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -85,21 +293,34 @@
   
   .laptops-product-image {
     width: 100%;
-    height: 200px; /* Increase the height for a larger image */
+    height: 200px; 
     overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    object-fit: contain;
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
     margin-bottom: 10px;
   }
   
   .laptops-product-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensure the image covers the container without distortion */
-    border-radius: 8px; /* Keep rounded corners if desired */
+    object-fit: cover; 
+    border-radius: 8px; 
   }
   
+
+   /* .laptops-product-image {
+    width: 100%;
+    height: auto;
+  }
+  
+  .laptops-product-img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+  }
+   */
 
   .laptops-product-details {
     text-align: center;
@@ -156,7 +377,7 @@
     padding: 20px;
     border-radius: 8px;
     max-width: 400px;
-    width: 90%; /* Ensure adminmodal takes 90% of the width on smaller screens */
+    width: 100%; /* Ensure adminmodal takes 90% of the width on smaller screens */
     margin-left: 10%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease-in-out;
@@ -261,6 +482,16 @@
   }
   
   @media (max-width: 480px) {
+    .laptops-product-image {
+      width: 100%;
+      height: 200px; 
+      overflow: hidden;
+      /* display: flex; */
+      /* justify-content: center; */
+      /* align-items: center; */
+      margin-bottom: 5px;
+    }
+    
     .adminmodal {
       width: 70%;
       /* margin-left: 80px; */
@@ -294,6 +525,10 @@
       display: none; /* Hide header on smaller screens */
     }
   
+    .feature-1 {
+      display: none; /* Hide header on smaller screens */
+    }
+  
     .laptops-card-row,
     .laptops-product-card {
       grid-template-columns: 1fr;
@@ -306,3 +541,106 @@
       padding: 10px;
     }
   }
+
+
+  /* Adjust the flex direction for responsive view */
+@media (max-width: 768px) { /* You can adjust the width as needed */
+  .features-input-container {
+      flex-direction: column; /* Stack items vertically */
+  }
+  
+  .laptops-card-input2 {
+      width: 100%; /* Set input width to full */
+  }
+
+  .icons-container {
+display: flex;    margin-top: 10px; /* Space above icons */
+}
+  
+ 
+}
+    .features-input-container {
+      display: flex; /* Use flexbox for alignment */
+      align-items: center; /* Center items vertically */
+      position: relative; /* Allow positioning of child elements */
+      width: 100%; /* Ensure full width */
+      margin-top: 15px; /* Adjust margin if needed */
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    
+  .pipe-icon {
+    cursor: pointer;
+    font-size: 24px; /* Adjust size as needed */
+    color: #000000; /* Change color to match your theme */
+    margin-left: 10px; /* Space between textarea and pipe icon */
+  }
+  
+  .info-icon {
+    cursor: pointer;
+    padding: 5px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    width: 24px; /* Adjust size */
+    height: 24px; /* Adjust size */
+    font-size: 14px; /* Font size for the 'i' */
+    margin-left: 10px; /* Space between pipe icon and info icon */
+    display: flex; /* Use flex to center content */
+    align-items: center; /* Center the 'i' vertically */
+    justify-content: center; /* Center the 'i' horizontally */
+  }
+  
+ 
+  
+  .info-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1008; /* Ensure it's on top */
+  }
+  
+  .popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: left;
+    width: 300px; /* Adjust width as needed */
+    position: relative; /* For close button positioning */
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  @media (max-width: 600px) {
+    .popup-content {
+      width: 90%; /* Responsive width for small screens */
+    }
+  }
+
+  .product-feature-list {
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+    text-align: left; /* Align text to the left */
+  }
+  
+  .product-feature-list li {
+    padding: 5px 0; /* Add some spacing between list items */
+    font-size: 16px; /* Adjust font size if necessary */
+    color: #333; /* Set color for the text */
+    margin-left: 10px;
+  }
+  

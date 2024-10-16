@@ -240,3 +240,14 @@
 .remove-btn:hover {
   opacity: 0.9;
 }
+
+.item-features {
+  display: -webkit-box; /* Use a box layout for controlling text lines */
+  -webkit-box-orient: vertical; /* Set orientation to vertical */
+  overflow: hidden; /* Hide any overflowing content */
+  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+  white-space: normal; /* Allow text to wrap */
+
+  font-size: 16px; /* Adjust as per your design */
+  line-height: 2; /* Set line height */
+}

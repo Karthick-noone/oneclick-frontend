@@ -4,7 +4,8 @@ import axios from "axios";
 import Header2 from "./Header2";
 // import Header3 from "./Header3";
 import Footer from "./footer";
-import Sidebar from "./Sidebar";
+import Filterbar from "./FilterBar";
+// import Sidebar from "./Sidebar";
 import Modal from "./Modal";
 import "./css/Computers.css";
 import { useCart } from "../components/CartContext";
@@ -12,6 +13,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ApiUrl } from "./ApiUrl";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Define a fallback image URL
 // const fallbackImage = require('./img/laptop.jpg'); // Replace with a valid fallback image
@@ -21,6 +23,24 @@ const MobileAccessories = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [favorites, setFavorites] = useState({});
   const { cartItems, addToCart, updateCartItemQuantity, addToWishlist, removeFromWishlist } = useCart();
+  const navigate = useNavigate();
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const searchQuery = queryParams.get('search');
+
+  // Use searchQuery in your component
+  console.log("Search Query:", searchQuery);
+
+   // Filter products based on the search query
+   const filteredProducts = searchQuery
+   ? products.filter(product => {
+       const nameMatches = product.prod_name.toLowerCase().includes(searchQuery);
+       const priceMatches = product.prod_price;
+      //  const featuresMatch = product.prod_features.toLowerCase().includes(searchQuery);
+       return priceMatches || nameMatches /* || featuresMatch */; // Return products that match either the name or features
+     })
+   : products; // If no search query, return all products
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -70,10 +90,18 @@ const MobileAccessories = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  const handleCardClick = (product) => {
-    setSelectedProduct(product);
-  };
+  // const handleCardClick = (product) => {
+  //   setSelectedProduct(product);
+  // };
 
+  const handleCardClick = (product) => {
+    // Check if product is defined and has an id
+    if (product && product.id) {
+      navigate(`/product/${product.id}`); // Navigate to the product details page
+    } else {
+      console.error("Product is undefined or missing ID:", product);
+    }
+  };
   const handleCloseModal = () => {
     setSelectedProduct(null);
   };
@@ -155,6 +183,7 @@ const MobileAccessories = () => {
             description: product.prod_features,
             category: product.category,
             product_id: product.prod_id,
+            actual_price: product.actual_price,
 
             quantity: 1,
           });
@@ -339,73 +368,168 @@ const MobileAccessories = () => {
       {/* <Header3 /> */}
       <span style={{ marginLeft: "20px",padding:'10px' }}><a style={{textDecoration:'none', color:'black'}} href="/">Home </a> &gt; Mobile Accessories</span>
       <div className="main-content">
-        <Sidebar />
+        <Filterbar />
+        {/* <Sidebar /> */}
         <div className="product-list">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="product-card"
-              onClick={() => handleCardClick(product)}
+  {filteredProducts.length === 0 ? (
+    // If filteredProducts is empty, fallback to using all products
+    products.map((product) => {
+      // Parse the prod_img if it's a JSON string; assuming it's an array
+      const images = Array.isArray(product.prod_img) ? product.prod_img : JSON.parse(product.prod_img);
+      const firstImage = images[0]; // Get the first image
+
+      return (
+        <div
+          key={product.id}
+          className="product-card"
+          onClick={() => handleCardClick(product)}
+        >
+          <div className="product-actions">
+            <img
+              src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+              alt={product.prod_name}
+              className="product-image"
+            />
+            <span
+              title="Add to Wishlist"
+              className={`favorite-icon ${favorites[product.prod_name] ? "filled" : ""}`}
+              onClick={(event) => handleToggleFavorite(product, event)}
             >
-              <div className="product-actions">
-                <img
-                  src={`${ApiUrl}/uploads/${product.category}/${product.prod_img}`} 
-                  alt={product.prod_name}
-                  className="product-image"
-                />
-                <span
-                  title="Add to Wishlist"
-                  className={`favorite-icon ${
-                    favorites[product.prod_name] ? "filled" : ""
-                  }`}
-                  onClick={(event) => handleToggleFavorite(product, event)}
-                >
-                  {favorites[`${product.prod_name}-${product.id}`] ? (
-                    <FaHeart style={{color:'red'}}/>
-                  ) : (
-                    <FaRegHeart  />
-                  )}
-                </span>
-                {/* <button
-                  className="toggle-favorite"
-                  onClick={(event) => handleToggleFavorite(product, event)}
-                >
-                  {favorites[`${product.prod_name}-${product.id}`] ? (
-                    <FaHeart />
-                  ) : (
-                    <FaRegHeart />
-                  )}
-                </button> */}
-              </div>
-              <h3 className="product-name">{product.prod_name}</h3>
-              <p className="product-description">{product.prod_features}</p>
-              <p className="product-price">₹{product.prod_price}</p>
-              {product.status === 'unavailable' ? (
-  <p style={{
-    color: 'red',
-    fontWeight: 'bold',
-    fontSize: '16px',
-    textAlign: 'center',
-    marginTop: '10px',
-    padding: '10px',
-    border: '2px solid red',
-    borderRadius: '5px',
-    backgroundColor: '#fdd',
-  }} className="out-of-stock">
-    Out of Stock
-  </p>
-) : (
-  <button
-  
-    onClick={(event) => handleAddToCart(product, event)}
-    className="add-to-cart"
-  >
-    Add to Cart
-  </button>
-)}
-            </div>
-          ))}
+              {favorites[`${product.prod_name}-${product.id}`] ? (
+                <FaHeart style={{ color: "red" }} />
+              ) : (
+                <FaRegHeart />
+              )}
+            </span>
+          </div>
+          <h3 className="product-name">{product.prod_name}</h3>
+          {/* <p className="product-description">{product.prod_features}</p> */}
+          <p className="product-price">₹{product.prod_price}</p>
+                    <p className="product-actual-price">
+                      <span style={{ textDecoration: "line-through" }}>
+                        ₹{product.actual_price}{" "}
+                      </span>
+                      <span style={{ color: "green", marginLeft: "10px" }}>
+                        (
+                        {Math.round(
+                          ((product.actual_price - product.prod_price) /
+                            product.actual_price) *
+                            100
+                        )}
+                        % OFF)
+                      </span>
+                    </p>{" "}
+          {product.status === "unavailable" ? (
+            <p
+              style={{
+                color: "red",
+                fontWeight: "bold",
+                fontSize: "16px",
+                textAlign: "center",
+                marginTop: "10px",
+                padding: "10px",
+                // border: "2px solid red",
+                // borderRadius: "5px",
+                // backgroundColor: "#fdd",
+              }}
+              className="out-of-stock"
+            >
+              Out of Stock
+            </p>
+          ) : (
+            <button
+              onClick={(event) => handleAddToCart(product, event)}
+              className="add-to-cart"
+            >
+              Add to cart
+            </button>
+          )}
         </div>
+      );
+    })
+  ) : (
+    // If filteredProducts has results, display them
+    filteredProducts.map((product) => {
+      const images = Array.isArray(product.prod_img) ? product.prod_img : JSON.parse(product.prod_img);
+      const firstImage = images[0];
+
+      return (
+        <div
+          key={product.id}
+          className="product-card"
+          onClick={() => handleCardClick(product)}
+        >
+          {product.offer_label && (
+                  <div className="product-label">{product.offer_label }</div>
+                )}
+
+
+          <div className="product-actions">
+            <img
+              src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+              alt={product.prod_name}
+              className="product-image"
+            />
+            <span
+              title="Add to Wishlist"
+              className={`favorite-icon ${favorites[product.prod_name] ? "filled" : ""}`}
+              onClick={(event) => handleToggleFavorite(product, event)}
+            >
+              {favorites[`${product.prod_name}-${product.id}`] ? (
+                <FaHeart style={{ color: "red" }} />
+              ) : (
+                <FaRegHeart />
+              )}
+            </span>
+          </div>
+          <h3 className="product-name">{product.prod_name}</h3>
+          {/* <p className="product-description">{product.prod_features}</p> */}
+          <p className="product-price">₹{product.prod_price}</p>
+                    <p className="product-actual-price">
+                      <span style={{ textDecoration: "line-through" }}>
+                        ₹{product.actual_price}{" "}
+                      </span>
+                      <span style={{ color: "green", marginLeft: "10px" }}>
+                        (
+                        {Math.round(
+                          ((product.actual_price - product.prod_price) /
+                            product.actual_price) *
+                            100
+                        )}
+                        % OFF)
+                      </span>
+                    </p>
+          {product.status === "unavailable" ? (
+            <p
+              style={{
+                color: "red",
+                fontWeight: "bold",
+                fontSize: "16px",
+                textAlign: "center",
+                marginTop: "10px",
+                padding: "10px",
+                // border: "2px solid red",
+                // borderRadius: "5px",
+                // backgroundColor: "#fdd",
+              }}
+              className="out-of-stock"
+            >
+              Out of Stock
+            </p>
+          ) : (
+            <button
+              onClick={(event) => handleAddToCart(product, event)}
+              className="add-to-cart"
+            >
+              Add to cart
+            </button>
+          )}
+        </div>
+      );
+    })
+  )}
+</div>
+
       </div>
       <Footer />
       {selectedProduct && (

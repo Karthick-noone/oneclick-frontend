@@ -7,6 +7,7 @@ import { ApiUrl } from "../../components/ApiUrl";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import './css/EditDoubleAdpage.css';
+import { FaInfoCircle } from "react-icons/fa";
 
 Modal.setAppElement('#root');
 
@@ -16,7 +17,11 @@ const EditSingleImageAd = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [category, setCategory] = useState(''); // Add a new state to track the selected category
 
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value); // Update category value when a new category is selected
+  };
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,17 +50,19 @@ const EditSingleImageAd = () => {
   };
 
   const handleAddProduct = async () => {
-    if (!newImage) {
+    if (!newImage || !category) {
       Swal.fire({
         icon: 'error',
-        title: 'No File Selected',
-        text: 'Please select an image to upload.',
+        title: 'Missing Data',
+        text: 'Please select both an image and a category.',
       });
       return;
     }
 
     const formData = new FormData();
     formData.append('image', newImage);
+    formData.append('category', category);  // Include category in the form data
+
 
     try {
       await axios.post(`${ApiUrl}/singleadpage`, formData, {
@@ -73,6 +80,9 @@ const EditSingleImageAd = () => {
       }).then((productsResponse) => {
         setProducts(productsResponse.data);
         setNewImage(null);
+        setCategory('');  // Clear the category
+        document.querySelector('input[type="file"]').value = ''; // Clear the input field
+
       });
 
     } catch (error) {
@@ -110,6 +120,8 @@ const EditSingleImageAd = () => {
           icon: 'success',
           title: 'Image Deleted',
           text: 'The image has been deleted successfully!',
+        }).then(() => {
+          window.location.reload();
         });
 
         setProducts((prevProducts) =>
@@ -127,46 +139,66 @@ const EditSingleImageAd = () => {
   };
 
   const handleUpdateImage = async () => {
-    if (!selectedFile) {
+    // Check if both selectedFile and category are not set
+    if (!selectedFile && !editingProduct.category) {
       Swal.fire({
         icon: 'error',
-        title: 'No File Selected',
-        text: 'Please select an image to update.',
+        title: 'No Changes Detected',
+        text: 'Please select an image or a category to update.',
       });
       return;
     }
-
+  
     const formData = new FormData();
-    formData.append('image', selectedFile);
-
+  
+    // Append selected file if it exists
+    if (selectedFile) {
+      formData.append('image', selectedFile);
+    }
+  
+    // Append category only if it has changed
+    if (editingProduct.category) {
+      formData.append('category', editingProduct.category);
+    }
+  
     try {
       const response = await axios.put(`${ApiUrl}/updatesingleadpageimage/${editingProduct.id}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
-
+  
       Swal.fire({
         icon: 'success',
-        title: 'Image Updated',
-        text: 'The image has been updated successfully!',
+        title: 'Product Updated',
+        text: 'The product has been updated successfully!',
       });
-
+  
+      // Update the product in the state with the new image or category if they were updated
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
-          product.id === editingProduct.id ? { ...product, image: response.data.updatedImage } : product
+          product.id === editingProduct.id
+            ? {
+                ...product,
+                image: selectedFile ? response.data.updatedImage : product.image, // Update image only if selectedFile is present
+                category: editingProduct.category !== product.category ? editingProduct.category : product.category, // Update category only if it's changed
+              }
+            : product
         )
       );
-      setModalIsOpen(false);
+  
+      setModalIsOpen(false); // Close the modal after successful update
     } catch (error) {
-      console.error('Error updating image:', error);
+      console.error('Error updating product:', error);
       Swal.fire({
         icon: 'error',
         title: 'Update Failed',
-        text: 'There was an error updating the image. Please try again.',
+        text: 'There was an error updating the product. Please try again.',
       });
     }
   };
+  
+  
 
   return (
     <div className="laptops-page">
@@ -174,7 +206,8 @@ const EditSingleImageAd = () => {
         <h2 className="laptops-page-title">Edit Single Image Ad Page</h2>
         <div className="laptops-card">
           <div className="laptops-card-header">
-            <div className="laptops-card-item">Images</div>
+            <div className="laptops-card-item">Image(2000 X 600)</div>
+            <div className="laptops-card-item">Category</div>
             <div className="laptops-card-item">Action</div>
           </div>
           <div className="laptops-card-row">
@@ -185,63 +218,120 @@ const EditSingleImageAd = () => {
               name='images'
               onChange={handleImageChange}
               className="laptops-card-input"
+              accept="image/*"  // This allows all image types
+
             />
          
+         <select
+      name="category"
+      // value={editingProduct.category}
+      value={category}  // Bind the state to the select value
+      onChange={handleCategoryChange}  // Update category on change
+      // onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+      className="laptops-card-input"
+    >
+      <option value="">Select Category</option>
+      <option value="Computers">Computer</option>
+      <option value="Mobiles">Mobile</option>
+      <option value="Printers">Printers</option>
+      <option value="Headphones">Headphone</option>
+      <option value="Speaker">Speaker</option>
+      <option value="CCTV">CCTV</option>
+      <option value="TV">TV</option>
+      <option value="Watch">Watch</option>
+      <option value="ComputerAccessories">Computer Accessories</option>
+      <option value="MobileAccessories">Mobile Accessories</option>
+      <option value="PrinterAccessories">Printer Accessories</option>
+              <option value="CCTVAccessories">CCTV Accessories</option>
+    </select>
+         
             <button onClick={handleAddProduct} className="laptops-add-btn">Add</button>
+            <FaInfoCircle  style={{cursor:'pointer',fontSize:'18px'}} title="Add banner size image for better view (2000 x 600)" />
+
           </div>
         </div>
       
         <div className="ad-cards-container">
           {products && products.length > 0 ? (
             products.map((product) => (
-              <div key={product.id} className="ad-card">
+              <div key={product.id} className="ad-cardd">
                 <div className="ad-image-container">
                   {product.image ? (
                     <img
                       src={`${ApiUrl}/uploads/singleadpage/${product.image}`}
                       alt="Ad"
-                      className="ad-image"
+                      className="ad-image3"
                     />
                   ) : (
-                    <p>No image available</p>
+                    <p>No image available.Please add one image for advertisement.</p>
                   )}
                   <div className="image-actions">
                     <span className="edit-icon" onClick={() => handleEditProduct(product)}>✏️</span>
                     <span className="delete-icon" onClick={() => handleDeleteImage(product)}>🗑️</span>
                   </div>
                 </div>
+
+                <div>Category - {product.category}</div>
               </div>
             ))
           ) : (
-            <p>No images available.</p>
+            <p>No images available.Please add one image for advertisement.</p>
           )}
         </div>
       </div>
 
-      {/* Modal for editing image */}
       {editingProduct && (
-        <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={() => setModalIsOpen(false)}
-          contentLabel="Edit Image"
-          className="adminmodal"
-          overlayClassName="adminmodal-overlay"
-        >
-          <div className="adminmodal-header">
-            <h2>Edit Image</h2>
-            <button onClick={() => setModalIsOpen(false)} className="adminmodal-close-btn">
-              &times;
-            </button>
-          </div>
-          <input
-            type="file"
-            onChange={(e) => setSelectedFile(e.target.files[0])}
-            className="adminmodal-input"
-          />
-          <button onClick={handleUpdateImage} className="adminmodal-update-btn">Update</button>
-          <button onClick={() => setModalIsOpen(false)} className="adminmodal-cancel-btn">Cancel</button>
-        </Modal>
-      )}
+  <Modal
+    isOpen={modalIsOpen}
+    onRequestClose={() => setModalIsOpen(false)}
+    contentLabel="Edit Image and Category"
+    className="adminmodal"
+    overlayClassName="adminmodal-overlay"
+  >
+    <div className="adminmodal-header">
+      <h2>Edit Image and Category</h2>
+      <button onClick={() => setModalIsOpen(false)} className="adminmodal-close-btn">
+        &times;
+      </button>
+    </div>
+
+    {/* Input for Image Upload */}
+    <input
+      type="file"
+      onChange={(e) => setSelectedFile(e.target.files[0])}
+      className="adminmodal-input"
+      accept="image/*"  // Allow all image types
+    />
+
+    {/* Dropdown for Category Selection */}
+    <select
+      name="category"
+      value={editingProduct.category || ''}  // Ensure category is controlled
+      onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+      className="adminmodal-input"
+    >
+      <option value="">Select Category</option>
+      <option value="Computers">Computer</option>
+      <option value="Mobiles">Mobile</option>
+      <option value="Printers">Printers</option>
+      <option value="Headphones">Headphone</option>
+      <option value="Speaker">Speaker</option>
+      <option value="CCTV">CCTV</option>
+      <option value="TV">TV</option>
+      <option value="Watch">Watch</option>
+      <option value="ComputerAccessories">Computer Accessories</option>
+      <option value="MobileAccessories">Mobile Accessories</option>
+      <option value="PrinterAccessories">Printer Accessories</option>
+              <option value="CCTVAccessories">CCTV Accessories</option>
+    </select>
+
+    {/* Update and Cancel Buttons */}
+    <button onClick={handleUpdateImage} className="adminmodal-update-btn">Update</button>
+    <button onClick={() => setModalIsOpen(false)} className="adminmodal-cancel-btn">Cancel</button>
+  </Modal>
+)}
+
+
     </div>
   );
 };

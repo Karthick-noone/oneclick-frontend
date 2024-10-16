@@ -35,24 +35,24 @@
     gap: 15px;
   }
   
-  .form-group-row {
+  .form-group2-row {
     display: flex;
     gap: 20px;
   }
   
-  .form-group {
+  .form-group2 {
     display: flex;
     flex-direction: column;
     flex: 1;
   }
   
-  .form-group label {
+  .form-group2 label {
     font-size: 14px;
     color: #333;
     margin-bottom: 5px;
   }
   
-  .form-group input {
+  .form-group2 input {
     padding: 8px;
     font-size: 14px;
     border: 1px solid #ddd;
@@ -60,19 +60,44 @@
   }
   
 
-  
   .address-card {
     position: relative;
     padding: 15px;
     border: 1px solid #ddd;
     margin-bottom: 10px;
     background-color: #f9f9f9;
+    overflow: hidden; /* Ensure content does not overflow */
+    max-width: 100%; /* Ensure the card does not exceed the container width */
+  }
+  
+  .address-card p {
+    margin: 5px 0;
+    display: flex; /* Use flexbox for proper label-value alignment */
+    white-space: normal; /* Allows text to wrap */
+    overflow-wrap: break-word; /* Breaks long words to prevent overflow */
+    word-wrap: break-word; /* For compatibility with older browsers */
+    hyphens: auto; /* Allows hyphenation for better wrapping */
+  }
+  
+  .address-card strong {
+    flex: 0 0 150px; /* Set fixed width for the label part (e.g., "Name:", "Street Address:") */
+    font-weight: bold;
+  }
+  
+  .address-card span {
+    flex: 1; /* Allow the values to take up the remaining space */
+    word-wrap: break-word; /* Wrap long text */
+    overflow-wrap: break-word; /* Ensure long words break appropriately */
+    white-space: normal; /* Make sure text wraps within the container */
+    min-width: 0; /* Important: allows the flex item to shrink properly */
   }
   
   .button-container {
-    position: absolute;
+    position: relative;
     top: 10px;
     right: 10px;
+    display: flex;
+    gap: 10px;
   }
   
   .adr-btn {
@@ -84,14 +109,51 @@
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
-    margin-left: 5px;
   }
   
+  .adr-btn:hover {
+    background-color: #0056b3;
+  }
 
-  
-  .address-card p {
-    margin: 5px 0;
+
+  .back-to-cart-button {
+    position: absolute;  /* Position it absolutely */
+    top: 150px;          /* Distance from the top of the container */
+    right: 10px;        /* Distance from the right of the container */
+    background-color: #007BFF; /* Button color */
+    color: white;       /* Text color */
+    border: none;       /* Remove border */
+    padding: 8px 10px; /* Button padding */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;    /* Pointer on hover */
+    font-size: 13px;    /* Font size */
+    transition: background-color 0.3s; /* Smooth background color change */
+    z-index: 10;        /* Ensure button appears above other content */
   }
+  
+  .back-to-cart-button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+  }
+
+  /* Responsive Styles */
+@media (max-width: 768px) {
+  .back-to-cart-button {
+    top: 160px;          /* Adjust top distance for smaller screens */
+    right: 5px;          /* Reduce right distance for smaller screens */
+    padding: 8px 12px;   /* Adjust padding for smaller screens */
+    font-size: 14px;     /* Adjust font size for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .back-to-cart-button {
+    top: 200px;          /* Further adjust top distance for very small screens */
+    right: 5px;          /* Keep right distance */
+    padding: 6px 10px;   /* Further adjust padding for very small screens */
+    font-size: 12px;     /* Further adjust font size for very small screens */
+  }
+}
+  
   
   @media (max-width: 768px) {
     .address-page-container {

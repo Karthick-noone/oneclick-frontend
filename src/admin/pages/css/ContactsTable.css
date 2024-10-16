@@ -1,0 +1,140 @@
+.contacts-table-container {
+    margin-top: 78px;
+    margin-left: 255px; /* Adjust this for larger screens */
+}
+
+.contacts-table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-x: auto; /* Allow horizontal scrolling on small screens */
+}
+
+.contacts-table th, .contacts-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+/* Make headers responsive */
+.contacts-table th {
+    background-color: #f4f4f4; /* Light background for headers */
+}
+
+/* Responsive Pagination Controls */
+.pagination-controls {
+    margin-top: 20px;
+}
+
+.pagination-controls button {
+    margin: 0 5px;
+}
+
+/* Popup Overlay */
+.popuppp-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6); /* Dark background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Ensure it appears on top */
+}
+
+/* Popup Content */
+.popuppp-content {
+    background: #fff; /* White background for the message box */
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+    padding: 20px;
+    width: 90%; /* Make popup width responsive */
+    max-width: 400px; /* Set a maximum width to maintain consistency */
+    text-align: left; /* Align text to the left */
+    position: relative;
+}
+
+/* Popup Heading */
+.popuppp-content h2 {
+    margin-top: 0; /* Remove top margin */
+    color: #333; /* Darker text color */
+    font-size: 1.5em; /* Responsive font size */
+}
+
+/* Popup Paragraph */
+.popuppp-content p {
+    color: #555; /* Lighter color for message */
+    margin: 10px 0; /* Add margin for spacing */
+    font-size: 1em; /* Responsive font size */
+}
+
+/* Button Styles */
+.changee-btn, .message-btn {
+    background-color: rgb(212, 6, 6); /* Button background */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    padding: 10px 15px; /* Padding for the button */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s; /* Smooth background color transition */
+    font-size: .9em; /* Responsive font size */
+}
+
+.message-btn {
+    background-color: rgb(6, 212, 51); /* Button background */
+}
+
+.changee-btn:hover {
+    background-color: darkred; /* Darker red on hover */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .contacts-table-container {
+        margin-left: 10px; /* Reduce margin on smaller screens */
+    }
+
+    .contacts-table th, .contacts-table td {
+        padding: 10px; /* Reduce padding for table cells */
+        font-size: 14px; /* Smaller font size */
+    }
+
+    .contacts-table {
+        overflow-x: auto; /* Allow horizontal scrolling */
+        display: block; /* Ensures the table can scroll */
+    }
+
+    .popuppp-content {
+        width: 80%; /* Make popup width responsive */
+        max-width: 70%; /* Adjust max-width */
+    }
+
+    .changee-btn, .message-btn {
+        padding: 12px; /* Increase padding */
+        font-size: 16px; /* Larger text for better touch targets */
+    }
+}
+
+@media (max-width: 480px) {
+    .contacts-table th, .contacts-table td {
+        padding: 8px; /* Further reduce padding for very small screens */
+        font-size: 12px; /* Even smaller font size */
+    }
+
+    .popuppp-content h2 {
+        font-size: 18px; /* Smaller heading */
+    }
+
+    .popuppp-content p {
+        font-size: 14px; /* Smaller paragraph text */
+    }
+
+    .changee-btn, .message-btn {
+        font-size: 14px; /* Adjust button text size */
+    }
+
+    .popuppp-content {
+        padding: 15px; /* Reduce padding for smaller screens */
+    }
+}

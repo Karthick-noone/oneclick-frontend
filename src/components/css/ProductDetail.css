@@ -1,0 +1,714 @@
+
+.offer-details {
+  font-size: 18px; /* Adjust the font size for better visibility */
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.product-detail-price {
+  color: #ff5722; /* Color for the discounted price */
+  font-size: 22px;
+}
+
+.product-detail-actual-price {
+  color: #999; /* Grey color for the actual price */
+  font-size: 18px;
+}
+
+.offer-text {
+  font-size: 18px;
+  color: green;
+}
+
+.save-tag {
+  background-color: #4caf50; /* Green background for the Save tag */
+  color: white;
+  padding: 4px 8px;
+  border-radius: 5px;
+  margin-right: 5px;
+}
+
+.discount-amount {
+  color: #d32f2f; /* Red color for the amount saved */
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.offerr-tag {
+  background-color: #ffeb3b; /* Yellow background for the offer percentage */
+  padding: 4px 8px;
+  border-radius: 5px;
+  color: #000;
+  font-weight: bold;
+}
+
+.coupon-box {
+  text-align: center; /* Center the title */
+  padding: 10px; /* Add padding for spacing */
+  border: 2px solid #ccc; /* Add a border for visibility */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #f9f9f9; /* Light background color */
+  margin: 20px 0; /* Space around the box */
+  width: 100%; /* Make it responsive */
+  max-width: 400px; /* Limit width on larger screens */  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border: 1px solid #4CAF50; /* Green border */
+
+}
+
+.coupon3 {
+  background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%); /* Gradient background */
+  color: white; /* Text color */
+  padding: 8px 15px; /* More padding for a larger clickable area */
+  border-radius: 8px; /* Slightly rounded corners */
+  font-weight: bold; /* Bold text */
+  text-align: center; /* Center the text */
+  font-size: 20px; /* Increased font size for better visibility */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4); /* Text shadow for depth */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Stronger shadow for depth */
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
+  width: 60%;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  
+
+}
+.dashedborder{
+  border: 3px dashed #4CAF50; /* Dashed border with a green color */
+  padding: 10px;
+}
+
+/* Add hover effect */
+.coupon3:hover {
+  transform: translateY(-3px); /* Slightly lift the element */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+/* Use a price tag icon from Font Awesome */
+.coupon3::before {
+  /* content: "\f0c0";  */
+  font-family: "Font Awesome 5 Free"; /* Specify the Font Awesome font */
+  font-weight: 900; /* Font weight for solid icons */
+  font-size: 28px; /* Size of the icon */
+  position: absolute; /* Positioning for icon */
+  left: 10px; /* Position it to the left */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Center vertically */
+  color: white; /* Icon color */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .coupon3 {
+    font-size: 18px; /* Decrease font size */
+    padding: 6px 10px; /* Reduce padding */
+  }
+
+  .coupon3::before {
+    font-size: 24px; /* Decrease icon size */
+    left: 8px; /* Adjust icon position */
+  }
+}
+
+.discountlabel{
+  color:#126aa5;
+  /* font-family: 'Dancing Script', cursive; */
+  /* font-family: 'Lobster', cursive; */
+  font-family: 'Satisfy', cursive;
+
+
+
+}
+.coupon-title {
+  font-family: 'Arial Black', sans-serif; /* Use a unique bold font */
+  font-size: 1.2rem; /* Adjust font size as needed */
+  margin-bottom: 5px; /* Space below the title */
+  margin-top: 3px;
+}
+
+.price-table {
+  display: table; /* Set the table display */
+  width: 100%; /* Make the table full width */
+  margin-top: 2px; /* Space above the price table */
+}
+
+.price-row {
+  display: table-row; /* Set the row display */
+}
+
+.price-cell {
+  display: table-cell; /* Set the cell display */
+  padding: 10px; /* Padding for spacing */
+  border: 1px solid #4CAF50; /* Border for visibility */
+  /* background-color: #f1f1f1;  */
+  text-align: center; /* Center the text in cells */
+}
+
+.price-label {
+  display: block; /* Make the label a block element */
+  font-weight: bold; /* Bold font for labels */
+  margin-bottom: 5px; /* Space below the label */
+  font-size: 12px;
+}
+
+.actual-priceee,
+.discounted-priceee,
+.total-priceee {
+  font-weight: bold; /* Make the prices bold */
+  font-size: 0.9rem; /* Adjust font size as needed */
+}
+
+.product-features-row {
+  padding: 1.5em; /* Padding around the features section */
+  background-color: #f9f9f9; /* Light background for contrast */
+  border-radius: 8px; /* Rounded corners */
+  margin: 1em 0; /* Margin for spacing */
+}
+
+.product-features-title {
+  font-size: 1.5em; /* Title font size */
+  color: #333; /* Dark color for the title */
+  margin-bottom: 0.5em; /* Space below the title */
+  text-align: center; /* Center align the title */
+}
+
+.product-feature-list {
+  list-style-type: none; /* Use disc bullets */
+  padding-left: 20px; /* Indent the list */
+  margin: 0; /* Remove default margin */
+}
+
+.product-feature-item {
+  margin-bottom: 0.5em; /* Space between list items */
+  font-size: 1em; /* Font size for the features */
+  color: #555; /* Gray color for readability */
+}
+
+@media (max-width: 768px) {
+  .product-features-row {
+    padding: 2em; /* Adjust padding on smaller screens */
+  }
+
+  .product-features-title {
+    font-size: 1.25em; /* Smaller title font size */
+  }
+
+  .product-feature-list {
+    padding-left: 15px; /* Reduce indentation on smaller screens */
+  }
+
+  .product-feature-item {
+    font-size: 0.9em; /* Smaller font size for features */
+  }
+}
+
+@media (max-width: 480px) {
+  .product-features-title {
+    font-size: 1.1em; /* Further reduce title size on mobile */
+  }
+
+  .product-feature-item {
+    font-size: 0.85em; /* Even smaller font size for features */
+  }
+}
+
+
+.related-products-section {
+    margin-top: 20px;
+    padding: 20px;
+    border-top: 1px solid #ddd;
+  }
+  
+  .related-products-grid {
+    display: flex;
+  gap: 40px;
+  overflow: hidden;
+  justify-content: flex-start; /* Center items */
+  flex-wrap: wrap;
+  max-width: 1200px; /* Limit the max width */
+  margin: 0 auto; /* Center the entire grid */
+  width: calc(100% - 80px); /* Adjust based on arrow width */
+  transition: transform 0.5s ease; /* Smooth transition */
+
+  }
+
+  .product-detail-image-container {
+  width: 500px; /* Set your desired fixed width */
+  height: 330px; /* Set your desired fixed height */
+  overflow: hidden; /* Hide overflow */
+  display: flex; /* Center content if necessary */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  background-color: #ffffff; /* Optional: background color */
+}
+  
+  .related-product-card {
+    width: 200px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    position: relative;
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+
+  }
+  
+  .related-product-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .related-product-image {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+  }
+  
+  .related-product-name {
+    font-size: 16px;
+    margin: 10px 0;
+}
+  .related-product-price {
+    font-size: 18px;
+    color: #27ae60;
+    margin: 10px 0;
+    font-weight: bold;
+}
+  .related-product-actual_price {
+    font-size: 15px;
+    color: #ff0505;
+    margin: 10px 0;
+    text-decoration: line-through;
+} 
+
+  /* Main container for the product page */
+.main-container {
+    display: flex;
+    gap: 20px;
+  }
+  
+  /* Container for the product details */
+  .product-detail-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
+}
+  
+  /* First row: main image and product details side by side */
+  .product-main-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-top: 20px;
+    position: relative;
+  }
+  
+ 
+
+
+  /* Main product image with a fixed size */
+  .product-detail-image {
+    width: 100%; /* Full width of its container */
+    max-width: 450px; /* Maximum width for the image */
+    max-height: 300px; /* Maximum width for the image */
+    height: auto; /* Automatic height to maintain aspect ratio */
+    object-fit: contain; /* Ensures the image maintains its aspect ratio */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: transform 0.3s ease-in-out;
+
+  }
+  .product-detail-info {
+    width: 100%;
+    max-width: 480px;
+    padding: 20px;
+    /* background-color: white; */
+    border-radius: 15px;
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  /* .product-detail-info:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  } */
+  
+  /* Product Title */
+  .product-detail-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+  
+  /* Price Section */
+  .price-section {
+    /* display: flex;
+    justify-content: center; */
+    align-items: left;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .product-detail-actual-price {
+    text-decoration: line-through;
+    color: red;
+    font-size: 1.1em;
+    text-align: left;
+    margin-left: 10px;
+  }
+  
+  .product-detail-price {
+    font-size: 1.4em;
+    color: #27ae60;
+    font-weight: bold;
+    text-align: left;
+  }
+  
+  /* Out of Stock Notice */
+  .product-detail-out-of-stock {
+    font-size: 1.2em;
+    color: #e63946;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  /* Add to Cart and Favorite Button */
+  .add-to-cart-container {
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .product-detail-add-to-cart {
+    padding: 12px 24px;
+    background-color: #3498db;
+    color: #fff;
+    font-size: .8em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    /* margin-left: 40px; */
+  }
+  
+  .product-detail-add-to-cart:hover {
+    background-color: #2980b9;
+  }
+  
+  /* Heart Icon */
+  .heart-icon {
+    font-size: 20px;
+    color: #ccc;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin-top: 8px;
+  }
+  
+  .heart-icon.filled {
+    color: #e63946;
+  }
+  
+  .heart-icon:hover {
+    transform: scale(1.2);
+  }
+  
+  /* Product Description */
+  /* .product-description {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    text-align: justify;
+    font-size: 1em;
+    color: #555;
+  } */
+
+  /* Responsive Design */
+@media (max-width: 768px) {
+  .product-detail-info {
+    padding: 15px;
+  }
+
+  .product-detail-title {
+    font-size: 1.8em;
+  }
+
+  .price-section {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .product-detail-actual-price {
+    font-size: 1.1em;
+  }
+
+  .product-detail-price {
+    font-size: 1.4em;
+  }
+
+  .product-detail-add-to-cart {
+    width: 42%;
+    text-align: center;
+  }
+}
+
+.related-product-name {
+    display: -webkit-box;              /* Required for WebKit-based browsers */
+    display: box;                       /* Fallback for other browsers */
+    -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
+    box-orient: vertical;              /* Fallback for other browsers */
+    overflow: hidden;                   /* Hide overflow content */
+    -webkit-line-clamp: 2;             /* Limit to 2 lines in WebKit-based browsers */
+    line-clamp: 2;                     /* Future proofing for standard implementation */
+    text-overflow: ellipsis;           /* Show ellipsis when text overflows */
+  }
+  
+
+.related-product-features {
+    display: -webkit-box;              /* Required for WebKit-based browsers */
+    /* display: box;                     */
+    -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
+    box-orient: vertical;              /* Fallback for other browsers */
+    overflow: hidden;                   /* Hide overflow content */
+    -webkit-line-clamp: 2;             /* Limit to 2 lines in WebKit-based browsers */
+    line-clamp: 2;                     /* Future proofing for standard implementation */
+    text-overflow: ellipsis;           /* Show ellipsis when text overflows */
+  }
+  
+
+
+
+  /* Other images container: display images in a row */
+  .other-images-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap; /* Wraps images to the next row if necessary */
+  }
+  
+  /* Small product images */
+  .product-detail-small-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: transform 0.2s ease;
+
+  }
+  
+
+.product-detail-small-image:hover {
+    transform: scale(1.05); /* Slight zoom effect on hover */
+  }
+
+  /* Large Screens (Desktop) */
+@media (min-width: 1200px) {
+  .main-container {
+    flex-direction: row;
+    gap: 40px;
+  }
+
+  .product-detail-info {
+    width: 60%;
+  }
+
+  .related-products-grid {
+    justify-content: flex-start;
+  }
+}
+
+/* Tablets (Medium Screens) */
+@media (max-width: 1199px) and (min-width: 768px) {
+  .main-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .product-detail-info {
+    width: 100%;
+  }
+
+  .product-main-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .related-products-grid {
+    gap: 20px;
+    justify-content: center;
+  }
+  .related-product-image {
+   
+    object-fit: contain;
+  }
+
+  .product-detail-description{
+    margin-left: 20px;
+    padding-right: 5px;
+
+  }
+
+}
+
+/* Mobile Devices (Small Screens) */
+@media (max-width: 767px) {
+  .main-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .product-detail-description{
+    margin-left: 20px;
+    padding-right: 5px;
+  }
+
+
+  .related-product-image {
+   
+    object-fit: contain;
+  }
+
+  .product-main-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .product-detail-info {
+    width: 100%;
+    /* margin-left: 30px; */
+    /* text-align: center; */
+  }
+
+  .product-detail-title {
+    font-size: 1.3em;
+    /* text-align: center; */
+
+  }
+  /* .add-to-cart-container {
+      justify-content: center;
+  } */
+
+
+  .product-detail-image-container {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .product-detail-image {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+}
+
+  .related-products-grid {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .related-product-card {
+    width: 100%;
+  }
+
+  .product-detail-add-to-cart {
+    width: 42%;
+  }
+  
+  .product-detail-small-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .other-images-container {
+    justify-content: center;
+  }
+
+  .sidebar {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+
+.related-products-carousel {
+  display: flex;
+  align-items: center;
+}
+
+.carousel-arrow {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  margin: 0 10px;
+}
+
+
+
+.product-label2 {
+  position: absolute; /* Use absolute positioning */
+  top: 10px; /* Distance from the top */
+  left: 40px; /* Distance from the left */
+  background-color: #00A098; /* Background color */
+  color: white; /* Text color */
+  padding: 5px 10px; /* Padding around the label */
+  border-radius: 3px; /* Rounded corners */
+  font-size: 12px; /* Font size */
+  font-weight: bold; /* Bold text */
+  z-index: 1; /* Ensure label is on top of the image */
+  box-shadow: 0 4px 15px rgba(0, 160, 152, 0.75); /* Glow effect */
+  text-transform: uppercase; /* Make label uppercase */
+  letter-spacing: 1px; /* Add letter spacing for style */
+  /* transform: rotate(-30deg);  */
+  animation: shine 2s infinite linear; /* Add a shine animation */
+}
+
+
+.carousel-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 400px; /* Set your desired fixed width */
+  height: 300px; /* Set your desired fixed height */
+  overflow: hidden; /* Hide overflow */
+}
+
+.carousel-arrow {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.product-detail-carousel-image {
+  width: 400px; /* Set your desired fixed width */
+  height: 230px; /* Set your desired fixed height */
+  overflow: hidden; /* Hide overflow */
+  object-fit: contain;
+  transition: transform 0.3s ease-in-out;
+
+}
+
+/* Zoom on hover */
+.product-detail-carousel-image:hover {
+  transform: scale(1.2); /* Zoom the image to 120% of its original size */
+}
+
+.close-carousel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: red; /* Or your desired color */
+  color: white;
+  border: none;
+  cursor: pointer;
+}

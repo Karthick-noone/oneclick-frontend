@@ -90,7 +90,7 @@ const ChangePasswordPage = () => {
             onClick={() => setShowNewPassword(!showNewPassword)}
             style={styles.eyeIcon}
           >
-            {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+            {showNewPassword ? <FaEye /> : <FaEyeSlash />}
           </span>
         </div>
         <div style={styles.passwordContainer}>
@@ -107,7 +107,7 @@ const ChangePasswordPage = () => {
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             style={styles.eyeIcon}
           >
-            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+            {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
           </span>
         </div>
         <button type="submit" style={styles.button}>

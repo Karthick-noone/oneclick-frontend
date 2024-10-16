@@ -1,0 +1,290 @@
+.banner-image {
+  width: 100%; /* Full width */
+  height: auto; /* Maintain aspect ratio */
+  max-width: 1280px; /* Limit max width */
+  margin-top: 28px; /* Space at the top */
+  /* max-height: 3; */
+}
+
+/* .banner-image{
+
+  width: '1280px'; margin-top: '28px'; height: '300px'
+} */
+
+.ad-section-container4 {
+  font-size: 24px;
+  text-align: center;
+  padding: 10px;
+  position: relative;
+}
+
+
+.offer-ad-container4 {
+  display: grid; /* Grid layout for the single ads */
+  grid-template-columns: repeat(3, 1fr); /* 3 columns for single ads */
+}
+
+.single-ad-container4 {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.offer-add {
+  width: 99%;
+  height: auto;
+}
+
+.offer-tagg {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #f39c12;
+  color: white;
+  padding: 15px 11px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.brand-namee {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #36b4e6;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 2;
+}
+.image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bannerr-container4 {
+  width: 100%; /* Full-width banner */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Optional: You can add a pseudo-element for added styling if needed */
+.bannerr-container4::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none; /* Allows clicks to pass through */
+}
+.product-overlayy {
+  display: flex; /* Use flexbox to layout product image and details */
+  align-items: center; /* Align items vertically */
+  justify-content: space-between; /* Space out the image and details */
+  position: absolute; /* Overlay within the offerAd */
+  top: 23%; /* Position the overlay */
+  left: 10%; /* Position the overlay */
+  right: 10%; /* Position the overlay */
+  color: white; /* Text color for visibility */
+  border-radius: 8px; /* Rounded corners for overlay */
+  padding: 10px; /* Padding around the text */
+}
+
+.ad-imagee {
+  width: 130px; /* Set size for product image */
+  height: 140px; /* Set size for product image */
+  margin-right: 10px; /* Space between image and text */
+  border-radius: 8px; /* Rounded corners for the product image */
+}
+
+.empty-ad {
+  width: 130px; /* Set size for product image */
+  height: 140px; /* Set size for product image */
+  margin-right: 10px; /* Space between image and text */
+  border-radius: 8px; /* Rounded corners for the product image */
+}
+
+.text-detailss {
+  text-align: center; /* Center align text */
+  width: 70%; /* Full width */
+}
+.text-detailsss {
+  text-align: center; /* Center align text */
+  width: 100%; /* Full width */
+}
+
+.text-detailss h3 {
+  font-size: 23px; /* Adjust font size */
+  margin-bottom: 5px; /* Space below the title */
+  font-family: "Dancing Script", cursive; /* Graceful handwritten font */
+  white-space: nowrap; /* Prevent wrapping of the title */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Show ellipsis for overflow text */
+  color: #333;
+
+}
+
+.text-detailss p {
+  font-size: 16px; /* Adjust font size */
+  line-height: 1.4; /* Space between lines */
+  margin: 0; /* Remove default margins */
+  font-family: "Poppins", cursive; /* Font family */
+  margin-bottom: 5px; /* Space below paragraph */
+  display: -webkit-box; /* Fallback for old browsers */
+  -webkit-box-orient: vertical; /* Enable vertical layout */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Show ellipsis for overflow text */
+  height: 5.6em; /* Set height for 4 lines (1.4em * 4) */
+  max-height: 5.6em; /* Ensure max-height matches */
+  color: #333;
+}
+
+.text-detailsss h3 {
+  font-size: 23px; /* Adjust font size */
+  margin-bottom: 5px; /* Space below the title */
+  font-family: "Dancing Script", cursive; /* Graceful handwritten font */
+  white-space: nowrap; /* Prevent wrapping of the title */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Show ellipsis for overflow text */
+  color: #333;
+
+}
+
+.text-detailsss p {
+  font-size: 14px; /* Adjust font size */
+  line-height: 1.4; /* Space between lines */
+  margin: 0; /* Remove default margins */
+  font-family: "Poppins", cursive; /* Font family */
+  margin-bottom: 5px; /* Space below paragraph */
+  display: -webkit-box; /* Fallback for old browsers */
+  -webkit-box-orient: vertical; /* Enable vertical layout */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Show ellipsis for overflow text */
+  height: 5.6em; /* Set height for 4 lines (1.4em * 4) */
+  max-height: 5.6em; /* Ensure max-height matches */
+  color: #333;
+
+}
+
+/* Responsive adjustments */
+
+/* For medium screens (Tablets) */
+@media (max-width: 992px) {
+  .offer-ad-containerr {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+  }
+  .banner-image {
+    max-width: 768px; /* Limit max width on medium screens */
+  }
+
+  .ad-imagee {
+    width: 100px; /* Smaller image size on medium screens */
+    height: 110px;
+  }
+
+  .text-detailss h3 {
+    font-size: 18px; /* Slightly smaller title size */
+  }
+
+  .text-detailss p {
+    font-size: 13px; /* Smaller description */
+  }
+}
+
+/* For small screens (Mobile) */
+@media (max-width: 768px) {
+  .offer-ad-containerr {
+    grid-template-columns: repeat(1, 1fr); /* 1 column on small screens */
+  }
+
+  .banner-image {
+    max-width: 100%; /* Full width on small screens */
+  }
+
+  .single-ad-containerr {
+    max-width: 100%; /* Full width for mobile */
+  }
+
+  .ad-imagee {
+    width: 80px; /* Smaller image size on mobile */
+    height: 90px;
+  }
+
+  .text-detailss h3 {
+    font-size: 16px; /* Smaller title size */
+  }
+
+  .text-detailss p {
+    font-size: 12px; /* Smaller description */
+  }
+}
+
+
+/* For medium screens (Tablets) */
+@media (max-width: 992px) {
+  .offer-ad-container4 {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+    gap: 10px;
+  }
+
+  .ad-imagee {
+    width: 100px;
+    height: 110px;
+  }
+
+  .text-detailss h3 {
+    font-size: 18px;
+  }
+
+  .text-detailss p {
+    font-size: 13px;
+  }
+
+  .offer-ad {
+    height: auto;
+    max-height: 180px;
+  }
+}
+
+/* For small screens (Mobile) */
+@media (max-width: 768px) {
+  .offer-ad-container4 {
+    grid-template-columns: 1fr; /* 1 column on small screens */
+    gap: 5px;
+  }
+
+  .single-ad-container4 {
+    max-width: 100%; /* Full width for mobile */
+  }
+
+  .ad-imagee {
+    width: 80px;
+    height: 90px;
+  }
+
+  .text-detailss h3 {
+    font-size: 16px;
+  }
+
+  .text-detailss p {
+    font-size: 12px;
+  }
+
+  .offer-ad {
+    max-height: 150px;
+  }
+}

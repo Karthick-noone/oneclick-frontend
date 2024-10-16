@@ -1,6 +1,6 @@
 /* Default Header3 Styles */
 .header3 {
-    background-color: #ffffff;
+    background-color: #000000;
     padding: 10px 30px;
     display: flex;
     justify-content: center;
@@ -18,6 +18,7 @@
     position: absolute;
     top: -8px;
     right: 15px;
+    color: white;
 }
 
 .header3 nav {
@@ -29,7 +30,7 @@
 
 
 .header3 nav a {
-    color: #333;
+    color: white;
     font-size: 14px;
     text-decoration: none;
     text-transform: uppercase;
@@ -38,8 +39,16 @@
     padding: 5px 10px;
     display: flex;
     align-items: center;
+    /* background-color: black; */
+    /* border: 1px solid #ddd; */
 }
 
+
+.nav-item{
+    color: white;
+
+
+}
 .header3 nav a:hover {
     color: #ff6600;
 }
@@ -51,7 +60,7 @@
 .fa-icons {
     font-size: 19px; /* Adjust icon size */
     margin-right: 5px; /* Space between icon and text */
-    color: #333; /* Adjust icon color */
+    color: white; /* Adjust icon color */
 }
 .header3 nav .fa-icons:hover {
     color: #ff6600;
@@ -68,29 +77,59 @@
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    background-color: #000000;
+    border: 1px solid #ccc;
+    border-radius: 1px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     min-width: 160px;
+    margin-top: 10px;
 }
 
 .nav-item:hover .dropdown,
 .nav-item .dropdown {
     display: block;
 }
-
+/* Basic style for dropdown links */
 .dropdown a {
     display: block;
-    padding: 10px;
-    color: #333;
+    padding: 10px 15px; /* Add more horizontal padding */
+    color: #fff; /* Change text color to white for better contrast */
     text-decoration: none;
+    background-color: #333; /* Darker background for dropdown items */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Add a subtle border between items */
+    font-family: 'poppins', sans-serif; /* Ensure clean, legible font */
+    font-size: 14px; /* Make the font size larger for better readability */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for hover effects */
+    /* z-index: 999; */
 }
 
-.dropdown a:hover {
-    background-color: #f5f5f5;
+/* Hover effect to highlight dropdown items */
+
+/* Add a slight shadow to dropdown items */
+.dropdown a {
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15); /* Add subtle shadow for a 3D effect */
 }
+
+/* For mobile-friendly dropdown items */
+@media (max-width: 768px) {
+    .dropdown a {
+        padding: 15px 20px; /* Increase padding for mobile view */
+        font-size: 18px; /* Increase font size for easier reading on small screens */
+    }
+    .fa-icons.active {
+        color: #ff6600; /* Change icon color when active */
+    }
+}
+
+/* Active state for the dropdown item */
+.dropdown a.active {
+    color: #fff;
+}
+
+/* .dropdown a:hover {
+    background-color: #f5f5f5;
+} */
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {
@@ -101,6 +140,9 @@
         padding: 0;
     }
 
+    .fa-icons.active {
+        color: #ff6600; /* Change icon color when active */
+    }
     .hamburger {
         display: block;
     }
@@ -112,7 +154,7 @@
         right: auto; /* Remove auto width control */
         bottom: 0;
         background-color: #ffffff;
-        width: 300px; /* Define the width of the navigation menu */
+        width: 380px; /* Define the width of the navigation menu */
         flex-direction: column;
         padding: 50px 20px; /* Add some padding for space */
         display: flex;
@@ -166,7 +208,7 @@
 
 
 .activelink {
-    color: #333;
+    color: white;
     font-size: 14px;
     text-decoration: none;
     text-transform: uppercase;

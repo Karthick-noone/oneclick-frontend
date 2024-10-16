@@ -186,34 +186,34 @@ const Dashboard = () => {
               }}
             />
           </div>
-          <div className="chart small-chart">
-            <h2>Orders by Category</h2>
-            {salesData ? (
-              <Bar
-                data={salesData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                }}
-              />
-            ) : (
-              <div className="chart-placeholder">Loading...</div>
-            )}
-          </div>
+          
           <div className="chart small-chart pie-chart-container">
   <h2>Category Distribution</h2>
   {pieData ? (
-    <Pie
-      data={pieData}
-      options={{
-        responsive: true,
-        maintainAspectRatio: false,
-      }}
-    />
+   <Pie
+   data={pieData}
+   options={{
+     responsive: true,
+     maintainAspectRatio: false,
+     layout: {
+       padding: 20, // Add padding around the chart
+     },
+     plugins: {
+       legend: {
+         position: 'bottom', // Position the legend below the chart
+         labels: {
+           padding: 20, // Add space between the legend and the chart
+         },
+       },
+     },
+   }}
+ />
+ 
   ) : (
     <div className="chart-placeholder">Loading...</div>
   )}
 </div>
+
 
         </div>
       </div>
