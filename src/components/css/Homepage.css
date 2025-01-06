@@ -1,3 +1,31 @@
+.slider-prev-arrow,
+.slider-next-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+  border: none;
+  padding: 5px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.slider-prev-arrow {
+  left: 0px;
+}
+
+.slider-next-arrow {
+  right: 0px;
+}
+
+.slider-prev-arrow:hover,
+.slider-next-arrow:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
 
 
 .spinner-container {
@@ -78,9 +106,7 @@
 
 .slider-image {
   width: 100%;
-  height: auto; /* Keep the height auto to maintain aspect ratio */
-  max-height: 400px; /* Set a max height for the image */
-  object-fit: cover; /* Ensures the image covers the entire area */
+  height: 370px; /* Keep the height auto to maintain aspect ratio */
   background-color: black;
   background-repeat: no-repeat;
     background-position: center;
@@ -199,6 +225,9 @@
   .overlay-title {
     font-size: 3vw; /* Further reduce title size */
   }
+  .custom-dotss{
+    display: none;
+  }
 
   .homepage-container {
     width: 100%;
@@ -225,10 +254,20 @@
 
   .slider-image {
     width: 100%;
-    height: auto; /* Ensure image keeps aspect ratio */
+    height: 100%; /* Ensure image keeps aspect ratio */
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
+    /* margin-top: 10px; */
 
   }
 }
+
+.box2{
+   background-color: white;
+  padding: 17px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+}
+
+

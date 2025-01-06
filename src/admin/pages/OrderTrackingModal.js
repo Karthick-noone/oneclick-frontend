@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Modal from "react-modal";
 import "./css/OrderTrackingModal.css"; // Ensure to import your CSS file
 import axios from "axios"; // Ensure you have axios installed
@@ -10,52 +10,58 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [deliveryStatus, setDeliveryStatus] = useState("");
   const [deliveryDate, setDeliveryDate] = useState(""); // Add state for delivery date
+  const [loading, setLoading] = useState(false); // Loading state for spinner
+
   const statuses = [
     "Order Confirmed",
     "Shipped",
-    "Out for Delivery",
+    "Out of Delivery",
     "Delivered",
   ]; // Define the statuses
   const [orderDate, setOrderDate] = useState(""); // State for order date
 
   console.log("OrderTrackingModal opened for Order ID:", order_id); // Log the order ID
+
+  // Memoized fetch function to ensure it is stable across renders
+  const fetchDeliveryStatus = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${ApiUrl}/api/get-order-status`, {
+        params: { orderId: order_id },
+      });
+
+      const { delivery_status, delivery_date, order_date } = response.data;
+
+      // Format the delivery date to "YYYY-MM-DD"
+      const dateObj = new Date(delivery_date);
+      const formattedDate = `${dateObj.getFullYear()}-${String(
+        dateObj.getMonth() + 1
+      ).padStart(2, "0")}-${String(dateObj.getDate()).padStart(2, "0")}`;
+
+      setOrderDate(new Date(order_date).toISOString().split("T")[0]);
+      setDeliveryStatus(delivery_status);
+      setSelectedStatus(delivery_status);
+      setDeliveryDate(formattedDate);
+    } catch (error) {
+      console.error("Error fetching delivery status:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error Fetching Status",
+        text: "Could not fetch delivery status.",
+        confirmButtonText: "OK",
+      });
+    } finally {
+      setLoading(false); // Stop loading spinner after fetch completes
+    }
+  }, [order_id, ApiUrl]);
+
   useEffect(() => {
-    const fetchDeliveryStatus = async () => {
-      try {
-        const response = await axios.get(`${ApiUrl}/api/get-order-status`, {
-          params: { orderId: order_id },
-        });
-
-        const { delivery_status, delivery_date, order_date } = response.data;
-
-        // Manually format delivery_date to YYYY-MM-DD without timezone conversion
-        const dateObj = new Date(delivery_date);
-        const formattedDate = `${dateObj.getFullYear()}-${String(
-          dateObj.getMonth() + 1
-        ).padStart(2, "0")}-${String(dateObj.getDate()).padStart(2, "0")}`;
-
-        // Set the order date state
-        const orderDateObj = new Date(order_date);
-        setOrderDate(orderDateObj.toISOString().split("T")[0]); // Set order date as YYYY-MM-DD
-
-        setDeliveryStatus(delivery_status);
-        setSelectedStatus(delivery_status);
-        setDeliveryDate(formattedDate); // Set formatted date without timezone conversion
-      } catch (error) {
-        console.error("Error fetching delivery status:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error Fetching Status",
-          text: "Could not fetch delivery status.",
-          confirmButtonText: "OK",
-        });
-      }
-    };
-
+    // Fetch data only when the modal opens
     if (isOpen) {
       fetchDeliveryStatus();
     }
-  }, [isOpen, order_id]);
+  }, [isOpen, fetchDeliveryStatus]);
+
 
   const maxDate = () => {
     if (orderDate) {
@@ -108,7 +114,7 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
         title: "Status Updated",
         text: "The delivery status and date have been updated successfully!",
         confirmButtonText: "OK",
-      });
+      }).then(() => {window.location.reload();})
     } catch (error) {
       console.error(
         "Error updating status:",
@@ -149,7 +155,7 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
           borderRadius: "10px",
           backgroundColor: "#fff",
           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-          width: "400px",
+          width: "350px",
         },
         overlay: {
           backgroundColor: "rgba(0, 0, 0, 0.1)",
@@ -157,6 +163,15 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
         },
       }}
     >
+      {loading ? (
+        <div className="spinner-container" style={{height:'360px'}}>
+          <div className="spinner">
+            {/* Spinner content here */}
+          </div>
+        </div>
+      ) : (
+
+        <>
       <button
         onClick={handleModalClose}
         className="modal-close-button10 close-button"
@@ -276,6 +291,8 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
       >
         Update Status
       </button>
+      </>
+         )}
     </Modal>
   );
 };

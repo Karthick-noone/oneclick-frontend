@@ -7,7 +7,7 @@
   height: 80vh; /* Adjust height to your preference */
   text-align: center;
   /* color: #555; */
-  margin-left: 150px;
+  margin-left: 240px;
 }
 
 .no-products-message h2 {
@@ -75,16 +75,16 @@
 
 .product-card {
     position: relative;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    /* border: 1px solid #ddd; */
+    /* border-radius: 8px; */
     overflow: hidden;
     width: calc(25% - 20px); /* Adjust to fit 4 cards in a row */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color: #fff;
     text-align: center;
-    height: 390px; /* Set a fixed height for the card */
-
-    margin-bottom: 20px; /* Space below each card */
+    height: auto; /* Set a fixed height for the card */
+    max-height: 380px; /* Set a fixed height for the card */
+    margin-bottom: 10px; /* Space below each card */
     cursor: pointer;
 }
 
@@ -96,7 +96,7 @@
 
 .product-name {
     font-size: 16px;
-    margin: 10px 0;
+    margin: 5px 0;
 }
 
 .product-description {
@@ -104,12 +104,17 @@
     color: #666;
     margin: 0 0 10px;
 }
+.product-subtitle2 {
+    font-size: 13px;
+    color: grey;
+}
 
 .product-price {
-    font-size: 18px;
+    font-size: 20px;
     color: #27ae60;
     margin: 10px 0;
     font-weight: bold;
+    margin-right: 5px;
 }
 .product-actual-price {
     font-size: 15px;
@@ -171,6 +176,9 @@
         margin-left: 0px;
         /* margin-top: 50px; */
     }
+    .add-to-cart{
+        width: 50%;
+    }
 
 
     .sidebar {
@@ -188,6 +196,7 @@
     .product-card {
         width: calc(100% - 20px); /* Fit 1 card in a row for very small screens */
     }
+    
 }
 
 .product-description {
@@ -202,6 +211,17 @@
   }
   
 .product-name {
+    display: -webkit-box;              /* Required for WebKit-based browsers */
+    /* display: box;                        */
+    -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
+    box-orient: vertical;              /* Fallback for other browsers */
+    overflow: hidden;                   /* Hide overflow content */
+    -webkit-line-clamp: 2;             /* Limit to 2 lines in WebKit-based browsers */
+    line-clamp: 2;                     /* Future proofing for standard implementation */
+    text-overflow: ellipsis;           /* Show ellipsis when text overflows */
+  }
+  
+.product-subtitle2 {
     display: -webkit-box;              /* Required for WebKit-based browsers */
     /* display: box;                        */
     -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */

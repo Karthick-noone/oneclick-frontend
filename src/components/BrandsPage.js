@@ -6,11 +6,16 @@ import brandA from './img/brands/dell.png';
 import brandB from './img/brands/lenovo.png';
 import brandC from './img/brands/vivo.png';
 import brandD from './img/brands/samsung.png';
-import brandE from './img/brands/hp.png';
+import brandk from './img/brands/hp.png';
 import brandF from './img/brands/epson.png';
 import brandG from './img/brands/oppo.png';
 import brandH from './img/brands/fireboltt.png';
 import brandI from './img/brands/hikvision.png';
+import brandj from './img/brands/boat.svg';
+import brandl from './img/brands/R.png';
+import brandE from './img/brands/OnePlus.png';
+import brandm from './img/brands/apple.png';
+import brandn from './img/brands/Dahua.jpg';
 
 const brands = [
   { logo: brandA },
@@ -22,6 +27,11 @@ const brands = [
   { logo: brandG },
   { logo: brandH },
   { logo: brandI },
+  { logo: brandj },
+  { logo: brandk },
+  { logo: brandl },
+  { logo: brandm },
+  { logo: brandn },
 ];
 
 const BrandsPage = () => {

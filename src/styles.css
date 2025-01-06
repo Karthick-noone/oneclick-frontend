@@ -8,7 +8,7 @@
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Calibri';
   background-color: #f9f9f9; /* Light background */
   color: #000000; /* Dark text for contrast */
 }
@@ -18,8 +18,36 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Scrollbar track */
+::-webkit-scrollbar {
+  width: 6px; /* Adjust the width as needed */
+}
 
+/* Scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #ff6f61, #ffcc00); /* Gradient color for the scrollbar */
+  border-radius: 5px; /* Rounded edges */
+}
 
+/* Scrollbar thumb hover */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #ff3b3f, #ff9900); /* Darker gradient on hover */
+}
+
+/* Scrollbar corner (for cases with both horizontal and vertical scrollbars) */
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* @media(prefers-color-scheme: dark){
+  body{
+    background-color: black
+  }
+} */
+
+/* :root {
+  color-scheme: light dark;
+} */
 
 /* Add these lines to your global CSS file */
 @import "~slick-carousel/slick/slick.css";

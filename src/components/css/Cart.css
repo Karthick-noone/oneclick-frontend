@@ -429,7 +429,7 @@
   font-size: 1em;
   margin: 5px 0; /* Margin for spacing between buttons */
   text-decoration: none;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'calibri', sans-serif;
   width: 100%; /* Full width for small screens */
 }
 
@@ -518,10 +518,10 @@
   background-color: #ff5722; /* Green background */
   color: white; /* White text */
   border: none;
-  border-radius: 5px;
+  /* border-radius: 5px; */
   padding: 10px 16px;
   cursor: pointer;
-  font-size: 1.0em;
+  font-size: .9em;
   
 }
 

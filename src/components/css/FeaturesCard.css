@@ -1,0 +1,118 @@
+/* General Card Styles */
+.card {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    overflow-x: auto;
+}
+
+.featuresContainer {
+    display: flex;
+    gap: 100px;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+}
+
+.feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    text-align: left;
+}
+
+.icon {
+    font-size: 24px;
+    color: #ff6600;
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+
+
+.text h4 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+
+.text p {
+    font-size: 14px;
+    margin: 0;
+    color: #666;
+}
+
+/* Specific Icon Customizations */
+
+
+/* Parent Container Centering */
+.parentContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+}
+
+/* Media Queries */
+@media (max-width: 1200px) {
+    .featuresContainer {
+        gap: 50px;
+    }
+}
+
+@media (max-width: 992px) {
+    .featuresContainer {
+        gap: 30px;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .feature {
+        flex: 1 1 45%;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .featuresContainer {
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .feature {
+        flex: 1 1 45%;
+        max-width: 45%;
+        padding-left: 20px;
+    }
+
+    .text h4 {
+        font-size: 18px;
+    }
+
+    .text p {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 20px;
+    }
+
+    .text h4 {
+        font-size: 16px;
+    }
+
+    .text p {
+        font-size: 10px;
+    }
+}

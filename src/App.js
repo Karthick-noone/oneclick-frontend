@@ -29,6 +29,8 @@ import Contact from './components/Contact'; // Adjust path as needed
 import HelpCenter from './components/HelpCenter'; // Adjust path as needed
 import ShippingAndReturns from './components/ShippingAndReturns'; // Adjust path as needed
 import TermsAndConditions from './components/TermsAndConditions'; // Adjust path as needed
+import Terms from './components/Terms'; // Adjust path as needed
+import PaymentSecurity from './components/PaymentSecurity'; // Adjust path as needed
 import CareersForm from './components/CareersForm'; // Adjust path as needed
 import Cart from './components/Cart'; // Adjust path as needed
 import UserAddress from './components/UserAddress'; // Adjust path as needed
@@ -39,6 +41,7 @@ import ComputerAdBanner from './components/ComputerAdBanner'; // Adjust path as 
 import MobileAdBanner from './components/MobileAdBanner'; // Adjust path as needed
 import CCTVAdBanner from './components/CCTVAdBanner'; // Adjust path as needed
 import FilterBar from './components/FilterBar'; // Adjust path as needed
+import Secondhandproducts from './components/Secondhandproducts'; // Adjust path as needed
 import AdminMain from './admin/AdminApp'; // Adjust path as needed
 
 const App = () => {
@@ -73,7 +76,9 @@ const App = () => {
                 <Route path="/Contact" element={<Contact />} />
                 <Route path="/HelpCenter" element={<HelpCenter />} />
                 <Route path="/ShippingAndReturns" element={<ShippingAndReturns />} />
-                <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
+                <Route path="/Privacypolicy" element={<TermsAndConditions />} />
+                <Route path="/Terms" element={<TermsAndConditions />} />
+                <Route path="/PaymentSecurity" element={<PaymentSecurity />} />
                 <Route path="/CareersForm" element={<CareersForm />} />
                 <Route path="/Cart" element={<Cart />} />
                 <Route path="/UserAddress" element={<UserAddress />} />
@@ -84,6 +89,7 @@ const App = () => {
                 <Route path="/CCTVAdBanner" element={<CCTVAdBanner />} />
                 <Route path="/MobileAdBanner" element={<MobileAdBanner />} />
                 <Route path="/FilterBar" element={<FilterBar />} />
+                <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
                 <Route path="/Admin/*" element={<AdminMain />} /> {/* Ensure correct path */}
             </Routes>
         </Router>

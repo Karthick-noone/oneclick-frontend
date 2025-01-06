@@ -236,153 +236,168 @@ const AddressPage = () => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const validationError = validateAddress(address);
     if (validationError) {
-      Swal.fire({
-        title: "Validation Error",
-        text: validationError,
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-      return;
+        Swal.fire({
+            title: "Validation Error",
+            text: validationError,
+            icon: "error",
+            confirmButtonText: "OK",
+        });
+        return;
     }
-  
+
     if (!userId) {
-      navigate("/login");
-      return;
+        navigate("/login");
+        return;
     }
-  
-     // Check if phone number already exists for a different user
-  const phoneExists = await checkPhoneNumberExists(address.phone, userId);
-  if (phoneExists) {
-    Swal.fire({
-      title: "Phone Number Exists",
-      text: "This phone number is already in use by another user. Please use a different number.",
-      icon: "error",
-      confirmButtonText: "OK",
-    });
-    return;
-  }
-  
-    try {
-      const response = await fetch(`${ApiUrl}/useraddress`, {
+
+    // Check if address already exists for this user
+    const addressExistsResponse = await fetch(`${ApiUrl}/checkAddressExists`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({ userId, address }),
-      });
-  
-      if (response.ok) {
+    });
+
+    if (addressExistsResponse.status === 409) {
         Swal.fire({
-          title: "Success",
-          text: "Address added successfully",
-          icon: "success",
-          confirmButtonText: "OK",
-        }).then(() => {
-          window.location.reload();
+            title: "Address Exists",
+            text: "This address already exists. Please use a different address.",
+            icon: "error",
+            confirmButtonText: "OK",
         });
-  
-        setSubmittedAddresses([
-          { ...address, address_id: Date.now() },
-          ...submittedAddresses,
-        ]);
-        setAddress({
-          name: "",
-          street: "",
-          city: "",
-          state: "",
-          postal_code: "",
-          country: "",
-          phone: "",
-        });
-      } else {
-        console.error("Error submitting address:", await response.text());
-      }
-    } catch (error) {
-      console.error("Error:", error);
+        return;
     }
-  };
-  
-  const handleUpdate = async (e) => {
+
+    try {
+        const response = await fetch(`${ApiUrl}/useraddress`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userId, address }),
+        });
+
+        if (response.ok) {
+            Swal.fire({
+                title: "Success",
+                text: "Address added successfully",
+                icon: "success",
+                confirmButtonText: "OK",
+            }).then(() => {
+                window.location.reload();
+            });
+
+            setSubmittedAddresses([
+                { ...address, address_id: Date.now() },
+                ...submittedAddresses,
+            ]);
+            setAddress({
+                name: "",
+                street: "",
+                city: "",
+                state: "",
+                postal_code: "",
+                country: "",
+                phone: "",
+            });
+        } else {
+            console.error("Error submitting address:", await response.text());
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
+
+const handleUpdate = async (e) => {
     e.preventDefault();
-  
+
     const validationError = validateAddress(editingAddress);
     if (validationError) {
-      Swal.fire({
-        title: "Validation Error",
-        text: validationError,
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-      return;
+        Swal.fire({
+            title: "Validation Error",
+            text: validationError,
+            icon: "error",
+            confirmButtonText: "OK",
+        });
+        return;
     }
-  
+
     if (!userId || !editingAddress) {
-      alert("User ID is missing or no address selected for update");
-      return;
+        alert("User ID is missing or no address selected for update");
+        return;
     }
-   // Check if phone number already exists for a different user
-   const phoneExists = await checkPhoneNumberExists(editingAddress.phone, userId);
-   if (phoneExists) {
-     Swal.fire({
-       title: "Phone Number Exists",
-       text: "This phone number is already in use by another user. Please use a different number.",
-       icon: "error",
-       confirmButtonText: "OK",
-     });
-     return;
-   }
-  
-  
-    try {
-      const response = await fetch(
-        `${ApiUrl}/updateuseraddress/${editingAddress.address_id}`,
-        {
-          method: "PUT",
-          headers: {
+
+    // Check if address already exists for this user
+    const addressExistsResponse = await fetch(`${ApiUrl}/checkAddressExists`, {
+        method: "POST",
+        headers: {
             "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editingAddress),
-        }
-      );
-  
-      if (response.ok) {
+        },
+        body: JSON.stringify({ userId, address: editingAddress }),
+    });
+
+    if (addressExistsResponse.status === 409) {
         Swal.fire({
-          title: "Success",
-          text: "Address updated successfully",
-          icon: "success",
-          confirmButtonText: "OK",
+            title: "Address Exists",
+            text: "This address already exists. Please use a different address.",
+            icon: "error",
+            confirmButtonText: "OK",
         });
-  
-        setSubmittedAddresses(
-          submittedAddresses.map((addr) =>
-            addr.address_id === editingAddress.address_id
-              ? editingAddress
-              : addr
-          )
-        );
-        setEditingAddress(null);
-      } else {
-        console.error("Error updating address:", await response.text());
-        Swal.fire({
-          title: "Error",
-          text: "Failed to update address. Please try again.",
-          icon: "error",
-          confirmButtonText: "OK",
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.fire({
-        title: "Error",
-        text: "An unexpected error occurred. Please try again later.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+        return;
     }
-  };
+
+    try {
+        const response = await fetch(
+            `${ApiUrl}/updateuseraddress/${editingAddress.address_id}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(editingAddress),
+            }
+        );
+
+        if (response.ok) {
+            Swal.fire({
+                title: "Success",
+                text: "Address updated successfully",
+                icon: "success",
+                confirmButtonText: "OK",
+            });
+
+            setSubmittedAddresses(
+                submittedAddresses.map((addr) =>
+                    addr.address_id === editingAddress.address_id
+                        ? editingAddress
+                        : addr
+                )
+            );
+            setEditingAddress(null);
+        } else {
+            console.error("Error updating address:", await response.text());
+            Swal.fire({
+                title: "Error",
+                text: "Failed to update address. Please try again.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+            title: "Error",
+            text: "An unexpected error occurred. Please try again later.",
+            icon: "error",
+            confirmButtonText: "OK",
+        });
+    }
+};
+
   
 
   const handleDeleteClick = async (addr) => {
@@ -746,29 +761,29 @@ const AddressPage = () => {
                     />
                   )}
                 <p>
-                  <strong>Name:</strong> <span>{addr.name}{" "}</span>
+                  <strong>Name</strong> <span>{addr.name}{" "}</span>
                   {addr.current_address === 1 && (
                     <FaCheck title="This is your current address" style={{ color: "green", marginLeft: "10px" }} />
                   )}
                 </p>
 
                 <p>
-                  <strong>Street Address:</strong> <span>{addr.street}</span>
+                  <strong>Street Address</strong> <span>{addr.street}</span>
                 </p>
                 <p>
-                  <strong>City:</strong> <span>{addr.city}</span>
+                  <strong>City</strong> <span>{addr.city}</span>
                 </p>
                 <p>
-                  <strong>State:</strong> <span>{addr.state}</span>
+                  <strong>State</strong> <span>{addr.state}</span>
                 </p>
                 <p>
-                  <strong>Postal Code:</strong> <span>{addr.postal_code}</span>
+                  <strong>Postal Code</strong> <span>{addr.postal_code}</span>
                 </p>
                 <p>
-                  <strong>Country:</strong> <span>{addr.country}</span>
+                  <strong>Country</strong> <span>{addr.country}</span>
                 </p>
                 <p>
-                  <strong>Phone Number:</strong> <span>{addr.phone}</span>
+                  <strong>Phone Number</strong> <span>{addr.phone}</span>
                 </p>
 
                 <div className="button-container">

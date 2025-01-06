@@ -31,8 +31,13 @@ const MobileAd = () => {
   const [bannerImage, setBannerImage] = useState(null);
   const [bannerImageName, setBannerImageName] = useState(null);
   const [bannerKeyword, setBannerKeyword] = useState(''); // Define state for bannerKeyword
-
   const [isBannerEdit, setIsBannerEdit] = useState(false); // Track if the edit is for the banner
+
+
+  const [potraitImage, setPotraitImage] = useState(null);
+  const [potraitImageName, setPotraitImageName] = useState(null);
+  const [potraitKeyword, setPotraitKeyword] = useState(''); // Define state for potraitKeyword
+  const [ispotraitEdit, setIsPotraitEdit] = useState(false); // Track if the edit is for the banner
 
 
   
@@ -51,13 +56,21 @@ const MobileAd = () => {
       const bannerImage = response.data.find(product => 
         product.image && product.image.startsWith('banner') // Adjust property name if needed
       );
+      // Extract the banner image name from the fetched products
+      const potraitImage = response.data.find(product => 
+        product.image && product.image.startsWith('potrait') // Adjust property name if needed
+      );
 
       if (bannerImage) {
         console.log("Banner image found:", bannerImage.image);
         setBannerImageName(bannerImage.image);
-      } else {
-        console.log("No banner image found that starts with 'banner'.");
-      }
+      } else if (potraitImage){
+        console.log("potrait image found:", potraitImage.image);
+        setPotraitImageName(potraitImage.image);  
+        }
+        else{
+          console.log("No images found")
+        }
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -76,43 +89,202 @@ const MobileAd = () => {
     });
   };
 
+  const compressImage = (file, maxSizeKB = 500) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 500;
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+  
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+          const compress = (quality) => {
+            return new Promise((resolveInner) => {
+              canvas.toBlob((blob) => {
+                if (blob.size / 1024 <= maxSizeKB) {
+                  resolveInner(blob);
+                } else {
+                  // Retry with lower quality
+                  resolveInner(compress(quality - 0.1));
+                }
+              }, 'image/jpeg', quality);
+            });
+          };
+  
+          compress(0.8).then(resolve);
+        };
+      };
+    });
+  };
+  
+
   const handleImageChange = (e, isBanner = false) => {
     const files = Array.from(e.target.files);
     const validFiles = [];
   
     files.forEach((file) => {
       const fileName = file.name;
-  
-      // Regular expression to match valid file names without special characters
       const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]+/g, '_');
-  
-      // Create a new File object with the sanitized name
       const sanitizedFile = new File([file], sanitizedFileName, { type: file.type });
   
-      // Check if the file has a valid image extension
       const validExtensions = ['jpg', 'jpeg', 'png', 'jfif'];
       const fileExtension = sanitizedFile.name.split('.').pop().toLowerCase();
   
       if (validExtensions.includes(fileExtension)) {
-        // If the current input is the banner input, prefix the file name
-        if (isBanner) {
-          const bannerFileName = `banner_${sanitizedFileName}`;
-          const bannerFile = new File([sanitizedFile], bannerFileName, { type: sanitizedFile.type });
-          validFiles.push(bannerFile); // Push the renamed banner file
-        } else {
-          validFiles.push(sanitizedFile); // Push the normal file
-        }
+        const reader = new FileReader();
+        reader.readAsDataURL(sanitizedFile);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800; // Maintain width
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+  
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+            // Compression function
+            const compressImage = (minQuality, maxQuality) => {
+              return new Promise((resolve) => {
+                const tryCompression = (quality) => {
+                  canvas.toBlob(
+                    (blob) => {
+                      if (blob) {
+                        const sizeInKB = blob.size / 1024;
+                        console.log(`Compressed image at quality ${quality} has size: ${sizeInKB.toFixed(2)} KB`);
+  
+                        if (sizeInKB > 500 && quality > minQuality) {
+                          tryCompression(quality - 0.05);
+                        } else if (sizeInKB < 500 && quality < maxQuality) {
+                          tryCompression(quality + 0.02);
+                        } else {
+                          resolve(blob);
+                        }
+                      }
+                    },
+                    'image/jpeg',
+                    quality
+                  );
+                };
+  
+                // Start compression attempt only if size is above 500 KB
+                if (sanitizedFile.size / 1024 > 500) {
+                  tryCompression(maxQuality);
+                } else {
+                  resolve(sanitizedFile);
+                }
+              });
+            };
+  
+            // Compressing with quality range between 0.5 and 0.95
+            compressImage(0.5, 0.95).then((compressedBlob) => {
+              const finalFileName = isBanner ? `banner_${sanitizedFileName}` : sanitizedFileName;
+              const finalFile = new File([compressedBlob], finalFileName, { type: sanitizedFile.type });
+              validFiles.push(finalFile);
+              setNewProduct((prev) => ({
+                ...prev,
+                images: [...prev.images, ...validFiles],
+              }));
+            });
+          };
+        };
       } else {
         console.error(`${sanitizedFileName} is not a valid image format (jpg, jpeg, png, jfif)`);
       }
     });
-  
-    // Update the state for new product images
-    setNewProduct((prev) => ({
-      ...prev,
-      images: [...prev.images, ...validFiles], // Append new valid files
-    }));
   };
+
+  
+  const handleImageChange2 = (e, isPortrait = false) => {
+    const files = Array.from(e.target.files);
+    const validFiles = [];
+  
+    files.forEach((file) => {
+      const fileName = file.name;
+      const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]+/g, '_');
+      const sanitizedFile = new File([file], sanitizedFileName, { type: file.type });
+  
+      const validExtensions = ['jpg', 'jpeg', 'png', 'jfif'];
+      const fileExtension = sanitizedFile.name.split('.').pop().toLowerCase();
+  
+      if (validExtensions.includes(fileExtension)) {
+        const reader = new FileReader();
+        reader.readAsDataURL(sanitizedFile);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800; // Maintain width
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+  
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+            // Compression function
+            const compressImage = (minQuality, maxQuality) => {
+              return new Promise((resolve) => {
+                const tryCompression = (quality) => {
+                  canvas.toBlob(
+                    (blob) => {
+                      if (blob) {
+                        const sizeInKB = blob.size / 1024;
+                        console.log(`Compressed image at quality ${quality} has size: ${sizeInKB.toFixed(2)} KB`);
+  
+                        if (sizeInKB > 500 && quality > minQuality) {
+                          tryCompression(quality - 0.05);
+                        } else if (sizeInKB < 500 && quality < maxQuality) {
+                          tryCompression(quality + 0.02);
+                        } else {
+                          resolve(blob);
+                        }
+                      }
+                    },
+                    'image/jpeg',
+                    quality
+                  );
+                };
+  
+                // Start compression attempt only if size is above 500 KB
+                if (sanitizedFile.size / 1024 > 500) {
+                  tryCompression(maxQuality);
+                } else {
+                  resolve(sanitizedFile);
+                }
+              });
+            };
+  
+            // Compressing with quality range between 0.5 and 0.95
+            compressImage(0.5, 0.95).then((compressedBlob) => {
+              const finalFileName = isPortrait ? `portrait_${sanitizedFileName}` : sanitizedFileName;
+              const finalFile = new File([compressedBlob], finalFileName, { type: sanitizedFile.type });
+              validFiles.push(finalFile);
+              setNewProduct((prev) => ({
+                ...prev,
+                images: [...prev.images, ...validFiles],
+              }));
+            });
+          };
+        };
+      } else {
+        console.error(`${sanitizedFileName} is not a valid image format (jpg, jpeg, png, jfif)`);
+      }
+    });
+  };
+  
   
   
 
@@ -149,6 +321,12 @@ const MobileAd = () => {
       formData.append("images", renamedBannerImage);
     }
   
+   else if (potraitImage) {
+      const potraitImageName = `potrait_${potraitImage.name}`; // Prefix the potrait image
+      const renamedpotraitImage = new File([potraitImage], potraitImageName, { type: potraitImage.type });
+      formData.append("images", renamedpotraitImage);
+    }
+  
     // Append other images without prefix
     newProduct.images.forEach((image) => {
       const originalImageName = image.name; // Keep the original name
@@ -181,6 +359,17 @@ const MobileAd = () => {
   
       // Reset file input
       document.querySelector('input[type="file"]').value = '';
+
+      const fileInput = document.querySelector('.filee-input'); // Select the input by its class
+    if (fileInput) {
+      fileInput.value = ''; // Clear the file input
+    }
+  
+
+      const fileInput2 = document.querySelector('.filee-inputt'); // Select the input by its class
+    if (fileInput2) {
+      fileInput2.value = ''; // Clear the file input
+    }
   
     } catch (error) {
       console.error("Error adding product:", error);
@@ -433,33 +622,30 @@ const MobileAd = () => {
   };
   
 
-  // Function to handle file change
-const handleFileChange = (e) => {
-  const file = e.target.files[0]; // Get the first selected file
-
-  if (file) {
-    // Sanitize the filename
-    const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]+/g, '_');
-    
-    // Create a new File object with the sanitized name
-    const sanitizedFile = new File([file], sanitizedFileName, { type: file.type });
-
-    // Validate the file extension
-    const validExtensions = ['jpg', 'jpeg', 'png', 'jfif'];
-    const fileExtension = sanitizedFile.name.split('.').pop().toLowerCase();
-
-    if (validExtensions.includes(fileExtension)) {
-      setSelectedFiles(sanitizedFile); // Store the sanitized file in state
-    } else {
-      console.error(`${sanitizedFileName} is not a valid image format (jpg, jpeg, png, jfif)`);
-      // Optionally, you can set an error state to show a message to the user
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]+/g, '_');
+      const sanitizedFile = new File([file], sanitizedFileName, { type: file.type });
+  
+      const validExtensions = ['jpg', 'jpeg', 'png', 'jfif'];
+      const fileExtension = sanitizedFile.name.split('.').pop().toLowerCase();
+  
+      if (validExtensions.includes(fileExtension)) {
+        compressImage(sanitizedFile).then((compressedBlob) => {
+          const finalFile = new File([compressedBlob], sanitizedFileName, { type: sanitizedFile.type });
+          setSelectedFiles(finalFile);
+        });
+      } else {
+        console.error(`${sanitizedFileName} is not a valid image format (jpg, jpeg, png, jfif)`);
+      }
     }
-  }
-};
+  };
+  
 return (
   <div className="laptops-page">
     <div className="laptops-content">
-      <h2 className="laptops-page-title">Edit mobile Offers</h2>
+      <h2 className="laptops-page-title">Edit Mobile Offers</h2>
       <div className="laptops-card">
         <div className="laptops-card-header">
           <div className="laptops-card-item">Brand Name</div>
@@ -526,7 +712,7 @@ return (
     products.map((product, index) => {
       // Check if the first image name starts with 'banner'
       const firstImage = product.image ? product.image.split(",")[0] : '';
-      if (firstImage.startsWith('banner')) {
+      if (firstImage.startsWith('banner') || firstImage.startsWith('potrait')) {
         return null; // Skip rendering this product
       }
 
@@ -543,7 +729,6 @@ return (
                   src={`${ApiUrl}/uploads/offerspage/${firstImage}`} // Displaying the first product image
                   alt="Product"
                   className="offer-ad"
-                  style={{ width: '400px', height: '200px' }} // Set size as specified
                 />
                 {/* Image Actions - Positioned in corners */}
                 <div className="image-action" style={{ position: 'absolute', top: '10px', right: '10px' }}>
@@ -559,7 +744,7 @@ return (
                     onClick={() => handleDeleteImage(product, index)}
                     style={{ cursor: 'pointer', color: '#fff', marginLeft: '10px' }} // Adjust icon style if needed
                   >
-                    🗑️
+                    {/* 🗑️ */}
                   </span>
                 </div>
               </div>
@@ -582,49 +767,7 @@ return (
 
 
  <div className="banner-container">
-  {/* Filter products to only include those with banner images */}
-  {products.length > 0 && products.some(product => product.image && product.image.startsWith("banner")) ? ( 
-    // Check if there are any products with banner images to display
-    products
-      .filter(product => product.image && product.image.startsWith("banner")) // Filter for banner images
-      .map((product, index) => (
-        <div key={index} className="banner-image-display" style={{ position: 'relative', marginBottom: '20px' }}>
-          <p style={{marginTop:'30px'}} className="brand-name">{product.brand_name}</p> {/* Display brand name */}
 
-          <img
-            src={`${ApiUrl}/uploads/offerspage/${product.image}`} // Construct the image URL for the product
-            alt={`Banner for ${product.brand_name}`} // Alt text for accessibility
-            className="banner-image" // Class for styling
-            style={{width:'875px',marginTop: '28px', height:'275px'  }}
-            // style={{ width: '875px', height: '295px', objectFit: 'cover', marginTop: '28px' }} // Make image cover the container
-          />
-          
-          {/* Image action icons */}
-          <div className="image-action" style={{ position: 'absolute', top: '30px', right: '10px' }}>
-            <span
-              className="edit-iconn"
-              onClick={() => handleSecondEditIcon(product, index, 'banner_')} // Pass the entire product object
-              style={{ cursor: 'pointer', color: '#fff' }} // Adjust icon style if needed
-            >
-              ✏️
-            </span>
-            <span
-              className="delete-iconn"
-              onClick={() => handleDeleteImage(product, index)} // Pass the entire product object
-              style={{ cursor: 'pointer', color: '#fff', marginLeft: '10px' }} // Adjust icon style if needed
-            >
-              🗑️
-            </span>
-          </div>
-          <button
-            onClick={() => handleEditProduct(product)}
-            className="laptops-edit-btnn"
-          >
-            Edit
-          </button>
-        </div>
-      ))
-  ) : (
     <>
     <h4 className="banner-title">Banner image (2000 x 600)</h4>
     <div className="input-groupp">
@@ -648,14 +791,141 @@ return (
         Add
       </button>
     </div></>
+</div>
+
+
+<div className="images-below-banner" style={{ marginTop: '20px' }}>
+  
+  {products.length > 0 && products.some(product => product.image && product.image.startsWith("banner")) ? (
+    // Filter for products with banner images and map to display them
+    products
+      .filter(product => product.image && product.image.startsWith("banner")) // Filter for banner images
+      .slice(0, 4) // Limit to the first 4 images
+      .map((product, index) => (
+        <div key={index} className="banner-image-display" style={{ position: 'relative', marginBottom: '20px' }}>
+         <div style={{ textAlign: 'center', marginTop: '10px' }}>
+            <span style={{ fontWeight: 'bold' }}>Banner Image {index + 1}</span>
+          </div>
+          <p style={{ marginTop: '30px' }} className="brand-name">{product.brand_name}</p> {/* Display brand name */}
+
+          <img
+            src={`${ApiUrl}/uploads/offerspage/${product.image}`} // Construct the image URL for the product
+            alt={`Banner for ${product.brand_name}`} // Alt text for accessibility
+            className="banner-image7" // Class for styling
+            // style={{ width: '875px', marginTop: '10px', height: '275px' }} // Styling for the image
+          />
+          
+          {/* Image action icons */}
+          <div className="image-action" style={{ position: 'absolute', top: '30px', right: '10px' }}>
+            <span
+              className="edit-iconn"
+              onClick={() => handleSecondEditIcon(product, index, 'banner_')} // Pass the entire product object
+              style={{ cursor: 'pointer', color: '#fff' }} // Adjust icon style if needed
+            >
+              ✏️
+            </span>
+            <span
+              className="delete-iconn"
+              onClick={() => handleDeleteImage(product, index)} // Pass the entire product object
+              style={{ cursor: 'pointer', color: '#fff', marginLeft: '10px' }} // Adjust icon style if needed
+            >
+              {/* 🗑️ */}
+            </span>
+          </div>
+          <button
+            onClick={() => handleEditProduct(product)}
+            className="laptops-edit-btnn"
+          >
+            Edit
+          </button>
+          
+          {/* Displaying the label for the banner image */}
+          
+        </div>
+      ))
+  ) : (
+    <p></p> // Fallback message when no banner images are present
   )}
 </div>
 
 
 
-     
+<div className="potrait-container">
+<>
+<h4 className="banner-title">Potrait image (4000 x 6000)</h4>
+<div className="input-grouppp">
+  {/* Display input fields when there are no images */}
+{/* <p className="banner-title">banner</p> */}
+  <input
+    type="text"
+    name="brand_name"
+    value={newProduct.brand_name}
+    onChange={handleChange}
+    placeholder="Enter product name"
+    className="laptops-cardd-input"
+  />
+  <input
+    type="file"
+    accept="image/*"
+    onChange={(e) => handleImageChange2(e, true)} // Pass true to indicate it's a banner image
+    className="filee-inputt" // Unique class for file input
+  />
+  <button onClick={handleAddProduct} className="laptops-add-btn">
+    Add
+  </button>
+</div></>
+</div>
 
 </div>
+<div className="images-below-banner" style={{ marginTop: '20px', display: 'flex', flexWrap: 'wrap' ,justifyContent:'flex-start', marginLeft:'50px' }}>
+  {products.length > 0 && products.some(product => product.image && product.image.startsWith("potrait")) ? (
+    // Filter for products with potrait images and map to display them
+    products
+      .filter(product => product.image && product.image.startsWith("potrait")) // Filter for potrait images
+      .map((product, index) => (
+        <div key={index} className="banner-image-display" style={{ position: 'relative', marginBottom: '20px', marginRight: index % 4 === 3 ? '0' : '20px' }}>
+          <div style={{ textAlign: 'center', marginTop: '10px' }}>
+            <span style={{ fontWeight: 'bold' }}>Potrait Image {index + 1}</span>
+          </div>
+          {/* <p style={{ marginTop: '30px' }} className="brand-name">{product.brand_name}</p>  */}
+
+          <img
+            src={`${ApiUrl}/uploads/offerspage/${product.image}`} // Construct the image URL for the product
+            alt={`Banner for ${product.brand_name}`} // Alt text for accessibility
+            className="potrait-imagee" // Class for styling
+          />
+          
+          {/* Image action icons */}
+          <div className="image-action" style={{ position: 'absolute', top: '50px', right: '10px', display: 'flex', gap: '5px' }}>
+            <span
+              className="edit-iconn"
+              onClick={() => handleSecondEditIcon(product, index, 'potrait_')} // Pass the entire product object
+              style={{ cursor: 'pointer', color: '#fff', fontSize: '20px' }} // Adjust icon style if needed
+            >
+              ✏️
+            </span>
+            <span
+              className="delete-iconn"
+              onClick={() => handleDeleteImage(product, index)} // Pass the entire product object
+              style={{ cursor: 'pointer', color: '#fff', fontSize: '20px' }} // Adjust icon style if needed
+            >
+              {/* 🗑️ */}
+            </span>
+          </div>
+          <button
+            onClick={() => handleEditProduct(product)}
+            className="laptops-edit-btnn"
+          >
+            Edit
+          </button>
+        </div>
+      ))
+  ) : (
+    <p></p> // Fallback message when no potrait images are present
+  )}
+</div>
+
+
 
 
     </div>

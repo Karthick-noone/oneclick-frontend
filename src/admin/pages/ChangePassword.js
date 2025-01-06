@@ -134,6 +134,7 @@ const ChangePassword = () => {
                     onChange={handleChange}
                     placeholder="Enter your old password"
                     required
+                    style={{color:'black'}}
                   />
                   <button
                     type="button"
@@ -155,7 +156,9 @@ const ChangePassword = () => {
                     value={formData.newPassword}
                     onChange={handleChange}
                     placeholder="Enter your new password"
+                    style={{color:'black'}}
                     required
+
                   />
                   <button
                     type="button"
@@ -178,6 +181,8 @@ const ChangePassword = () => {
                     onChange={handleChange}
                     placeholder="Confirm your new password"
                     required
+                    style={{color:'black'}}
+
                   />
                   <button
                     type="button"

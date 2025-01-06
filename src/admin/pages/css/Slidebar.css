@@ -4,7 +4,7 @@
   left: 0;
   height: 100%;
   width: 250px;
-  background-color: #ffffff;
+  background-color: #001a35;
   color: #333;
   transition: width 0.4s ease, transform 0.4s ease;
   overflow: auto;
@@ -18,13 +18,15 @@
 }
 
 .slidebar-header {
+  position: sticky;
+  top: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  background-color: #ffffff;
+  background-color: #001a35;
   white-space: nowrap;
-  /* border-bottom:1px solid #333; */
+  /* border-bottom:1px solid #afafaf; */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 
 }
@@ -56,11 +58,11 @@
 
 .slidebar-menu li {
   padding: 10px;
-  color: #333;
+  color: white;
 }
 
 .slidebar-menu li a {
-  color: #333;
+  color: white;
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -95,7 +97,7 @@
 } */
 
 .submenu-items li a {
-  color: #333;
+  color: white;
 }
 
 .submenu-icon {
@@ -160,13 +162,13 @@
 }
 
 .slidebar::-webkit-scrollbar-thumb {
-  background-color: #e9ebec; /* Color of the scrollbar thumb */
+  background-color: #3498db; /* Color of the scrollbar thumb */
   border-radius: 10px; /* Rounded edges for the thumb */
-  border: 2px solid #e9ebec; /* Border around the thumb */
+  border: 2px solid #001a35; /* Border around the thumb */
 }
 
 .slidebar::-webkit-scrollbar-track {
-  background-color: #e9ebec; /* Color of the scrollbar track */
+  background-color: #001a35; /* Color of the scrollbar track */
   border-radius: 10px; /* Rounded edges for the track */
 }
 
@@ -241,7 +243,7 @@
 
 /* When sidebar is collapsed */
 .collapsed .slidebar-menu li a {
-  color: #333; /* Default color when collapsed */
+  color: white; /* Default color when collapsed */
 }
 
 /* Active link color when sidebar is collapsed */

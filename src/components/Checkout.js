@@ -8,8 +8,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaTimes, FaTrash, FaCheck } from "react-icons/fa";
-// import '@fortawesome/fontawesome-free/css/all.min.css';
-// import { FaCashRegister, FaCreditCard, FaUniversity, FaPaypal } from 'react-icons/fa';
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import {
+  FaMoneyBillWave,
+  FaCreditCard,
+  FaUniversity,
+  FaPaypal,
+} from "react-icons/fa";
 import Swal from "sweetalert2";
 import Footer from "./footer";
 
@@ -39,13 +44,60 @@ const Checkout = () => {
   const [discountAmount, setDiscountAmount] = useState(0); // New state for storing discount
   const [messageType, setMessageType] = useState(""); // New state to track the message type (success/error)
   const [isCouponApplied, setIsCouponApplied] = useState(false); // New state to track if coupon is applied
+  const [coupons, setCoupons] = useState(0);
+  const [couponValue, setCouponValue] = useState(0);
+  const [minPurchaseLimit, setMinPurchaseLimit] = useState(0);
+
+  const fetchCoupons = async () => {
+    try {
+      const response = await axios.get(`${ApiUrl}/api/fetchcoupons`);
+      setCoupons(response.data); // Set the coupons in state
+  
+      // Debugging: Check the response structure
+      console.log("Fetched coupons successfully:", response.data);
+  
+      // Extract the values for couponValue and minPurchaseLimit
+      const validCoupon = response.data[0]; // Assuming only one coupon exists in the array
+      if (validCoupon) {
+        const couponValue = validCoupon.value;
+        const minPurchaseLimit = validCoupon.min_purchase_limit;
+  
+        // Log the variables
+        console.log("Coupon Value:", couponValue);
+        console.log("Min Purchase Limit:", minPurchaseLimit);
+  
+        // Optionally set the state if needed
+        setCouponValue(couponValue);
+        setMinPurchaseLimit(minPurchaseLimit);
+      } else {
+        console.log("No coupons available.");
+      }
+    } catch (error) {
+      console.error("Error fetching coupons:", error);
+      Swal.fire("Error", "Failed to fetch coupons. Please try again.", "error");
+    }
+  };
+  
+
+  useEffect(() => {
+    fetchCoupons();
+  }, []);
+
 
   const handleCouponChange = (event) => {
-    setCoupon(event.target.value);
+    // Get the value from the input
+    const inputValue = event.target.value;
+
+    // Use a regular expression to allow only alphanumeric characters (A-Z, a-z, 0-9)
+    const validCharacters = /^[a-zA-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+
+    // Check if the input value matches the regex
+    if (validCharacters.test(inputValue)) {
+      setCoupon(inputValue); // Only set the value if it's valid
+    }
   };
 
   const handleApplyCoupon = async (couponCode) => {
-
     if (!couponCode.trim()) {
       // If the coupon input is empty, show a message and exit the function
       setMessage("Please enter a coupon code.");
@@ -62,7 +114,9 @@ const Checkout = () => {
       console.log("Applying coupon:", couponCode, "for all products in cart");
 
       // Collect all product IDs from cartItems
-      const productIds = cartItems.map((item) => item.id);
+      const productIds = cartItems.map((item) => item.product_id);
+
+      console.log("productIds", productIds);
 
       // Calculate the total price before applying the coupon
       const calculatedTotalPrice = calculateTotalPrice();
@@ -120,19 +174,51 @@ const Checkout = () => {
       setMessageType("error"); // Set message type to error
     }
   };
-  
 
-  // Assuming this is where you calculate the total amount
   const calculateTotalPrice = () => {
+    // Calculate the total price of cart items
     const totalPrice = cartItems
       .reduce((total, item) => {
         const price = parseFloat(item.price);
-        return total + (isNaN(price) ? 0 : price * item.quantity);
+        const deliveryCharge = parseFloat(item.deliverycharge || 0);
+  
+        return (
+          total + (isNaN(price) ? 0 : price * item.quantity) + deliveryCharge
+        );
       }, 0)
       .toFixed(2);
-
+  
     console.log("Calculated total price:", totalPrice); // Log the calculated total price
-    return totalPrice;
+  
+    // Convert totalPrice to a float for comparison
+    let finalPrice = parseFloat(totalPrice);
+  
+    // Check if the total price exceeds the min purchase limit
+    if (finalPrice >= minPurchaseLimit) {
+      // Apply coupon if total price meets the minimum limit
+      if (couponValue > 0) {
+        finalPrice -= couponValue; // Apply coupon discount
+        console.log("Coupon applied. Discounted price:", finalPrice);
+      }
+    } else {
+      console.log("Total price is below minimum purchase limit. Coupon not applied.");
+    }
+  
+    // Ensure price is not negative
+    finalPrice = finalPrice < 0 ? 0 : finalPrice;
+  
+    return finalPrice.toFixed(2);
+  };
+  
+  
+
+  const calculateDeliveryCharge = () => {
+    return cartItems
+      .reduce((total, item) => {
+        const deliveryCharge = parseFloat(item.deliverycharge || 0);
+        return total + (isNaN(deliveryCharge) ? 0 : deliveryCharge);
+      }, 0)
+      .toFixed(2);
   };
 
   useEffect(() => {
@@ -482,55 +568,55 @@ const Checkout = () => {
         icon: "error",
         title: "Cart is Empty",
         text: "Please add items to your cart before proceeding with payment.",
-        timer: 2000,
+        timer: 5000,
         showConfirmButton: false,
       });
       return;
     }
 
-    const finalAmountToSend = newTotalAmount > 0 ? newTotalAmount : calculateTotalPrice();
+    const selectedAddressDetails = addressDetails.find(
+      (address) => String(address.address_id) === String(addressToUse)
+    );
+    const finalAmountToSend =
+      newTotalAmount > 0 ? newTotalAmount : calculateTotalPrice();
+    const phonenumber = `${selectedAddressDetails.phone}`;
+    const name = `${selectedAddressDetails.name}`;
+    const email = localStorage.getItem("email");
+
+    // console.log("Razorpay Prefill Data:", {
+    //   name: name,           // Logs the user's name (or admin's name if hardcoded)
+    //   email: email,         // Logs the user's email (or admin's email if hardcoded)
+    //   contact: phonenumber  // Logs the phone number for the prefill
+    // });
 
     const options = {
-      key: "rzp_test_mtjdapiflomQkN", // Replace with your Razorpay Test Key ID
-      key_secret: "g13PipAk6MMAEj2Rr3lajUmJ", // Replace with your Razorpay Test Key ID
+      key: "rzp_live_YExdymlgVGlrcC", // Replace with your Razorpay Test Key ID
+      key_secret: "IUFWdAs57nzoQqnrPZM1pzzt", // Replace with your Razorpay Test Key ID
+      // key: "rzp_test_mtjdapiflomQkN", // Replace with your Razorpay Test Key ID karthick
+      // key_secret: "g13PipAk6MMAEj2Rr3lajUmJ", // Replace with your Razorpay Test Key ID
       amount: finalAmountToSend * 100, // Amount in paise (Razorpay works in paise)
       currency: "INR",
       name: "One CLick",
       description: "Order Payment",
       handler: async function (response) {
-        // Swal.fire({
-        //   icon: 'success',
-        //   title: 'Payment Successful',
-        //   text: `Your payment was successful. Payment ID: ${response.razorpay_payment_id}`,
-        //   timer: 2000,
-        //   showConfirmButton: false
-        // });
-
         try {
-          await handlePlaceOrder();
-
-          // Swal.fire({
-          //   icon: 'success',
-          //   title: 'Order Placed',
-          //   text: 'Your order has been placed successfully!',
-          //   timer: 2000,
-          //   showConfirmButton: false
-          // });
+          // Handle the order placement based on the payment method
+          await handlePlaceOrder(response);
         } catch (error) {
           console.error("Error while placing order after payment:", error);
           Swal.fire({
             icon: "error",
             title: "Order Error",
             text: `An error occurred while placing the order: ${error.message}`,
-            timer: 2000,
+            timer: 5000,
             showConfirmButton: false,
           });
         }
       },
       prefill: {
-        name: "Karthick",
-        email: "karthicknoone@gmail.com",
-        contact: "8778315180",
+        name: name,
+        email: email,
+        contact: phonenumber,
       },
       theme: {
         color: "#3399cc",
@@ -548,21 +634,44 @@ const Checkout = () => {
     }
   }, [addressDetails]);
 
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = async (response) => {
     console.log("handlePlaceOrder function called");
 
     // Use the selected address if available, otherwise fall back to the default address
     const addressToUse = selectedAddress || defaultAddress;
 
-    if (!addressToUse) {
-      console.log("No address selected or default address found");
+    if (cartItems.length === 0) {
       Swal.fire({
         icon: "error",
-        title: "Address Required",
-        text: "Please select a shipping address.",
-        timer: 2000,
+        title: "Cart is Empty",
+        text: "Please add items to your cart before proceeding with payment.",
+        timer: 5000,
         showConfirmButton: false,
       });
+      return;
+    }
+
+    // if (!addressToUse) {
+    //   console.log("No address selected or default address found");
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Address Required",
+    //     text: "Please select a shipping address.",
+    //     timer: 5000,
+    //     showConfirmButton: false,
+    //   });
+    //   return;
+    // }
+    if (!addressToUse) {
+      // Swal.fire({
+      //   icon: "error",
+      //   title: "No Address Selected",
+      //   text: "Please select a delivery address before proceeding with payment.",
+      //   timer: 2000,
+      //   showConfirmButton: false,
+      // });
+      navigate("/UserAddress"); // Update the path to your UserAddress page
+
       return;
     }
 
@@ -586,7 +695,7 @@ const Checkout = () => {
         icon: "error",
         title: "Address Not Found",
         text: "Selected address not found.",
-        timer: 2000,
+        timer: 5000,
         showConfirmButton: false,
       });
       return;
@@ -612,7 +721,18 @@ const Checkout = () => {
 
     // Log the enriched cart items to check their structure and content
     console.log("Enriched Cart Items:", enrichedCartItems);
-    const finalAmountToSend = newTotalAmount > 0 ? newTotalAmount : calculateTotalPrice();
+    const finalAmountToSend =
+      newTotalAmount > 0 ? newTotalAmount : calculateTotalPrice();
+
+    // const orderData = {
+    //   user_id: userId,
+    //   total_amount: finalAmountToSend,
+    //   shipping_address: fullAddress,
+    //   address_id: addressToUse,
+    //   cartItems: enrichedCartItems,
+    //   payment_method: selectedPaymentMethod === "cod" ? "COD" : "Online", // Payment method based on selection
+    //   status: selectedPaymentMethod === "cod" ? "Pending" : "Paid", // Status based on selection
+    // };
 
     const orderData = {
       user_id: userId,
@@ -620,7 +740,18 @@ const Checkout = () => {
       shipping_address: fullAddress,
       address_id: addressToUse,
       cartItems: enrichedCartItems,
+      payment_method: selectedPaymentMethod === "cod" 
+        ? "COD" 
+        : selectedPaymentMethod === "pickup"
+        ? "Pick Up From Store"
+        : "Online", // Payment method based on selection
+      status: selectedPaymentMethod === "cod" 
+        ? "Pending" 
+        : selectedPaymentMethod === "pickup"
+        ? "Ready for Pickup"
+        : "Paid", // Status based on selection
     };
+    
 
     console.log("Order Data:", orderData);
 
@@ -633,7 +764,7 @@ const Checkout = () => {
           icon: "success",
           title: "Order Placed",
           text: "Your order has been placed successfully!",
-          timer: 2000,
+          timer: 5000,
           showConfirmButton: false,
         }).then(() => {
           clearCart(); // Call your function to clear the cart
@@ -661,7 +792,7 @@ const Checkout = () => {
         text: `An error occurred: ${
           error.response?.data?.message || error.message
         }`,
-        timer: 2000,
+        timer: 5000,
         showConfirmButton: false,
       });
     }
@@ -682,12 +813,10 @@ const Checkout = () => {
     navigate(`/product/${productId}`);
   };
 
-
-  const finalAmount = newTotalAmount > 0 
-  ? Number(newTotalAmount) // Convert to number if it's not
-  : Number(calculateTotalPrice()); // Ensure this is a number
-
-
+  const finalAmount =
+    newTotalAmount > 0
+      ? Number(newTotalAmount) // Convert to number if it's not
+      : Number(calculateTotalPrice()); // Ensure this is a number
 
   return (
     <>
@@ -799,7 +928,12 @@ const Checkout = () => {
                     </div>
                   ) : (
                     <div>
-                      <p>{totalItems === 1 ? `${totalItems} item` : `${totalItems} items`} in cart</p>
+                      <p>
+                        {totalItems === 1
+                          ? `${totalItems} item`
+                          : `${totalItems} items`}{" "}
+                        in cart
+                      </p>
                       <button
                         className="change-btn"
                         onClick={handleToggleExpand}
@@ -949,8 +1083,14 @@ const Checkout = () => {
 
           <div className="cart-summary">
             <div className="summary-item">
-            <span>Price ({getTotalItemsCount() === 1 ? '1 item' : `${getTotalItemsCount()} items`})</span>
-            <span>₹{calculateActualPrice()}</span>
+              <span>
+                Price (
+                {getTotalItemsCount() === 1
+                  ? "1 item"
+                  : `${getTotalItemsCount()} items`}
+                )
+              </span>
+              <span>₹{calculateActualPrice()}</span>
             </div>
             <div className="summary-item">
               <span>Discount</span>
@@ -963,17 +1103,27 @@ const Checkout = () => {
             <div className="summary-item">
               <span>Delivery charge</span>
               <span>
-                <span style={{ textDecoration: "line-through" }}>₹50</span>{" "}
-                <span style={{ color: "green" }}>FREE Delivery</span>
+                {/* <span style={{ textDecoration: "line-through" }}>₹50</span>{" "}
+                <span style={{ color: "green" }}>FREE Delivery</span> */}
+                <span>₹{calculateDeliveryCharge()}</span>
               </span>
             </div>
             <div className="summary-item">
               <span>Coupon Discount</span>
               <span style={{ color: "green" }}>
-              - ₹{discountAmount.toFixed(2)}
-              {/* <span style={{ color: "green" }}>FREE Delivery</span> */}
+                - ₹{discountAmount.toFixed(2)}
+                {/* <span style={{ color: "green" }}>FREE Delivery</span> */}
               </span>
             </div>
+            {parseFloat(calculateTotalPrice()) >= minPurchaseLimit && (
+  <div className="summary-item">
+    <span>Extra Offer for Purchasing Over ₹{minPurchaseLimit}</span>
+    <span style={{ color: "green" }}>
+      - ₹{couponValue.toFixed(2)}
+    </span>
+  </div>
+)}
+
             <div className="summary-item">
               {/* Input for coupon code */}
               <input
@@ -982,30 +1132,34 @@ const Checkout = () => {
                 type="text"
                 placeholder="Enter Coupon code"
                 disabled={isCouponApplied} // Disable input if coupon is applied
-
               />
 
               {/* Single Apply button for all items */}
-              <button disabled={isCouponApplied} onClick={() =>  handleApplyCoupon(coupon)}>Apply</button>
+              <button
+                disabled={isCouponApplied}
+                onClick={() => handleApplyCoupon(coupon)}
+              >
+                Apply
+              </button>
             </div>
-
             {message && (
-        <p
-          style={{
-            color:
-              messageType === "success"
-                ? "green"
-                : messageType === "error"
-                ? "red"
-                : "orange", // Orange for warning (if coupon is already applied)
-            // fontWeight: "bold",
-            marginTop: "5px",
-            fontSize:'14px'
-          }}
-        >
-          {message}
-        </p>
-      )}  <hr />
+              <p
+                style={{
+                  color:
+                    messageType === "success"
+                      ? "green"
+                      : messageType === "error"
+                      ? "red"
+                      : "orange", // Orange for warning (if coupon is already applied)
+                  // fontWeight: "bold",
+                  marginTop: "5px",
+                  fontSize: "14px",
+                }}
+              >
+                {message}
+              </p>
+            )}{" "}
+            <hr />
             <div className="summary-item">
               <strong>Total Amount</strong>
               <span style={{ fontWeight: "bold" }}>
@@ -1013,8 +1167,7 @@ const Checkout = () => {
                 {/* {newTotalAmount > 0
                   ? newTotalAmount.toFixed(2)
                   : calculateTotalPrice()} */}
- {finalAmount.toFixed(2)}
-
+                {finalAmount.toFixed(2)}
               </span>
             </div>
             <hr />
@@ -1023,57 +1176,102 @@ const Checkout = () => {
                 You will save ₹{discount()} on this order
               </span> 
             </div> */}
-            <button
+            {/* <button
               className="summary-place-order-btn"
               onClick={handlePayment}
               //   onClick={() => navigate("/checkout")}
             >
-              Pay Now
-            </button>
+              Place Order
+            </button> */}
+            <center>
+              <h4 style={{ marginTop: "10px" }}>Select Payment Method</h4>
+            </center>
+            <div className="payment-methods">
+              <div
+                className={`summary-item2 ${
+                  selectedPaymentMethod === "cod" ? "selected" : ""
+                }`}
+              >
+                <FaMoneyBillWave className="payment-icon" />
+                <span className="methods">Cash on Delivery</span>
+                <span>
+                  <input
+                    type="radio"
+                    name="payment-method"
+                    value="cod"
+                    checked={selectedPaymentMethod === "cod"}
+                    onChange={handlePaymentMethodChange}
+                  />
+                </span>
+                {selectedPaymentMethod === "cod" && (
+                  <div className="continue-wrapper">
+                    <button
+                      onClick={() => handlePlaceOrder("cod")} // Pass "cod" to handlePayment function
+                      className="summary-place-order-btn"
+                    >
+                      Place Order
+                    </button>
+                  </div>
+                )}
+              </div>
 
-            {/* <center>
-        <h4 style={{ marginTop: '10px' }}>Payment Method</h4>
-      </center>
-      <div className="payment-methods">
-        <div className={`summary-item2 ${selectedPaymentMethod === 'cod' ? 'selected' : ''}`}>
-          <FaCashRegister className="payment-icon" />
-          <span className="methods">Cash on Delivery</span>
-          <span>
-            <input
-              type="radio"
-              name="payment-method"
-              value="cod"
-              checked={selectedPaymentMethod === 'cod'}
-              onChange={handlePaymentMethodChange}
-            />
-          </span>
-          {selectedPaymentMethod === 'cod' && (
-            <div className="continue-wrapper">
-              <button className="continue-button">Continue</button>
-            </div>
-          )}
-        </div>
-        
-        <div className={`summary-item2 ${selectedPaymentMethod === 'card' ? 'selected' : ''}`}>
-          <FaCreditCard className="payment-icon" />
-          <span className="methods">Credit/Debit Card</span>
-          <span>
-            <input
-              type="radio"
-              name="payment-method"
-              value="card"
-              checked={selectedPaymentMethod === 'card'}
-              onChange={handlePaymentMethodChange}
-            />
-          </span>
-          {selectedPaymentMethod === 'card' && (
-            <div className="continue-wrapper">
-              <button className="continue-button">Continue</button>
-            </div>
-          )}
-        </div>
-        
-        <div className={`summary-item2 ${selectedPaymentMethod === 'net-banking' ? 'selected' : ''}`}>
+              <div
+                className={`summary-item2 ${
+                  selectedPaymentMethod === "card" ? "selected" : ""
+                }`}
+              >
+                <FaCreditCard className="payment-icon" />
+                <span className="methods">Pay Online</span>
+                <span>
+                  <input
+                    type="radio"
+                    name="payment-method"
+                    value="card"
+                    checked={selectedPaymentMethod === "card"}
+                    onChange={handlePaymentMethodChange}
+                  />
+                </span>
+                {selectedPaymentMethod === "card" && (
+                  <div className="continue-wrapper">
+                    <button
+                      onClick={() => handlePayment("Online")} // Pass "cod" to handlePayment function
+                      className="summary-place-order-btn"
+                    >
+                      Pay Now
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div
+                className={`summary-item2 ${
+                  selectedPaymentMethod === "pickup" ? "selected" : ""
+                }`}
+              >
+                <FaMoneyBillWave className="payment-icon" />
+                <span className="methods">Pick Up From Store</span>
+                <span>
+                  <input
+                    type="radio"
+                    name="payment-method"
+                    value="pickup"
+                    checked={selectedPaymentMethod === "pickup"}
+                    onChange={handlePaymentMethodChange}
+                  />
+                </span>
+                {selectedPaymentMethod === "pickup" && (
+                  <div className="continue-wrapper">
+                    <button
+                      onClick={() => handlePlaceOrder("pickup")} // Pass "cod" to handlePayment function
+                      className="summary-place-order-btn"
+                    >
+                      Place Order
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* <div className={`summary-item2 ${selectedPaymentMethod === 'net-banking' ? 'selected' : ''}`}>
           <FaUniversity className="payment-icon" />
           <span className="methods">Net Banking</span>
           <span>
@@ -1109,9 +1307,8 @@ const Checkout = () => {
               <button className="continue-button">Continue</button>
             </div>
           )}
-        </div>
-      </div> */}
-
+        </div> */}
+            </div>
             {isModalOpen && (
               <div className="modal4-overlay">
                 <div className="modal4-content">

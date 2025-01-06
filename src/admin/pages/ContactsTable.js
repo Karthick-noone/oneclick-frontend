@@ -1,28 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import './css/ContactsTable.css'; // Import the CSS file
-import { ApiUrl } from '../../components/ApiUrl';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./css/ContactsTable.css"; // Import the CSS file
+import { ApiUrl } from "../../components/ApiUrl";
+import { FaTrash } from "react-icons/fa";
 // import { FaDownload } from 'react-icons/fa';
+import Swal from "sweetalert2";
+
 
 const ContactsTable = () => {
   const [contacts, setContacts] = useState([]);
-//   const [loading, setLoading] = useState(true);
+  //   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   // State for Popup
   const [showPopup, setShowPopup] = useState(false);
-  const [selectedSubject, setSelectedSubject] = useState('');
-  const [selectedMessage, setSelectedMessage] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [selectedMessage, setSelectedMessage] = useState("");
 
   useEffect(() => {
-    axios.get(`${ApiUrl}/fetchcontacts`) // Adjust this to your actual contacts API endpoint
-      .then(response => {
+    axios
+      .get(`${ApiUrl}/fetchcontacts`) // Adjust this to your actual contacts API endpoint
+      .then((response) => {
         setContacts(response.data);
         // setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         setError(error);
         // setLoading(false);
       });
@@ -38,13 +42,16 @@ const ContactsTable = () => {
     setShowPopup(false);
   };
 
-//   if (loading) return <p>Loading...</p>;
+  //   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading contacts: {error.message}</p>;
 
   // Pagination logic
   const indexOfLastContact = currentPage * itemsPerPage;
   const indexOfFirstContact = indexOfLastContact - itemsPerPage;
-  const currentContacts = contacts.slice(indexOfFirstContact, indexOfLastContact);
+  const currentContacts = contacts.slice(
+    indexOfFirstContact,
+    indexOfLastContact
+  );
 
   const totalPages = Math.ceil(contacts.length / itemsPerPage);
 
@@ -75,11 +82,17 @@ const ContactsTable = () => {
         pages.push(i);
       }
     } else {
-      const leftBoundary = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-      const rightBoundary = Math.min(totalPages, currentPage + Math.floor(maxPagesToShow / 2));
+      const leftBoundary = Math.max(
+        1,
+        currentPage - Math.floor(maxPagesToShow / 2)
+      );
+      const rightBoundary = Math.min(
+        totalPages,
+        currentPage + Math.floor(maxPagesToShow / 2)
+      );
 
       if (leftBoundary > 2) {
-        pages.push(1, '...');
+        pages.push(1, "...");
       } else {
         for (let i = 1; i < leftBoundary; i++) {
           pages.push(i);
@@ -91,7 +104,7 @@ const ContactsTable = () => {
       }
 
       if (rightBoundary < totalPages - 1) {
-        pages.push('...', totalPages);
+        pages.push("...", totalPages);
       } else {
         for (let i = rightBoundary + 1; i <= totalPages; i++) {
           pages.push(i);
@@ -102,69 +115,152 @@ const ContactsTable = () => {
     return pages;
   };
 
+
+  const handleDeleteContact = async (id) => {
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.delete(`${ApiUrl}/api/deletecontact/${id}`);
+        if (response.status === 200) {
+          // Show success message
+          Swal.fire({
+            title: "Deleted!",
+            text: "Career entry has been deleted.",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: true,
+          });
+  
+          // Update state to remove deleted career
+          setContacts(contacts.filter((career) => career.id !== id));
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: response.data.message || "Failed to delete the entry.",
+            icon: "error",
+          });
+        }
+      } catch (error) {
+        console.error("Error deleting career entry:", error);
+        Swal.fire({
+          title: "Error",
+          text: "An error occurred while deleting the entry.",
+          icon: "error",
+        });
+      }
+    }
+  };
   return (
     <div className="contacts-table-container">
-      <h2>Contacts List</h2>
-      <table className="contacts-table">
-  <thead>
-    <tr>
-      <th>S.No</th>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Phone</th>
-      <th>Message</th> {/* Add Message column */}
-    </tr>
-  </thead>
-<tbody>
-  {currentContacts.map((contact, index) => (
-    <tr key={contact.id}>
-      <td>{index + 1 + indexOfFirstContact}</td>
-      <td>{contact.name}</td>
-      <td>{contact.email}</td>
-      <td>{contact.phone}</td>
-      <td>
-        <button className='message-btn' onClick={() => handleMessageClick(contact)}>View</button>
-      </td>
-    </tr>
-  ))}
-</tbody>
-</table>
-
-      {/* Pagination Controls */}
-      <div className="pagination-controls">
-        <button onClick={handlePrevPage} disabled={currentPage === 1}>
-          &lt;
-        </button>
-        {getPaginationPages().map((page, index) =>
-          page === '...' ? (
-            <span key={index}>...</span>
-          ) : (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={page === currentPage ? 'active' : ''}
-            >
-              {page}
-            </button>
-          )
+      <main className="staff-main-content">
+        <div className="orders-header">
+          <h2 className="orders-page-title">Contacted Lists</h2>
+        </div>{" "}
+        <table className="careers-table">
+          <thead>
+            <tr>
+              <th>S.No</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Date</th> {/* Add Date column */}
+              <th>Message</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentContacts.map((contact, index) => (
+              <tr key={contact.id}>
+                <td>{index + 1 + indexOfFirstContact}</td>
+                <td>{contact.name}</td>
+                <td>{contact.email}</td>
+                <td>{contact.phone}</td>
+                <td>
+                  {new Intl.DateTimeFormat("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  }).format(new Date(contact.created_at))}
+                </td>
+                <td>
+                  <button
+                    className="message-btn"
+                    onClick={() => handleMessageClick(contact)}
+                  >
+                    View
+                  </button>
+                </td>
+                <td>
+                  <button
+                    className="resume-btn"
+                    onClick={() => handleDeleteContact(contact.id)}
+                    title="Delete"
+                  >
+                    <FaTrash
+                      style={{
+                        // color: "red",
+                        color: "black",
+                        // fontSize: isMobile ? "20px" : "16px",
+                      }}
+                    />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {/* Pagination Controls */}
+        <div className="pagination-controls">
+          <button onClick={handlePrevPage} disabled={currentPage === 1}>
+            &lt;
+          </button>
+          {getPaginationPages().map((page, index) =>
+            page === "..." ? (
+              <span key={index}>...</span>
+            ) : (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={page === currentPage ? "active" : ""}
+              >
+                {page}
+              </button>
+            )
+          )}
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            &gt;
+          </button>
+        </div>
+        {/* Popup for Messages */}
+        {showPopup && (
+          <div className="popuppp-overlay">
+            <div className="popuppp-content">
+              <h2>Subject: {selectedSubject}</h2>
+              <p>Message: {selectedMessage}</p>
+              <button
+                style={{ background: "red" }}
+                className="changee-btn"
+                onClick={handleClosePopup}
+              >
+                Close
+              </button>
+            </div>
+          </div>
         )}
-        <button onClick={handleNextPage} disabled={currentPage === totalPages}>
-          &gt;
-        </button>
-      </div>
-
-      {/* Popup for Messages */}
-      {showPopup && (
-  <div className="popuppp-overlay">
-    <div className="popuppp-content">
-      <h2>Subject: {selectedSubject}</h2>
-      <p>Message: {selectedMessage}</p>
-      <button style={{ background: 'red' }} className='changee-btn' onClick={handleClosePopup}>
-        Close
-      </button>
-    </div>
-  </div>
-)}
+      </main>
     </div>
   );
 };

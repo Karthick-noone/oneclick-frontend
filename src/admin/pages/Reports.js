@@ -10,8 +10,11 @@ const Reports = () => {
   const [ordersReport, setOrdersReport] = useState([]);
   const [customersReport, setCustomersReport] = useState([]);
 
-  // Pagination States for Orders Report
-  const [currentPage, setCurrentPage] = useState(1);
+  // Pagination States for Orders, Sales, and Customers Reports
+  const [currentPageOrders, setCurrentPageOrders] = useState(1);
+  const [currentPageSales, setCurrentPageSales] = useState(1);
+  const [currentPageCustomers, setCurrentPageCustomers] = useState(1);
+
   const [itemsPerPage] = useState(10); // Number of items per page
 
   const fetchSalesReport = async () => {
@@ -26,7 +29,6 @@ const Reports = () => {
   useEffect(() => {
     fetchSalesReport();
   }, []);
-
 
   // Fetch Orders Data
   const fetchOrdersReport = async () => {
@@ -60,16 +62,28 @@ const Reports = () => {
     }
   }, [navigate]);
 
-  // Pagination Logic
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentOrders = ordersReport.slice(indexOfFirstItem, indexOfLastItem);
+  // Pagination Logic for Orders Report
+  const indexOfLastOrderItem = currentPageOrders * itemsPerPage;
+  const indexOfFirstOrderItem = indexOfLastOrderItem - itemsPerPage;
+  const currentOrders = ordersReport.slice(indexOfFirstOrderItem, indexOfLastOrderItem);
+
+  // Pagination Logic for Sales Report
+  const indexOfLastSalesItem = currentPageSales * itemsPerPage;
+  const indexOfFirstSalesItem = indexOfLastSalesItem - itemsPerPage;
+  const currentSales = salesReport.slice(indexOfFirstSalesItem, indexOfLastSalesItem);
+
+  // Pagination Logic for Customers Report
+  const indexOfLastCustomerItem = currentPageCustomers * itemsPerPage;
+  const indexOfFirstCustomerItem = indexOfLastCustomerItem - itemsPerPage;
+  const currentCustomers = customersReport.slice(indexOfFirstCustomerItem, indexOfLastCustomerItem);
 
   // Calculate total pages
-  const totalPages = Math.ceil(ordersReport.length / itemsPerPage);
+  const totalOrderPages = Math.ceil(ordersReport.length / itemsPerPage);
+  const totalSalesPages = Math.ceil(salesReport.length / itemsPerPage);
+  const totalCustomerPages = Math.ceil(customersReport.length / itemsPerPage);
 
   // Get Pagination Pages
-  const getPaginationPages = () => {
+  const getPaginationPages = (totalPages, currentPage, setCurrentPage) => {
     const pages = [];
     const maxPagesToShow = 5; // Total number of page numbers to show at a time
 
@@ -103,132 +117,164 @@ const Reports = () => {
       }
     }
 
-    return pages;
+    return pages.map((page, index) => (
+      <button
+        key={index}
+        onClick={() => handlePageChange(page, setCurrentPage)}
+        className={currentPage === page ? 'active' : ''}
+      >
+        {page}
+      </button>
+    ));
   };
 
   // Pagination handlers
-  const handlePageChange = (pageNumber) => {
+  const handlePageChange = (pageNumber, setCurrentPage) => {
     if (pageNumber === '...') return;
     setCurrentPage(pageNumber);
   };
 
-
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
+
   return (
     <div className="reports-container">
-      {/* <h1 className="page-title">Admin Reports</h1> */}
-
-      <section className="report-section">
-      <h2>Sales Report</h2>
-      <div className="table-wrapper">
-        <table className="styled-table">
-          <thead>
-            <tr>
-              <th>Product Name</th>
-              <th>Category</th>
-              <th>Total Sales (₹)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {salesReport.length > 0 ? (
-              salesReport.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.product_name}</td>
-                  <td>{item.category}</td>
-                  <td>{item.sales}</td>
-                </tr>
-              ))
-            ) : (
+      <section className="staff-main-content">
+      <div className="orders-header">
+        <h2 className="orders-page-title">Sales Report</h2>
+      </div>        <div className="table-wrapper">
+          <table className="styled-table">
+            <thead>
               <tr>
-                <td colSpan="3">No sales data available.</td>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Total Sales (₹)</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-      {/* Orders Report */}
-      <section className="report-section">
-        <h2>Orders Report</h2>
-        <div className="table-wrapper">
-  <table className="styled-table">
-    <thead>
-      <tr>
-        <th>Sl.No</th>
-        <th>Order ID</th>
-        <th>User Name</th> {/* Changed from User ID to User Name */}
-        <th>Total Amount (₹)</th>
-        <th>Order Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {currentOrders.map((order, index) => (
-        <tr key={index}>
-          <td>{indexOfFirstItem + index + 1}</td>
-          <td>#{order.unique_id}</td>
-          <td>{capitalizeFirstLetter(order.user_name)}</td> {/* Use user_name instead of user_id */}
-          <td>{order.total_amount}</td>
-          <td>{order.status}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
-
-        {/* Pagination Controls */}
+            </thead>
+            <tbody>
+              {currentSales.length > 0 ? (
+                currentSales.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.product_name}</td>
+                    <td>{item.category}</td>
+                    <td>{item.sales}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3">No sales data available.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        {/* Pagination Controls for Sales Report */}
         <div className="pagination-controls">
           <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPageSales - 1, setCurrentPageSales)}
+            disabled={currentPageSales === 1}
           >
-            &lt; 
+            &lt;
           </button>
-          {getPaginationPages().map((page, index) => (
-            <button
-              key={index}
-              onClick={() => handlePageChange(page)}
-              className={currentPage === page ? 'active' : ''}
-            >
-              {page}
-            </button>
-          ))}
+          {getPaginationPages(totalSalesPages, currentPageSales, setCurrentPageSales)}
           <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(currentPageSales + 1, setCurrentPageSales)}
+            disabled={currentPageSales === totalSalesPages}
           >
-             &gt;
+            &gt;
+          </button>
+        </div>
+      </section>
+
+      {/* Orders Report */}
+      <section className="staff-main-content">
+      <div className="orders-header">
+        <h2 className="orders-page-title">Order Report</h2>
+      </div>        
+        <div className="table-wrapper">
+          <table className="styled-table">
+            <thead>
+              <tr>
+                <th>Sl.No</th>
+                <th>Order ID</th>
+                <th>User Name</th>
+                <th>Total Amount (₹)</th>
+                <th>Order Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentOrders.map((order, index) => (
+                <tr key={index}>
+                  <td>{indexOfFirstOrderItem + index + 1}</td>
+                  <td>#{order.unique_id}</td>
+                  <td>{capitalizeFirstLetter(order.user_name)}</td>
+                  <td>{order.total_amount}</td>
+                  <td>{order.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {/* Pagination Controls for Orders Report */}
+        <div className="pagination-controls">
+          <button
+            onClick={() => handlePageChange(currentPageOrders - 1, setCurrentPageOrders)}
+            disabled={currentPageOrders === 1}
+          >
+            &lt;
+          </button>
+          {getPaginationPages(totalOrderPages, currentPageOrders, setCurrentPageOrders)}
+          <button
+            onClick={() => handlePageChange(currentPageOrders + 1, setCurrentPageOrders)}
+            disabled={currentPageOrders === totalOrderPages}
+          >
+            &gt;
           </button>
         </div>
       </section>
 
       {/* Customers Report */}
- <section className="report-section">
-  <h2>Customers Report</h2>
-  <div className="table-wrapper">
-    <table className="styled-table">
-      <thead>
-        <tr>
-          <th>User Name</th> {/* Changed from User ID to User Name */}
-          <th>Total Orders</th>
-          <th>Total Spent (₹)</th>
-        </tr>
-      </thead>
-      <tbody>
-        {customersReport.map((customer, index) => (
-          <tr key={index}>
-            <td>{capitalizeFirstLetter(customer.user_name)}</td> {/* Use user_name instead of user_id */}
-            <td>{customer.total_orders}</td>
-            <td>{customer.total_spent}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</section>
-
+      <section className="staff-main-content">
+      <div className="orders-header">
+        <h2 className="orders-page-title">Customer Report</h2>
+      </div>          <div className="table-wrapper">
+          <table className="styled-table">
+            <thead>
+              <tr>
+                <th>User Name</th>
+                <th>Total Orders</th>
+                <th>Total Spent (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentCustomers.map((customer, index) => (
+                <tr key={index}>
+                  <td>{capitalizeFirstLetter(customer.user_name)}</td>
+                  <td>{customer.total_orders}</td>
+                  <td>{customer.total_spent}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {/* Pagination Controls for Customers Report */}
+        <div className="pagination-controls">
+          <button
+            onClick={() => handlePageChange(currentPageCustomers - 1, setCurrentPageCustomers)}
+            disabled={currentPageCustomers === 1}
+          >
+            &lt;
+          </button>
+          {getPaginationPages(totalCustomerPages, currentPageCustomers, setCurrentPageCustomers)}
+          <button
+            onClick={() => handlePageChange(currentPageCustomers + 1, setCurrentPageCustomers)}
+            disabled={currentPageCustomers === totalCustomerPages}
+          >
+            &gt;
+          </button>
+        </div>
+      </section>
     </div>
   );
 };

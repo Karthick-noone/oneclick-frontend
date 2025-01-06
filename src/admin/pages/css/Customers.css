@@ -3,11 +3,11 @@
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
-    background-color: #f8f9fa;
+    /* background-color: #f8f9fa; */
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     margin-left: 250px;
-    margin-top: 100px;
+    margin-top: 70px;
   }
   
   /* Page title styling */
@@ -45,14 +45,18 @@
     overflow: hidden;
   }
   
+  .styled-table th, 
+  .styled-table td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+  }
+  
   /* Header row styles */
   .styled-table th {
-    background-color: #007bff;
-    color: white;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    padding: 12px 15px;
+      background-color: #f2f2f2;
+      font-weight: bold;
+      color: #333;
   }
   
   /* Table cell styling */
@@ -124,15 +128,16 @@
   }
 
   .user-details-modal {
-    content: "User Details";
     padding: 20px;
     background-color: #fff;
     border-radius: 8px;
     max-width: 500px;
     margin: auto;
     margin-top: 150px;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2); /* Adding shadow for depth */
-    transition: all 0.3s ease; /* Smooth transition for modal */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    max-height: 450px; /* Fixed height for modal */
+    overflow-y: auto; /* Enables vertical scrolling */
   }
   
   .view-button {

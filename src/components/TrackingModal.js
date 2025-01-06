@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Modal from "react-modal";
 import axios from "axios"; // Ensure you have axios installed
 import { ApiUrl } from "./ApiUrl";
@@ -9,47 +9,57 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [deliveryStatus, setDeliveryStatus] = useState("");
   const [deliveryDate, setDeliveryDate] = useState(""); // State for delivery date
+  const [loading, setLoading] = useState(false); // Loading state for spinner
 
   // Define the statuses
   const statuses = [
     "Order Confirmed",
     "Shipped",
-    "Out for Delivery",
+    "Out of Delivery",
     // 'Delivery expected on', // This status will be displayed with the delivery date
     "Delivered", // Keep this status for completeness
   ];
   console.log("OrderTrackingModal opened for Order ID:", order_id); // Log the order ID
 
-  useEffect(() => {
-    const fetchDeliveryStatus = async () => {
-      try {
-        const response = await axios.get(`${ApiUrl}/api/get-order-status`, {
-          params: { orderId: order_id },
-        });
+ // Memoized fetch function to ensure it is stable across renders
+ const fetchDeliveryStatus = useCallback(async () => {
+  setLoading(true);
+  try {
+    const response = await axios.get(`${ApiUrl}/api/get-order-status`, {
+      params: { orderId: order_id },
+    });
 
-        const { delivery_status, delivery_date } = response.data;
+    const { delivery_status, delivery_date, order_date } = response.data;
 
-        // Format delivery_date to "DD MMM YYYY"
-        const formattedDate = formatDeliveryDate(delivery_date);
+    // Format the delivery date to "YYYY-MM-DD"
+    const dateObj = new Date(delivery_date);
+    const formattedDate = `${dateObj.getFullYear()}-${String(
+      dateObj.getMonth() + 1
+    ).padStart(2, "0")}-${String(dateObj.getDate()).padStart(2, "0")}`;
 
-        setDeliveryStatus(delivery_status);
-        setSelectedStatus(delivery_status);
-        setDeliveryDate(formattedDate); // Set formatted date
-      } catch (error) {
-        console.error("Error fetching delivery status:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error Fetching Status",
-          text: "Could not fetch delivery status.",
-          confirmButtonText: "OK",
-        });
-      }
-    };
+    // setOrderDate(new Date(order_date).toISOString().split("T")[0]);
+    setDeliveryStatus(delivery_status);
+    setSelectedStatus(delivery_status);
+    setDeliveryDate(formattedDate);
+  } catch (error) {
+    console.error("Error fetching delivery status:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error Fetching Status",
+      text: "Could not fetch delivery status.",
+      confirmButtonText: "OK",
+    });
+  } finally {
+    setLoading(false); // Stop loading spinner after fetch completes
+  }
+}, [order_id, ApiUrl]);
 
-    if (isOpen) {
-      fetchDeliveryStatus();
-    }
-  }, [isOpen, order_id]);
+useEffect(() => {
+  // Fetch data only when the modal opens
+  if (isOpen) {
+    fetchDeliveryStatus();
+  }
+}, [isOpen, fetchDeliveryStatus]);
 
   const formatDeliveryDate = (dateString) => {
     const dateObj = new Date(dateString);
@@ -81,7 +91,7 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
           borderRadius: "10px",
           backgroundColor: "#fff",
           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-          width: "400px",
+          width: "350px",
         },
         overlay: {
           backgroundColor: "rgba(0, 0, 0, 0.1)",
@@ -89,6 +99,16 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
         },
       }}
     >
+
+{loading ? (
+        <div className="spinner-container" style={{height:'225px'}}>
+          <div className="spinner">
+            {/* Spinner content here */}
+          </div>
+        </div>
+      ) : (
+
+        <>
       <button
         onClick={handleModalClose}
         className="modal-close-button10 close-button"
@@ -135,6 +155,16 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
                 deliveryStatus !== "Delivered" && (
                   <span style={{ fontWeight: "bold", marginLeft: "5px" }}>
                     {deliveryDate}
+                    {(() => {
+                  const dateObj = new Date(deliveryDate);
+                  const day = String(dateObj.getDate()).padStart(2, "0"); // Ensure day has leading zero
+                  const month = dateObj.toLocaleString("default", {
+                    month: "short",
+                  }); // Get month as short name
+                  const year = dateObj.getFullYear(); // Get year
+
+                  return `${day} ${month} ${year}`; // Return formatted date
+                })()}
                   </span>
                 )}
               {/* Show delivery date next to "Delivered" */}
@@ -168,6 +198,8 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
           )}
         </div>
       </div>
+      </>
+         )}
     </Modal>
   );
 };

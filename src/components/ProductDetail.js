@@ -12,7 +12,9 @@ import Sidebar from "./Sidebar";
 import { FaHeart } from "react-icons/fa"; // Import the heart icon from react-icons
 import Footer from "./footer";
 import { useNavigate } from "react-router-dom"; // Import useNavigate at the top
-// import Slider from "react-slick"; // Import the slider component
+import Slider from "react-slick"; // Import the slider component
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 import { useCart } from "../components/CartContext";
 import leftarrow from "./img/left.png";
@@ -20,8 +22,10 @@ import rightarrow from "./img/right.png";
 import pricetag from "./img/check-mark.png";
 import tag from "./img/percent.png";
 import offertag from "./img/sale.png";
+import couponimg from "./img/couponcode.png";
+import FullAdPage from "./FullAdPage";
 
-const ProductDetail = () => {
+const ProductDetail = ({ accessoryCategory }) => {
   const navigate = useNavigate(); // Initialize useNavigate
 
   const { addToWishlist, removeFromWishlist } = useCart();
@@ -35,6 +39,103 @@ const ProductDetail = () => {
   const [currentStartIndex, setCurrentStartIndex] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showCarousel, setShowCarousel] = useState(false);
+  const [relatedAccessories, setRelatedAccessories] = useState([]);
+  const [selectedAccessories, setSelectedAccessories] = useState([]);
+  const [addToCartTriggered, setAddToCartTriggered] = useState(false); // Track if add to cart was triggered
+  const [products, setProducts] = useState([]);
+  const [coupons, setCoupons] = useState({}); // State to hold coupon codes for products
+
+  // State for storing related items
+  const [relatedItems, setRelatedItems] = useState([]);
+  // State for tracking the current index for carousel
+  const [currentStartIndex2, setStartIndex] = useState(0);
+
+
+  const [remainingTime, setRemainingTime] = useState(null);
+  const [isOfferActive, setIsOfferActive] = useState(true);
+
+  useEffect(() => {
+    if (product && product.offer_end_time) {
+      const now = new Date();
+      const offerEndTime = new Date(product.offer_end_time);
+  
+      // Set offer active based on whether the offer end time is in the future
+      setIsOfferActive(offerEndTime > now);
+    }
+  }, [product]);
+  useEffect(() => {
+    const getSimilarProducts = async () => {
+      try {
+        const apiResponse = await axios.get(
+          `${ApiUrl}/products2/related/${product.category}`
+        );
+        setRelatedItems(apiResponse.data);
+      } catch (err) {
+        console.error("Error retrieving related items:", err);
+      }
+    };
+
+    if (product) {
+      getSimilarProducts();
+    }
+  }, [product]);
+
+  const maxDisplayItems = 5;
+
+  // Filter products to remove the current product from related items
+  const productsExcludingCurrent = relatedItems.filter(
+    (item) => item.id !== product.id
+  );
+
+  // Handle next slide in carousel
+  const handleNextSlide = () => {
+    if (
+      currentStartIndex2 + 1 <
+      productsExcludingCurrent.length - maxDisplayItems + 1
+    ) {
+      setStartIndex((prev) => prev + 1);
+    }
+  };
+
+  // Handle previous slide in carousel
+  const handlePreviousSlide = () => {
+    if (currentStartIndex2 > 0) {
+      setStartIndex((prev) => prev - 1);
+    }
+  };
+
+  // Sort related products based on keyword matches from the current product name
+  const prioritizedRelatedItems = productsExcludingCurrent
+    .slice()
+    .sort((itemA, itemB) => {
+      const productName = product.prod_name.trim().toLowerCase();
+      const itemAName = itemA.prod_name.trim().toLowerCase();
+      const itemBName = itemB.prod_name.trim().toLowerCase();
+
+      // Get keywords from the product name
+      const keywords = productName.split(" ");
+      const itemAHasKeyword = keywords.some((keyword) =>
+        itemAName.includes(keyword)
+      );
+      const itemBHasKeyword = keywords.some((keyword) =>
+        itemBName.includes(keyword)
+      );
+
+      // Prioritize items based on keyword match
+      if (itemAHasKeyword && !itemBHasKeyword) return -1;
+      if (!itemAHasKeyword && itemBHasKeyword) return 1;
+      return 0;
+    });
+
+  const handleCheckboxChange = (event, accessoryId) => {
+    if (event.target.checked) {
+      // Add the accessory ID to the selected accessories array
+      setSelectedAccessories((prev) => [...prev, accessoryId]);
+    } else {
+      // Remove the accessory ID from the selected accessories array
+      setSelectedAccessories((prev) => prev.filter((id) => id !== accessoryId));
+    }
+  };
 
   const handleNext2 = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -45,7 +146,8 @@ const ProductDetail = () => {
       (prevIndex) => (prevIndex - 1 + images.length) % images.length
     );
   };
-  const itemsToShow = 4;
+
+  const itemsToShow = 5;
 
   const filteredProducts = relatedProducts.filter(
     (relatedProduct) => relatedProduct.id !== product.id
@@ -62,24 +164,17 @@ const ProductDetail = () => {
       setCurrentStartIndex((prevIndex) => prevIndex - 1);
     }
   };
+
   // Sort related products to prioritize matching product name (exact and partial)
   const sortedFilteredProducts = filteredProducts.slice().sort((a, b) => {
     const currentProductName = product.prod_name.trim().toLowerCase(); // Trim and lower case the main product name
     const nameA = a.prod_name.trim().toLowerCase(); // Trim and lower case for comparison
     const nameB = b.prod_name.trim().toLowerCase(); // Trim and lower case for comparison
 
-    // Log the current product name and the names of the related products
-    // console.log("Current Product Name:", currentProductName);
-    // console.log("Comparing with Related Product A:", nameA);
-    // console.log("Comparing with Related Product B:", nameB);
-
     // Extract relevant keywords from the current product name
     const keywords = currentProductName.split(" "); // Split into keywords
     const isAKeywordMatch = keywords.some((keyword) => nameA.includes(keyword)); // Check for any keyword match in product A
     const isBKeywordMatch = keywords.some((keyword) => nameB.includes(keyword)); // Check for any keyword match in product B
-
-    // Log whether each product matches the current product
-    // console.log(`Is A a Match? ${isAKeywordMatch} | Is B a Match? ${isBKeywordMatch}`);
 
     // If A matches and B does not, A comes first
     if (isAKeywordMatch && !isBKeywordMatch) return -1;
@@ -119,12 +214,41 @@ const ProductDetail = () => {
     const fetchProductDetails = async () => {
       try {
         const response = await axios.get(`${ApiUrl}/products/${id}`);
-        setProduct(response.data);
+        const productData = response.data;
+        setProduct(productData);
+
         // Set the initial selected image
-        const images = Array.isArray(response.data.prod_img)
-          ? response.data.prod_img
-          : JSON.parse(response.data.prod_img || "[]");
+        const images = Array.isArray(productData.prod_img)
+          ? productData.prod_img
+          : JSON.parse(productData.prod_img || "[]");
         setSelectedImage(images[0]); // Set the first image as the default selected image
+
+        // Fetch coupon using product ID after the product is set
+        const couponResponse = await axios.get(
+          `${ApiUrl}/coupons/${productData.prod_id}`
+        );
+        console.log(
+          `Coupon Response for product ${productData.prod_id}:`,
+          couponResponse.data
+        );
+
+        if (couponResponse.data.coupons.length > 0) {
+          console.log(
+            `Coupons found for product ${productData.prod_id}:`,
+            couponResponse.data.coupons
+          );
+
+          // Set the first coupon code for the product
+          setCoupons((prev) => ({
+            ...prev,
+            [productData.prod_id]: couponResponse.data.coupons[0].coupon_code,
+          }));
+          console.log(
+            `Set coupon code for product ${productData.prod_id}: ${couponResponse.data.coupons[0].coupon_code}`
+          );
+        } else {
+          console.log(`No coupons found for product ${productData.prod_id}.`);
+        }
       } catch (error) {
         console.error("Error fetching product details:", error);
         toast.error("Error fetching product details.");
@@ -150,7 +274,8 @@ const ProductDetail = () => {
     }
   }, [product]); // Dependency on product
 
-  const handleAddToCart = async (product, event) => {
+  const handleAddToCart2 = async (selectedAccessories, event) => {
+    if (!event) return; // Prevent further execution if event is undefined
     event.stopPropagation();
 
     const email = localStorage.getItem("email");
@@ -180,6 +305,139 @@ const ProductDetail = () => {
         const cartKey = `${email}-cart`;
         const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
 
+        // Add selected accessories to the cart
+        selectedAccessories.forEach((accessoryId) => {
+          const accessory = relatedAccessories.find(
+            (acc) => acc.id === accessoryId
+          );
+          if (accessory) {
+            const existingAccessory = cartItems.find(
+              (item) => item.id === accessory.id
+            );
+            if (existingAccessory) {
+              existingAccessory.quantity += 1; // Increase quantity if it already exists
+              toast.info(
+                `Increased quantity of ${accessory.prod_name} in your cart!`,
+                {
+                  position: "top-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+            } else {
+              cartItems.push({
+                id: accessory.id,
+                name: accessory.prod_name,
+                price: accessory.effectiveprice,
+                actual_price: accessory.prod_price,
+                image: accessory.prod_img,
+                description: accessory.prod_features,
+                category: accessory.category,
+                deliverycharge: product.deliverycharge,
+                product_id: accessory.prod_id,
+                quantity: 1,
+              });
+              toast.success(
+                `${accessory.prod_name} has been added to your cart!`,
+                {
+                  position: "top-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+            }
+          }
+        });
+
+        // Save the updated cart in localStorage
+        localStorage.setItem(cartKey, JSON.stringify(cartItems));
+      } else {
+        toast.error("User not found!", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } catch (error) {
+      console.error("Error verifying user or updating cart:", error);
+      toast.error("An error occurred while adding to cart.", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  };
+
+  const handleAddToCartWithAccessories = async (selectedAccessories, event) => {
+    // Check if at least one accessory is selected
+    if (selectedAccessories.length === 0) {
+      toast.warn("Please select at least one accessory!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return; // Exit the function if no accessory is selected
+    }
+    // Call the main product add to cart function
+    await handleAddToCart(product, event); // Make sure this function is asynchronous
+
+    // Call the function to add selected accessories to the cart
+    await handleAddToCart2(selectedAccessories, event);
+  };
+
+  const handleAddToCart = async (product, event) => {
+    if (!event) return; // Prevent further execution if event is undefined
+    event.stopPropagation();
+
+    const email = localStorage.getItem("email");
+    const username = localStorage.getItem("username");
+
+    if (!email || !username) {
+      toast.error("User is not logged in!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${ApiUrl}/verify-user`, {
+        email,
+        username,
+      });
+
+      if (response.data.exists) {
+        const cartKey = `${email}-cart`;
+        const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
+        const currentPrice = isOfferActive && product.offer_price > 0
+        ? product.offer_price  // Use offer_price if offer is active
+        : product.prod_price;
         // Find existing item by id and category
         const existingItem = cartItems.find(
           (item) => item.id === product.id && item.category === product.category
@@ -205,11 +463,12 @@ const ProductDetail = () => {
           cartItems.push({
             id: product.id,
             name: product.prod_name,
-            price: product.prod_price,
+            price: currentPrice, // Use offer_price if it's valid, otherwise prod_price
             actual_price: product.actual_price,
             image: product.prod_img,
             description: product.prod_features,
             category: product.category,
+            deliverycharge: product.deliverycharge,
             product_id: product.prod_id,
             quantity: 1,
           });
@@ -398,6 +657,194 @@ const ProductDetail = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(`${ApiUrl}/productdetailsofferspage`);
+        console.log("Fetched products:", response.data);
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // useEffect(() => {
+  //   const fetchRelatedAccessories = async () => {
+  //     if (product && product.category) {
+  //       console.log(
+  //         "Fetching related accessories for category:",
+  //         product.category
+  //       );
+  //       const categoryMap = {
+  //         Mobiles: "mobileaccessories",
+  //         Computers: "computeraccessories",
+  //         CCTV: "cctvaccessories",
+  //         Printers: "printeraccessories",
+  //       };
+  //       const accessoryCategory = categoryMap[product.category];
+
+  //       if (accessoryCategory) {
+  //         try {
+  //           const url = `${ApiUrl}/products/accessories/${accessoryCategory}`;
+  //           const response = await axios.get(url);
+  //           console.log(
+  //             "Fetched related accessories successfully:",
+  //             response.data
+  //           );
+
+  //           // Filter accessories based on product name
+  //           const filteredAccessories = response.data.filter(
+  //             (accessory) =>
+  //               accessory.prod_name
+  //                 .toLowerCase()
+  //                 .includes(product.prod_name.toLowerCase()) ||
+  //               product.prod_name
+  //                 .toLowerCase()
+  //                 .includes(accessory.prod_name.toLowerCase())
+  //           );
+
+  //           setRelatedAccessories(filteredAccessories);
+  //           console.log("Filtered related accessories:", filteredAccessories);
+  //         } catch (error) {
+  //           console.error(
+  //             "Error fetching related accessories:",
+  //             error.response ? error.response.data : error.message
+  //           );
+  //         }
+  //       } else {
+  //         console.warn(
+  //           "No matching accessory category found for:",
+  //           product.category
+  //         );
+  //       }
+  //     } else {
+  //       console.warn("Product or product category is undefined");
+  //     }
+  //   };
+
+  //   fetchRelatedAccessories();
+  // }, [product]);
+
+
+  useEffect(() => {
+    const fetchRelatedAccessories = async () => {
+      if (product && product.id) {
+        console.log("Fetching related accessories for product ID:", product.id);
+  
+        try {
+          const url = `${ApiUrl}/products/accessories/${product.id}`;
+          const response = await axios.get(url);
+          console.log("Fetched related accessories successfully:", response.data);
+  
+          const accessoryIds = response.data.additional_accessories
+            ? response.data.additional_accessories.split(",")
+            : [];
+  
+          if (accessoryIds.length > 0) {
+            // Create an array of promises to fetch the details of each accessory
+            const accessoryDetailsPromises = accessoryIds.map((id) =>
+              axios
+                .get(`${ApiUrl}/products/accessory-details/${id}`)
+                .catch((err) => {
+                  // Handle individual errors
+                  console.error(`Error fetching accessory details for ID: ${id}`, err.response ? err.response.data : err.message);
+                  return null; // return null for failed request
+                })
+            );
+  
+            // Wait for all requests to complete
+            const accessoryDetailsResponses = await Promise.all(accessoryDetailsPromises);
+  
+            // Filter out null values (failed requests)
+            const validAccessories = accessoryDetailsResponses.filter((res) => res !== null);
+  
+            // Map the valid responses to the required structure
+            const accessories = validAccessories.map((res) => {
+              const accessory = res.data;
+            
+              let productImages = [];
+              if (Array.isArray(accessory.prod_img)) {
+                productImages = accessory.prod_img; // Handle as an array if it's valid
+              } else if (typeof accessory.prod_img === "string") {
+                productImages = [accessory.prod_img]; // Treat it as a single image (array format)
+              }
+            
+              // Ensure that prod_name exists before calling any methods
+              const productName = accessory.prod_name ? accessory.prod_name.toLowerCase() : "No Name";
+            
+              return {
+                id: accessory.id,
+                prod_name: productName,
+                prod_price: accessory.prod_price,
+                effectiveprice: accessory.effectiveprice,
+                category:accessory.category,
+                prod_img: productImages.length > 0 ? productImages[0] : null, // Get the first image
+              };
+            });
+            
+  
+            setRelatedAccessories(accessories);
+            console.log("Fetched accessory details:", accessories);
+          } else {
+            console.warn("No related accessories found for product ID:", product.id);
+            setRelatedAccessories([]);
+          }
+        } catch (error) {
+          console.error("Error fetching related accessories:", error.response ? error.response.data : error.message);
+        }
+      } else {
+        console.warn("Product or product ID is undefined");
+      }
+    };
+  
+    fetchRelatedAccessories();
+  }, [product]);
+  
+
+  useEffect(() => {
+    const calculateRemainingTime = () => {
+      if (!product || !product.offer_end_time) {
+        // If product or offer_end_time is invalid, stop processing
+        setIsOfferActive(false);
+        setRemainingTime(null);
+        return;
+      }
+
+      const now = new Date();
+      const endTime = new Date(product.offer_end_time);
+
+      if (endTime <= now) {
+        // Offer expired
+        setIsOfferActive(false);
+        setRemainingTime(null);
+      } else {
+        const diff = endTime - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        if (days > 0) {
+          setRemainingTime({ days });
+        } else {
+          setRemainingTime({ hours, minutes, seconds });
+        }
+      }
+    };
+
+    // Update the timer every second
+    const timer = setInterval(calculateRemainingTime, 1000);
+
+    return () => clearInterval(timer); // Cleanup on component unmount
+  }, [product]);
+  
+  // if (isLoading) {
+  //   return <div>Loadingvbcvbcv...</div>;
+  // }
+
   if (isLoading) {
     return (
       <div className="spinner-container">
@@ -410,30 +857,6 @@ const ProductDetail = () => {
     ); // You can replace this with a loading spinner or skeleton screen
   }
 
-  // const settings = {
-  //   dots: true,
-  //   infinite: true,
-  //   speed: 500,
-  //   slidesToShow: 3, // Number of slides to show at once
-  //   slidesToScroll: 1,
-  //   responsive: [
-  //     {
-  //       breakpoint: 1024, // For medium screens
-  //       settings: {
-  //         slidesToShow: 2, // Number of slides to show at once
-  //         slidesToScroll: 1,
-  //       },
-  //     },
-  //     {
-  //       breakpoint: 600, // For small screens
-  //       settings: {
-  //         slidesToShow: 1, // Number of slides to show at once
-  //         slidesToScroll: 1,
-  //       },
-  //     },
-  //   ],
-  // };
-
   if (!product) {
     return <div>Product not found.</div>;
   }
@@ -444,8 +867,9 @@ const ProductDetail = () => {
 
   // const firstImage = images.length > 0 ? images[0] : null; // Get the first image or null if not available
 
-  const couponCode = product.coupon; // e.g., "OFF2499"
+  const couponCode = coupons[product?.prod_id]; // Use coupons object instead of product
 
+  console.log("couponCode", couponCode);
   // Ensure couponCode is a valid string and contains digits
   let couponNumber = null; // Default to null in case there's no number
 
@@ -457,26 +881,153 @@ const ProductDetail = () => {
   }
 
   // Now you can safely use couponNumber
-  console.log(couponNumber); // Will log the coupon number or null if not found
+  console.log("couponNumber", couponNumber); // Will log the coupon number or null if not found
+  const gradientBackgrounds = [
+    "linear-gradient(to bottom, #dcff8a, #f6f7d7)",
+    "linear-gradient(to bottom, #dcff8a, #f6f7d7)",
+  ]; // Two gradient backgrounds
 
+  const filteredBanners = products.filter(
+    (product) => product.image && product.image.startsWith("product_banner")
+  );
+
+  // Click handler function
+  const handleAdClick = (product) => {
+    const url = `/${
+      product.category
+    }?search=${product.brand_name.toLowerCase()}`;
+    navigate(url); // Navigate to the constructed URL
+  };
+
+  const settings = {
+    dots: false,
+    infinite: images.length > 1,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: images.length > 1 ? 1 : 0,
+    arrows: images.length > 1,
+    autoplay: false,
+    draggable: images.length > 1,
+    swipe: images.length > 1,
+    prevArrow: (
+      <div className="arrow-container left-arrow">
+        <img
+          src={leftarrow}
+          style={{
+            width: "30px",
+            borderRadius: "50%",
+            backgroundColor: "white",
+            padding: "5px",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
+          }}
+          alt="Previous"
+        />
+      </div>
+    ),
+    nextArrow: (
+      <div className="arrow-container right-arrow">
+        <img
+          src={rightarrow}
+          style={{
+            width: "30px",
+            borderRadius: "50%",
+            backgroundColor: "white",
+            padding: "5px",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
+          }}
+          alt="Next"
+        />
+      </div>
+    ),
+  };
+
+  const settings2 = {
+    dots: false,
+    infinite: sortedFilteredProducts.length > 5, // Enable infinite loop only if more than 5 products
+    speed: 500,
+    slidesToShow: 5, // Number of items to show at once
+    slidesToScroll: 1,
+    arrows: true, // Enable arrows
+    prevArrow: (
+      <button className="custom-arrow left-arrow">
+        <img src={leftarrow} alt="Previous" style={{ width: "30px" }} />
+      </button>
+    ),
+    nextArrow: (
+      <button className="custom-arrow right-arrow">
+        <img src={rightarrow} alt="Next" style={{ width: "30px" }} />
+      </button>
+    ),
+    responsive: [
+      {
+        breakpoint: 1024, // Tablet
+        settings2: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 768, // Mobile
+        settings2: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 480, // Smaller devices
+        settings2: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+
+
+  
+  
   return (
     <>
       <Header2 />
       <div className="main-container">
-        <Sidebar />
+        {/* <Sidebar /> */}
+
         <div className="product-detail-container">
-          {/* Main Image and Product Details in the same row */}
-          <div className="product-main-row">
-            <div className="product-detail-image-container">
+          <div className="another-container">
+            <div className="product-style">
+              <div
+                className="responsive-navigation"
+                style={{ marginTop: "5px", marginLeft: "5px" }}
+              >
+                <a style={{ textDecoration: "none", color: "grey" }} href="/">
+                  Home{" "}
+                </a>{" "}
+                <span style={{ color: "grey" }}>&gt;</span>
+                <a
+                  style={{ textDecoration: "none", color: "grey" }}
+                  href={`/${
+                    product.category === "TV" ? "TeleVision" : product.category
+                  }`} // Conditional URL
+                  // Dynamically set the category in the URL
+                >
+                  {" "}
+                  {product.category}{" "}
+                </a>
+              </div>
+
+              {/* Main Image and Product Details in the same row */}
+
+              {/* <div className="product-detail-image-container">
+             
+              <div className="carousel-container">
               {product.offer_label && (
                 <div className="product-label2">{product.offer_label}</div>
               )}
-              <div className="carousel-container">
                 {images.length > 1 && (
                   <img
                     src={leftarrow}
                     onClick={handlePrev2}
-                    className="carousel-arrow left-arrow"
+                    className="carousel2-arrow left-arrow"
                     width={"37px"}
                     alt=""
                   />
@@ -492,7 +1043,7 @@ const ProductDetail = () => {
                       images[currentIndex]
                     }`}
                     alt={product.prod_name}
-                    className="product-detail-carousel-image"
+                    className="product-detail-image"
                   />
                 ) : (
                   <div>No image available</div> // Fallback message if no image is available
@@ -505,235 +1056,702 @@ const ProductDetail = () => {
                   <img
                     src={rightarrow}
                     onClick={handleNext2}
-                    style={{ marginTop: "-10px" }}
-                    className="carousel-arrow right-arrow"
+                    // style={{ marginTop: "-10px" }}
+                    className="carousel2-arrow right-arrow"
                     width={"37px"}
                     alt=""
                   />
                 )}
               </div>
+              
+            </div> */}
+              <div className="product-detail-image-container">
+                <div className="carousel-container">
+                  {product.offer_label && (
+                    <div className="product-label2">{product.offer_label}</div>
+                  )}
+
+                  {/* Slider component for images */}
+                  <Slider {...settings}>
+                    {images.length > 0 ? (
+                      images.map((image, index) => (
+                        <div key={index}>
+                          <img
+                            src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${image}`}
+                            alt={product.prod_name}
+                            className="product-detail-image"
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div>No image available</div> // Fallback message if no image is available
+                    )}
+                  </Slider>
+                </div>
+              </div>
+
+              <div className="side-row">
+                <div className="product-main-row">
+                  {/* Product details */}
+                  <div className="product-detail-info">
+                    <div
+                      className="non-responsive-navigation"
+                      style={{ marginBottom: "15px" }}
+                    >
+                      <a
+                        style={{ textDecoration: "none", color: "grey" }}
+                        href="/"
+                      >
+                        {" "}
+                        Home{" "}
+                      </a>{" "}
+                      <span style={{ color: "grey" }}>&gt;</span>
+                      <a
+                        style={{ textDecoration: "none", color: "grey" }}
+                        href={`/${
+                          product.category === "TV"
+                            ? "TeleVision"
+                            : product.category
+                        }`} // Conditional URL
+                      >
+                        {" "}
+                        {product.category}{" "}
+                      </a>
+                    </div>
+
+                    <h2 className="product-detail-title">
+                      {product.prod_name.charAt(0).toUpperCase()+ product.prod_name.slice(1)}
+                    </h2>
+                    {/* {product.offer_price} */}
+
+                    {couponCode && couponCode.trim() ? (
+                    // {couponNumber > 0 ? (
+                      <p
+                        className="coupon-discount-label"
+                        style={{
+                          marginTop: "10px",
+                          marginBottom: "10px",
+                          fontSize: "12px",
+                        }}
+                      >
+                        Apply coupon code and get an amazing discount!
+                      </p>
+                    ) : (
+                      <p></p>
+                    )}
+                    {/* <span style={{color:'grey'}}>({product.subtitle})</span> */}
+                    <p>
+
+    <div>
+      <span>
+        <span className="product-detail-price">
+          ₹{isOfferActive && product.offer_price ? product.offer_price : product.prod_price}{" "}
+        </span>{" "}
+        M.R.P
+        <span
+          className="product-detail-actual-price"
+          style={{ textDecoration: "line-through" }}
+        >
+          ₹{product.actual_price}{" "}
+        </span>
+      </span>
+      <span className="offer-text" style={{ marginLeft: "12px" }}>
+        <span className="save-tag" style={{ marginLeft: "5px" }}>
+          <span>
+            {Math.round(
+              ((product.actual_price -
+                (isOfferActive && product.offer_price
+                  ? product.offer_price
+                  : product.prod_price)) /
+                product.actual_price) *
+                100
+            )}
+            % OFF
+          </span>
+        </span>
+      </span>
+
+      <p className="offerr-tag">
+        Save upto ₹
+        {product.actual_price -
+          (isOfferActive && product.offer_price
+            ? product.offer_price
+            : product.prod_price)}
+      </p>
+
+      {/* Timer display */}
+      {isOfferActive  && product.offer_price && remainingTime && (
+    <div className="offer-timer">
+      {remainingTime.days ? (
+        <p style={{ color: "red" }}>
+          {remainingTime.days} day(s) left for this offer
+        </p>
+      ) : (
+        <p>
+         Deals end in <span className="timer-tag"> {remainingTime.hours}h : {remainingTime.minutes}m : {remainingTime.seconds}s  </span> {/* Hurry up! */}
+        </p>
+      )}
+    </div>
+  )}
+    </div>
+</p>
+
+
+                    {/* </p> */}
+                    <div className="coupon-box">
+  <div className="price-table">
+    <div className="price-row">
+      {/* Actual Price */}
+      <div
+        className="price-cell"
+        style={{ backgroundColor: "white" }}
+      >
+        <span className="price-label">Actual Price</span>
+        <span className="actual-priceee">
+          M.R.P. ₹
+          {coupons[product?.prod_id]
+            ? product?.offer_price || product?.prod_price
+            : product?.actual_price}
+        </span>
+      </div>
+
+      {/* Discount */}
+      <div
+        className="price-cell"
+        style={{ backgroundColor: "white" }}
+      >
+        <span className="price-label">Discount</span>
+        <span className="discounted-priceee">
+          {coupons[product?.prod_id]
+            ? // If a coupon exists, calculate and round discount percentage
+              `${Math.round(
+                ((product?.actual_price - couponNumber) / product?.actual_price) *
+                  100
+              )}%`
+            : // If no coupon, calculate and round discount percentage
+              `${Math.round(
+                ((product?.actual_price -
+                  (product?.offer_price || product?.prod_price)) /
+                  product?.actual_price) *
+                  100
+              )}%`}
+        </span>
+      </div>
+
+      {/* Effective Price */}
+      <div className="price-cell">
+        <span className="price-label">Effective Price</span>
+        <span className="total-priceee">
+          ₹
+          {coupons[product?.prod_id]
+            ? (product?.offer_price || product?.prod_price) - couponNumber
+            : product?.offer_price || product?.prod_price}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+                    {product.status === "unavailable" ? (
+                      <p className="product-detail-out-of-stock">
+                        Out of Stock
+                      </p>
+                    ) : (
+                      <div className="add-to-cart-container">
+                        <button
+                          title="Add to cart"
+                          onClick={(event) => handleAddToCart(product, event)}
+                          className="product-detail-add-to-cart"
+                        >
+                          ADD TO CART <span style={{marginLeft:'10px'}}>&gt;</span> 
+                        </button>
+                        <FaHeart
+                          title="Add to wishlist"
+                          className={`heart-icon ${isFavorite ? "filled" : ""}`}
+                          onClick={(event) => toggleFavorite(product, event)}
+                        />
+                        <span
+                          style={{
+                            color: "green",
+                            marginTop: "5px",
+                            fontWeight: "bold",
+                            fontSize: "18px",
+                          }}
+                        >
+                          In Stock
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {relatedAccessories.length > 0 && (
+                    <div className="product-detail-infooo">
+                      <div className="product-detail-infoo">
+                        <div className="related-accessories">
+                          <h4>Get An Extra Discount</h4>
+                          {relatedAccessories.map((accessory) => {
+                            const images = Array.isArray(accessory.prod_img)
+                              ? accessory.prod_img
+                              : JSON.parse(accessory.prod_img || "[]");
+
+                            const firstImage =
+                              images.length > 0
+                                ? images[0]
+                                : "fallback_image.jpg"; // Fallback image
+
+                            return (
+                              <div
+                                key={accessory.id}
+                                className="accessory-item"
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  marginTop: "15px",
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={`accessory-${accessory.id}`}
+                                  onChange={(event) =>
+                                    handleCheckboxChange(event, accessory.id)
+                                  }
+                                  style={{ marginRight: "10px" }}
+                                />
+                                {/* <span>{accessory.prod_name}</span> */}
+                                <img
+                                  src={`${ApiUrl}/uploads/${accessory.category.toLowerCase()}/${firstImage}`}
+                                  alt={accessory.prod_name}
+                                  className="accessory-image"
+                                  style={{
+                                    width: "60px",
+                                    height: "60px",
+                                    marginLeft: "10px",
+                                  }}
+                                />
+                                <div style={{ flex: 1 }}>
+                                  <h5
+                                    style={{
+                                      marginLeft: "10px",
+                                      marginBottom: "2px",
+                                      marginTop: "0",
+                                    }}
+                                  >
+                                    {accessory.prod_name.charAt(0).toUpperCase() + accessory.prod_name.slice(1)}
+                                  </h5>
+                                  <p
+                                    style={{
+                                      marginLeft: "10px",
+                                      margin: 0,
+                                      fontSize: "14px",
+                                    }}
+                                  >
+                                    Buy Together for
+                                  </p>
+                                </div>
+                                <div style={{ flex: 1, textAlign: "right" }}>
+                                  <p
+                                    style={{
+                                      textDecoration: "line-through",
+                                      color: "gray",
+                                      margin: 0,
+                                    }}
+                                  >
+                                    ₹{accessory.prod_price}
+                                  </p>
+                                  <p style={{ marginLeft: "10px", margin: 0 }}>
+                                    ₹{accessory.effectiveprice}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <button
+                          title="Add to cart"
+                          onClick={(event) =>
+                            handleAddToCartWithAccessories(
+                              selectedAccessories,
+                              event
+                            )
+                          } // Pass selected accessories
+                          style={{ alignSelf: "left", width: "20%" }}
+                          className="product-detail-add-to-cart2"
+                        >
+                          ADD
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="product-features-row">
+                  {/* <span>{product.category}</span> */}
+                  <h3 className="product-features-title">
+                    {product.category === "Mobiles" ||
+                    product.category === "Computers"
+                      ? "Key Specifications"
+                      : product.category === "CCTV" ||
+                        product.category === "Watch" ||
+                        product.category === "TV" ||
+                        product.category === "Headphones" ||
+                        product.category === "Speaker"
+                      ? "Features"
+                      : "Description"}
+                  </h3>
+
+                  {product.category === "Mobiles" ||
+                  product.category === "Computers" ? (
+                    // Mobiles and Computers Specifications
+                    <ul style={{ listStyleType: "none", padding: 0 }}>
+                      {product.storage && (
+                        <li style={listItemStyle}>
+                          <span style={labelStyle}>Storage</span>
+                          <span style={valueStyle}>{product.storage}</span>
+                        </li>
+                      )}
+                      {product.camera && (
+                        <li style={listItemStyle}>
+                          <span style={labelStyle}>Camera</span>
+                          <span style={valueStyle}>{product.camera}</span>
+                        </li>
+                      )}
+                      {product.memory && (
+                        <li style={listItemStyle}>
+                          <span style={labelStyle}>Memory</span>
+                          <span style={valueStyle}>{product.memory}</span>
+                        </li>
+                      )}
+                      {product.processor && (
+                        <li style={listItemStyle}>
+                          <span style={labelStyle}>Processor</span>
+                          <span style={valueStyle}>{product.processor}</span>
+                        </li>
+                      )}
+                      {product.display && (
+                        <li style={listItemStyle}>
+                          <span style={labelStyle}>Display</span>
+                          <span style={valueStyle}>{product.display}</span>
+                        </li>
+                      )}
+                      {product.os && (
+                        <li style={listItemStyle}>
+                          <span style={labelStyle}>OS</span>
+                          <span style={valueStyle}>{product.os}</span>
+                        </li>
+                      )}
+                      {product.network && (
+                        <li style={listItemStyle}>
+                          <span style={labelStyle}>Network</span>
+                          <span style={valueStyle}>{product.network}</span>
+                        </li>
+                      )}
+                      {product.battery && (
+                        <li style={listItemStyle}>
+                          <span style={labelStyle}>Battery</span>
+                          <span style={valueStyle}>{product.battery}</span>
+                        </li>
+                      )}
+                      {product.others && (
+                        <li style={listItemStyle}>
+                          <span style={labelStyle}>Others</span>
+                          <span style={valueStyle}>{product.others}</span>
+                        </li>
+                      )}
+                    </ul>
+                  ) : product.category === "CCTV" ||
+                    product.category === "Watch" ||
+                    product.category === "TV" ||
+                    product.category === "Headphones" ||
+                    product.category === "Speaker" ? (
+                    // Product Features for CCTV, Watch, TV, Headphones, and Speaker
+                    <p style={descriptionStyle}>{product.prod_features}</p>
+                  ) : (
+                    // For other categories
+                    <p style={descriptionStyle}>{product.prod_features}</p>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* Product details */}
-            <div className="product-detail-info">
-              <h2 className="product-detail-title">{product.prod_name}</h2>
-              <p>
-                <span>
-                  <span className="product-detail-price">
-                    ₹{product.prod_price}{" "}
-                  </span>{" "}
-                  <span
-                    className="product-detail-actual-price"
-                    style={{ textDecoration: "line-through" }}
-                  >
-                    ₹{product.actual_price}{" "}
-                  </span>
-                </span>
-                <span className="offer-text" style={{ marginLeft: "12px" }}>
-                  <span className="save-tag" style={{ marginLeft: "5px" }}>
-                    {/*   <img src={offertag} width={'20px'}  alt="" />  */}
-                    <span>
-                      {Math.round(
-                        ((product.actual_price - product.prod_price) /
-                          product.actual_price) *
-                          100
-                      )}
-                      % OFF
-                    </span>
-                  </span>
-                </span>
-                {/* <span className="offerr-tag">Save upto</span>
-  <span className="discount-amount">₹{product.actual_price - product.prod_price}</span> */}
-              </p>
+            {/* ad  */}
 
-              {/* </p> */}
-              <p className="product-detail-price"></p>
-              {product.status === "unavailable" ? (
-                <p className="product-detail-out-of-stock">Out of Stock</p>
-              ) : (
-                <div className="add-to-cart-container">
-                  <button
-                    title="Add to cart"
-                    onClick={(event) => handleAddToCart(product, event)}
-                    className="product-detail-add-to-cart"
-                  >
-                    Add to cart
-                  </button>
-                  <FaHeart
-                    title="Add to wishlist"
-                    className={`heart-icon ${isFavorite ? "filled" : ""}`}
-                    onClick={(event) => toggleFavorite(product, event)}
-                  />
+            {/* // Inside the JSX where you display related products */}
+            {product.category !== "MobileAccessories" &&
+              product.category !== "CCTVAccessories" &&
+              product.category !== "ComputerAccessories" &&
+              product.category !== "PrinterAccessories" &&
+              product.category !== "Headphones" &&
+              product.category !== "Speakers" &&
+              product.category !== "Watch" &&
+              product.category !== "secondhandproducts" &&
+              product.category !== "TV" &&
+              prioritizedRelatedItems.length > 0 && (
+                <div className="related-products-section">
+                  <h3 style={{ marginBottom: "10px" }}>
+                    {product.category} Accessories
+                  </h3>
+                  <div className="related-products-carousel">
+                    {prioritizedRelatedItems.length > 5 && (
+                      <button
+                        onClick={handlePreviousSlide}
+                        className="carousel-arrow left-arrow"
+                      >
+                        <img
+                          style={{
+                            width: "30px",
+                            borderRadius: "50%",
+                            backgroundColor: "white",
+                            padding: "5px",
+                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
+                          }}
+                          src={leftarrow}
+                          alt=""
+                        />
+                      </button>
+                    )}
+
+                    <div className="related-products-grid">
+                      {prioritizedRelatedItems
+                        .slice(
+                          currentStartIndex2,
+                          currentStartIndex2 + maxDisplayItems
+                        )
+                        .map((relatedProduct) => {
+                          // Parse the prod_img string into an array
+                          const images = JSON.parse(relatedProduct.prod_img);
+                          // Get the first image from the array
+                          const firstImage = images[0];
+
+                          return (
+                            <div
+                              key={relatedProduct.id}
+                              onClick={() =>
+                                handleProductClick(relatedProduct.id)
+                              }
+                              className="related-product-card"
+                            >
+                              {relatedProduct.offer_label && (
+                                <div className="product-label">
+                                  {relatedProduct.offer_label}
+                                </div>
+                              )}
+                              <img
+                                src={`${ApiUrl}/uploads/${relatedProduct.category.toLowerCase()}/${firstImage}`}
+                                alt={relatedProduct.prod_name}
+                                className="related-product-image"
+                              />
+                              <p className="related-product-name">
+                                {relatedProduct.prod_name.charAt(0).toUpperCase() + relatedProduct.prod_name.slice(1)}
+                              </p>
+                              {/* <p className="related-product-features">
+                  {relatedProduct.prod_features}
+                </p> */}
+                              <p className="product-actual-price">
+                                <span
+                                  style={{ textDecoration: "line-through" }}
+                                >
+                                  ₹{relatedProduct.actual_price}{" "}
+                                </span>
+                                <span
+                                  style={{ color: "green", marginLeft: "10px" }}
+                                >
+                                  (
+                                  {Math.round(
+                                    ((relatedProduct.actual_price -
+                                      relatedProduct.prod_price) /
+                                      relatedProduct.actual_price) *
+                                      100
+                                  )}
+                                  % OFF)
+                                </span>
+                              </p>
+                              <p className="related-product-price">
+                                ₹{relatedProduct.prod_price}
+                              </p>
+                            </div>
+                          );
+                        })}
+                    </div>
+                    {prioritizedRelatedItems.length > 5 && (
+                      <button
+                        onClick={handleNextSlide}
+                        className="carousel-arrow right-arrow"
+                      >
+                        <img
+                          style={{
+                            width: "30px",
+                            borderRadius: "50%",
+                            backgroundColor: "white",
+                            padding: "5px",
+                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
+                          }}
+                          src={rightarrow}
+                          alt=""
+                        />
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
 
-              <div className="coupon-box">
-                {product?.coupon?.length > 0 ? (
-                  <>
-                    <div className="dashedborder">
-                      <center>
-                        <div className="coupon3">
-                          {/* Coupon Code */}
-                          <img src={tag} width={"30px"} alt="Price Tag" />
-                          <span style={{ marginLeft: "2px" }}>
-                            {product.coupon}
-                          </span>
-                        </div>
-                      </center>
-                      <h4 className="coupon-title">
-                        Rs.{couponNumber}{" "}
-                        <span className="discountlabel">Discount</span>
-                      </h4>
-                    </div>
-                  </>
-                ) : (
-                  <h4 className="coupon-title">
-                    {/* Rs.{product.prod_price} <span className="discountlabel">No Discount</span> */}
-                  </h4>
-                )}
-                <div className="price-table">
-                  <div className="price-row">
-                    <div className="price-cell">
-                      <span className="price-label">Actual Price</span>
-                      <span className="actual-priceee">
-                        ₹
-                        {product?.coupon?.length > 0
-                          ? product.prod_price
-                          : product?.actual_price}
-                      </span>
-                    </div>
-                    <div className="price-cell">
-                      <span className="price-label">Discounted Price</span>
-                      <span className="discounted-priceee">
-                        ₹
-                        {product?.coupon?.length > 0
-                          ? couponNumber
-                          : product?.actual_price - product?.prod_price}
-                      </span>
-                    </div>
-                    <div className="price-cell">
-                      <span className="price-label">Effective Price</span>
-                      <span className="total-priceee">
-                        ₹
-                        {product?.coupon?.length > 0
-                          ? product.prod_price - couponNumber
-                          : product?.prod_price}
-                      </span>
-                    </div>
+            <div className="bannerr-container4">
+              {filteredBanners.length > 0 ? (
+                <div>
+                  <div
+                    className="banner-image-display"
+                    style={{
+                      marginTop: "-30px",
+                      position: "relative",
+                      marginBottom: "5px",
+                    }}
+                  >
+                    {/* <p className="brand-name" style={{ marginTop: '30px' }}>{filteredBanners[0].brand_name}</p> */}
+                    <img
+                      onClick={() => handleAdClick(filteredBanners[0])}
+                      src={`${ApiUrl}/uploads/offerspage/${filteredBanners[0].image}`}
+                      alt={`Banner for ${filteredBanners[0].brand_name}`}
+                      className="banner-image"
+                      // style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
+                    />
                   </div>
                 </div>
-              </div>
+              ) : (
+                <h4 className="banner-title"></h4>
+              )}
             </div>
-          </div>
 
-          <div className="product-features-row">
-            <h3 className="product-features-title">Key Specifications</h3>
-            <ul className="product-feature-list">
-              {product.prod_features.split("|").map((feature, index) => (
-                <li
-                  key={index}
-                  style={{
-                    background: "linear-gradient(to right, #ffe5b4, #fff3e0)", // Double colors (light orange shades)
-                    padding: "10px", // Padding for better spacing
-                    borderRadius: "5px", // Rounded corners
-                    margin: "5px 0", // Margin between items
-                    display: "flex", // Flexbox for alignment
-                    alignItems: "center", // Center align items vertically
-                  }}
-                >
-                  <span>
-                    <img src={pricetag} width={"25px"} alt="Price Tag" />
-                  </span>
-                  <span style={{ marginLeft: "5px", marginTop: "-5px" }}>
-                    {" "}
-                    {feature.trim()}{" "}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* // Inside the JSX where you display related products */}
+            {sortedFilteredProducts.length > 0 && (
+              <div className="related-products-section">
+                <h3 style={{ marginBottom: "10px" }}>You might also like</h3>
+                <div className="related-products-carousel">
+                  {sortedFilteredProducts.length > 5 && (
+                    <button
+                      onClick={handlePrev}
+                      className="carousel-arrow left-arrow"
+                    >
+                      <img
+                        style={{
+                          width: "30px",
+                          borderRadius: "50%",
+                          backgroundColor: "white",
+                          padding: "5px",
+                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
+                        }}
+                        src={leftarrow}
+                        alt=""
+                      />
+                    </button>
+                  )}
 
-          {/* // Inside the JSX where you display related products */}
-          {sortedFilteredProducts.length > 0 && (
-            <div className="related-products-section">
-              <h3 style={{ marginBottom: "10px" }}>You might also like</h3>
-              <div className="related-products-carousel">
-                {sortedFilteredProducts.length > 4 && (
-                  <button
-                    onClick={handlePrev}
-                    className="carousel-arrow left-arrow"
-                  >
-                    &lt;
-                  </button>
-                )}
+                  <div className="related-products-grid">
+                    {sortedFilteredProducts
+                      .slice(currentStartIndex, currentStartIndex + itemsToShow)
+                      .map((relatedProduct) => {
+                        // Parse the prod_img string into an array
+                        const images = JSON.parse(relatedProduct.prod_img);
+                        // Get the first image from the array
+                        const firstImage = images[0];
 
-                <div className="related-products-grid">
-                  {sortedFilteredProducts
-                    .slice(currentStartIndex, currentStartIndex + itemsToShow)
-                    .map((relatedProduct) => {
-                      // Parse the prod_img string into an array
-                      const images = JSON.parse(relatedProduct.prod_img);
-                      // Get the first image from the array
-                      const firstImage = images[0];
-
-                      return (
-                        <div
-                          key={relatedProduct.id}
-                          onClick={() => handleProductClick(relatedProduct.id)}
-                          className="related-product-card"
-                        >
-                          {relatedProduct.offer_label && (
-                            <div className="product-label">
-                              {relatedProduct.offer_label}
-                            </div>
-                          )}
-                          <img
-                            src={`${ApiUrl}/uploads/${relatedProduct.category.toLowerCase()}/${firstImage}`}
-                            alt={relatedProduct.prod_name}
-                            className="related-product-image"
-                          />
-                          <p className="related-product-name">
-                            {relatedProduct.prod_name}
-                          </p>
-                          {/* <p className="related-product-features">
+                        return (
+                          <div
+                            key={relatedProduct.id}
+                            onClick={() =>
+                              handleProductClick(relatedProduct.id)
+                            }
+                            className="related-product-card"
+                          >
+                            {relatedProduct.offer_label && (
+                              <div className="product-label">
+                                {relatedProduct.offer_label}
+                              </div>
+                            )}
+                            <img
+                              src={`${ApiUrl}/uploads/${relatedProduct.category.toLowerCase()}/${firstImage}`}
+                              alt={relatedProduct.prod_name}
+                              className="related-product-image"
+                            />
+                            <p className="related-product-name">
+                            {relatedProduct.prod_name.charAt(0).toUpperCase() + relatedProduct.prod_name.slice(1)}
+                            </p>
+                            {/* <p className="related-product-features">
                   {relatedProduct.prod_features}
                 </p> */}
-                          <p className="product-actual-price">
-                            <span style={{ textDecoration: "line-through" }}>
-                              ₹{relatedProduct.actual_price}{" "}
-                            </span>
-                            <span
-                              style={{ color: "green", marginLeft: "10px" }}
-                            >
-                              (
-                              {Math.round(
-                                ((relatedProduct.actual_price -
-                                  relatedProduct.prod_price) /
-                                  relatedProduct.actual_price) *
-                                  100
-                              )}
-                              % OFF)
-                            </span>
-                          </p>
-                          <p className="related-product-price">
-                            ₹{relatedProduct.prod_price}
-                          </p>
-                        </div>
-                      );
-                    })}
+                            <p className="product-actual-price">
+                              <span style={{ textDecoration: "line-through" }}>
+                                ₹{relatedProduct.actual_price}{" "}
+                              </span>
+                              <span
+                                style={{ color: "green", marginLeft: "10px" }}
+                              >
+                                (
+                                {Math.round(
+                                  ((relatedProduct.actual_price -
+                                    relatedProduct.prod_price) /
+                                    relatedProduct.actual_price) *
+                                    100
+                                )}
+                                % OFF)
+                              </span>
+                            </p>
+                            <p className="related-product-price">
+                              ₹{relatedProduct.prod_price}
+                            </p>
+                          </div>
+                        );
+                      })}
+                  </div>
+                  {sortedFilteredProducts.length > 5 && (
+                    <button
+                      onClick={handleNext}
+                      className="carousel-arrow right-arrow"
+                    >
+                      <img
+                        style={{
+                          width: "30px",
+                          borderRadius: "50%",
+                          backgroundColor: "white",
+                          padding: "5px",
+                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
+                        }}
+                        src={rightarrow}
+                        alt=""
+                      />
+                    </button>
+                  )}
                 </div>
-                {sortedFilteredProducts.length > 4 && (
-                  <button
-                    onClick={handleNext}
-                    className="carousel-arrow right-arrow"
-                  >
-                    &gt;
-                  </button>
-                )}
               </div>
+            )}
+
+            <div className="bannerr-container4">
+              {filteredBanners.length > 1 ? (
+                <div>
+                  <div
+                    className="banner-image-display"
+                    style={{
+                      marginTop: "-5px",
+                      position: "relative",
+                      marginBottom: "5px",
+                    }}
+                  >
+                    {/* <p className="brand-name" style={{ marginTop: '30px' }}>{filteredBanners[0].brand_name}</p> */}
+                    <img
+                      onClick={() => handleAdClick(filteredBanners[1])}
+                      src={`${ApiUrl}/uploads/offerspage/${filteredBanners[1].image}`}
+                      alt={`Banner for ${filteredBanners[1].brand_name}`}
+                      className="banner-image"
+                      // style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
+                    />
+                  </div>
+                </div>
+              ) : (
+                <h4 className="banner-title"></h4>
+              )}
             </div>
-          )}
-          <ToastContainer />
+
+            <ToastContainer />
+          </div>
         </div>
       </div>
 
@@ -742,6 +1760,53 @@ const ProductDetail = () => {
       <Footer />
     </>
   );
+};
+
+{
+  /* Styling for the list items */
+}
+const listItemStyle = {
+  display: "flex",
+  flexDirection: "row", // Ensure the label and value are side by side
+  padding: "15px",
+  marginBottom: "15px", // Increased space between items
+  borderRadius: "8px", // Rounded corners
+  background: "linear-gradient(135deg, #f9f9f9, #f0f0f0)", // Light gradient for list items
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+};
+
+const labelStyle = {
+  fontWeight: "bold",
+  padding: "12px 15px", // More padding for better spacing
+  background: "linear-gradient(135deg, #e9ecef, #ffffff)",
+  // background: "linear-gradient(135deg, #007BFF, #00c6ff)",
+  color: "#333", // White text for contrast
+  borderRadius: "8px 0 0 8px",
+  width: "30%", // Increased width for label
+  marginRight: "15px", // More space between label and value
+  fontSize: "16px", // Slightly larger font for readability
+};
+
+const valueStyle = {
+  padding: "12px 15px", // Same padding as label
+  background: "linear-gradient(135deg, #e9ecef, #ffffff)", // Light gradient for value background
+  color: "#333", // Dark text for better visibility
+  borderRadius: "0 8px 8px 0",
+  width: "70%", // Adjusted width for value
+  fontSize: "16px", // Consistent font size
+  fontWeight: "normal", // Regular weight for value
+};
+
+// Additional styles for description and text
+const descriptionStyle = {
+  padding: "15px",
+  // background: "linear-gradient(135deg, #f0f8ff, #e0f7fa)", // original
+  background: "linear-gradient(135deg, #e0f7fa, #f0f8ff)", // Light gradient for descriptions
+  borderRadius: "8px",
+  fontSize: "14px",
+  lineHeight: "1.6",
+  color: "#333", // Dark text for good contrast
+  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.05)", // Slight shadow for depth
 };
 
 export default ProductDetail;

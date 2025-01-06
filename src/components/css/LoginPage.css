@@ -1,3 +1,37 @@
+.radio-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.staff-input.password-hidden {
+  -webkit-text-security: disc; /* Mimic password dots */
+}
+
+/* Radio button wrapper */
+.radio-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Label for radio buttons */
+.radio-label {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Radio button styles */
+.radio-input {
+  width: 18px;
+  height: 18px;
+  accent-color: #4CAF50; /* Green for checked state */
+  cursor: pointer;
+  outline: none;
+}
+
 
 
 /* Container styling */
@@ -15,7 +49,8 @@
   width: 100%;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-color: #007bff; /* Change border color on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.9); /* Add a glowing effect */
   background-color: rgba(0, 0, 0, 0.8); /* Medium black with transparency */
   position: relative;
   z-index: 1000;

@@ -1,6 +1,8 @@
 .contacts-table-container {
     margin-top: 78px;
     margin-left: 255px; /* Adjust this for larger screens */
+    margin-right: 5px; /* Adjust this for larger screens */
+    
 }
 
 .contacts-table {

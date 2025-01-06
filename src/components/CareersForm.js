@@ -18,15 +18,51 @@ const CareersForm = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setResumeFile(file); // Update the state with the selected file
+  
+    // Check file type and size
+    if (file) {
+      const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      
+      // Validate file type
+      if (!validTypes.includes(file.type)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid File Type',
+          text: 'Please upload a valid PDF or Word document.',
+        });
+        setResumeFile(null); // Reset file input
+        setErrors({
+          ...errors,
+          resumeFile: 'Invalid file type. Only PDF or Word documents are allowed.',
+        });
+        return; // Exit the function
+      }
+  
+      // Validate file size (50 KB limit)
+      if (file.size > 50 * 1024) { // 50 KB
+        Swal.fire({
+          icon: 'error',
+          title: 'File Too Large',
+          text: 'File size should be below 50 KB.',
+        });
+        setResumeFile(null); // Reset file input
+        e.target.value = ''; // Clear the input field
 
-    setErrors({
-      ...errors,
-      resumeFile: '',  // Clear the error message related to the file input
-  });
-    
+        setErrors({
+          ...errors,
+          resumeFile: 'File size must be below 50 KB.',
+        });
+        return; // Exit the function
+      }
+  
+      // If file is valid
+      setResumeFile(file); // Update the state with the selected file
+      setErrors({
+        ...errors,
+        resumeFile: '',  // Clear the error message related to the file input
+      });
+    }
   };
-
   // const validateForm = () => {
   //   const newErrors = {};
 

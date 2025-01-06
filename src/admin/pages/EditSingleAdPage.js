@@ -45,9 +45,115 @@ const EditSingleImageAd = () => {
     fetchProducts();
   }, []);
 
-  const handleImageChange = (e) => {
-    setNewImage(e.target.files[0]);
+  const compressImage = (file, maxSizeKB = 450) => {  // Set maxSizeKB to 450
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+  
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+  
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 500; // Set maximum width for the image
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+  
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+          // Compression function with adjustable quality
+          const compress = (quality) => {
+            return new Promise((resolveInner) => {
+              canvas.toBlob((blob) => {
+                if (blob.size / 1024 <= maxSizeKB || quality < 0.3) {
+                  resolveInner(blob); // Return if under size limit or at minimum quality
+                } else {
+                  resolveInner(compress(quality - 0.1)); // Retry with lower quality
+                }
+              }, 'image/jpeg', quality);
+            });
+          };
+  
+          // Start compressing with initial quality of 0.8
+          compress(0.8).then(resolve);
+        };
+      };
+    });
   };
+  
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      console.log("Selected image:", file);
+  
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          console.log("Original image dimensions:", img.width, img.height);
+  
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800; // Maintain width
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+  
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+          console.log("Resizing image to:", canvas.width, canvas.height);
+  
+          const compressImage = (minQuality, maxQuality) => {
+            return new Promise((resolve) => {
+              const tryCompression = (quality) => {
+                canvas.toBlob(
+                  (blob) => {
+                    const sizeInKB = blob.size / 1024;
+                    console.log(`Compressed image at quality ${quality} has size: ${sizeInKB.toFixed(2)} KB`);
+  
+                    if (sizeInKB > 500 && quality > minQuality) { // Change to 500 KB
+                      // If over 500 KB, lower quality and try again
+                      tryCompression(quality - 0.05);
+                    } else if (sizeInKB < 500 && quality < maxQuality) {
+                      // If under 500 KB, slightly increase quality to get as close as possible
+                      tryCompression(quality + 0.02);
+                    } else {
+                      // Final image close to 500 KB or within acceptable range
+                      resolve(blob);
+                    }
+                  },
+                  'image/jpeg',
+                  quality
+                );
+              };
+              // Start compression attempt only if size is above 500 KB
+              if (file.size / 1024 > 500) {
+                tryCompression(maxQuality);
+              } else {
+                // No compression needed, resolve with original file
+                resolve(file);
+              }
+            });
+          };
+  
+          // Compressing with quality range between 0.5 and 0.95
+          compressImage(0.5, 0.95).then((finalBlob) => {
+            const compressedFile = new File([finalBlob], file.name, { type: file.type });
+            setNewImage(compressedFile); // Set the compressed image in state
+            console.log("Compressed single image size for setNewImage:", (compressedFile.size / 1024).toFixed(2), "KB");
+          });
+        };
+      };
+    }
+  };
+  
+  
 
   const handleAddProduct = async () => {
     if (!newImage || !category) {
@@ -198,6 +304,81 @@ const EditSingleImageAd = () => {
     }
   };
   
+  const onChangeCompressedImage = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      console.log("Selected image:", file);
+  
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          console.log("Original image dimensions:", img.width, img.height);
+  
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800; // Maintain width
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+  
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+          console.log("Resizing image to:", canvas.width, canvas.height);
+  
+          const compressImage = (minQuality, maxQuality) => {
+            return new Promise((resolve) => {
+              const tryCompression = (quality) => {
+                canvas.toBlob(
+                  (blob) => {
+                    const sizeInKB = blob.size / 1024;
+                    console.log(`Compressed image at quality ${quality} has size: ${sizeInKB.toFixed(2)} KB`);
+  
+                    if (sizeInKB > 500 && quality > minQuality) {
+                      // If over 500 KB, lower quality and try again
+                      tryCompression(quality - 0.05);
+                    } else if (sizeInKB < 500 && quality < maxQuality) {
+                      // If under 500 KB, slightly increase quality to get as close as possible
+                      tryCompression(quality + 0.02);
+                    } else {
+                      // Final image close to 500 KB or within acceptable range
+                      resolve(blob);
+                    }
+                  },
+                  'image/jpeg',
+                  quality
+                );
+              };
+  
+              // Start compression attempt only if size is above 500 KB
+              if (file.size / 1024 > 500) {
+                tryCompression(maxQuality);
+              } else {
+                // No compression needed, resolve with original file
+                resolve(file);
+              }
+            });
+          };
+  
+          // Compressing with quality range between 0.5 and 0.95
+          compressImage(0.5, 0.95).then((compressedBlob) => {
+            const compressedFile = new File([compressedBlob], file.name, { type: file.type });
+  
+            // Check the compressed file size
+            if (compressedFile.size <= 500 * 1024) {  // 500 KB limit
+              setSelectedFile(compressedFile);  // Update state with the compressed image
+              console.log("Compressed image size:", (compressedFile.size / 1024).toFixed(2), "KB");
+            } else {
+              console.error("Image compression failed to reduce size under 500 KB");
+            }
+          });
+        };
+      };
+    }
+  };
+  
   
 
   return (
@@ -219,7 +400,6 @@ const EditSingleImageAd = () => {
               onChange={handleImageChange}
               className="laptops-card-input"
               accept="image/*"  // This allows all image types
-
             />
          
          <select
@@ -298,7 +478,7 @@ const EditSingleImageAd = () => {
     {/* Input for Image Upload */}
     <input
       type="file"
-      onChange={(e) => setSelectedFile(e.target.files[0])}
+      onChange={onChangeCompressedImage}
       className="adminmodal-input"
       accept="image/*"  // Allow all image types
     />

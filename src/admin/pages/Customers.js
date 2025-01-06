@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './css/Customers.css'; // Import external CSS
-import { ApiUrl } from '../../components/ApiUrl';
-import Modal from 'react-modal'; // Importing Modal
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./css/Customers.css"; // Import external CSS
+import { ApiUrl } from "../../components/ApiUrl";
+import Modal from "react-modal"; // Importing Modal
+import Swal from "sweetalert2";
+import { FaTrash } from "react-icons/fa";
 
 const Customers = () => {
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ const Customers = () => {
       setUsers(response.data);
       setTotalPages(Math.ceil(response.data.length / itemsPerPage));
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error("Error fetching users:", error);
     }
   };
 
@@ -66,11 +68,17 @@ const Customers = () => {
         pages.push(i);
       }
     } else {
-      const leftBoundary = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-      const rightBoundary = Math.min(totalPages, currentPage + Math.floor(maxPagesToShow / 2));
+      const leftBoundary = Math.max(
+        1,
+        currentPage - Math.floor(maxPagesToShow / 2)
+      );
+      const rightBoundary = Math.min(
+        totalPages,
+        currentPage + Math.floor(maxPagesToShow / 2)
+      );
 
       if (leftBoundary > 2) {
-        pages.push(1, '...');
+        pages.push(1, "...");
       } else {
         for (let i = 1; i < leftBoundary; i++) {
           pages.push(i);
@@ -82,7 +90,7 @@ const Customers = () => {
       }
 
       if (rightBoundary < totalPages - 1) {
-        pages.push('...', totalPages);
+        pages.push("...", totalPages);
       } else {
         for (let i = rightBoundary + 1; i <= totalPages; i++) {
           pages.push(i);
@@ -109,111 +117,193 @@ const Customers = () => {
     setSelectedUser(null);
   };
 
+  const handleDeleteUser = async (id) => {
+  // Show confirmation dialog
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  });
+
+  if (result.isConfirmed) {
+    try {
+      const response = await axios.delete(`${ApiUrl}/api/deleteuser/${id}`);
+      if (response.status === 200) {
+        // Show success message
+        Swal.fire({
+          title: "Deleted!",
+          text: "User entry has been deleted.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: true,
+        });
+
+        // Update state to remove deleted user
+        setUsers(users.filter((user) => user.id !== id)); // Filter by user_id
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: response.data.message || "Failed to delete the user entry.",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting user entry:", error);
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred while deleting the user entry.",
+        icon: "error",
+      });
+    }
+  }
+};
+
   return (
     <div className="customers-container">
-      <h3 className="page-titlee">Customer Details</h3>
-
-      {/* Customers Table */}
-      <section className="customers-section">
-        <div className="table-wrapper">
-          <table className="styled-table">
-            <thead>
-              <tr>
-                <th>S.No</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Number</th>
-                <th>View</th> {/* New View column */}
-              </tr>
-            </thead>
-            <tbody>
-              {currentUsers.map((user, index) => (
-                <tr key={user.user_id}>
-                  <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                  <td>{capitalizeFirstLetter(user.username)}</td>
-                  <td>{user.email}</td>
-                  <td>{user.contact_number}</td>
-                  <td>
-                    <button onClick={() => openModal(user)} className="view-button">
-                      View
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <main className="staff-main-content">
+        <div className="orders-header">
+          <h2 className="orders-page-title">Customer Details</h2>
         </div>
-      </section>
-
-      {/* Pagination Controls */}
-      <div className="pagination-controls">
-        <button 
-          onClick={handlePrevPage} 
-          disabled={currentPage === 1}
-          className="pagination-button"
-        >
-          &lt;
-        </button>
-        {getPaginationPages().map((page, index) => (
-          <button 
-            key={index} 
-            onClick={() => {
-              if (page !== '...') handlePageChange(page);
-            }} 
-            className={`pagination-button ${currentPage === page ? 'active' : ''}`}
-            disabled={page === '...'}
-          >
-            {page}
-          </button>
-        ))}
-        <button 
-          onClick={handleNextPage} 
-          disabled={currentPage === totalPages}
-          className="pagination-button"
-        >
-          &gt;
-        </button>
-      </div>
-
-      {/* Modal for Viewing User Details */}
-    {/* Modal for Viewing User Details */}
-<Modal
-  isOpen={isModalOpen}
-  onRequestClose={closeModal}
-  contentLabel="User Details"
-  ariaHideApp={false}
-  className="user-details-modal"
->
-  <h2>User Details</h2>
-  {selectedUser && (
-    <div>
-      <p><strong>Username:</strong> {capitalizeFirstLetter(selectedUser.username)}</p>
-      <p><strong>Email:</strong> {selectedUser.email}</p>
-      <p><strong>Number:</strong> {selectedUser.contact_number}</p>
-      <p><strong>Addresses:</strong></p>
-      {selectedUser.address_names && selectedUser.address_names.split(', ').map((address, i) => {
-        const street = selectedUser.streets?.split(', ')[i] || 'N/A';
-        const city = selectedUser.cities?.split(', ')[i] || 'N/A';
-        const state = selectedUser.states?.split(', ')[i] || 'N/A';
-        const postalCode = selectedUser.postal_codes?.split(', ')[i] || 'N/A';
-        const country = selectedUser.countries?.split(', ')[i] || 'N/A';
-        const phone = selectedUser.phones?.split(', ')[i] || 'N/A'; // Corresponding phone number
-
-        return (
-          <div key={i}>
-            <p>
-              {i + 1}. {address}, {street}, {city}, {state}, {postalCode}, {country} 
-              <br />
-              <strong>Phone:</strong> {phone}
-            </p>
+        {/* Customers Table */}
+        <section className="customers-section">
+          <div className="table-wrapper">
+            <table className="careers-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Number</th>
+                  <th>Full Address</th> {/* New View column */}
+                  <th>Delete</th> {/* New View column */}
+                </tr>
+              </thead>
+              <tbody>
+                {currentUsers.map((user, index) => (
+                  <tr key={user.user_id}>
+                    <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                    <td>{capitalizeFirstLetter(user.username)}</td>
+                    <td>{user.email}</td>
+                    {/* <td>{user.id}</td> */}
+                    <td>{user.contact_number}</td>
+                    <td>
+                      <button
+                        onClick={() => openModal(user)}
+                        className="view-button"
+                      >
+                        View
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        className="resume-btn"
+                        onClick={() => handleDeleteUser(user.id)}
+                        title="Delete"
+                      >
+                        <FaTrash
+                          style={{
+                            // color: "red",
+                            color: "black",
+                            // fontSize: isMobile ? "20px" : "16px",
+                          }}
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        );
-      })}
-    </div>
-  )}
-  <button onClick={closeModal}>Close</button>
-</Modal>
+        </section>
 
+        {/* Pagination Controls */}
+        <div className="pagination-controls">
+          <button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className="pagination-button"
+          >
+            &lt;
+          </button>
+          {getPaginationPages().map((page, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                if (page !== "...") handlePageChange(page);
+              }}
+              className={`pagination-button ${
+                currentPage === page ? "active" : ""
+              }`}
+              disabled={page === "..."}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className="pagination-button"
+          >
+            &gt;
+          </button>
+        </div>
+
+        {/* Modal for Viewing User Details */}
+        {/* Modal for Viewing User Details */}
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={closeModal}
+          contentLabel="User Details"
+          ariaHideApp={false}
+          className="user-details-modal"
+        >
+          <h2>User Details</h2>
+          {selectedUser && (
+            <div>
+              <p>
+                <strong>Username:</strong>{" "}
+                {capitalizeFirstLetter(selectedUser.username)}
+              </p>
+              <p>
+                <strong>Email:</strong> {selectedUser.email}
+              </p>
+              <p>
+                <strong>Number:</strong> {selectedUser.contact_number}
+              </p>
+              <p>
+                <strong>Addresses:</strong>
+              </p>
+              {selectedUser.address_names &&
+                selectedUser.address_names.split(", ").map((address, i) => {
+                  const street = selectedUser.streets?.split(", ")[i] || "N/A";
+                  const city = selectedUser.cities?.split(", ")[i] || "N/A";
+                  const state = selectedUser.states?.split(", ")[i] || "N/A";
+                  const postalCode =
+                    selectedUser.postal_codes?.split(", ")[i] || "N/A";
+                  const country =
+                    selectedUser.countries?.split(", ")[i] || "N/A";
+                  const phone = selectedUser.phones?.split(", ")[i] || "N/A"; // Corresponding phone number
+
+                  return (
+                    <div key={i}>
+                      <p>
+                        {i + 1}. {address}, {street}, {city}, {state},{" "}
+                        {postalCode}, {country}
+                        <br />
+                        <strong>Phone:</strong> {phone}
+                      </p>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+          <button onClick={closeModal}>Close</button>
+        </Modal>
+      </main>
     </div>
   );
 };

@@ -1,4 +1,16 @@
 /* General Styles */
+.btn-print {
+  background-color: transparent; /* Green background */
+  color: #45a049; /* White text */
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+
+
+
 .orders-page {
   margin-left: 250px; /* Adjust according to the width of the sidebar */
   margin-top: 60px;   /* Adjust according to the height of the top bar */
@@ -24,8 +36,121 @@
   font-size: 24px;
 }
 
+/* Search box container to align it with the table */
+.search-box2-container {
+  margin-bottom: 20px; /* Space between search and table */
+  display: flex;
+  justify-content: flex-end; /* Aligns the search box to the right */
+  width: 100%; /* Ensures it takes full width */
+  position: relative;
+}
+.clear-button {
+  position: absolute;
+  right: 10px; /* Position the button on the right side */
+  top: 50%; /* Vertically center the button */
+  transform: translateY(-50%); /* Adjust vertical centering */
+  background-color: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filters-container {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end; /* Aligns the search box to the right */
+
+  margin-bottom: 15px;
+}
+
+.filter-select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 1px;
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.filter-select:focus,
+.filter-select.selected { /* Apply focus effect and selected style */
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.clear-button:hover {
+  color: #333;
+}
+
+.status-new-order {
+  color: #007bff; /* Bright Blue for New Order */
+}
+
+.status-shipped {
+  color: #ff6f00; /* Vibrant Orange for Shipped */
+}
+
+.status-Out-of-Delivery {
+  color: #ffbf00; /* Warm Yellow-Orange for Out for Delivery */
+}
+
+.status-delivered {
+  color: #28a745; /* Bright Green for Delivered */
+}
+
+.status-cancelled {
+  color: #dc3545; /* Bold Red for Cancelled */
+}
+
+.status-unknown {
+  color: #6c757d; /* Muted Gray for Unknown */
+}
+
+.filter-radio-buttons {
+  display: flex;
+  flex-direction: row; /* Align radio buttons in a row */
+  gap: 20px; /* Adds space between the radio buttons */
+  padding: 10px;
+  flex-wrap: wrap; /* Allows wrapping if there are too many items */
+}
+
+.filter-radio-buttons label {
+  display: flex;
+  align-items: center; /* Centers the text and radio button vertically */
+  font-size: 14px; /* Set font size for labels */
+}
+
+.filter-radio-buttons input[type="radio"] {
+  margin-right: 3px; /* Adds space between the radio button and the label */
+  accent-color: #007bff; /* Change radio button color (optional) */
+}
+
+
+
+
+
+/* Styling for the search box */
+.search-box2 {
+  padding: 8px 12px;
+  width: 250px; /* Adjust the width as needed */
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 1px;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Adds light shadow */
+  transition: all 0.3s ease; /* Smooth transition for focus */
+}
+
+/* Focus state for the search box */
+.search-box2:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Focus effect */
+}
+
 .table-wrapper {
   overflow-x: auto; /* Add horizontal scrolling to the table container */
+  margin-top: 20px; /* Space from search box */
+
 }
 
 .orders-table {
@@ -84,9 +209,31 @@
   transition: background-color 0.3s, transform 0.3s;
 }
 
+.btn-view, .btn-delete {
+  background-color: transparent;
+  display: inline-flex; /* Ensure buttons stay inline */
+  align-items: center; /* Align icon with text */
+  justify-content: center;
+  color: inherit;
+  border: none; /* Remove button borders if any */
+  padding: 5px 10px; /* Adjust padding */
+  cursor: pointer;
+}
+
 .btn-view {
-  background-color: #2196f3;
-  color: #fff;
+  color: #2196f3;
+  font-size: 16px;
+}
+
+.btn-delete {
+  color: #f44336;
+  font-size: 16px;
+
+}
+
+.btn-container {
+  display: inline-flex; /* Flex container for the buttons */
+  gap: 5px; /* Space between the buttons */
 }
 
 .btn-edit {
@@ -94,27 +241,19 @@
   color: #fff;
 }
 
-.btn-delete {
-  background-color: #f44336;
-  color: #fff;
-  margin-left: 10px;
-}
+
 
 .btn:hover {
   transform: scale(1.05);
 }
 
-.btn-view:hover {
-  background-color: #1976d2;
-}
+
 
 .btn-edit:hover {
   background-color: #f57c00;
 }
 
-.btn-delete:hover {
-  background-color: #c62828;
-}
+
 
 /* Responsive Styles */
 @media (max-width: 768px) {

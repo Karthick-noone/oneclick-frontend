@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate  } from 'react-router-dom';
 import AdminMain from './pages/AdminMain'; // Path to your AdminMain component
 import Computers from './pages/AddComputers'; // Example page
 import Mobiles from './pages/AddMobiles'; // Example page
@@ -26,7 +26,12 @@ import ContactsTable from './pages/ContactsTable'; // Example page
 import CareersTable from './pages/CareersTable'; // Example page
 import ComputersAd from './pages/ComputersAd'; // Example page
 import MobileAd from './pages/MobileAd'; // Example page
+import ProductDetailPage from './pages/ProductDetailPage'; // Example page
 import CCTVAd from './pages/CCTVAd'; // Example page
+import Tracking from './pages/Tracking'; // Example page
+import CouponManager from './pages/CouponManager'; // Example page
+import StaffManagement from './pages/StaffManagement'; // Example page
+import Secondhandproducts from './pages/AddSecondhandproducts'; // Example page
 import { ThemeProvider } from './ThemeContext'; // Import ThemeProvider
 
 function App() {
@@ -35,7 +40,7 @@ function App() {
     backgroundColor: '#f4f4f4', // Replace with your preferred background color
     minHeight: '100vh',
     margin: 0,
-    fontFamily: 'Poppins, sans-serif'
+    fontFamily: 'calibri, sans-serif'
   };
 
   React.useEffect(() => {
@@ -45,6 +50,18 @@ function App() {
     document.body.style.fontFamily = bodyStyle.fontFamily;
   }, []);
 
+
+  const userRole = localStorage.getItem('userRole'); // Get the role from localStorage
+
+  const ProtectedRoute = ({ element, restrictedRoles }) => {
+    // If the user role is restricted, redirect to the dashboard or home
+    if (restrictedRoles.includes(userRole)) {
+      return <Navigate to="/Admin/Dashboard" />; // You can change the redirect route as needed
+    }
+    return element; // Return the original element if not restricted
+  };
+
+  
   return (
     <ThemeProvider>
       <AdminMain>
@@ -61,20 +78,27 @@ function App() {
           <Route path="/MobileAccessories" element={<MobileAccessories />} />
           <Route path="/PrinterAccessories" element={<PrinterAccessories />} />
           <Route path="/CCTVAccessories" element={<CCTVAccessories />} />
-          <Route path="/Orders" element={<Orders />} />
-          <Route path="/Customers" element={<Customers />} />
-          <Route path="/Reports" element={<Reports />} />
-          <Route path="/ChangePassword" element={<ChangePassword />} />
-          <Route path="/EditHomePage" element={<EditHomePage />} />
-          <Route path="/EditDoubleImageAd" element={<EditDoubleImageAd />} />
-          <Route path="/EditSingleImageAd" element={<EditSingleImageAd />} />
-          <Route path="/EditLoginBackgroundImage" element={<EditLoginpageBG />} />
           <Route path="/Dashboard" element={<Dashboard />} />
-          <Route path="/CareersTable" element={<CareersTable />} />
-          <Route path="/ContactsTable" element={<ContactsTable />} />
-          <Route path="/ComputersAd" element={<ComputersAd />} />
-          <Route path="/MobileAd" element={<MobileAd />} />
-          <Route path="/CCTVAd" element={<CCTVAd />} />
+          <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
+
+          <Route path="/Orders" element={<ProtectedRoute element={<Orders />} restrictedRoles={['Staff']} />} />
+          <Route path="/Customers" element={<ProtectedRoute element={<Customers />} restrictedRoles={['Staff']} />} />
+          <Route path="/Reports" element={<ProtectedRoute element={<Reports />} restrictedRoles={['Staff']} />} />
+          <Route path="/ChangePassword" element={<ProtectedRoute element={<ChangePassword />} restrictedRoles={['Staff']} />} />
+          <Route path="/EditHomePage" element={<ProtectedRoute element={<EditHomePage />} restrictedRoles={['Staff']} />} />
+          <Route path="/EditDoubleImageAd" element={<ProtectedRoute element={<EditDoubleImageAd />} restrictedRoles={['Staff']} />} />
+          <Route path="/EditSingleImageAd" element={<ProtectedRoute element={<EditSingleImageAd />} restrictedRoles={['Staff']} />} />
+          <Route path="/EditLoginBackgroundImage" element={<ProtectedRoute element={<EditLoginpageBG />} restrictedRoles={['Staff']} />} />
+          <Route path="/CareersTable" element={<ProtectedRoute element={<CareersTable />} restrictedRoles={['Staff']} />} />
+          <Route path="/ContactsTable" element={<ProtectedRoute element={<ContactsTable />} restrictedRoles={['Staff']} />} />
+          <Route path="/ComputersAd" element={<ProtectedRoute element={<ComputersAd />} restrictedRoles={['Staff']} />} />
+          <Route path="/MobileAd" element={<ProtectedRoute element={<MobileAd />} restrictedRoles={['Staff']} />} />
+          <Route path="/ProductDetailPage" element={<ProtectedRoute element={<ProductDetailPage />} restrictedRoles={['Staff']} />} />
+          <Route path="/CCTVAd" element={<ProtectedRoute element={<CCTVAd />} restrictedRoles={['Staff']} />} />
+          <Route path="/Tracking" element={<ProtectedRoute element={<Tracking />} restrictedRoles={['Staff']} />} />
+          <Route path="/CouponManager" element={<ProtectedRoute element={<CouponManager />} restrictedRoles={['Staff']} />} />
+          <Route path="/StaffManagement" element={<ProtectedRoute element={<StaffManagement />} restrictedRoles={['Staff']} />} />
+          
         </Routes>
       </AdminMain>
     </ThemeProvider>

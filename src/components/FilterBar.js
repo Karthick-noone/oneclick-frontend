@@ -31,7 +31,7 @@ const Sidebar = ({ onApplyFilters }) => {
     <div style={styles.sidebar}>
       <h3 style={styles.title}>Filter by Mobile Brand</h3>
       <div style={styles.filterOptions}>
-        {['Samsung', 'Apple', 'OnePlus', 'Xiaomi', 'Vivo', 'Realme', 'Oppo','Poco', 'Infinix', 'Moto',].map((brand) => (
+        {['Samsung', 'Apple', 'OnePlus', 'Redmi', 'Vivo', 'Realme', 'Oppo','Poco', 'Infinix', 'Moto', 'IQOO'].map((brand) => (
           <label key={brand} style={styles.radioLabel}>
             <input
               type="radio"

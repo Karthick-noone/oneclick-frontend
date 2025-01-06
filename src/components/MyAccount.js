@@ -307,7 +307,7 @@ const styles = {
   bannerImage: {
     width: "100%",
     height: "100%",
-    objectFit: "cover",
+    // objectFit: "cover",
   },
   bannerTextContainer: {
     position: "absolute",
@@ -338,6 +338,8 @@ const styles = {
   profileHeader: {
     display: "flex",
     alignItems: "center",
+    justifyContent: 'center',
+    flexWrap: "wrap", // Allows wrapping for responsiveness
   },
   avatar: {
     width: "150px",
@@ -366,4 +368,20 @@ const styles = {
     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
     marginBottom: "20px",
   },
+  "@media (max-width: 768px)": {
+    profileHeader: {
+      flexDirection: "column", // Stack image and details vertically
+      alignItems: "center", // Center align for a clean look
+      textAlign: "center",
+    },
+    avatar: {
+      marginRight: 0, // Remove right margin when stacked vertically
+      marginBottom: "15px", // Add some spacing below the image
+    },
+    profileName: {
+      fontSize: "1.5rem",
+    },
+  },
 };
+
+

@@ -9,7 +9,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   background-color: #fff;
-  margin-left: 270px;
+  margin-left: 290px;
   margin-top: 90px;
 }
 
@@ -34,14 +34,15 @@
 }
 
 .careers-table th, .careers-table td {
-  padding: 12px;
-  text-align: left;
-  font-size: 16px;
+  border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
 }
 
 .careers-table th {
+  background-color: #f2f2f2;
   font-weight: bold;
-  text-transform: uppercase;
+  color: #333;
 }
 
 .careers-table tr:nth-child(even) {
@@ -53,7 +54,7 @@
 }
 
 .resume-btn {
-  background-color: #007bff;
+  background-color: transparent;
   color: white;
   border: none;
   padding: 8px 15px;
@@ -61,9 +62,9 @@
   cursor: pointer;
 }
 
-.resume-btn:hover {
+/* .resume-btn:hover {
   background-color: #0056b3;
-}
+} */
 
 /* Responsive Table Design */
 @media (max-width: 768px) {
@@ -144,16 +145,13 @@
   background-color: red;
 }
 .download-btn {
-  position: absolute;
   top: 2px;
   right: 25px;
   border: none;
-  background: none;
   display: none;
   font-size: 20px;
   cursor: pointer;
   /* color: #007bff; */
-  color: rgb(8, 141, 250);
   /* border-radius: 50%; */
   width: 4%;
   /* background-color: rgb(40, 94, 245); */
@@ -178,7 +176,6 @@
 
   .resume-btn {
     display: inline-block; /* Ensure button is visible */
-    background-color: #007bff;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -194,12 +191,12 @@
   .download-btn {
     display: block;
     text-align: center;
-    font-size: 16px;
+    font-size: 14px;
     padding: 10px;
     color: #007bff;
     text-decoration: none;
-    border: 1px solid #007bff;
     border-radius: 5px;
+    background-color: transparent;
   }
 
   .download-btn:hover {

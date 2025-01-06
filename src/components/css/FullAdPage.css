@@ -1,14 +1,40 @@
 /* FullAdPage.css */
 .full-page-container {
     width: 100%;
-  max-height: 65vh; 
+  /* max-height: 75vh;  */
   height: auto; /* Let the height be determined by the content/image size */
   overflow: hidden;
   position: relative;
 }
 
+.bannner-image {
+    width: 1250px; /* Full width */
+    height: 300px; /* Maintain aspect ratio */
+    max-width: 1255px; /* Limit max width */
+    cursor: pointer;
+    border-radius: 5px;
+    transition: transform 0.3s ease; /* Smooth transition for scaling */
+  
+    /* max-height: 3; */
+  }
+  
+  .bannner-image:hover {
+    transform: scale(1.02); /* Slightly zoom in on hover */
+  }
+
+.full-ad-card {
+    background-color: white; /* Background color of the card */
+    border-radius: 8px; /* Rounded corners */
+    overflow: hidden; /* Hide overflow if the image is larger than the card */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s; /* Transition for hover effect */
+    padding: 15px;
+  }
+  
+  
+
 .ad-image-container {
-    width: 100%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,13 +44,22 @@
 .full-page-image {
     width: 100%;
   height: auto; /* Keep the height auto to maintain aspect ratio */
+  min-height: 400px;
   max-height: 400px; /* Set a max height for the image */
   object-fit: cover; /* Ensures the image covers the entire area */
   background-color: #f4f4f4;
   background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
+    transition: transform 0.3s ease-in-out;
+    border-radius: 5px;
+
 }
+
+/* Zoom on hover */
+.full-page-image:hover {
+    transform: scale(1.02); /* Scale up the card on hover */
+  }
 
 .overlay-content {
     position: absolute; /* Overlay on top of the image */
@@ -55,6 +90,11 @@
 @media (max-width: 768px) {
     .full-page-container {
         height: auto !important; /* Adjust height to auto for responsiveness */
+    }
+    .bannner-image {
+        width:100%;
+        height: auto;
+
     }
 
     .ad-image-container {

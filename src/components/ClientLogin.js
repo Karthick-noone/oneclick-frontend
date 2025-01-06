@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { useNavigate } from 'react-router-dom';
 import { ApiUrl } from "./ApiUrl";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
+import { FaEye, FaEyeSlash , FaSignOutAlt} from "react-icons/fa"; // Import eye icons
 import logo from './img/logo3.png';
 import confetti from 'canvas-confetti'; // Import the confetti package
 import axios from 'axios';
@@ -191,30 +191,32 @@ document.head.appendChild(styleElement);
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible); // Toggle password visibility
   };
-
   return (
     <div style={styles.background}>
       {backgroundImage && (
         <div
           style={{
             ...styles.blurredBackground,
-            backgroundImage: `url(${ApiUrl}/uploads/singleadpage/${backgroundImage})`, // Set the blurred background image
+            backgroundImage: `url(${ApiUrl}/uploads/singleadpage/${backgroundImage})`,
           }}
         />
       )}
-    {/* Optional overlay for the blur effect */}
-    {backgroundImage && <div style={styles.blurOverlay} />}
+      {backgroundImage && <div style={styles.blurOverlay} />}
       <div style={styles.container}>
+        <button style={styles.signOutButton} className="close-btn">
+          <a href="/" style={styles.signOutLink}>
+            <FaSignOutAlt />
+          </a>
+        </button>
         <center>
           <a href="/">
             <img src={logo} width={'200px'} alt="Logo" />
           </a>
         </center>
-
         <h2 style={styles.title}>User Login</h2>
+  
         <form style={styles.form} onSubmit={handleSubmit}>
-          <label style={styles.label} htmlFor="name">Mobile Number</label>
-
+          <label style={styles.label} htmlFor="name">WhatsApp Number</label>
           <input
             type="tel"
             name="contact_number"
@@ -225,30 +227,33 @@ document.head.appendChild(styleElement);
             required
           />
           <label style={styles.label} htmlFor="name">Password</label>
-
           <div style={styles.passwordContainer}>
             <input
-              type={passwordVisible ? "text" : "password"}
+              // type={passwordVisible ? "text" : "password"}
               name="password"
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
               style={styles.passwordInput}
               required
-            />
-            <span onClick={togglePasswordVisibility} style={styles.eyeIcon}>
-              {passwordVisible ? <FaEye /> : <FaEyeSlash />}
-            </span>
-          </div>
+              className={`staff-input ${passwordVisible ? "" : "password-hidden"}`}
 
+            />
+            {/* <span onClick={togglePasswordVisibility} style={styles.eyeIcon}>
+              {passwordVisible ? <FaEye /> : <FaEyeSlash />}
+            </span> */}
+            <span onClick={togglePasswordVisibility} style={styles.eyeIcon} className="eye-icon">
+                            {passwordVisible ? <FaEye /> : <FaEyeSlash />}
+                          </span>
+          </div>
           <button type="submit" style={styles.button}>
             Login
           </button>
         </form>
         <div style={styles.linksContainer}>
-          <a href="/ForgotPassword" style={styles.link}>
+           {/* <a href="/ForgotPassword" style={styles.link}>
             Forgot Password? 
-          </a>
+          </a>  */}
           <a href="/signup" style={styles.link}>
             Don't have an account? Sign Up
           </a>
@@ -294,17 +299,16 @@ const bounceKeyframes = `
 
 
 
-
 const styles = {
   background: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100vh', // Full height of the viewport
-    background: 'linear-gradient(to bottom right, #add8e6, #ffffff)', // Default gradient
-    backgroundSize: 'cover', // Ensure the background covers the entire area
-    position: 'relative', // To position the overlay
-    overflow: 'hidden', // Hide overflow to keep blur contained
+    height: '100vh',
+    background: 'linear-gradient(to bottom right, #add8e6, #ffffff)',
+    backgroundSize: 'cover',
+    position: 'relative',
+    overflow: 'hidden',
   },
   blurredBackground: {
     position: 'absolute',
@@ -312,22 +316,14 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundSize: 'cover', // Ensure the background covers the entire area
-    filter: 'blur(4px)', // Adjust the blur effect here
-    zIndex: 1, // Place behind other content
-  },
-  content: {
-    position: 'relative', // Position content above the blur
-    zIndex: 2,
-    textAlign: 'center',
-    color: 'white',
-  },
-  label: {
-    color: 'white',
-    marginTop: '5px'
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    filter: 'blur(4px)',
+    zIndex: 1,
   },
   container: {
     maxWidth: "400px",
+    width:'350px',
     margin: "30px auto",
     padding: "15px",
     borderRadius: "10px",
@@ -335,7 +331,21 @@ const styles = {
     backgroundColor: "rgba(0, 0, 0, 0.8)",
     marginTop: '100px',
     zIndex: 2,
-
+    position: 'relative',
+  },
+  signOutButton: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    backgroundColor: 'transparent',
+    border: 'none',
+    color: 'white',
+    cursor: 'pointer',
+    fontSize: '18px',
+  },
+  signOutLink: {
+    color: 'white',
+    textDecoration: 'none',
   },
   title: {
     textAlign: "center",
@@ -353,11 +363,11 @@ const styles = {
     padding: "8px",
     margin: "8px 0",
     borderRadius: "5px",
-    border:'1px solid grey',
+    border: '1px solid grey',
     fontSize: "14px",
     backgroundColor: "black",
     color: "white",
-    background:'transparent',
+    background: 'transparent',
   },
   passwordContainer: {
     position: "relative",
@@ -373,8 +383,7 @@ const styles = {
     marginTop: "10px",
     backgroundColor: "black",
     color: "white",
-    background:'transparent',
-
+    background: 'transparent',
   },
   eyeIcon: {
     position: "absolute",
@@ -403,8 +412,11 @@ const styles = {
     fontSize: "14px",
     color: "white",
     textDecoration: "none",
-    marginLeft:"5px"
+    marginLeft: "5px",
   },
+  label:{
+    color:'white'
+  }
 };
 
 export default LoginPage;

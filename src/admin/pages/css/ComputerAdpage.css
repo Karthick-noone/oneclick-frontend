@@ -5,8 +5,9 @@
   gap: 20px; /* Space between the ads */
 }
 .banner-container {
-  width: 880px; /* Width of the banner */
-  height: 280px; /* Height of the banner */
+  max-width: 880px; /* Max width of the banner */
+  width: 100%; /* Full width on smaller screens */
+  height: 280px; /* Fixed height, can adjust for smaller screens if needed */
   background-size: 10px 10px; /* Adjust size for spacing of slashes */
   border: none; /* Remove regular border */
   margin-top: 20px; /* Add space between products and banner */
@@ -15,8 +16,21 @@
   align-items: center; /* Center the content vertically */
   flex-direction: column; /* Arrange children in a column */
   position: relative; /* Position relative for pseudo-elements */
+  padding: 10px; /* Add some padding for smaller screens */
+  box-sizing: border-box; /* Include padding in width/height calculations */
 }
 
+.banner-image7{
+
+  width: 875px;
+  margin-top: 10px;
+  height: 275px;
+}
+.potrait-imagee{
+  width: 230px;
+  height: 300px;
+  margin-top: 10px;
+}
 /* Optional: You can add a pseudo-element for added styling if needed */
 .banner-container::before {
   content: '';
@@ -25,8 +39,43 @@
   left: 0;
   right: 0;
   bottom: 0;
-  border: 2px dashed #000; /* Add dashed border inside */
+  border: 1px dashed #000; /* Add dashed border inside */
   pointer-events: none; /* Allows clicks to pass through */
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .banner-container {
+    height: 300px; /* Adjust height for smaller screens */
+    padding: 5px; /* Adjust padding for smaller screens */
+  }
+  .offer-ad {
+    width: 100%;
+    height: auto;
+  }
+  .banner-image7{
+
+    width: 100%;
+    margin-top: 10px;
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .offer-ad {
+    width: 100%;
+    height: auto;
+  }
+
+  .banner-image7{
+
+    width: 100%;
+    margin-top: 10px;
+    height: auto;
+  }
+  .banner-container {
+    height: 250px; /* Further adjust height for mobile devices */
+    padding: 5px; /* Adjust padding for mobile */
+  }
 }
 /* Title styling */
 .banner-title {
@@ -37,13 +86,84 @@
   text-align: center; /* Center align the title */
 }
 
-/* Input group to align elements in a row */
+.potrait-container {
+  width: 300px; /* Width of the potrait */
+  height: 350px; /* Height of the potrait */
+  background-size: 10px 10px; /* Adjust size for spacing of slashes */
+  border: none; /* Remove regular border */
+  margin-top: 20px; /* Add space between products and potrait */
+  display: flex; /* Center the image inside the container */
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
+  flex-direction: column; /* Arrange children in a column */
+  position: relative; /* Position relative for pseudo-elements */
+  padding: 10px;
+}
+
+/* Optional: You can add a pseudo-element for added styling if needed */
+.potrait-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px dashed #000; /* Add dashed border inside */
+  pointer-events: none; /* Allows clicks to pass through */
+}
+/* Title styling */
+.potrait-title {
+  margin-bottom: 30px; /* Space below the title */
+  font-size: 20px; /* Font size for the title */
+  font-weight: bold; /* Bold font weight */
+  color: #333; /* Color for the title text */
+  text-align: center; /* Center align the title */
+}
 .input-groupp {
   display: flex; /* Use flexbox for the input group */
   align-items: center; /* Center items vertically */
   gap: 10px; /* Space between elements */
 }
 
+
+.input-grouppp {
+  display: flex; /* Use flexbox to align children */
+  flex-direction: column; /* Arrange inputs in a column */
+  width: 100%; /* Ensure inputs take full width of container */
+  align-items: center; /* Center align inputs */
+  gap: 10px;
+}
+
+.portrait-container {
+  width: 300px; /* Default width */
+  height: 350px; /* Default height */
+  background-size: 10px 10px; /* Background size */
+  border: none; /* Remove border */
+  margin-top: 20px; /* Space above */
+  display: flex; /* Use flexbox */
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+  flex-direction: column; /* Arrange children in a column */
+  position: relative; /* Relative positioning */
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+
+  .portrait-container {
+    width: 60%; /* Change width to 90% for smaller screens */
+    height: auto; /* Adjust height to auto for flexibility */
+    margin: 10px; /* Add margin for spacing */
+}
+
+  .input-groupp {
+    flex-direction: column; /* Stack inputs in a column for smaller screens */
+    align-items: stretch; /* Ensure inputs take full width */
+  }
+  .input-grouppp {
+    flex-direction: column; /* Stack inputs in a column for smaller screens */
+    align-items: stretch; /* Ensure inputs take full width */
+  }
+}
 .laptops-cardd-input {
   padding: 10px; /* Inner padding for input field */
   border: 1px solid #ccc; /* Border for input */
@@ -53,6 +173,12 @@
 }
 
 .filee-input {
+  padding: 10px; /* Inner padding for file input */
+  border: 1px solid #ccc; /* Border for file input */
+  border-radius: 4px; /* Slightly rounded corners */
+  flex: 1; /* Allow file input to grow */
+}
+.filee-inputt {
   padding: 10px; /* Inner padding for file input */
   border: 1px solid #ccc; /* Border for file input */
   border-radius: 4px; /* Slightly rounded corners */
@@ -114,8 +240,10 @@
 }
 
 .offer-ad {
-  width: 100%;
-  height: auto;
+  max-width: 100%; /* Make the image responsive */
+  max-height: 100%; /* Limit the height of the image */
+  object-fit: cover; /* Ensure the image covers the area without distortion */
+  display: block; /* Remove any inline spacing around the image */
 }
 
 .offer-tag {
@@ -181,7 +309,6 @@
   position: absolute; /* Position it absolutely within the product image wrapper */
   top: -25px; /* Distance from the top of the image */
   right: 25px; /* Distance from the right of the image */
-  
   gap: 5px; /* Space between icons */
   z-index: 1; /* Ensure it stays on top of other elements */
 }
@@ -218,7 +345,7 @@
   font-size: 14px; /* Adjust font size */
   line-height: 1.4; /* Space between lines */
   margin: 0; /* Remove default margins */
-  font-family: 'Poppins', cursive; /* Delicate, elegant script for paragraph */
+  font-family: 'calibri', cursive; /* Delicate, elegant script for paragraph */
   margin-bottom: 5px;
   /* white-space: nowrap; */
   text-align: center;
@@ -274,5 +401,53 @@
 
 
 .product-image-wrapper {
-  position: relative; /* Relative positioning for the image action */
+  position: relative; /* Position relative to allow absolute positioning of child elements */
+  max-width: 400px; /* Maximum width for the wrapper */
+  max-height: 200px; /* Maximum height for the wrapper */
+  width: 100%; /* Make it responsive */
+  height: 200; /* Allow height to adjust based on content */
+  margin: 0 auto; /* Center the wrapper */
+}
+
+.fatimes {
+  position: absolute;
+  top: 10px; /* Distance from the top */
+  right: 10px; /* Distance from the right */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #999; /* Default color for the close button */
+  transition: color 0.3s; /* Smooth transition for color change */
+}
+
+.fatimes:hover {
+  color: black; /* Change color on hover */
+}
+
+.coupon-title {
+  font-size: 1.5em;
+  margin-bottom: 15px; /* Space below title */
+  color: #333; /* Dark color for title */
+}
+ .faedit{
+    margin-left: 7px;
+  }
+.coupons-list {
+  list-style-type: none; /* Remove default list styling */
+  padding: 0; /* Remove padding */
+  margin: 0; /* Remove margin */
+}
+
+.coupon-item {
+  padding: 10px 0; /* Add vertical padding to items */
+  border-bottom: 1px solid #e0e0e0; /* Light border between items */
+}
+
+.coupon-code {
+  font-weight: bold; /* Make coupon code bold */
+  color: #4CAF50; /* Green color for coupon codes */
+}
+
+.expiry-date {
+  color: #888; /* Grey color for expiry dates */
 }

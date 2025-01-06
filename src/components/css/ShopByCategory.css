@@ -57,11 +57,29 @@
     .category {
         width: calc(25% - 20px); /* 4 items in a row */
     }
+
+    .category-image {
+        width: 100px; /* Further reduce image size */
+        height: 100px; /* Further reduce image size */
+    }
+
+    .category span {
+        font-size: 10px; /* Reduce font size */
+    }
 }
 
 @media (max-width: 900px) {
     .category {
         width: calc(33.33% - 20px); /* 3 items in a row */
+    }
+
+    .category-image {
+        width: 80px; /* Further reduce image size */
+        height: 80px; /* Further reduce image size */
+    }
+
+    .category span {
+        font-size: 9px; /* Further reduce font size */
     }
 }
 
@@ -69,10 +87,45 @@
     .category {
         width: calc(50% - 20px); /* 2 items in a row */
     }
+
+    .category-image {
+        width: 60px; /* Further reduce image size */
+        height: 60px; /* Further reduce image size */
+    }
+
+    .category span {
+        font-size: 8px; /* Further reduce font size */
+    }
 }
 
 @media (max-width: 400px) {
     .category {
         width: 100%; /* 1 item in a row */
+    }
+
+    .category-image {
+        width: 50px; /* Further reduce image size */
+        height: 50px; /* Further reduce image size */
+    }
+
+    .category span {
+        font-size: 7px; /* Further reduce font size */
+    }
+}
+
+/* Add the media query for 5 items in a row on smaller screens */
+@media (max-width: 500px) {
+    .category {
+        width: calc(21% - 3px);
+        gap: 10px;
+    }
+
+    .category-image {
+        width: 70px; /* Reduce image size further */
+        height: 70px; /* Reduce image size further */
+    }
+
+    .category span {
+        font-size: 11px; /* Reduce font size */
     }
 }

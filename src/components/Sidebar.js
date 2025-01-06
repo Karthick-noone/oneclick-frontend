@@ -1,13 +1,30 @@
-import React, { useState } from 'react';
-import { FaSearch, FaTimes, FaHome, FaLaptop, FaHeadphones, FaMobileAlt, FaPrint,  FaTv,FaVolumeUp, FaClock, FaVideo } from 'react-icons/fa'; // Removed FaBars and FaCctv
-import './css/Sidebar.css'; // Ensure you create this CSS file
+import React, { useState, useEffect } from 'react';
+import { FaSearch, FaTimes, FaHome, FaLaptop, FaHeadphones, FaMobileAlt, FaPrint, FaTv, FaVolumeUp, FaClock, FaVideo, FaRecycle } from 'react-icons/fa';
+import { useLocation } from 'react-router-dom';  // Import useLocation hook
+import './css/Sidebar.css';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const location = useLocation();  // Get the current URL path
+    const [activeLink, setActiveLink] = useState(localStorage.getItem('activeLink') || '');
 
+    // Toggle sidebar
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
+
+    // Handle submenu click and set active link
+    const handleLinkClick = (link) => {
+        setActiveLink(link);
+        localStorage.setItem('activeLink', link);  // Save active link to localStorage
+    };
+
+    // This useEffect will ensure the active link updates based on the current URL
+    useEffect(() => {
+        const path = location.pathname.replace('/', '').toLowerCase();  // Remove leading "/" and convert to lowercase
+        setActiveLink(path);
+        localStorage.setItem('activeLink', path);  // Update localStorage with the current URL path
+    }, [location]);  // Re-run when the location changes
 
     return (
         <div>
@@ -19,30 +36,133 @@ const Sidebar = () => {
                     </div>
                     <h3>Browse by products</h3>
                     <ul>
-                        <li><a href="/"><FaHome /> Home</a></li>
-                        <li><a href="/Computers"><FaLaptop /> Computers</a></li>
-                        <li><a href="/CCTV"><FaVideo /> CCTV</a></li> {/* Use FaTags or another relevant icon */}
-                        <li><a href="/Headphones"><FaHeadphones /> Headphones</a></li>
-                        {/* <li><a href="/Headphones"><FaHeadphones /> Home Page Best Sellers</a></li> */}
-                        {/* <li><a href="/"><FaSearch /> Home Page Sale</a></li> */}
-                        <li><a href="/Mobiles"><FaMobileAlt /> Mobiles</a></li>
-                        <li><a href="/Speaker"><FaVolumeUp/> Speakers</a></li>
-                        <li><a href="/TeleVision"><FaTv /> TV & Home Cinema</a></li>
-                        <li><a href="/Watch"><FaClock /> Wearable Tech</a></li>
-                        <li><a href="/Printers"><FaPrint /> Printers</a></li>
-                        <li><a href="/MobileAccessories"><FaMobileAlt /> Mobile Accessories</a></li>
-                        <li><a href="/ComputerAccessories"><FaLaptop /> Computer Accessories</a></li>
-                        <li><a href="/CCTVAccessories"><FaVideo /> CCTV Accessories</a></li>
-                        <li><a href="/PrinterAccessories"><FaPrint /> Printer Accessories</a></li>
+                        <li>
+                            <a
+                                href="/"
+                                onClick={() => handleLinkClick('home')}
+                                className={activeLink === 'home' ? 'active' : ''}
+                            >
+                                <FaHome /> Home
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/Computers"
+                                onClick={() => handleLinkClick('computers')}
+                                className={activeLink === 'computers' ? 'active' : ''}
+                            >
+                                <FaLaptop /> Computers
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/CCTV"
+                                onClick={() => handleLinkClick('cctv')}
+                                className={activeLink === 'cctv' ? 'active' : ''}
+                            >
+                                <FaVideo /> CCTV
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/Headphones"
+                                onClick={() => handleLinkClick('headphones')}
+                                className={activeLink === 'headphones' ? 'active' : ''}
+                            >
+                                <FaHeadphones /> Headphones
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/Mobiles"
+                                onClick={() => handleLinkClick('mobiles')}
+                                className={activeLink === 'mobiles' ? 'active' : ''}
+                            >
+                                <FaMobileAlt /> Mobiles
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/Speaker"
+                                onClick={() => handleLinkClick('speaker')}
+                                className={activeLink === 'speaker' ? 'active' : ''}
+                            >
+                                <FaVolumeUp /> Speakers
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/TeleVision"
+                                onClick={() => handleLinkClick('television')}
+                                className={activeLink === 'television' ? 'active' : ''}
+                            >
+                                <FaTv /> TV & Home Cinema
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/Watch"
+                                onClick={() => handleLinkClick('watch')}
+                                className={activeLink === 'watch' ? 'active' : ''} 
+                            >
+                                <FaClock /> Wearable Tech
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/Printers"
+                                onClick={() => handleLinkClick('printers')}
+                                className={activeLink === 'printers' ? 'active' : ''}
+                            >
+                                <FaPrint /> Printers
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/MobileAccessories"
+                                onClick={() => handleLinkClick('mobileaccessories')}
+                                className={activeLink === 'mobileaccessories' ? 'active' : ''}
+                            >
+                                <FaMobileAlt /> Mobile Accessories
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/ComputerAccessories"
+                                onClick={() => handleLinkClick('computeraccessories')}
+                                className={activeLink === 'computeraccessories' ? 'active' : ''}
+                            >
+                                <FaLaptop /> Computer Accessories
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/CCTVAccessories"
+                                onClick={() => handleLinkClick('cctvaccessories')}
+                                className={activeLink === 'cctvaccessories' ? 'active' : ''}
+                            >
+                                <FaVideo /> CCTV Accessories
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/PrinterAccessories"
+                                onClick={() => handleLinkClick('printeraccessories')}
+                                className={activeLink === 'printeraccessories' ? 'active' : ''}
+                            >
+                                <FaPrint /> Printer Accessories
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="/Secondhandproducts"
+                                onClick={() => handleLinkClick('secondhandproducts')}
+                                className={activeLink === 'secondhandproducts' ? 'active' : ''}
+                            >
+                                <FaRecycle /> Refurbish
+                            </a>
+                        </li>
                     </ul>
-                    {/* <h3>Filter by</h3>
-                    <div className="price-filter">
-                        <label>
-                            Price
-                            <input type="range" min="0" max="100000" /><br />
-                            <span>₹39,499.00 - ₹72,999.00</span>
-                        </label>
-                    </div> */}
                 </div>
             </aside>
 

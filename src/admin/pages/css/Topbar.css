@@ -4,7 +4,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #ffffff;
+    background-color: #001a35;
     color: rgb(49, 49, 49);
     display: flex;
     justify-content: flex-end;
@@ -117,6 +117,12 @@
 
 /* Responsive Styles */
 @media (max-width: 768px) {
+
+    .notification-box {
+        width: 100%;
+        right: 0;
+      }
+    
     .topbar-content {
         flex-direction: row; /* Ensure content is in a single row */
         align-items: center; /* Center items vertically */
@@ -181,11 +187,12 @@ margin-right: 1px;    }
 .profile-section {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
     padding: 0;
+    
   }
   
-  .profile-image {
+  .profile-imagee {
     width: 70px;
     height: 70px;
     border-radius: 50%;
@@ -207,5 +214,250 @@ margin-right: 1px;    }
     font-size: 10px;
     color: black;
   } */
+ /* Enhanced Notification Box */
+ .notification-box {
+    position: absolute;
+    top: 75px;
+    right: 10px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    /* padding: 15px; */
+    width: 250px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    overflow: hidden;
+    max-height: 400px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+  }
 
+  .no-notify{
+    margin-top: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  /* Notification Header */
+.notification-box h4 {
+    margin: 0;
+    font-size: 18px;
+    /* font-weight: bold; */
+    color: white;
+    display: inline-block;
+    
+  }
+  
+  .notification-box .mark-all-btn {
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-left: 10px;
+    display: inline-block;
+    
+  }
+  
+  /* Flex container for header */
+  .notification-header {
+    display: flex;
+    background-color: #001a35;
+    justify-content: space-between; /* This aligns items to the left and right */
+    align-items: center; /* Ensures vertical centering of the items */
+    border-bottom: 1px solid black;
+    padding: 10px;
+
+  }
+  
+ 
+  
+  /* Notification List */
+  .notification-box ul {
+    list-style-type: none;
+    /* padding-right: 10px;
+    padding-left: 10px; */
+    padding: 10px;
+    margin: 0;
+    overflow-y: auto;
+    flex-grow: 1;
+    /* margin-top: 10px; */
+  }
+  
+  .notification-box ul li {
+    /* display: flex; */
+    justify-content: space-between;
+    align-items: center;
+    /* padding: 5px ; */
+    /* border-bottom: 1px solid #f1f1f1; */
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+  }
+  /* Notification Count Badge */
+.notification-count {
+    position: absolute;
+    top: 15px;
+    right: 75px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    /* font-weight: bold; */
+    width: 20px;
+    height: 20px;
+    padding: 3px ;
+    border-radius: 50%;
+    min-width: 18px;
+    text-align: center;
+  }
+  
+  
+  .notification-box ul li:last-child {
+    border-bottom: none;
+  }
+  
+  /* Notification Content */
+  .notification-box ul li .content {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+  
+  /* Circle Button (Read/Unread) */
+ /* Circle Button (Read/Unread) */
+.notification-box ul li .circle-btn-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;  /* Aligns the circle button to the right */
+    flex: 0; /* Prevents the wrapper from taking up extra space */
+    margin-left: auto; /* Ensures that the circle buttons stay on the far right */
+  }
+  
+  .circle-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid #007bff;
+    background-color: transparent;
+    cursor: pointer;
+  }
+  
+  .circle-btn.unread {
+    background-color: #007bff;
+  }
+  
+  .circle-btn.read {
+    background-color: transparent;
+    border: 1px solid #888;
+  }
+  
+  /* New/Read Notification Styles */
+  .notification-box ul li.new {
+    /* background-color: #e0f7fa;  */
+    font-weight: bold;
+  }
+  
+  .notification-box ul li.read {
+    background-color: transparent; /* Transparent background for read notifications */
+    color: #888; /* Grey color for read notifications */
+  }
+  
+  .notification-box ul li.unread {
+    background-color: #fff; /* White background for unread notifications */
+  }
+  
+  .notification-box ul li .timestamp {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+    display: block;
+    margin-left: 20px; /* Optional: aligns timestamp with content */
+  }
+  
+  /* Mark All Button */
+  .notification-box .mark-all-btn {
+    margin-top: 10px;
+    align-self: flex-start; /* Align it to the start */
+  }
+
+  /* Notification Item */
+.notification-item {
+    display: flex; /* Use flex to arrange items in a row for message and circle button */
+    flex-direction: column; /* Stack the content vertically */
+    padding: 10px 5px;
+    border-bottom: 1px solid #f1f1f1;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  /* Notification Row (Message and Circle Button) */
+  .notification-row {
+    display: flex; /* Arrange message and circle button in the same row */
+    justify-content: space-between; /* Space out the content, push circle to the right */
+    align-items: center; /* Vertically center the items */
+    width: 100%;
+  }
+  
+  /* Circle Button Wrapper */
+  .circle-btn-wrapper {
+    display: flex;
+    justify-content: flex-end; /* Ensure circle button is aligned to the right */
+    flex: 0; /* Prevent wrapper from taking extra space */
+  }
+  
+  /* Circle Button */
+  .circle-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid #007bff;
+    background-color: transparent;
+    cursor: pointer;
+  }
+  
+  .circle-btn.unread {
+    background-color: #007bff;
+  }
+  
+  .circle-btn.read {
+    background-color: transparent;
+    border: 1px solid #888;
+  }
+  
+  /* Notification Time */
+  .notification-time {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px; /* Add space above the time */
+  }
+  
+  /* Clear Option */
+  .notification-box .clear {
+    text-align: center;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #888;
+  }
+  
+  .notification-box .clear:hover {
+    text-decoration: underline;
+  }
+  
+  /* Marking Read Notifications */
+  .notification-item.read {
+    background-color: transparent; /* Remove background for read notifications */
+  }
+  
+  .notification-item.new {
+    /* background-color: #e0f7fa;  */
+    font-weight: bold;
+  }
+  
+  .notification-item.unread {
+    background-color: #fff;
+  }
+  
+  /* Improved Topbar and Menu Styles */
 

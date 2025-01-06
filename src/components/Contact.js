@@ -182,27 +182,36 @@ const Contact = () => {
     <div>
       <Header2 />
       <div style={styles.container}>
-        <div style={styles.imageContainer}>
-          <h2 style={styles.title}>Get in Touch</h2>
-          <p style={styles.paragraph}>
-            <strong>Opening Hours:</strong>
-            <br />
-            Mon - Sat: 10 am - 9 pm
-            <br />
-            <br />
-            <strong>Email:</strong>
-            <br />
-            enquiryoneclick@gmail.com
-            <br />
-            <br />
-            <strong>Store Location:</strong>
-            <br />
-            MARKET ROAD, MARTHANDAM,
-            <br />
-            KANYAKUMARI - 629165
-            <br />
-          </p>
-        </div>
+      <div style={styles.imageContainer}>
+    <h2 style={styles.title}>Get in Touch</h2>
+    <p style={styles.paragraph}>
+      <strong>Opening Hours:</strong>
+      <br />
+      Mon - Sat: 10 am - 9 pm
+      <br />
+      <br />
+      <strong>Email:</strong>
+      <br />
+      enquiryoneclick@gmail.com
+      <br />
+      <br />
+      <strong>Store Location:</strong>
+      <br />
+      MARKET ROAD, MARTHANDAM,
+      <br />
+      KANYAKUMARI - 629165
+    </p>
+    <div style={styles.mapContainer}>
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.0045738569324!2d77.2232186!3d8.3023422!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b04554d46344113%3A0xbda68de23a7d7261!2sONE%20CLICK%20TECHNOLOGIES!5e0!3m2!1sen!2sin!4v1730793178125!5m2!1sen!2sin"
+        style={styles.mapIframe}
+        allowFullScreen=""
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  </div>
+        
         <div style={styles.textContainer}>
           <h3 style={styles.subtitle}>We're here to help!</h3>
           <p style={styles.paragraph}>
@@ -297,13 +306,33 @@ const Contact = () => {
 };
 
 const styles = {
+
+  mapContainer: {
+    position: 'relative',
+    paddingBottom: '57.95%', // Aspect ratio 16:9
+    width: '100%',
+    maxWidth: '500px', // Limits max width for larger screens
+    height: 0,
+    overflow: 'hidden',
+    borderRadius: '8px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+    margin: '0 auto', // Center alignment
+  },
+  mapIframe: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    border: 0,
+  },
   container: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     padding: "40px 20px",
-    maxWidth: "1200px",
+    maxWidth: "1100px",
     margin: "0 auto",
     flexWrap: "wrap",
   },
@@ -323,6 +352,8 @@ const styles = {
     color: "#333",
     textTransform: "uppercase",
     letterSpacing: "1.5px",
+    textAlign: "left",
+
   },
   subtitle: {
     fontSize: "1.5em",
@@ -330,6 +361,7 @@ const styles = {
     marginTop: "20px",
     marginBottom: "10px",
     color: "#555",
+
   },
   paragraph: {
     fontSize: "1em",
@@ -341,7 +373,7 @@ const styles = {
   form: {
     display: "flex",
     flexDirection: "column",
-    fontFamily:'Poppins'
+    fontFamily:'calibri'
 
   },
   formGroup: {
@@ -361,7 +393,7 @@ const styles = {
     borderRadius: "4px",
     boxSizing: "border-box",
     marginBottom: "10px",
-    fontFamily:'Poppins'
+    fontFamily:'calibri'
 
   },
   textarea: {
@@ -374,7 +406,7 @@ const styles = {
     boxSizing: "border-box",
     marginBottom: "10px",
     resize: "vertical",
-    fontFamily:'Poppins'
+    fontFamily:'calibri'
 
   },
   button: {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { FaHome, FaLaptop, FaUsb, FaMobileAlt, FaVideo, FaPrint, FaHeadphones, FaVolumeUp, FaTv, FaAppleAlt, FaCog } from 'react-icons/fa';
+import { FaHome, FaLaptop, FaUsb, FaMobileAlt, FaVideo, FaPrint, FaHeadphones, FaVolumeUp, FaTv, FaAppleAlt, FaCog, FaRecycle, FaInfoCircle, FaEnvelope, FaQuestionCircle } from 'react-icons/fa';
 import './css/Header3.css'; // Adjust path as needed
 
 const Header3 = () => {
@@ -60,18 +60,18 @@ const Header3 = () => {
             >
                 {isOpen ? '✖' : '☰'}
             </div>
-            <nav style={{backgroundColor:'black'}} className={`nav ${isOpen ? 'open' : ''}`}>
+            <nav  className={`nav ${isOpen ? 'open' : ''}`}>
                 <NavLink   to="/" exact className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
                     <FaHome   className={`fa-icons ${location.pathname === '/' ? 'active' : ''}`} /> {isOpen ? 'Home' : ''}
                 </NavLink>
                 <NavLink  /* to="/Computers" */ to="/ComputerAdBanner" className={`nav-link ${location.pathname === '/Computers' ? 'active' : ''}`}>
-                    <FaLaptop  className={`fa-icons ${location.pathname === '/Computers' ? 'active' : ''}`} /> Computers
+                    <FaLaptop  className={`fa-icons ${location.pathname === '/Computers' || location.pathname === '/ComputerAdBanner'  ? 'active' : ''}`} /> Computers
                 </NavLink>
                 <NavLink /*  to="/Mobiles" */ to="/MobileAdBanner" className={`nav-link ${location.pathname === '/Mobiles' ? 'active' : ''}`}>
-                    <FaMobileAlt  className={`fa-icons ${location.pathname === '/Mobiles' ? 'active' : ''}`} /> Mobile
+                    <FaMobileAlt  className={`fa-icons ${location.pathname === '/Mobiles' || location.pathname === '/MobileAdBanner' ? 'active' : ''}`} /> Mobile
                 </NavLink>
                 <NavLink  /* to="/CCTV" */ to="/CCTVAdBanner" className={`nav-link ${location.pathname === '/CCTV' ? 'active' : ''}`}>
-                    <FaVideo  className={`fa-icons ${location.pathname === '/CCTV' ? 'active' : ''}`} /> CCTV
+                    <FaVideo  className={`fa-icons ${location.pathname === '/CCTV' || location.pathname === '/CCTVAdBanner' ? 'active' : ''}`} /> CCTV
                 </NavLink>
                 {/* Parent Audio link */}
          <div className={`nav-item ${isAudioActive ? 'active' : ''}`} onClick={toggleHeadphonesDropdown}>
@@ -98,6 +98,7 @@ const Header3 = () => {
                 <NavLink  to="/Printers" className={`nav-link ${location.pathname === '/Printers' ? 'active' : ''}`}>
                     <FaPrint  className={`fa-icons ${location.pathname === '/Printers' ? 'active' : ''}`} /> Printers
                 </NavLink>
+               
                 {/* Parent Accessories link */}
                 <div className={`nav-item ${isAccessoriesActive ? 'active' : ''}`} onClick={toggleMoreDropdown}>
                     <span  className='activelink'>
@@ -120,6 +121,39 @@ const Header3 = () => {
                         </div>
                     )}
                 </div>
+                <NavLink  to="/Secondhandproducts" className={`nav-link ${location.pathname === '/Secondhandproducts' ? 'active' : ''}`}>
+                    <FaRecycle  className={`fa-icons ${location.pathname === '/Secondhandproducts' ? 'active' : ''}`} /> Refurbish
+                </NavLink>
+                <NavLink
+  to="/About"
+  className={`nav-link ${location.pathname === '/About' ? 'active' : ''}`}
+  style={{
+    display: window.innerWidth <= 768 ? 'flex' : 'none', // Show only on mobile
+  }}
+>
+  <FaInfoCircle className={`fa-icons ${location.pathname === '/About' ? 'active' : ''}`} /> About
+</NavLink>
+
+<NavLink
+  to="/Contact"
+  className={`nav-link ${location.pathname === '/Contact' ? 'active' : ''}`}
+  style={{
+    display: window.innerWidth <= 768 ? 'flex' : 'none', // Show only on mobile
+  }}
+>
+  <FaEnvelope className={`fa-icons ${location.pathname === '/Contact' ? 'active' : ''}`} /> Contact
+</NavLink>
+
+<NavLink
+  to="/HelpCenter"
+  className={`nav-link ${location.pathname === '/HelpCenter' ? 'active' : ''}`}
+  style={{
+    display: window.innerWidth <= 768 ? 'flex' : 'none', // Show only on mobile
+  }}
+>
+  <FaQuestionCircle className={`fa-icons ${location.pathname === '/HelpCenter' ? 'active' : ''}`} /> Help Center
+</NavLink>
+
             </nav>
         </header>
     );

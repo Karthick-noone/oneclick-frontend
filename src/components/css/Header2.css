@@ -62,7 +62,8 @@
   position: sticky;
   top: 0;
   z-index: 1008;
-  background-color: rgb(36, 35, 35); /* Ensure the header has a background to cover content underneath */
+  /* background-color: black  ; */
+  background-color: #001a35  ;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -104,7 +105,7 @@
 .header2 .iconss {
   display: flex;
   align-items: center;
-  gap:15px;
+  gap:22px;
 }
 
 .header2 .iconss svg {
@@ -137,7 +138,7 @@
   font-size: 20px;
   color: #333;
   cursor: pointer;
-  margin-left: 18px;
+  margin-left: 22px;
 }
 .dropdown-item {
   display: flex;
@@ -150,7 +151,7 @@
 
 .dropdown-menu {
   position: absolute;
-  top: 40px; /* Adjust based on icon size and placement */
+  top: 85px; /* Adjust based on icon size and placement */
   right:1px; /* Aligns the dropdown to the right of the icon */
   background-color: white;
   border: 1px solid #ccc;
@@ -161,6 +162,9 @@
   border-radius: 8px;
 }
 
+.iicon{
+  color: black;
+}
 .dropdown-menu a{
   text-decoration: none;
   color: black;
@@ -184,6 +188,11 @@
       flex-direction: column;
       gap: 13px;
       text-align: center;
+  }
+
+  .dropdown-menu {
+    top: 180px; /* Adjust based on icon size and placement */
+   
   }
 
   .header2 .search-box {
@@ -474,11 +483,12 @@
   }
   
 /* Container for the search box */
+/* Container for the search box */
 .search-box {
-  position: relative; /* Ensure dropdown is positioned relative to this container */
+  position: fixed; /* Ensure dropdown is positioned relative to this container */
   display: flex; /* Align input and button horizontally */
   align-items: center; /* Center vertically */
-  max-width: 930px; /* Maximum width for the search box */
+  max-width: 700px; /* Maximum width for the search box */
   margin: 0 auto; /* Center the search box in its container */
   border-radius: 5px; /* Rounded corners for the rectangular shape */
   overflow: hidden; /* Hide overflow for rounded corners */
@@ -489,18 +499,29 @@
 /* Styling for the input field */
 .search-box input[type="text"] {
   border: none; /* Remove default border */
-  padding: 15px; /* Add padding for spacing */
+  padding: 10px; /* Add padding for spacing */
   font-size: 1rem; /* Font size */
   flex: 1; /* Allow input to take up available space */
   outline: none; /* Remove outline on focus */
 }
 
+/* Container for the search icon */
+.search-box .search-icon-container {
+  display: flex; /* Align items horizontally */
+  align-items: center; /* Center icon vertically */
+  justify-content: center; /* Center icon horizontally */
+  background-color: #ffc68e; /* Light orange background for the box */
+  padding: 10px; /* Padding inside the box */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-left: 8px; /* Space between the input and the icon box */
+}
+
 /* Styling for the search icon */
 .search-box .search-icon {
-  margin-right: 12px;
-  cursor: pointer; /* Pointer cursor on hover */
   font-size: 1.2rem; /* Adjust size as needed */
+  color: #333; /* Icon color */
 }
+
 
 /* Suggestions dropdown container */
 .suggestions-dropdown {
@@ -614,6 +635,12 @@
   background-color: #f1f1f1; /* Color of the track */
   border-radius: 10px; /* Rounded corners for the track */
 }
+
+
+
+
+
+
 
 
 

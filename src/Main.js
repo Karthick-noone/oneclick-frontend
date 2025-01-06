@@ -11,6 +11,7 @@ import AdPage from './components/AdPage';
 import './styles.css';
 import FullAdPage from './components/FullAdPage';
 import BrandsPage from './components/BrandsPage';
+import ProductCategories from './components/ProductCategories';
 
 const Main = () => {
     return (
@@ -19,11 +20,15 @@ const Main = () => {
             <Header2 />
             {/* <Header3 /> */}
             <Homepage />
+
             <FeaturesCard />
             <AdPage />
             <ShopByCategory />
+
             <FullAdPage />
-            <ProductList />
+            <ProductCategories />
+
+            {/* <ProductList /> */}
             <BrandsPage />
             
             <Footer />

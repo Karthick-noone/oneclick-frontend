@@ -2,13 +2,18 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick"; // Import Slider from react-slick
-import { FaInfoCircle } from "react-icons/fa"; // Ensure to import any icons you need
+import { FaInfoCircle, FaClone } from "react-icons/fa"; // Ensure to import any icons you need
+import CouponEditPopup from "./CouponEditPopup";
+import EditCouponModal from "./EditCouponModal"; // Import the modal component
 
+
+import leftarrow from './img/left.png';
+import rightarrow from './img/right.png';
 // Set up the modal root element
 Modal.setAppElement("#root");
 
@@ -20,10 +25,14 @@ const MobileAccessories = () => {
     features: "",
     price: "",
     label: "",
+    subtitle: "",
+    deliverycharge: "",
     category: "",
     coupon: "",
     coupon_expiry_date: "",
     actual_price: "", // Add actual price field
+    effectiveprice: "", // Add actual price field
+    
   });
   const [editingProduct, setEditingProduct] = useState(null); // To handle the product being edited
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal open/close state
@@ -35,16 +44,251 @@ const MobileAccessories = () => {
   const [imageIndex, setImageIndex] = useState(null);
   const [newImages, setNewImages] = useState({});
   const [isPopupVisible, setPopupVisible] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [isViewingCoupons, setIsViewingCoupons] = useState(false);
+  const [coupons, setCoupons] = useState([]);
+  const [isEditingCoupon, setIsEditingCoupon] = useState(false);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [productName, setproductName] = useState(null);
+  const [selectedProductPrice, setSelectedProductPrice] = useState(null);
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false); // Renamed state
+  const [offerStartTime, setOfferStartTime] = useState("");
+  const [offerEndTime, setOfferEndTime] = useState("");
+  const [offerPrice, setOfferPrice] = useState("");
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  // Handle opening modal and passing productId
+  const handleOpenOfferModal = (id) => { // Renamed function
+    setProductId(id);
+    setIsOfferModalOpen(true);
+  };
+
+  const handleCloseOfferModal = () => { // Renamed function
+    setIsOfferModalOpen(false);
+    setProductId(null); // Clear the productId when closing
+  };
+
+  useEffect(() => {
+    if (isOfferModalOpen && productId) {
+      setIsEditMode(true);
+      fetchOfferData(productId);
+    } else {
+      setIsEditMode(false);
+    }
+  }, [isOfferModalOpen, productId]);
+
+  const fetchOfferData = async (id) => {
+    try {
+      const response = await axios.get(`${ApiUrl}/api/products/fetchoffer/${id}`);
+      const { offer_start_time, offer_end_time, offer_price } = response.data;
+  
+      // The dates are already in the correct format from the backend
+      setOfferStartTime(offer_start_time || "");
+      setOfferEndTime(offer_end_time || "");
+      setOfferPrice(offer_price || "");
+    } catch (error) {
+      console.error("Error fetching offer data", error);
+    }
+  };
+  
+  const handleChangePrice = (e) => {
+    const value = e.target.value;
+  
+    // Regex to prevent starting with 0 (except for "0." as a decimal input), and only allow numbers and up to 2 decimal places.
+    const regex = /^[1-9][0-9]*$/; // Only digits from 1 to 9 and no leading zeros
+  
+    // Allow empty string for clearing input
+    if (regex.test(value) || value === "") {
+      setOfferPrice(value);
+    } 
+  };
+  
+  
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!offerStartTime || !offerEndTime || !offerPrice) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please fill all fields",
+        text: "Ensure all fields are filled out correctly before submitting.",
+      });
+      return;
+    } 
+  
+    
+    const offerData = {
+      offer_start_time: offerStartTime,
+      offer_end_time: offerEndTime,
+      offer_price: offerPrice,
+    };
+  
+    try {
+      if (isEditMode) {
+        await axios.put(`${ApiUrl}/api/products/updateoffer/${productId}`, offerData);
+        Swal.fire('Success!', 'Offer updated successfully!', 'success');
+      } else {
+        await axios.post(`${ApiUrl}/api/products/addoffer`, { ...offerData, productId });
+        Swal.fire('Success!', 'Offer added successfully!', 'success');
+      }
+      handleCloseOfferModal(); // Close the modal after successful submission
+    } catch (error) {
+      console.error("Error submitting offer", error);
+      Swal.fire('Error!', 'There was an error processing your request. Please try again.', 'error');
+    }
+  };
+  
+  // Handle deletion of offer with confirmation
+  const handleDelete = async () => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`${ApiUrl}/api/products/deleteoffer/${productId}`);
+          Swal.fire('Deleted!', 'Offer has been deleted.', 'success');
+          handleCloseOfferModal(); // Close the modal after deletion
+        } catch (error) {
+          console.error("Error deleting offer", error);
+          Swal.fire('Error!', 'There was an error deleting the offer. Please try again.', 'error');
+        }
+      }
+    });
+  };
+  
+  const openPopup = (id, productName, prodPrice) => {
+    // Set states
+    setSelectedProductId(id);
+    setSelectedProductPrice(prodPrice);
+    setproductName(productName);
+    setIsPopupOpen(true);
+  
+    // Log the parameters passed
+    console.log("Product ID passed:", id);
+    console.log("Product Name passed:", productName);
+    console.log("Product Price passed:", prodPrice);
+  
+    // Use a timeout to log updated state after React processes the setState
+    setTimeout(() => {
+      console.log("Selected Product ID (state):", selectedProductId);
+      console.log("Selected Product Price (state):", selectedProductPrice);
+      console.log("Product Name (state):", productName);
+      console.log("Popup open status (state):", isPopupOpen);
+    }, 100);
+  };
+  
+
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    setSelectedProductId(null);
+  };
 
   const handlePopupToggle = () => {
     setPopupVisible(!isPopupVisible);
   };
 
-  const handleFileChange = (productId, event) => {
-    const files = Array.from(event.target.files);
-    setNewImages((prev) => ({ ...prev, [productId]: files }));
-    console.log(`Selected files for product ID ${productId}:`, files); // Log selected files
+  const fetchCoupons = async (productId, productName, productPrice) => {
+    console.log(`Fetching coupons for product ID: ${productId}`); // Log when fetching starts
+
+    try {
+      const response = await axios.get(`${ApiUrl}/coupons/${productId}`); // Create this endpoint
+      if (response.status === 200) {
+        console.log(
+          `Successfully fetched coupons for product ID: ${productId}`,
+          response.data.coupons
+        ); // Log successful response
+        setCoupons(response.data.coupons); // Assuming your response has this structure
+        setIsViewingCoupons(true); // Set to true to display the coupons
+        setproductName(productName);
+        setSelectedProductPrice(productPrice); // Set the product price for use
+      }
+    } catch (error) {
+      console.error("Error fetching coupons:", error); // Log any error
+    }
   };
+
+  const handleCouponUpdated = () => {
+    console.log("Coupon updated successfully!");
+  };
+ const handleFileChange = (productId, event) => {
+  const files = Array.from(event.target.files); // Convert FileList to array
+  const resizedFiles = [];
+
+  files.forEach((file) => {
+    console.log(`Selected file for product ID ${productId}:`, file);
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      const img = new Image();
+      img.src = e.target.result;
+      img.onload = () => {
+        console.log("Original image dimensions:", img.width, img.height);
+
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 500; // Define max width
+        const scaleSize = MAX_WIDTH / img.width;
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleSize;
+
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        console.log("Resizing image to:", canvas.width, canvas.height);
+
+        // Compress and convert to blob
+        canvas.toBlob(
+          (blob) => {
+            console.log("Resized image size (in KB):", (blob.size / 1024).toFixed(2));
+
+            if (blob.size / 1024 < 50) {
+              console.log("Image is under 50 KB, ready for upload.");
+              resizedFiles.push(blob); // Add resized image to array
+            } else {
+              console.log("Image still above 50 KB, applying further compression.");
+              canvas.toBlob(
+                (compressedBlob) => {
+                  console.log("Compressed image size (in KB):", (compressedBlob.size / 1024).toFixed(2));
+                  resizedFiles.push(compressedBlob);
+
+                  // Update state after all files processed
+                  if (resizedFiles.length === files.length) {
+                    setNewImages((prev) => ({
+                      ...prev,
+                      [productId]: resizedFiles,
+                    }));
+                  }
+                },
+                'image/jpeg',
+                0.7
+              );
+            }
+
+            // Update state after all files processed
+            if (resizedFiles.length === files.length) {
+              setNewImages((prev) => ({
+                ...prev,
+                [productId]: resizedFiles,
+              }));
+            }
+          },
+          'image/jpeg',
+          0.8
+        );
+      };
+    };
+  });
+};
+
 
   const handleUploadImages = async (productId) => {
     if (!newImages[productId] || newImages[productId].length === 0) {
@@ -116,12 +360,12 @@ const MobileAccessories = () => {
   };
 
   const settings = {
-    dots: true, // Show dots
+    dots: false, // Show dots
     infinite: true,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    arrows: true, // Show arrows
+    arrows: false, // Show arrows
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
   };
@@ -136,7 +380,7 @@ const MobileAccessories = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${ApiUrl}/fetchmobileaccessories`);
+        const response = await axios.get(`${ApiUrl}/adminfetchmobileaccessories`);
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -164,7 +408,7 @@ const MobileAccessories = () => {
     //   }
     // }
 
-    if (name === "price" || name === "actual_price") {
+    if (name === "price" || name === "actual_price" || name === "deliverycharge" || name === "effectiveprice") {
       // Allow only numeric characters for price and actual_price
       const isNumeric = value === "" || /^[0-9]*\.?[0-9]*$/.test(value);
       if (!isNumeric) {
@@ -172,7 +416,7 @@ const MobileAccessories = () => {
         Swal.fire({
           icon: "warning",
           title: "Validation Error",
-          text: "Price and Actual Price should only contain numbers.",
+          text: "Price should only contain numbers.",
         });
         return; // Prevent updating state if invalid
       }
@@ -187,9 +431,58 @@ const MobileAccessories = () => {
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
-    setSelectedFile(file); // Store the selected file in state
-    console.log(file);
+    if (file) {
+      console.log("Selected image for upload:", file);
+  
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          console.log("Original image dimensions:", img.width, img.height);
+  
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 500;  // Define max width
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+  
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+          console.log("Resizing image to:", canvas.width, canvas.height);
+  
+          // Compress image
+          canvas.toBlob(
+            (blob) => {
+              console.log("Resized image size (in KB):", (blob.size / 1024).toFixed(2));
+              if (blob.size / 1024 < 50) {
+                console.log("Image is under 50 KB, ready for upload.");
+                setSelectedFile(blob); // Update state with resized image
+              } else {
+                console.log("Image still above 50 KB, applying further compression.");
+                // Further compress if above 50 KB
+                canvas.toBlob(
+                  (compressedBlob) => {
+                    console.log("Compressed image size (in KB):", (compressedBlob.size / 1024).toFixed(2));
+                    setSelectedFile(compressedBlob);
+                  },
+                  'image/jpeg',
+                  0.7
+                );
+              }
+            },
+            'image/jpeg',
+            0.8
+          );
+        };
+      };
+    }
   };
+  
 
   // Your existing handleImageUpdate function
   const handleImageUpdate = () => {
@@ -197,13 +490,10 @@ const MobileAccessories = () => {
     if (selectedFile) {
       formData.append("image", selectedFile);
 
-      fetch(
-        `${ApiUrl}/updatemobileaccessories/image/${productId}?index=${imageIndex}`,
-        {
-          method: "PUT",
-          body: formData,
-        }
-      )
+      fetch(`${ApiUrl}/updatemobileaccessories/image/${productId}?index=${imageIndex}`, {
+        method: "PUT",
+        body: formData,
+      })
         .then((response) => response.json())
         .then((data) => {
           if (data.message) {
@@ -251,12 +541,9 @@ const MobileAccessories = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // Make the DELETE request to the backend API
-        fetch(
-          `${ApiUrl}/deletemobileaccessories/image/${productId}?index=${imageIndex}`,
-          {
-            method: "DELETE",
-          }
-        )
+        fetch(`${ApiUrl}/deletemobileaccessories/image/${productId}?index=${imageIndex}`, {
+          method: "DELETE",
+        })
           .then((response) => response.json())
           .then((data) => {
             if (data.message) {
@@ -289,12 +576,74 @@ const MobileAccessories = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files); // Convert FileList to an array
-    setNewProduct((prevProduct) => ({
-      ...prevProduct,
-      images: files, // Store the array of files
-    }));
+    const resizedFiles = [];
+  
+    files.forEach((file) => {
+      console.log("Selected image for upload:", file);
+  
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          console.log("Original image dimensions:", img.width, img.height);
+  
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 500;  // Define max width
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+  
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+          console.log("Resizing image to:", canvas.width, canvas.height);
+  
+          canvas.toBlob(
+            (blob) => {
+              console.log("Resized image size (in KB):", (blob.size / 1024).toFixed(2));
+              if (blob.size / 1024 < 50) {
+                console.log("Image is under 50 KB, ready for upload.");
+                resizedFiles.push(blob); // Add resized image to the array
+              } else {
+                console.log("Image still above 50 KB, applying further compression.");
+                // Further compress if above 50 KB
+                canvas.toBlob(
+                  (compressedBlob) => {
+                    console.log("Compressed image size (in KB):", (compressedBlob.size / 1024).toFixed(2));
+                    resizedFiles.push(compressedBlob);
+                    // Update state after processing all files
+                    if (resizedFiles.length === files.length) {
+                      setNewProduct((prevProduct) => ({
+                        ...prevProduct,
+                        images: resizedFiles,
+                      }));
+                    }
+                  },
+                  'image/jpeg',
+                  0.7
+                );
+              }
+  
+              // Update state after processing all files
+              if (resizedFiles.length === files.length) {
+                setNewProduct((prevProduct) => ({
+                  ...prevProduct,
+                  images: resizedFiles,
+                }));
+              }
+            },
+            'image/jpeg',
+            0.8
+          );
+        };
+      };
+    });
   };
-
+  
   const handleAddProduct = async () => {
     if (newProduct.label && newProduct.label.length > 15) {
       Swal.fire({
@@ -332,14 +681,14 @@ const MobileAccessories = () => {
       });
       return;
     }
-    if (!newProduct.category.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Validation Error",
-        text: "Product category is required.",
-      });
-      return;
-    }
+    // if (!newProduct.category.trim()) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Product category is required.",
+    //   });
+    //   return;
+    // }
     if (
       !newProduct.price ||
       isNaN(newProduct.price) ||
@@ -384,76 +733,82 @@ const MobileAccessories = () => {
       return;
     }
 
- // Validate coupon code and extract numeric part
- const couponCode = newProduct.coupon
- ? newProduct.coupon.trim()
- : ""; // Trim coupon code to avoid spaces
-const couponExpiryDate =
- newProduct.coupon_expiry_date &&
- newProduct.coupon_expiry_date !== "0000-00-00"
-   ? newProduct.coupon_expiry_date.trim()
-   : ""; // Treat "0000-00-00" as empty
-
-
+    // Validate coupon code and extract numeric part
+    const couponCode = newProduct.coupon; // Fetching the coupon code
+    const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
 
     // Check if either coupon code or coupon expiry date is provided
-    if (
-      (couponCode && !couponExpiryDate) ||
-      (!couponCode && couponExpiryDate)
-    ) {
-      Swal.fire({
-        icon: "warning",
-        title: "Validation Error",
-        text: "Both coupon code and coupon expiry date must be provided together or clear both.",
-      });
-      return;
-    }
+    // if (
+    //   (couponCode && !couponExpiryDate) ||
+    //   (!couponCode && couponExpiryDate)
+    // ) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
+    //   });
+    //   return;
+    // }
 
     // Check if coupon code is provided and not just spaces
-    if (couponCode && !couponCode.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Validation Error",
-        text: "Coupon code cannot be just spaces.",
-      });
-      return;
-    }
-    if (couponCode && couponExpiryDate) {
-  const hasDigit = /\d/.test(couponCode);
+    // if (couponCode && !couponCode.trim()) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Coupon code cannot be just spaces.",
+    //   });
+    //   return;
+    // }
 
-  if (!hasDigit) {
-    Swal.fire({
-      icon: "warning",
-      title: "Validation Error",
-      text: "Coupon code must contain price value like OFFER599.",
-    });
-    return;
-  }
-}
+    // // Extract numeric part from coupon code
+    // const couponValueMatch = couponCode.match(/\d+/); // Regex to find the first numeric part in the coupon code
+    // const couponValue = couponValueMatch ? Number(couponValueMatch[0]) : 0; // Get the number or default to 0 if not found
 
-    // Extract numeric part from coupon code
-    const couponValueMatch = couponCode.match(/\d+/); // Regex to find the first numeric part in the coupon code
-    const couponValue = couponValueMatch ? Number(couponValueMatch[0]) : 0; // Get the number or default to 0 if not found
+    // // Ensure the extracted coupon value is less than the product price
+    // if (couponValue >= Number(newProduct.price)) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Coupon discount must be less than the product price.",
+    //   });
+    //   return;
+    // }
 
-    // Ensure the extracted coupon value is less than the product price
-    if (couponValue >= Number(newProduct.price)) {
-      Swal.fire({
-        icon: "warning",
-        title: "Validation Error",
-        text: "Coupon discount must be less than the product price.",
-      });
-      return;
-    }
+    // // Check if the coupon code contains at least one letter and one digit
+    // // const hasLetter = /[a-zA-Z]/.test(couponCode);
+    // if (couponCode && couponExpiryDate) {
+    //   const hasDigit = /\d/.test(couponCode);
+
+    //   if (!hasDigit) {
+    //     Swal.fire({
+    //       icon: "warning",
+    //       title: "Validation Error",
+    //       text: "Coupon code must contain price value like OFFER599.",
+    //     });
+    //     return;
+    //   }
+    // }
+
+        // Fetch user role from localStorage
+const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+
+// Set product status based on user role
+const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
     formData.append("name", newProduct.name);
     formData.append("features", newProduct.features);
     formData.append("price", newProduct.price);
     formData.append("actual_price", newProduct.actual_price);
+    formData.append("effectiveprice", newProduct.effectiveprice);
     formData.append("label", newProduct.label);
-    formData.append("coupon_expiry_date", newProduct.coupon_expiry_date);
-    formData.append("coupon", newProduct.coupon);
+    formData.append("subtitle", newProduct.subtitle);
+    formData.append("deliverycharge", newProduct.deliverycharge);
+    // formData.append("coupon_expiry_date", newProduct.coupon_expiry_date);
+    // formData.append("coupon", newProduct.coupon);
     formData.append("category", newProduct.category); // Add category here
+    formData.append("productStatus", productStatus); // Add category here
+    
     // Append each image file to the FormData
     newProduct.images.forEach((image) => {
       formData.append("images", image); // Use 'images' for multiple file upload
@@ -473,7 +828,7 @@ const couponExpiryDate =
       });
 
       // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/fetchmobileaccessories`);
+      const response = await axios.get(`${ApiUrl}/adminfetchmobileaccessories`);
       setProducts(response.data);
       setNewProduct({
         name: "",
@@ -482,8 +837,11 @@ const couponExpiryDate =
         price: "",
         actual_price: "",
         label: "",
+        subtitle: "",
+        deliverycharge: "",
         coupon_expiry_date: "",
         coupon: "",
+        effectiveprice: "",
         category: "", // Clear the category here
       });
 
@@ -499,21 +857,19 @@ const couponExpiryDate =
   };
 
   const handleEditProduct = (product) => {
+    let formattedDate = "";
+    if (product.coupon_expiry_date) {
+      const expiryDate = new Date(product.coupon_expiry_date);
 
-    let formattedDate = '';
-  if (product.coupon_expiry_date) {
-    const expiryDate = new Date(product.coupon_expiry_date);
-
-    if (!isNaN(expiryDate)) {
-      // Format the date manually to YYYY-MM-DD without timezone conversion
-      const year = expiryDate.getFullYear();
-      const month = String(expiryDate.getMonth() + 1).padStart(2, '0'); // Add 1 because months are 0-indexed
-      const day = String(expiryDate.getDate()).padStart(2, '0');
-      formattedDate = `${year}-${month}-${day}`;
+      if (!isNaN(expiryDate)) {
+        // Format the date manually to YYYY-MM-DD without timezone conversion
+        const year = expiryDate.getFullYear();
+        const month = String(expiryDate.getMonth() + 1).padStart(2, "0"); // Add 1 because months are 0-indexed
+        const day = String(expiryDate.getDate()).padStart(2, "0");
+        formattedDate = `${year}-${month}-${day}`;
+      }
     }
-  }
 
-  
     setEditingProduct({
       id: product.id,
       name: product.prod_name,
@@ -521,10 +877,14 @@ const couponExpiryDate =
       features: product.prod_features,
       price: product.prod_price,
       actual_price: product.actual_price,
+      effectiveprice: product.effectiveprice,
       label: product.offer_label,
+      subtitle: product.subtitle,
+      deliverycharge: product.deliverycharge,
       status: product.status,
-      coupon_expiry_date: formattedDate,
-      coupon: product.coupon,
+      productStatus: product.productStatus,
+      // coupon_expiry_date: formattedDate,
+      // coupon: product.coupon,
       category: product.category,
     });
     setModalIsOpen(true);
@@ -540,14 +900,14 @@ const couponExpiryDate =
       return;
     }
 
-    if (editingProduct.label && /\d/.test(editingProduct.label)) {
-      Swal.fire({
-        icon: "warning",
-        title: "Validation Error",
-        text: "Label cannot contain numeric values.",
-      });
-      return;
-    }
+    // if (editingProduct.label && /\d/.test(editingProduct.label)) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Label cannot contain numeric values.",
+    //   });
+    //   return;
+    // }
 
     if (editingProduct.label && editingProduct.label.length > 15) {
       Swal.fire({
@@ -594,14 +954,14 @@ const couponExpiryDate =
       });
       return;
     }
-    if (!editingProduct.category.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Validation Error",
-        text: "Product category is required.",
-      });
-      return;
-    }
+    // if (!editingProduct.category.trim()) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Product category is required.",
+    //   });
+    //   return;
+    // }
     if (
       !editingProduct.price ||
       isNaN(editingProduct.price) ||
@@ -635,59 +995,65 @@ const couponExpiryDate =
       return;
     }
 
-    // Validate coupon code and extract numeric part
-    const couponCode = editingProduct.coupon; // Fetching the coupon code
-    const couponExpiryDate = editingProduct.coupon_expiry_date; // Assuming expiry date is stored here
+    // // Validate coupon code and extract numeric part
+    // const couponCode = editingProduct.coupon
+    //   ? editingProduct.coupon.trim()
+    //   : ""; // Trim coupon code to avoid spaces
+    // const couponExpiryDate =
+    //   editingProduct.coupon_expiry_date &&
+    //   editingProduct.coupon_expiry_date !== "0000-00-00"
+    //     ? editingProduct.coupon_expiry_date.trim()
+    //     : ""; // Treat "0000-00-00" as empty
 
-    // Check if either coupon code or coupon expiry date is provided
-    if (
-      (couponCode && !couponExpiryDate) ||
-      (!couponCode && couponExpiryDate)
-    ) {
-      Swal.fire({
-        icon: "warning",
-        title: "Validation Error",
-        text: "Both coupon code and coupon expiry date must be provided together or clear both.",
-      });
-      return;
-    }
+    // // Check if either coupon code or coupon expiry date is provided
+    // if (
+    //   (couponCode && !couponExpiryDate) ||
+    //   (!couponCode && couponExpiryDate)
+    // ) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
+    //   });
+    //   return;
+    // }
 
-    // Check if coupon code is provided and not just spaces
-    if (couponCode && !couponCode.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Validation Error",
-        text: "Coupon code cannot be just spaces.",
-      });
-      return;
-    }
+    // // Check if coupon code is provided and not just spaces
+    // if (couponCode && !couponCode.trim()) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Coupon code cannot be just spaces.",
+    //   });
+    //   return;
+    // }
 
-    if (couponCode && couponExpiryDate) {
-  const hasDigit = /\d/.test(couponCode);
+    // if (couponCode && couponExpiryDate) {
+    //   const hasDigit = /\d/.test(couponCode);
 
-  if (!hasDigit) {
-    Swal.fire({
-      icon: "warning",
-      title: "Validation Error",
-      text: "Coupon code must contain price value like OFFER599.",
-    });
-    return;
-  }
-}
+    //   if (!hasDigit) {
+    //     Swal.fire({
+    //       icon: "warning",
+    //       title: "Validation Error",
+    //       text: "Coupon code must contain price value like OFFER599.",
+    //     });
+    //     return;
+    //   }
+    // }
 
-    // Extract numeric part from coupon code
-    const couponValueMatch = couponCode.match(/\d+/); // Regex to find the first numeric part in the coupon code
-    const couponValue = couponValueMatch ? Number(couponValueMatch[0]) : 0; // Get the number or default to 0 if not found
+    // // Extract numeric part from coupon code
+    // const couponValueMatch = couponCode.match(/\d+/); // Regex to find the first numeric part in the coupon code
+    // const couponValue = couponValueMatch ? Number(couponValueMatch[0]) : 0; // Get the number or default to 0 if not found
 
-    // Ensure the extracted coupon value is less than the product price
-    if (couponValue >= Number(editingProduct.price)) {
-      Swal.fire({
-        icon: "warning",
-        title: "Validation Error",
-        text: "Coupon discount must be less than the product price.",
-      });
-      return;
-    }
+    // // Ensure the extracted coupon value is less than the product price
+    // if (couponValue >= Number(editingProduct.price)) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Coupon discount must be less than the product price.",
+    //   });
+    //   return;
+    // }
 
     // Log the product details that will be sent to the backend
     console.log("Updating product with details:", {
@@ -707,10 +1073,14 @@ const couponExpiryDate =
     formData.append("features", editingProduct.features);
     formData.append("price", editingProduct.price);
     formData.append("actual_price", editingProduct.actual_price);
+    formData.append("effectiveprice", editingProduct.effectiveprice);
     formData.append("status", editingProduct.status);
+    formData.append("productStatus", editingProduct.productStatus);
     formData.append("label", editingProduct.label);
-    formData.append("coupon_expiry_date", editingProduct.coupon_expiry_date);
-    formData.append("coupon", editingProduct.coupon);
+    formData.append("subtitle", editingProduct.subtitle);
+    formData.append("deliverycharge", editingProduct.deliverycharge);
+    // formData.append("coupon_expiry_date", editingProduct.coupon_expiry_date);
+    // formData.append("coupon", editingProduct.coupon);
     formData.append("category", editingProduct.category);
     if (editingProduct.image) {
       formData.append("image", editingProduct.image);
@@ -745,7 +1115,7 @@ const couponExpiryDate =
       });
 
       // Fetch updated list of products
-      const fetchResponse = await axios.get(`${ApiUrl}/fetchmobileaccessories`);
+      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchmobileaccessories`);
       setProducts(fetchResponse.data);
 
       // Log successful fetch
@@ -785,21 +1155,16 @@ const couponExpiryDate =
     if (confirmResult.isConfirmed) {
       try {
         // Log before sending delete request
-        console.log(
-          "Sending delete request to:",
-          `${ApiUrl}/deletemobileaccessories/${id}`
-        );
+        console.log("Sending delete request to:", `${ApiUrl}/deletemobileaccessories/${id}`);
 
         // Perform the delete operation
-        const deleteResponse = await axios.delete(
-          `${ApiUrl}/deletemobileaccessories/${id}`
-        );
+        const deleteResponse = await axios.delete(`${ApiUrl}/deletemobileaccessories/${id}`);
 
         // Log response from delete request
         console.log("Delete response:", deleteResponse.data);
 
         // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/fetchmobileaccessories`);
+        const response = await axios.get(`${ApiUrl}/adminfetchmobileaccessories`);
         setProducts(response.data);
 
         // Log the updated product list
@@ -824,6 +1189,16 @@ const couponExpiryDate =
     } else {
       console.log("Product deletion canceled by user.");
     }
+  };
+
+  const handleEditExpiry = (couponId) => {
+    const couponToEdit = coupons.find(
+      (coupon) => coupon.coupon_id === couponId
+    );
+    setSelectedCoupon(couponToEdit);
+    setIsEditingCoupon(true);
+    setSelectedProductPrice(selectedProductPrice); // Pass the price from state
+
   };
 
   const overlayStyle = {
@@ -929,23 +1304,87 @@ const couponExpiryDate =
   const today = new Date();
   const minDate = today.toISOString().split("T")[0]; // Format to YYYY-MM-DD
 
-  // Calculate max date (30 days from today)
+   // Calculate max date (30 days from today)
   const maxDate = new Date(today);
   maxDate.setDate(today.getDate() + 30);
   const maxDateStr = maxDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
 
+  const handleDeleteCoupon = async (couponId) => {
+    const confirmation = window.confirm(
+      "Are you sure you want to delete this coupon?"
+    );
+    if (!confirmation) return;
+
+    try {
+      const response = await axios.delete(
+        `${ApiUrl}/deletecoupons/${couponId}`
+      );
+      if (response.status === 200) {
+        alert("Coupon deleted successfully");
+        setCoupons(coupons.filter((coupon) => coupon.coupon_id !== couponId));
+      }
+    } catch (error) {
+      console.error("Error deleting coupon:", error);
+      alert("Failed to delete the coupon");
+    }
+  };
+  const role = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+
+
+  const handleCopyProduct = async (productId) => {
+    try {
+      const response = await fetch(`${ApiUrl}/api/copy-product/${productId}`, {
+        method: 'POST',
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        // Success alert using SweetAlert
+        Swal.fire({
+          title: 'Success!',
+          text: `Product copied successfully! New product ID: ${data.newProductId}`,
+          icon: 'success',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          // After the alert closes, call the fetchProducts function
+         window.location.reload();
+        });
+      } else {
+        // Error alert using SweetAlert
+        Swal.fire({
+          title: 'Error!',
+          text: data.message,
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+      }
+    } catch (error) {
+      console.error('Error copying product:', error);
+      // Generic error alert using SweetAlert
+      Swal.fire({
+        title: 'Oops!',
+        text: 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+    }
+  };
+
+
   return (
     <div className="laptops-page">
       <div className="laptops-content">
-        <h2 className="laptops-page-title">Add mobileaccessories</h2>
+        <h2 className="laptops-page-title">Add Mobile Accessories</h2>
         <div className="laptops-card">
           <div className="laptops-card-header">
             <div className="laptops-card-item">Product Name</div>
             <div className="laptops-card-item">Product Image</div>
-            <div className="laptops-card-item">Actual Price</div>
-            <div className="laptops-card-item">Selling Price</div>
+            <div className="laptops-card-item">M.R.P Price</div>
+            <div className="laptops-card-item">Selling Price</div>          
             <div className="laptops-card-item">Label</div>
-            <div className="laptops-card-item">Category</div>
+            <div className="laptops-card-item">Subtitle</div>
+            <div className="laptops-card-item">Delivery charge</div>
+            {/* <div className="laptops-card-item">Category</div> */}
           </div>
 
           <div className="laptops-card-row">
@@ -970,7 +1409,7 @@ const couponExpiryDate =
               name="actual_price"
               value={newProduct.actual_price}
               onChange={handleChange}
-              placeholder="Enter actual price"
+              placeholder="Enter M.R.P price"
               className="laptops-card-input"
             />
             <input
@@ -982,16 +1421,37 @@ const couponExpiryDate =
               className="laptops-card-input"
             />
 
-            <input
+<input
               type="text"
               name="label" // New input for product label
               value={newProduct.label} // Ensure to add label to the newProduct state
               onChange={handleChange}
-              placeholder="(e.g., New Arrived)"
+              placeholder="(e.g., Best Price)"
               className="laptops-card-input" // Use the same style class
             />
 
-            {isPopupVisible && (
+            <input
+              type="text"
+              name="subtitle" // New input for product subtitle
+              value={newProduct.subtitle} // Ensure to add subtitle to the newProduct state
+              onChange={handleChange}
+              placeholder="Enter subtitle"
+              className="laptops-card-input" // Use the same style class
+            />
+
+            <input
+              type="text"
+              name="deliverycharge" // New input for product deliverycharge
+              value={newProduct.deliverycharge} // Ensure to add deliverycharge to the newProduct state
+              onChange={handleChange}
+              placeholder="Enter Deliverycharge "
+              className="laptops-card-input" // Use the same style class
+            />
+
+
+         
+
+            {/* {isPopupVisible && (
               <div className="info-popup">
                 <div className="popup-content">
                   <button className="close-button" onClick={handlePopupToggle}>
@@ -1012,9 +1472,9 @@ const couponExpiryDate =
                   </p>
                 </div>
               </div>
-            )}
+            )} */}
 
-            <select
+            {/* <select
               name="category"
               value={newProduct.category}
               onChange={handleChange}
@@ -1029,24 +1489,53 @@ const couponExpiryDate =
               <option value="CCTV">CCTV</option>
               <option value="TV">TV</option>
               <option value="Watch">Watch</option>
-              <option value="ComputerAccessories">Computer Accessories</option>
+              <option value="mobileAccessories">Computer Accessories</option>
               <option value="MobileAccessories">Mobile Accessories</option>
               <option value="PrinterAccessories">Printer Accessories</option>
-              <option value="CCTVAccessories">CCTV Accessories</option>
-            </select>
+              <option value="mobileAccessories">CCTV Accessories</option>
+            </select> */}
           </div>
+          <div className="laptops-card-header">
+            <div className="laptops-card-item">Effective Price</div>
+            <div className="laptops-card-item">Features</div>
+            
+            {/* <div className="laptops-card-item">Category</div> */}
+          </div>
+          <div className="laptops-card-row3">
+
+
+<input
+              type="text"
+              name="effectiveprice" // New input for product effectiveprice
+              value={newProduct.effectiveprice} // Ensure to add effectiveprice to the newProduct state
+              onChange={handleChange}
+              placeholder="Enter Effective price"
+              className="laptops-card-input4" // Use the same style class
+            />
+
+<textarea
+              name="features"
+              value={newProduct.features}
+              onChange={handleChange}
+              placeholder="Features"
+              className="laptops-card-input5"
+              rows="1"
+              style={{ flex: "1", width: "100%" }} // Ensures the textarea spans the full width
+
+            ></textarea>
+            </div>
 
           {/* Separate Features Field */}
-          <div className="laptops-card-header">
+          {/* <div className="laptops-card-header">
             <div className="feature-1 laptops-card-item ">Coupon Code</div>
             <div className="feature-1 laptops-card-item ">
               Coupon Expiry date
             </div>
             <div className="feature-1 laptops-card-item ">Product Features</div>
-          </div>
+          </div> */}
 
-          <div className="features-input-container">
-            <input
+          {/* <div className="features-input-container"> */}
+            {/* <input
               type="text"
               name="coupon"
               value={newProduct.coupon}
@@ -1063,22 +1552,25 @@ const couponExpiryDate =
               className="laptops-card-input2"
               min={minDate} // Set min date to today
               max={maxDateStr} // Set max date to 30 days from today
-            />
-            <textarea
+            /> */}
+            {/* <textarea
               name="features"
               value={newProduct.features}
               onChange={handleChange}
               placeholder="Features"
               className="laptops-card-input1"
               rows="1"
-            ></textarea>
-            <div className="pipe-icon" onClick={handleAddPipe}>
-              <p className="pipe-character">|</p>
+            ></textarea> */}
+
+          
+            
+           {/* <div className="pipe-icon" onClick={handleAddPipe}>
+              <p title="Click here for separate the key value pair(eg.RAM | 8gb)" className="pipe-character">|</p>
             </div>
             <div className="info-icon" onClick={handlePopupToggle}>
               <FaInfoCircle className="info-icon-text" />
-            </div>
-          </div>
+            </div> */}
+          {/* </div> */}
 
           {/* Add Button */}
           <button onClick={handleAddProduct} className="laptops-add-btn">
@@ -1098,7 +1590,12 @@ const couponExpiryDate =
                   <div className="slider-container">
                     {" "}
                     {/* Wrap the slider in a container for relative positioning */}
-                    <Slider {...settings}>
+                    <Slider
+                      {...{
+                        ...settings,
+                        arrows: product.prod_img.length > 1, // Display arrows only if more than one image
+                      }}
+                    >
                       {product.prod_img.map((img, imgIndex) => (
                         <div key={imgIndex} className="image-wrapper">
                           <img
@@ -1111,12 +1608,14 @@ const couponExpiryDate =
                               onClick={() => openModal(product.id, imgIndex)} // Pass product ID and image index
                               className="action-icon"
                             />
-                            <FaTrash
-                              onClick={() =>
-                                handleDeleteImage(product.id, imgIndex)
-                              }
-                              className="action-icon"
-                            />
+                            {product.prod_img.length > 1 && ( // Display trash icon only if there is more than one image
+                              <FaTrash
+                                onClick={() =>
+                                  handleDeleteImage(product.id, imgIndex)
+                                }
+                                className="action-icon"
+                              />
+                            )}
                           </div>
                         </div>
                       ))}
@@ -1124,35 +1623,226 @@ const couponExpiryDate =
                   </div>
                 </div>
                 <div className="laptops-product-details">
-                  <h3 className="laptops-product-name">{product.prod_name}</h3>
+                  <h3 className="laptops-product-name">{product.prod_name} {product.productStatus === 'unapproved' ? <span style={{color:'red'}}>({product.productStatus})</span> : null}</h3>                  <h3 className="laptops-product-subtitle">{product.subtitle}</h3>
                   <p className="laptops-product-features">
-                    <ul className="product-feature-list">
-                      {product.prod_features
-                        .split("|")
-                        .map((feature, index) => (
-                          <li key={index}>
-                            {feature.trim()}{" "}
-                            {/* Trim whitespace from each feature */}
-                          </li>
-                        ))}
-                    </ul>{" "}
+                  <span>{product.prod_features}</span>
+
+                  {/* <ul className="product-feature-list">
+  {product.prod_features
+    .split("|")
+    .reduce((acc, feature, index, array) => {
+      if (index % 2 === 0) {
+        acc.push([feature.trim(), array[index + 1]?.trim() || ""]);
+      }
+      return acc;
+    }, [])
+    .map((pair, index) => (
+      <li key={index}>
+        <span className="feature-key">{pair[0]}</span>
+        <span className="feature-value">{pair[1]}</span>
+      </li>
+    ))}
+</ul> */}
+
                   </p>
                   <p className="laptops-product-actual-price">
-                    Actual Price:{" "}
+                    M.R.P Price:{" "}
                     <span className="actual-price">
-                      ${product.actual_price}
+                      ₹{product.actual_price}
                     </span>
                   </p>
                   <p className="laptops-product-pricee">
-                    Selling Price: ${product.prod_price}
+                    Selling Price: ₹{product.prod_price}
                   </p>
+                  <p className="laptops-product-pricee">
+                    Effective Price: ₹{product.effectiveprice}
+                  </p>
+                  <p className="laptops-product-deliverycharge">
+                   Delivery charge: ₹{product.deliverycharge}
+                  </p>
+
                   <p className="laptops-product-coupon">
-                    Coupon Code: {product.coupon}
+                    Coupon Code:
+                    <span
+  onClick={() => openPopup(product.prod_id, product.prod_name, product.prod_price)}
+  style={{ cursor: "pointer" }}
+                    >
+                      <FaEdit className="faedit" title="Edit Coupon" />
+                    </span>
+                    <span
+                                             onClick={() => fetchCoupons(product.prod_id, product.prod_name, product.prod_price)}
+
+                      style={{ cursor: "pointer" }}
+                    >
+                      <FaEye className="faedit" title="View Coupon" />
+                    </span>
                   </p>
+
+                  <CouponEditPopup
+  isOpen={isPopupOpen}
+  onClose={closePopup}
+  productId={selectedProductId}   // Correctly passed from state
+  prodPrice={selectedProductPrice} // Correctly passed from state
+  onCouponUpdated={handleCouponUpdated}
+/>
+
+                  {isViewingCoupons && (
+                    <div className="pop-overlay">
+                      <div className="pop-content">
+                        <button
+                          onClick={() => setIsViewingCoupons(false)}
+                          className="fatimes"
+                        >
+                          <FaTimes color="black" size={20} />
+                        </button>
+                        <h4 className="coupon-title">
+                          Coupons for {productName}
+                        </h4>
+                        {coupons.length > 0 ? (
+                          <ul className="coupons-list">
+                            {coupons.map((coupon, index) => (
+                              <li
+                                key={coupon.coupon_id}
+                                className="coupon-item"
+                              >
+                                <span className="serial-number">
+                                  {index + 1}.{" "}
+                                </span>{" "}
+                                {/* Serial number */}
+                               <span className="coupon-code">
+                                  {coupon.coupon_code}
+                                </span>{" "}
+                                - 
+
+                                <span className="coupon-code">
+                                  {coupon.discount_value}
+                                </span>{" "}
+
+                                -
+                                <span className="expiry-date">
+                                  Expires on:{" "}
+                                  {new Date(
+                                    coupon.expiry_date
+                                  ).toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  })}
+                                <FaEdit
+                                    className="edit-icon"
+                                    title="Edit Expiry Date"
+                                    onClick={() =>
+                                      handleEditExpiry(coupon.coupon_id)
+                                    }
+                                  />
+                                  <FaTrash
+                                    className="delete-icon"
+                                    title="Delete Coupon"
+                                    onClick={() =>
+                                      handleDeleteCoupon(coupon.coupon_id)
+                                    }
+                                    style={{
+                                      marginLeft: "10px",
+                                      cursor: "pointer",
+                                    }}
+                                  />
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p>No coupons available for this product.</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+<div className="frequently-buy" style={{marginBottom:'10px'}}>
+                  <span className="frequently-buy-label">
+                   Make a copy of this product
+                  </span>
+                  <FaClone  
+                 onClick={() => handleCopyProduct(product.id)}
+                className="frequently-buy-icon"
+                /> 
+                </div>
+
+                  <EditCouponModal
+                    isOpen={isEditingCoupon}
+                    onClose={() => setIsEditingCoupon(false)}
+                    coupon={selectedCoupon}
+                    productId={selectedProductId}
+                    productPrice={selectedProductPrice}    // Selected product price
+                    onCouponUpdated={() => {
+                      // Refresh coupon list or update state as necessary
+                      // e.g., fetchCoupons();
+                    }}
+                  />
                 </div>
                 {/* <div>
                 Label: {product.label}
                 </div> */}
+
+                
+<div
+  onClick={() => handleOpenOfferModal(product.id)} // Pass the productId as needed
+  className="offer-edit-btn"
+>
+  <span className="offer-edit-text">Edit Price Offer</span>
+  <FaEdit className="offer-edit-icon" />
+
+</div>
+
+{/* Modal rendering */}
+{isOfferModalOpen && (
+  <div className="offer-modal-overlay">
+    <div className="offer-modal-content">
+      <button onClick={handleCloseOfferModal} className="offer-close-btn">
+        &times; {/* Use the "×" symbol for close */}
+      </button>
+      <h3 className="offer-modal-title">{isEditMode ? "Edit Price Offer" : "Add Price Offer"}</h3>
+      <form onSubmit={handleSubmit} className="offer-form">
+        <label className="offer-label">Offer Start Time</label>
+        <input
+          type="datetime-local"
+          value={offerStartTime}
+          onChange={(e) => setOfferStartTime(e.target.value)}
+          required
+          min={minDate}
+          className="offer-input"
+        />
+        <label className="offer-label">Offer End Time</label>
+        <input
+          type="datetime-local"
+          value={offerEndTime}
+          onChange={(e) => setOfferEndTime(e.target.value)}
+          required
+          min={minDate}
+          className="offer-input"
+        />
+        <label className="offer-label">Offer Price</label>
+        <input
+          type="number"
+          value={offerPrice}
+          onChange={handleChangePrice} // Custom handler for price
+          required
+          className="offer-input"
+        />
+        <button type="submit" className="offer-submit-btn">
+          {isEditMode ? "Update Offer" : "Add Offer"}
+        </button>
+      </form>
+
+      {isEditMode && (
+        <button onClick={handleDelete} className="offer-delete-btn">
+          Delete Offer
+        </button>
+      )}
+    </div>
+  </div>
+)}
+
+
                 <div className="upload-container">
                   Upload more images
                   <input
@@ -1260,7 +1950,9 @@ const couponExpiryDate =
               &times; {/* or use a close icon */}
             </button>
           </div>
+          <div className="feature-item">
 
+<label className="feature-label">Product Name</label>
           <input
             type="text"
             name="name"
@@ -1271,9 +1963,12 @@ const couponExpiryDate =
             placeholder="Enter product name"
             className="adminmodal-input"
           />
-
+</div>
+          <div className="feature-item">
           {/* Features Textarea with Icons */}
           <div className="features-input-container">
+
+<label className="feature-label">Description</label>
             <textarea
               name="features"
               value={editingProduct.features}
@@ -1287,16 +1982,20 @@ const couponExpiryDate =
               className="adminmodal-input1"
               rows="4" // Adjust as needed
             ></textarea>
-            <div className="icons-container">
+            
+            {/* <div className="icons-container">
               <div className="pipe-icon" onClick={handleUpdatePipe}>
                 <p className="pipe-character">|</p>
               </div>
               <div className="info-icon" onClick={handlePopupToggle}>
                 <FaInfoCircle className="info-icon-text" />
               </div>
-            </div>
+            </div> */}
           </div>
+          </div>
+          <div className="feature-item">
 
+<label className="feature-label">M.R.P Price</label>
           <input
             type="text"
             name="actual_price"
@@ -1310,7 +2009,10 @@ const couponExpiryDate =
             placeholder="Enter actual price"
             className="adminmodal-input"
           />
+          </div>
+<div className="feature-item">
 
+<label className="feature-label">Selling Price</label>
           <input
             type="text"
             name="price"
@@ -1321,7 +2023,10 @@ const couponExpiryDate =
             placeholder="Enter product price"
             className="adminmodal-input"
           />
+          </div>
+<div className="feature-item">
 
+<label className="feature-label">Offer Label</label>
           <input
             type="text"
             name="label"
@@ -1335,7 +2040,42 @@ const couponExpiryDate =
             placeholder="Enter label"
             className="adminmodal-input"
           />
+          </div>
+<div className="feature-item">
+
+<label className="feature-label">Subtitle</label>
           <input
+            type="text"
+            name="subtitle"
+            value={editingProduct.subtitle}
+            onChange={(e) =>
+              setEditingProduct({
+                ...editingProduct,
+                subtitle: e.target.value,
+              })
+            }
+            placeholder="Enter subtitle"
+            className="adminmodal-input"
+          />
+          </div>
+<div className="feature-item">
+
+<label className="feature-label">Delivery Charge</label>
+          <input
+            type="text"
+            name="deliverycharge"
+            value={editingProduct.deliverycharge}
+            onChange={(e) =>
+              setEditingProduct({
+                ...editingProduct,
+                deliverycharge: e.target.value,
+              })
+            }
+            placeholder="Enter deliverycharge"
+            className="adminmodal-input"
+          />
+          </div>
+          {/* <input
             type="text"
             name="coupon"
             value={editingProduct.coupon}
@@ -1360,10 +2100,12 @@ const couponExpiryDate =
             }
             placeholder="Enter expiry date"
             className="adminmodal-input"
-            min={minDate} // Set min date to today
-            max={maxDateStr} // Set max date to 30 days from today
-          />
+            min={minDate} 
+        max={maxDateStr}
+          /> */}
+<div className="feature-item">
 
+<label className="feature-label">In Stock or Out Of Stock</label>
           <select
             name="status"
             value={editingProduct.status}
@@ -1372,9 +2114,30 @@ const couponExpiryDate =
             }
             className="adminmodal-input"
           >
-            <option value="available">Available</option>
-            <option value="unavailable">Unavailable</option>
+            <option value="available">In Stock</option>
+            <option value="unavailable">Out Of Stock</option>
           </select>
+</div>
+          <div className="feature-item">
+
+<label className="feature-label">Approve or Unapprove</label>
+
+
+<select
+           disabled={role === 'Staff'}
+
+    name="productStatus"
+    value={editingProduct.productStatus}
+    onChange={(e) =>
+      setEditingProduct({ ...editingProduct, productStatus: e.target.value })
+    }
+    className="adminmodal-input"
+  >
+    <option value="approved">Approve</option>
+    <option value="unapproved">UnApprove</option>
+  </select>
+
+</div>
 
           <button
             onClick={handleUpdateProduct}
@@ -1407,18 +2170,18 @@ const SampleNextArrow = (props) => {
         alignItems: "center",
         right: "10px",
         zIndex: 10,
-        backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background for visibility
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.5)", // Add box shadow
         borderRadius: "50%", // Round shape
         width: "30px", // Width for clickable area
         height: "30px", // Height for clickable area
         cursor: "pointer", // Cursor pointer
       }}
       onClick={onClick}
-    ></div>
+    >
+      <img src={rightarrow} alt="Next" width="15px" height="15px" />
+    </div>
   );
 };
-
-// Custom previous arrow component
 const SamplePrevArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -1431,15 +2194,19 @@ const SamplePrevArrow = (props) => {
         alignItems: "center",
         left: "10px",
         zIndex: 10,
-        backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark background for visibility
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)", // Box shadow applied here
+        backgroundColor: "white",
         borderRadius: "50%", // Round shape
         width: "30px", // Width for clickable area
         height: "30px", // Height for clickable area
         cursor: "pointer", // Cursor pointer
       }}
       onClick={onClick}
-    ></div>
+    >
+      <img src={leftarrow} alt="Previous" width="15px" height="15px" />
+    </div>
   );
 };
+
 
 export default MobileAccessories;

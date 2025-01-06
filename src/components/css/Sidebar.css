@@ -1,3 +1,19 @@
+/* Active link styles */
+.sidebar ul li a.active {
+    background-color: #007bff; /* Set the background color for active link */
+    color: white; /* Set the text color for active link */
+    font-weight: bold; /* Make the active link bold */
+    width: 100%;
+}
+
+/* Optional: Active link hover effect */
+.sidebar ul li a.active:hover {
+    width: 100%;
+    background-color: #0056b3; /* Darken background on hover for active link */
+}
+
+
+
 /* Sidebar Styles */
 .sidebar {
     position: fixed; /* Keeps the sidebar fixed in place */
@@ -83,6 +99,7 @@
     display: flex;
     align-items: center; /* Align items vertically */
     margin-bottom: 10px;
+    
 }
 
 .sidebar ul li a {
@@ -93,10 +110,13 @@
     padding: 10px; /* Add padding for better click area */
     border-radius: 4px; /* Rounded corners */
     transition: background-color 0.3s ease; /* Smooth background color transition */
+    width: 100%;
+
 }
 
 .sidebar ul li a:hover {
     background-color: #ddd; /* Highlight background on hover */
+    width: 100%;
 }
 
 .sidebar ul li a svg {

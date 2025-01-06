@@ -78,11 +78,14 @@ const Footer = () => {
           <a href="/ShippingAndReturns">
             <p>Shipping & Returns</p>
           </a>
-          <a href="/TermsAndConditions">
-            <p>Terms & Conditions</p>
+          <a href="/Privacypolicy">
+            <p>Privacy Policy</p>
           </a>
-          <a href="/TermsAndConditions#PaymentMethod">
-            <p>Payment Methods</p>
+          <a href="/Terms">
+            <p>Terms Of Use</p>
+          </a>
+          <a href="/PaymentSecurity">
+            <p>Payment Security</p>
           </a>
           <a href="/HelpCenter">
             <p>FAQ</p>

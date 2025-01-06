@@ -19,6 +19,20 @@ const Dashboard = () => {
   const [pendingPayments, setPendingPayments] = useState(0);
   const [monthlySales, setMonthlySales] = useState([]);
 
+   // Fetch pending payments from the backend
+   useEffect(() => {
+    const fetchPendingPayments = async () => {
+      try {
+        const response = await axios.get(`${ApiUrl}/pending-payment`);
+        const totalPendingAmount = response.data.totalPendingAmount || 0;
+        setPendingPayments(new Intl.NumberFormat('en-IN').format(totalPendingAmount));      } catch (error) {
+        console.error("Error fetching pending payments:", error);
+      }
+    };
+
+    fetchPendingPayments();
+  }, []);
+
   // Helper function to get last 6 months
   const getLast6Months = () => {
     const months = [];
@@ -43,7 +57,7 @@ const Dashboard = () => {
         const totalCategories = new Set(ordersData.map(order => order.shipping_address)).size;
 
         setTotalOrders(totalOrders);
-        setTotalSales(totalSales);
+        setTotalSales(new Intl.NumberFormat('en-IN').format(totalSales)); // Format with commas
         setTotalCustomers(totalCustomers);
         setTotalCategories(totalCategories);
 
@@ -85,23 +99,39 @@ const Dashboard = () => {
               label: 'Category Distribution',
               data: categoriesData.map(cat => cat.total_amount),
               backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 99, 132, 0.2)',  // Red
+                'rgba(54, 162, 235, 0.2)',  // Blue
+                'rgba(255, 206, 86, 0.2)',  // Yellow
+                'rgba(75, 192, 192, 0.2)',  // Teal
+                'rgba(153, 102, 255, 0.2)', // Purple
+                'rgba(255, 159, 64, 0.2)',  // Orange
+                'rgba(199, 199, 199, 0.2)', // Grey
+                'rgba(144, 238, 144, 0.2)', // Light Green
+                'rgba(240, 128, 128, 0.2)', // Light Coral
+                'rgba(135, 206, 250, 0.2)', // Light Sky Blue
+                'rgba(221, 160, 221, 0.2)', // Plum
+                'rgba(189, 183, 107, 0.2)', // Dark Khaki
               ],
               borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
+                'rgba(255, 99, 132, 1)',  // Red
+                'rgba(54, 162, 235, 1)',  // Blue
+                'rgba(255, 206, 86, 1)',  // Yellow
+                'rgba(75, 192, 192, 1)',  // Teal
+                'rgba(153, 102, 255, 1)', // Purple
+                'rgba(255, 159, 64, 1)',  // Orange
+                'rgba(199, 199, 199, 1)', // Grey
+                'rgba(144, 238, 144, 1)', // Light Green
+                'rgba(240, 128, 128, 1)', // Light Coral
+                'rgba(135, 206, 250, 1)', // Light Sky Blue
+                'rgba(221, 160, 221, 1)', // Plum
+                'rgba(189, 183, 107, 1)', // Dark Khaki
               ],
               borderWidth: 1,
             },
           ],
         };
+        
+        
 
         setPieData(pieData);
 
@@ -131,7 +161,7 @@ const Dashboard = () => {
             <FaChartLine className="summary-icon" />
             <div className="summary-info">
               <h3>Sales Revenue</h3>
-              <p>${totalSales.toFixed(2)}</p>
+              <p>₹{totalSales}</p>
             </div>
           </div>
           <div className="summary-card">
@@ -152,7 +182,7 @@ const Dashboard = () => {
             <FaMoneyBillWave className="summary-icon" />
             <div className="summary-info">
               <h3>Pending Payments</h3>
-              <p>${pendingPayments.toFixed(2)}</p>
+              <p>₹{pendingPayments}</p>
             </div>
           </div>
         </div>

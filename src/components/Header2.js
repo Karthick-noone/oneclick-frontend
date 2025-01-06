@@ -9,6 +9,10 @@ import {
   FaInfoCircle,
   FaEnvelope,
   FaQuestionCircle,
+  FaShoppingBag,
+  FaAddressBook,
+  FaPowerOff,
+  FaBox
 } from "react-icons/fa";
 import "./../styles.css"; // Adjust path as needed
 import "./css/Header2.css"; // Adjust path as needed
@@ -22,6 +26,9 @@ import { ApiUrl } from "./ApiUrl";
 import axios from "axios";
 import Header3 from "./Header3";
 import Swal from "sweetalert2";
+import 'nprogress/nprogress.css';
+import NProgress from 'nprogress';
+
 const Header2 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
@@ -34,11 +41,27 @@ const Header2 = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDropdownOpen4, setIsDropdownOpen4] = useState(false);
   const [isDropdownOpen3, setIsDropdownOpen3] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // State to hold error message
   const dropdownRef = useRef(null);
   const [username, setUsername] = useState("");
 
+
+
+  useEffect(() => {
+    NProgress.configure({ showSpinner: false }); // Disable spinner
+
+    NProgress.start();
+
+    // Simulate a delay to show the progress bar
+    const timeout = setTimeout(() => {
+      NProgress.done();
+    }, 1000); // Adjust the time as needed
+
+    // Cleanup function to stop NProgress if the component unmounts
+    return () => clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     // Fetch the username from local storage
@@ -103,93 +126,122 @@ const Header2 = () => {
 
   const keywordMapping = [
     { term: "Computers", keywords: ["laptop", "laptops", "desktop", "desktops", "computer", "computers", "notebook"] },
-    { term: "Mobiles", keywords: ["mobile", "mobiles", "smartphone", "smartphones", "phones", "phone", "android"] },
+    { term: "Mobiles", keywords: ["mobile", "mobiles", "smartphone", "smartphones", "phones", "phone", "android",] }, // Added xiomi and redmi here
+    { term: "CCTV", keywords: ["cctv", "security camera", "surveillance"] },
+    { term: "Printers", keywords: ["printer","printers", "scanner","scanners", "fax"] },
+    { term: "ComputerAccessories", keywords: ["keyboard", "mouse", "monitor", "webcam", "laptop charger", "adapter"] },
+    { term: "MobileAccessories", keywords: ["charger", "mobile charger", "back cover", "back case", "flip cover", "case", "screen protector", "power bank", "c type charger"] },
     { term: "Headphones", keywords: ["headphone", "headphones", "earphone", "earphones", "earbuds", "headset", "wireless headphone", "wired headphone", "wired headphones"] },
-    { term: "Printers", keywords: ["printer", "scanner", "fax"] },
     { term: "Speaker", keywords: ["speaker", "speakers", "bluetooth speaker", "audio", "home theatre"] },
     { term: "Television", keywords: ["television", "tv", "tele"] },
-    { term: "Watch", keywords: ["watch", "smart watch", "time", "clock", "wall clock"] },
-    { term: "CCTV", keywords: ["cctv", "security camera", "surveillance"] },
-    { term: "ComputerAccessories", keywords: ["keyboard", "mouse", "monitor", "webcam", "laptop charger", "adapter"] },
-    { term: "MobileAccessories", keywords: ["charger", "mobile charger", "back cover", "back case", "flip cover", "case", "screen protector", "power bank", "c type charger"] }
-];
-// Function to handle search and navigate
-// Function to handle search and navigate
-// Function to handle search and navigate
-const handleSearch = async () => {
-  const searchTerm = searchQuery.trim().toLowerCase(); // Convert input to lowercase for comparison
-
-  if (searchTerm) {
-    // 1. First, check locally using keyword mapping
-    const foundCategory = keywordMapping.find(mapping => 
-      mapping.keywords.some(keyword => searchTerm === keyword.toLowerCase()) // Use exact match, not includes
-    );
-
-    if (foundCategory) {
-      let category = foundCategory.term;
-
-      // Explicitly handle "TV" search
-      if (searchTerm === 'tv') {
-        category = 'TeleVision';
-      }
-
-      // If a local match is found, navigate to the category with search query
-      navigate(`/${encodeURIComponent(category)}?search=${encodeURIComponent(searchTerm)}`);
-    } else {
-      // 2. If no local match, call the backend API for suggestions
-      try {
-        const response = await fetch(`${ApiUrl}/api/suggestions?query=${encodeURIComponent(searchQuery.trim())}`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.category) {
-            let category = data.category;
-
-            // Explicitly handle backend response for "tv"
-            if (category.toLowerCase() === 'tv') {
-              category = 'TeleVision';
-            } else if (searchQuery.trim().toLowerCase() === 'cctv') {
-              category = 'CCTV';
+    { term: "Watch", keywords: ["watch", "smart watch", "time", "clock", "wall clock"] }
+  ];
+  
+  const synonymMapping = {
+    xiaomi: "redmi",
+    redmi: "redmi" // This can help in consistency for checks
+  };
+  
+  const handleSearch = async () => {
+    let searchTerm = searchQuery.trim().toLowerCase(); // Convert input to lowercase for comparison
+    console.log("Search term:", searchTerm); // Log the search term
+  
+    // Map the search term if it's a synonym
+    if (synonymMapping[searchTerm]) {
+      searchTerm = synonymMapping[searchTerm]; // Replace the term with its synonym
+      console.log("Mapped search term:", searchTerm); // Log the mapped term
+    }
+  
+    if (searchTerm) {
+      // 1. First, check locally using priority categories
+      const foundCategory = keywordMapping.find(mapping => 
+        mapping.term !== "ComputerAccessories" && mapping.term !== "MobileAccessories" &&
+        mapping.keywords.some(keyword => searchTerm === keyword.toLowerCase()) // Use exact match
+      );
+  
+      console.log("Found category in priority categories:", foundCategory); // Log found category
+  
+      if (foundCategory) {
+        // If a priority category match is found, navigate to that category
+        console.log(`Navigating to category: ${foundCategory.term}`); // Log navigation
+        navigate(`/${encodeURIComponent(foundCategory.term)}?search=${encodeURIComponent(searchTerm)}`);
+      } else {
+        // 2. If no priority category found, check for accessories
+        const accessoryFound = keywordMapping.find(mapping => 
+          (mapping.term === "ComputerAccessories" || mapping.term === "MobileAccessories") &&
+          mapping.keywords.some(keyword => searchTerm === keyword.toLowerCase()) // Use exact match
+        );
+  
+        console.log("Found category in accessories:", accessoryFound); // Log found accessory
+  
+        if (accessoryFound) {
+          console.log(`Navigating to accessory category: ${accessoryFound.term}`); // Log navigation to accessory
+          navigate(`/${encodeURIComponent(accessoryFound.term)}?search=${encodeURIComponent(searchTerm)}`);
+        } else {
+          // 3. If no local match, call the backend API for suggestions
+          console.log("No local match found, calling backend API for suggestions.");
+          try {
+            const response = await fetch(`${ApiUrl}/api/suggestions?query=${encodeURIComponent(searchQuery.trim())}`);
+            
+            if (response.ok) {
+              const data = await response.json();
+              console.log("API response data:", data); // Log API response
+  
+              if (data.category) {
+                let category = data.category;
+  
+                // Explicitly handle backend response for "tv"
+                if (category.toLowerCase() === 'tv') {
+                  category = 'TeleVision';
+                } else if (searchQuery.trim().toLowerCase() === 'cctv') {
+                  category = 'CCTV';
+                }
+  
+                console.log(`Navigating to category from API: ${category}`); // Log navigation from API
+                navigate(`/${encodeURIComponent(category)}?search=${encodeURIComponent(searchTerm)}`);
+              } else {
+                // If the backend doesn't return a category, show "Product not found"
+                console.warn("No category returned from API."); // Log warning
+                Swal.fire({
+                  title: 'Product not found',
+                  text: 'We could not find any products matching your search.',
+                  icon: 'warning',
+                  confirmButtonText: 'OK'
+                });
+              }
+            } else {
+              console.error("Failed to fetch suggestions from API."); // Log error
+              Swal.fire({
+                title: 'Product not found',
+                text: 'We could not find any products matching your search.',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+              });
             }
-
-            // Navigate to the product's category page with search query
-            navigate(`/${encodeURIComponent(category)}?search=${encodeURIComponent(searchTerm)}`);
-          } else {
-            // If the backend doesn't return a category, show "Product not found"
+          } catch (error) {
+            console.error("Error during search:", error); // Log error
             Swal.fire({
-              title: 'Product not found',
-              text: 'We could not find any products matching your search.',
-              icon: 'warning',
+              title: 'Error',
+              text: 'An error occurred while searching.',
+              icon: 'error',
               confirmButtonText: 'OK'
             });
           }
-        } else {
-          Swal.fire({
-            title: 'Product not found',
-            text: 'We could not find any products matching your search.',
-            icon: 'warning',
-            confirmButtonText: 'OK'
-          });
         }
-      } catch (error) {
-        console.error("Error during search:", error);
-        Swal.fire({
-          title: 'Error',
-          text: 'An error occurred while searching.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
       }
+    } else {
+      console.warn("Search term is empty."); // Log warning for empty search term
     }
-  }
-};
-
+  };
+  
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
+      console.log("Enter key pressed, initiating search."); // Log enter key press
       handleSearch();
     }
   };
-
+  
+  
   // const handleSuggestionClick = (suggestion) => {
   //   setSearchQuery(suggestion);
   //   setIsDropdownOpen3(false);
@@ -345,6 +397,9 @@ const handleSearch = async () => {
     }
   };
 
+  const sidebarRef = useRef(null);
+  const wishlistRef = useRef(null);
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -353,17 +408,47 @@ const handleSearch = async () => {
     setIsWishlistOpen(!isWishlistOpen);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Check if the click is outside the sidebar and wishlist
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        isSidebarOpen
+      ) {
+        setIsSidebarOpen(false);
+      }
+
+      if (
+        wishlistRef.current &&
+        !wishlistRef.current.contains(event.target) &&
+        isWishlistOpen
+      ) {
+        setIsWishlistOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isSidebarOpen, isWishlistOpen]);
+
   const toggleUserCard = () => {
     const storedUsername = localStorage.getItem("username");
     const storedEmail = localStorage.getItem("email");
 
     if (storedUsername && storedEmail) {
-      setIsUserCardOpen((prevState) => !prevState);
+      setIsDropdownOpen4((prevState) => !prevState);
       setUser({ username: storedUsername, email: storedEmail });
     } else {
       navigate("/login");
     }
   };
+
+  // const handleToggleDropdown = () => {
+  //   setIsDropdownOpen((prevState) => !prevState);
+  // };
 
   const handleLogout = () => {
     localStorage.removeItem("username");
@@ -392,7 +477,7 @@ const handleSearch = async () => {
         !event.target.closest(".users")
       ) {
         setIsUserCardOpen(false);
-        setIsDropdownOpen3(false);
+        setIsDropdownOpen(false);
       }
 
       if (
@@ -401,6 +486,10 @@ const handleSearch = async () => {
         !event.target.closest(".dots")
       ) {
         setIsDropdownOpen(false);
+      }
+
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen4(false); // Close the dropdown if clicked outside
       }
     };
 
@@ -505,50 +594,28 @@ const handleSearch = async () => {
       >
         <div className="company-name">
           <a href="/">
-            <img src={logo} width={"230px"} alt="Company Logo" />
+            <img src={logo} width={"230px"} style={{marginLeft:'50px'}} alt="Company Logo" />
           </a>
         </div>
-        <div className="search-box" ref={dropdownRef}>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleSearchInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder="Search for products..."
-          />
-          <FaSearch className="search-icon" onClick={handleSearch} />
-          {errorMessage && <div className="error-message">{errorMessage}</div>}
+        <div className="search-box">
+  <input
+    type="text"
+    className="searchboxinput"
+    value={searchQuery}
+    onChange={handleSearchInputChange}
+    onKeyPress={handleKeyPress}
+    placeholder="Search for products..."
+  />
+  <div className="search-icon-container" onClick={handleSearch}>
+    <FaSearch className="search-icon" />
+  </div>
+</div>
 
-          {/* {isDropdownOpen3 && (
-            <ul className="suggestions-dropdown">
-              {suggestions.length > 0 ? (
-                suggestions.map((suggestion, index) => (
-                  <li
-                    key={index}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    {suggestion}
-                  </li>
-                ))
-              ) : (
-                <li className="no-suggestions">Product not found</li>
-              )}
-            </ul>
-          )} */}
-        </div>
 
         <div className="iconss">
           <FaUser  title={username || "Login"} style={{color:'white'}} className="users"  onClick={toggleUserCard} />
-          <FaHeart style={{color:'white'}} title="Wish List" onClick={toggleWishlist} />
-          <div className="cart-icon-container">
-            <FaShoppingCart style={{color:'white',marginTop:'5px'}} title="Cart" onClick={toggleSidebar} />
-            <FaEllipsisV style={{color:'white'}} className="dots" onClick={handleToggleDropdown} />
 
-            {getTotalItemsCount() > 0 && (
-              <span className="cart-count">{getTotalItemsCount()}</span>
-            )}
-
-            {isDropdownOpen && (
+          {isDropdownOpen && (
               <div className="dropdown-menu" ref={dropdownRef}>
                 <a href="/About">
                   <div
@@ -579,10 +646,32 @@ const handleSearch = async () => {
                 </a>
               </div>
             )}
+          <FaHeart style={{color:'white'}} title="Wish List" onClick={toggleWishlist} />
+          <div className="cart-icon-container">
+            <FaShoppingCart style={{color:'white',marginTop:'4px'}} title="Cart" onClick={toggleSidebar} />
+            <FaEllipsisV style={{color:'white'}} className="dots" onClick={handleToggleDropdown} />
+
+            {getTotalItemsCount() > 0 && (
+              <span className="cart-count">{getTotalItemsCount()}</span>
+            )}
+
+            {isDropdownOpen4 && (
+              <div ref={dropdownRef} className="dropdownnn-container">
+              <div className="dropdownnn-content">
+                <a href="/UserAddress"><FaAddressBook style={{color:"#333"}} className="iicon" /> My Addresses</a>
+                {/* <a href="/my-subscription"><FaCalendarCheck /> My Subscription</a> */}
+                <a href="/MyAccount"><FaUser style={{color:"#333"}}  className="iicon"  /> My Account</a>
+                <a href="/MyOrders"><FaBox  style={{color:"#333"}} className="iicon"  /> My Orders</a>
+                <a href="/Cart"><FaShoppingBag style={{color:"#333"}} className="iicon" />Cart</a>
+                <hr />
+                <a href="#" onClick={handleLogout}><FaPowerOff style={{color:"#333"}} /> Logout</a>
+              </div>
+            </div>
+            )}
           </div>
           {isMobileView && <Header3 />}
         </div>
-        <div className={`sidebarcart ${isSidebarOpen ? "open" : ""}`}>
+        <div  ref={sidebarRef} className={`sidebarcart ${isSidebarOpen ? "open" : ""}`}>
           <button
             style={{ color: "black" }}
             className="close-btn"
@@ -692,6 +781,8 @@ const handleSearch = async () => {
           toggleWishlist={toggleWishlist}
           wishlistItems={wishlistItems}
           removeFromWishlist={removeFromWishlist}
+          wishlistRef={wishlistRef} // Pass the ref
+
         />
         {isUserCardOpen && user && (
           <div className="user-card-container" ref={userCardRef}>

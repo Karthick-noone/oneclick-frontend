@@ -40,28 +40,53 @@ const Watch = () => {
      })
    : products; // If no search query, return all products
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(`${ApiUrl}/fetchwatch`);
+   const [coupons, setCoupons] = useState({}); // State to store coupons
 
-        setProducts(response.data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        toast.error("Failed to fetch products.", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      }
-    };
-
-    fetchProducts();
-  }, []);
+    useEffect(() => {
+      const fetchProducts = async () => {
+        try {
+          const response = await axios.get(`${ApiUrl}/fetchwatch`);
+          const fetchedProducts = response.data;
+  
+          // Set products to state
+          setProducts(fetchedProducts);
+  
+          // Fetch coupons for each product
+          for (const product of fetchedProducts) {
+            try {
+              const couponResponse = await axios.get(`${ApiUrl}/coupons/${product.prod_id}`);
+              // Assuming couponResponse.data.coupons returns an array of coupons
+              if (couponResponse.data.coupons.length > 0) {
+                // Set the first coupon code for the product
+                setCoupons((prev) => ({
+                  ...prev,
+                  [product.prod_id]: couponResponse.data.coupons[0].coupon_code // Use coupon_code from the first coupon
+                }));
+                console.log(`Set coupon code for product ${product.prod_id}: ${couponResponse.data.coupons[0].coupon_code}`);
+              } else {
+                console.log(`No coupons found for product ${product.prod_id}`);
+              }
+            } catch (couponError) {
+              console.error(`Failed to fetch coupon for product ${product.prod_id}:`, couponError);
+            
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching products:", error);
+          toast.error("Failed to fetch products.", {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        }
+      };
+  
+      fetchProducts();
+    }, []);
 
   useEffect(() => {
     const updateFavorites = () => {
@@ -177,9 +202,10 @@ const Watch = () => {
             image: product.prod_img,
             description: product.prod_features,
             category: product.category,
+            deliverycharge: product.deliverycharge,
             product_id: product.prod_id,
             actual_price: product.actual_price,
-
+            coupon: product.coupon,
             quantity: 1,
           });
   
@@ -365,7 +391,18 @@ const Watch = () => {
       <div className="main-content">
         <Sidebar />
         <div className="product-list">
-  {filteredProducts.length === 0 ? (
+          
+          
+        {products.length === 0 ? (
+    <div className="no-products-message">
+    <h2>No products available yet...</h2>
+    <p>
+      In the meantime, please select a different category to continue shopping.
+    </p>
+  </div>
+  
+  ) : (
+  filteredProducts.length === 0 ? (
     // If filteredProducts is empty, fallback to using all products
     products.map((product) => {
       // Parse the prod_img if it's a JSON string; assuming it's an array
@@ -396,14 +433,16 @@ const Watch = () => {
               )}
             </span>
           </div>
-          <h3 className="product-name">{product.prod_name}</h3>
+           
+                    <h3 className="product-name">{product.prod_name}</h3>
+                    <span className="product-subtitle2">{product.subtitle}</span>
           {/* <p className="product-description">{product.prod_features}</p> */}
-          <p className="product-price">₹{product.prod_price}</p>
-                    <p className="product-actual-price">
-                      <span style={{ textDecoration: "line-through" }}>
-                        ₹{product.actual_price}{" "}
+                 <p >
+                      <span >
+                    <span className="product-price">₹{product.prod_price}</span>
+                    <span style={{marginRight:'5px',fontSize:'15px'}}>M.R.P</span><span className="product-actual-price" style={{ textDecoration: "line-through" }}>₹{product.actual_price}</span>
                       </span>
-                      <span style={{ color: "green", marginLeft: "10px" }}>
+                      <p style={{ color: "green", marginLeft: "10px",marginBottom: "10px" }}>
                         (
                         {Math.round(
                           ((product.actual_price - product.prod_price) /
@@ -411,7 +450,7 @@ const Watch = () => {
                             100
                         )}
                         % OFF)
-                      </span>
+                      </p>
                     </p>{" "}
           {product.status === "unavailable" ? (
             <p
@@ -438,6 +477,15 @@ const Watch = () => {
               Add to cart
             </button>
           )}
+
+<><br />
+{/* {coupons[product.prod_id] && ( // Access using prod_id
+          <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
+            <span>
+              Coupon Available
+            </span>
+          </div>
+        )} */}</>
         </div>
       );
     })
@@ -476,14 +524,16 @@ const Watch = () => {
               )}
             </span>
           </div>
-          <h3 className="product-name">{product.prod_name}</h3>
+           
+                    <h3 className="product-name">{product.prod_name}</h3>
+                    <span className="product-subtitle2">{product.subtitle}</span>
           {/* <p className="product-description">{product.prod_features}</p> */}
-          <p className="product-price">₹{product.prod_price}</p>
-                    <p className="product-actual-price">
-                      <span style={{ textDecoration: "line-through" }}>
-                        ₹{product.actual_price}{" "}
+                 <p >
+                      <span >
+                    <span className="product-price">₹{product.prod_price}</span>
+                    <span style={{marginRight:'5px',fontSize:'15px'}}>M.R.P</span><span className="product-actual-price" style={{ textDecoration: "line-through" }}>₹{product.actual_price}</span>
                       </span>
-                      <span style={{ color: "green", marginLeft: "10px" }}>
+                      <p style={{ color: "green", marginLeft: "10px",marginBottom: "10px" }}>
                         (
                         {Math.round(
                           ((product.actual_price - product.prod_price) /
@@ -491,7 +541,7 @@ const Watch = () => {
                             100
                         )}
                         % OFF)
-                      </span>
+                      </p>
                     </p>
           {product.status === "unavailable" ? (
             <p
@@ -518,10 +568,20 @@ const Watch = () => {
               Add to cart
             </button>
           )}
+
+<><br />
+{/* {coupons[product.prod_id] && ( // Access using prod_id
+          <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
+            <span>
+              Coupon Available
+            </span>
+          </div>
+        )} */}</>
         </div>
       );
     })
-  )}
+  )
+)}
 </div>
 
 

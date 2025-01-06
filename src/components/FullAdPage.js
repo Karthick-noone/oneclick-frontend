@@ -37,30 +37,38 @@ const FullAdPage = () => {
   };
   return (
     <div className="full-page-container">
-      {adImages.length > 0 ? (
-        adImages.map((ad, index) => (
-          <div key={index} className="ad-image-container">
-            <Link
-              style={{ textDecoration: "none" }}
-              to={`/${categoryMap[ad.category] || ad.category}`}
-            >
+    {adImages.length > 0 ? (
+      adImages.map((ad, index) => (
+        <div key={index} className="ad-image-container">
+          <Link
+            style={{ textDecoration: "none" }}
+            to={`/${categoryMap[ad.category] || ad.category}`}
+          >
+            <div className="full-ad-card">
               <img
                 src={`${ApiUrl}/uploads/singleadpage/${ad.image}`} // Adjust path as needed
                 alt={`Ad ${index + 1}`}
-                className="full-page-image"
+                // className="full-page-image"
+                className="bannner-image"
+
                 loading="lazy"
+                // style={{ width: '1250px', marginTop: '20px', height: 'auto' }} // Styling for the image
+
               />
-            </Link>
-            {/* <div>{ad.category}</div> */}
-            {/* <div className="overlay-content">
-                            <button className="shop-now-button">Shop Now</button>
-                        </div> */}
-          </div>
-        ))
-      ) : (
-        <p>No ads available</p>
-      )}
-    </div>
+            </div>
+          </Link>
+          {/* Uncomment if you want to display the category or overlay content */}
+          {/* <div>{ad.category}</div> */}
+          {/* <div className="overlay-content">
+                          <button className="shop-now-button">Shop Now</button>
+                      </div> */}
+        </div>
+      ))
+    ) : (
+      <p>No ads available</p>
+    )}
+  </div>
+  
   );
 };
 

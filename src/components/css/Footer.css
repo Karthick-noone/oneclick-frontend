@@ -7,7 +7,7 @@
     background-color: #fff; /* White background for the card effect */
     color: #000; /* Black text color */
     text-align: left;
-    font-family: 'Poppins', sans-serif; /* Font family */
+    font-family: 'calibri', sans-serif; /* Font family */
 
     /* Add box-shadow for card effect */
     box-shadow: 10px 10px 10px 8px rgba(0, 0, 0, 0.3);

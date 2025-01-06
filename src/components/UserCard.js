@@ -5,15 +5,7 @@ import { FaAddressBook, FaCalendarCheck, FaUser, FaBox, FaHeart,  FaPowerOff, Fa
 const UserCard = ({ onLogout }) => {
   return (
     <div className="dropdownnn-container">
-      <div className="dropdownnn-content">
-        <a href="/UserAddress"><FaAddressBook /> My Addresses</a>
-        {/* <a href="/my-subscription"><FaCalendarCheck /> My Subscription</a> */}
-        <a href="/MyAccount"><FaUser /> My Account</a>
-        <a href="/MyOrders"><FaBox /> My Orders</a>
-        <a href="/Cart"><FaShoppingBag/>Cart</a>
-        <hr />
-        <a href="#" onClick={onLogout}><FaPowerOff /> Logout</a>
-      </div>
+     
     </div>
   );
 };

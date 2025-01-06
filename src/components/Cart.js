@@ -181,7 +181,9 @@ useEffect(() => {
     return cartItems
       .reduce((total, item) => {
         const price = parseFloat(item.price);
-        return total + (isNaN(price) ? 0 : price * item.quantity);
+        const deliveryCharge = parseFloat(item.deliverycharge || 0);
+
+        return total + (isNaN(price) ? 0 : price * item.quantity) + deliveryCharge;
       }, 0)
       .toFixed(2);
   };
@@ -200,6 +202,15 @@ useEffect(() => {
         const price = parseFloat(item.price);
         const discountPerItem = actual_price - price;
         return total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity);
+      }, 0)
+      .toFixed(2);
+  };
+
+  const calculateDeliveryCharge = () => {
+    return cartItems
+      .reduce((total, item) => {
+        const deliveryCharge = parseFloat(item.deliverycharge || 0);
+        return total + (isNaN(deliveryCharge) ? 0 : deliveryCharge);
       }, 0)
       .toFixed(2);
   };
@@ -354,6 +365,7 @@ useEffect(() => {
       image: item.image,
       description: item.description,
       product_id: item.prod_id,
+      delivery_charge: item.delivery_charge,
       category: item.category,
     }));
 
@@ -579,8 +591,8 @@ useEffect(() => {
             <div className="summary-item">
               <span>Delivery charge</span>
               <span>
-                <span style={{ textDecoration: "line-through" }}>₹40</span> <span style={{color:'green'}}>FREE Delivery</span>
-               
+                {/* <span style={{ textDecoration: "line-through" }}>₹40</span> <span style={{color:'green'}}>FREE Delivery</span> */}
+               <span>₹{calculateDeliveryCharge()}</span>
               </span>
             </div>
             {/* <div className="summary-item">
@@ -602,7 +614,7 @@ useEffect(() => {
               onClick={() => navigate("/Checkout")}
               // onClick={handlePlaceOrder}
             >
-              Place Order
+              Checkout
             </button>
 
             {isModalOpen && (

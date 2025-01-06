@@ -197,10 +197,10 @@ const MyOrders = () => {
                   <span className="info-label">Price</span>
                   <span className="info-value ">₹{currentProduct.prod_price}</span>
                 </p>
-                <p className="info-row">
+                {/* <p className="info-row">
                   <span className="info-label">Description</span>
                   <span className="info-value product-descriptionn">{currentProduct.prod_features}</span>
-                </p>
+                </p> */}
               </>
             )}
           </div>

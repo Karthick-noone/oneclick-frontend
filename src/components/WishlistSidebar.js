@@ -7,12 +7,14 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCart } from "../components/CartContext";
 import { Link } from "react-router-dom";
+import right from './img/right.png'
 
 const WishlistSidebar = ({
   isOpen,
   toggleWishlist,
   wishlistItems = [],
   removeFromWishlist,
+  wishlistRef
 }) => {
   const { addToCart, updateCartItemQuantity, cartItems } = useCart();
   const [, setWishlistItems] = useState([]);
@@ -124,6 +126,8 @@ const WishlistSidebar = ({
             category: product.category,
             product_id: product.prod_id,
             actual_price: product.actual_price,
+            deliverycharge: product.deliverycharge,
+            coupon: product.coupon,
             quantity: 1,
           });
         }
@@ -162,13 +166,14 @@ const WishlistSidebar = ({
 
   return (
   <>
-    <div className={`wishlist-sidebar ${isOpen ? "open" : ""}`}>
+    <div  ref={wishlistRef} className={`wishlist-sidebar ${isOpen ? "open" : ""}`}>
       <button
         style={{ color: "black" }}
         className="close-btn"
         onClick={toggleWishlist}
       >
         <FaTimes />
+        {/* <img src={right} width={'20px'} alt="" /> */}
       </button>
       <div className="wishlist-sidebar-header">
         <h3>Wishlist</h3>
