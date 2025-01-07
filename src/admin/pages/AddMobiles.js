@@ -1369,116 +1369,154 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
   };
 
 
- const handleOpenFrequentlyBuyModal = async (productId, category) => {
-      setCurrentProductId(productId);
-      setIsFrequentlyBuyModalOpen(true);
-    
-      // Fetch all accessories and pre-selected ones
-  const response = await fetch(
-        `${ApiUrl}/getaccessories?category=${category}&productId=${productId}`
-      );
-          const data = await response.json();
-    
-      const selectedAccessories = data[0]?.selected_accessories?.split(",") || [];
-      setSelectedAccessories(selectedAccessories);
-      setComputerAccessories(data);
-    };
-    
-  
-    
-    const handleCloseFrequentlyBuyModal = () => {
-      setIsFrequentlyBuyModalOpen(false);
-      setSelectedAccessories([]);
-    };
-  
-    
-    const handleAccessorySelection = async (e) => {
-      const accessoryId = e.target.value;
-    
-      if (e.target.checked) {
-        // Add accessory ID to the selected list
-        setSelectedAccessories((prev) => [...prev, accessoryId]);
-      } else {
-        // Remove accessory ID from the selected list
-        setSelectedAccessories((prev) => prev.filter((id) => id !== accessoryId));
-        
-        // Call the backend to remove the accessory from the table
-        try {
-          const response = await fetch(`${ApiUrl}/removefrequentlybuy`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              productId: currentProductId,
-              accessoryId: accessoryId,
-            }),
-          });
-    
-          if (response.ok) {
-            const data = await response.text();
-            console.log("Accessory removed successfully:", data);
-          } else {
-            const errorData = await response.text();
-            console.error("Error removing accessory:", errorData);
-          }
-        } catch (error) {
-          console.error("Error during fetch:", error);
-        }
-      }
-    };
-    
-    
-    const handleAddAccessories = () => {
-      navigate('/Admin/MobileAccessories');
-    };
-    
-    const handleSaveAccessories = async () => {
-      const payload = {
-        id: currentProductId,
-        accessoryIds: selectedAccessories.join(","),
-      };
-    
-      try {
-        const response = await fetch(`${ApiUrl}/addfrequentlybuy`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-    
-        if (response.ok) {
-          const data = await response.text();
-          console.log("Accessories updated successfully:", data);
-    
-          Swal.fire({
-            icon: "success",
-            title: "Success",
-            text: "Accessories have been updated successfully!",
-            confirmButtonColor: "#4caf50",
-          });
-        } else {
-          const errorData = await response.text();
-          console.error("Error updating accessories:", errorData);
-    
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to update accessories. Please try again.",
-            confirmButtonColor: "#f44336",
-          });
-        }
-      } catch (error) {
-        console.error("Error during fetch:", error);
-    
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "An unexpected error occurred. Please try again later.",
-          confirmButtonColor: "#f44336",
-        });
-      }
-    
-      setIsFrequentlyBuyModalOpen(false);
-      setSelectedAccessories([]);
-    };
+  const handleOpenFrequentlyBuyModal = async (productId, category) => {
+     console.log("[INFO] Opening Frequently Buy Modal");
+     console.log(`[INFO] Product ID: ${productId}, Category: ${category}`);
+   
+     setCurrentProductId(productId);
+     setIsFrequentlyBuyModalOpen(true);
+   
+     try {
+       console.log("[INFO] Fetching accessories from API");
+       const response = await fetch(
+         `${ApiUrl}/getmobileaccessories?&productId=${productId}`
+       );
+   
+       if (!response.ok) {
+         const errorData = await response.text();
+         console.error("[ERROR] Failed to fetch accessories:", errorData);
+         return;
+       }
+   
+       const data = await response.json();
+       console.log("[INFO] Accessories fetched successfully:", data);
+   
+       // Check if the response contains the categoryAccessories array
+       if (Array.isArray(data.categoryAccessories)) {
+         setComputerAccessories(data.categoryAccessories);
+       } else {
+         console.error("[ERROR] categoryAccessories is not an array:", data.categoryAccessories);
+         setComputerAccessories([]); // Set to an empty array if there's an error
+       }
+   
+       // Parse the selected accessories if they exist
+       const selectedAccessories = data.additionalAccessories
+         ? data.additionalAccessories.split(",")
+         : [];
+       console.log("[INFO] Pre-selected accessories:", selectedAccessories);
+   
+       setSelectedAccessories(selectedAccessories);
+     } catch (error) {
+       console.error("[ERROR] Error while fetching accessories:", error);
+     }
+   };
+   
+   const handleCloseFrequentlyBuyModal = () => {
+     console.log("[INFO] Closing Frequently Buy Modal");
+     setIsFrequentlyBuyModalOpen(false);
+     setSelectedAccessories([]);
+   };
+   
+   const handleAccessorySelection = async (e) => {
+     const accessoryId = e.target.value;
+     console.log(`[INFO] Accessory ID: ${accessoryId}, Checked: ${e.target.checked}`);
+   
+     if (e.target.checked) {
+       console.log("[INFO] Adding accessory to the selected list");
+       setSelectedAccessories((prev) => [...prev, accessoryId]);
+     } else {
+       console.log("[INFO] Removing accessory from the selected list");
+       setSelectedAccessories((prev) => prev.filter((id) => id !== accessoryId));
+   
+       try {
+         console.log("[INFO] Removing accessory from the backend");
+         const response = await fetch(`${ApiUrl}/removefrequentlybuy`, {
+           method: "POST",
+           headers: { "Content-Type": "application/json" },
+           body: JSON.stringify({
+             productId: currentProductId,
+             accessoryId: accessoryId,
+           }),
+         });
+   
+         if (response.ok) {
+           const data = await response.text();
+           console.log("[INFO] Accessory removed successfully:", data);
+         } else {
+           const errorData = await response.text();
+           console.error("[ERROR] Error removing accessory:", errorData);
+         }
+       } catch (error) {
+         console.error("[ERROR] Error during accessory removal fetch:", error);
+       }
+     }
+   };
+   
+   const handleAddAccessories = () => {
+     console.log("[INFO] Navigating to Add Accessories page");
+     navigate("/Admin/MobileAccessories");
+   };
+   
+   const handleSaveAccessories = async () => {
+     // if (selectedAccessories.length === 0) {
+     //   Swal.fire({
+     //     icon: "warning",
+     //     title: "No Accessories Selected",
+     //     text: "Please select at least one accessory to update.",
+     //     confirmButtonColor: "#ff9800",
+     //   });
+     //   return; // Prevent saving when no accessories are selected
+     // }
+   
+     console.log("[INFO] Saving selected accessories");
+     const payload = {
+       id: currentProductId,
+       accessoryIds: selectedAccessories.join(","),
+     };
+     console.log("[INFO] Payload for saving accessories:", payload);
+   
+     try {
+       const response = await fetch(`${ApiUrl}/addfrequentlybuy`, {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify(payload),
+       });
+   
+       if (response.ok) {
+         const data = await response.text();
+         console.log("[INFO] Accessories updated successfully:", data);
+   
+         Swal.fire({
+           icon: "success",
+           title: "Success",
+           text: "Accessories have been updated successfully!",
+           confirmButtonColor: "#4caf50",
+         });
+       } else {
+         const errorData = await response.text();
+         console.error("[ERROR] Failed to update accessories:", errorData);
+   
+         Swal.fire({
+           icon: "error",
+           title: "Error",
+           text: "Failed to update accessories. Please try again.",
+           confirmButtonColor: "#f44336",
+         });
+       }
+     } catch (error) {
+       console.error("[ERROR] Unexpected error during save operation:", error);
+   
+       Swal.fire({
+         icon: "error",
+         title: "Error",
+         text: "An unexpected error occurred. Please try again later.",
+         confirmButtonColor: "#f44336",
+       });
+     }
+   
+     setIsFrequentlyBuyModalOpen(false);
+     setSelectedAccessories([]);
+   };
 
     const role = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
@@ -1997,69 +2035,66 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                 </div>
                 
                 
-                {isFrequentlyBuyModalOpen && (
-  <div className="freq-modal-overlay">
-    <div className="freq-modal-content">
-      <button onClick={handleCloseFrequentlyBuyModal} className="freq-modal-close-btn">
-        <FaTimes />
-      </button>
-      <h3 className="freq-modal-title">Select Accessories</h3>
-
-      {computerAccessories.length === 0 ? (
-        <div className="no-accessories-message">
-          <p>No accessories added to this category</p>
-          <button onClick={handleAddAccessories} className="add-accessories-btn">
-            Add Accessories
-          </button>
-        </div>
-      ) : (
-        <div className="freq-modal-list">
-          {computerAccessories.map((accessory) => {
-            // Parse prod_img if it's a stringified array or check if it's already an array
-            const images = Array.isArray(accessory.prod_img)
-              ? accessory.prod_img
-              : JSON.parse(accessory.prod_img);
-
-            // Only use the first image from the array
-            const firstImage = images[0];
-
-            return (
-              <div key={accessory.id} className="freq-modal-item">
-                <div className="freq-image-wrapper">
-                  {/* Display only the first image */}
-                  {firstImage && (
-                    <img
-                      src={`${ApiUrl}/uploads/mobileaccessories/${firstImage}`}
-                      alt={accessory.prod_name}
-                      className="freq-item-image"
-                    />
-                  )}
-                </div>
-                <div className="freq-item-details">
-                  <span className="freq-item-name">{accessory.prod_name}</span>
-                  <span className="freq-item-price">₹{accessory.prod_price}</span>
-                </div>
-                <input
-                  type="checkbox"
-                  className="freq-item-checkbox"
-                  value={accessory.id}
-                  checked={selectedAccessories.includes(accessory.id.toString())}
-                  onChange={handleAccessorySelection}
-                />
+          {isFrequentlyBuyModalOpen && (
+            <div className="freq-modal-overlay">
+              <div className="freq-modal-content">
+                <button onClick={handleCloseFrequentlyBuyModal} className="freq-modal-close-btn">
+                  <FaTimes />
+                </button>
+                <h3 className="freq-modal-title">Select Accessories</h3>
+          
+                {Array.isArray(computerAccessories) && computerAccessories.length === 0 ? (
+                  <div className="no-accessories-message">
+                    <p>No accessories added to this category</p>
+                    <button onClick={handleAddAccessories} className="add-accessories-btn">
+                      Add Accessories
+                    </button>
+                  </div>
+                ) : (
+                  <div className="freq-modal-list">
+                    {Array.isArray(computerAccessories) &&
+                      computerAccessories.map((accessory) => {
+                        const images = Array.isArray(accessory.prod_img)
+                          ? accessory.prod_img
+                          : JSON.parse(accessory.prod_img || "[]");
+                        const firstImage = images[0];
+          
+                        return (
+                          <div key={accessory.id} className="freq-modal-item">
+                            <div className="freq-image-wrapper">
+                              {firstImage && (
+                                <img
+                                  src={`${ApiUrl}/uploads/mobileaccessories/${firstImage}`}
+                                  alt={accessory.prod_name}
+                                  className="freq-item-image"
+                                />
+                              )}
+                            </div>
+                            <div className="freq-item-details">
+                              <span className="freq-item-name">{accessory.prod_name}</span>
+                              <span className="freq-item-price">₹{accessory.prod_price}</span>
+                            </div>
+                            <input
+                              type="checkbox"
+                              className="freq-item-checkbox"
+                              value={accessory.id}
+                              checked={selectedAccessories.includes(accessory.id.toString())}
+                              onChange={handleAccessorySelection}
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+          
+                {Array.isArray(computerAccessories) && computerAccessories.length > 0 && (
+                  <button onClick={handleSaveAccessories} className="freq-save-btn">
+                    Add
+                  </button>
+                )}
               </div>
-            );
-          })}
-        </div>
-      )}
-
-{computerAccessories.length > 0 && (
-        <button onClick={handleSaveAccessories} className="freq-save-btn">
-          Add
-        </button>
-      )}
-    </div>
-  </div>
-)}
+            </div>
+          )}
 
 <div
   onClick={() => handleOpenOfferModal(product.id)} // Pass the productId as needed

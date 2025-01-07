@@ -1362,14 +1362,14 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
   const handleOpenFrequentlyBuyModal = async (productId, category) => {
     console.log("[INFO] Opening Frequently Buy Modal");
     console.log(`[INFO] Product ID: ${productId}, Category: ${category}`);
-    
+  
     setCurrentProductId(productId);
     setIsFrequentlyBuyModalOpen(true);
   
     try {
       console.log("[INFO] Fetching accessories from API");
       const response = await fetch(
-        `${ApiUrl}/getaccessories?category=${category}&productId=${productId}`
+        `${ApiUrl}/getcomputeraccessories?productId=${productId}`
       );
   
       if (!response.ok) {
@@ -1381,11 +1381,21 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
       const data = await response.json();
       console.log("[INFO] Accessories fetched successfully:", data);
   
-      const selectedAccessories = data[0]?.selected_accessories?.split(",") || [];
+      // Check if the response contains the categoryAccessories array
+      if (Array.isArray(data.categoryAccessories)) {
+        setComputerAccessories(data.categoryAccessories);
+      } else {
+        console.error("[ERROR] categoryAccessories is not an array:", data.categoryAccessories);
+        setComputerAccessories([]); // Set to an empty array if there's an error
+      }
+  
+      // Parse the selected accessories if they exist
+      const selectedAccessories = data.additionalAccessories
+        ? data.additionalAccessories.split(",")
+        : [];
       console.log("[INFO] Pre-selected accessories:", selectedAccessories);
   
       setSelectedAccessories(selectedAccessories);
-      setComputerAccessories(data);
     } catch (error) {
       console.error("[ERROR] Error while fetching accessories:", error);
     }
@@ -1434,10 +1444,20 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
   
   const handleAddAccessories = () => {
     console.log("[INFO] Navigating to Add Accessories page");
-    navigate('/Admin/ComputerAccessories');
+    navigate("/Admin/ComputerAccessories");
   };
   
   const handleSaveAccessories = async () => {
+    // if (selectedAccessories.length === 0) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "No Accessories Selected",
+    //     text: "Please select at least one accessory to update.",
+    //     confirmButtonColor: "#ff9800",
+    //   });
+    //   return; // Prevent saving when no accessories are selected
+    // }
+  
     console.log("[INFO] Saving selected accessories");
     const payload = {
       id: currentProductId,
@@ -2019,7 +2039,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
       </button>
       <h3 className="freq-modal-title">Select Accessories</h3>
 
-      {computerAccessories.length === 0 ? (
+      {Array.isArray(computerAccessories) && computerAccessories.length === 0 ? (
         <div className="no-accessories-message">
           <p>No accessories added to this category</p>
           <button onClick={handleAddAccessories} className="add-accessories-btn">
@@ -2028,45 +2048,42 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
         </div>
       ) : (
         <div className="freq-modal-list">
-          {computerAccessories.map((accessory) => {
-            // Parse prod_img if it's a stringified array or check if it's already an array
-            const images = Array.isArray(accessory.prod_img)
-              ? accessory.prod_img
-              : JSON.parse(accessory.prod_img);
+          {Array.isArray(computerAccessories) &&
+            computerAccessories.map((accessory) => {
+              const images = Array.isArray(accessory.prod_img)
+                ? accessory.prod_img
+                : JSON.parse(accessory.prod_img || "[]");
+              const firstImage = images[0];
 
-            // Only use the first image from the array
-            const firstImage = images[0];
-
-            return (
-              <div key={accessory.id} className="freq-modal-item">
-                <div className="freq-image-wrapper">
-                  {/* Display only the first image */}
-                  {firstImage && (
-                    <img
-                      src={`${ApiUrl}/uploads/computeraccessories/${firstImage}`}
-                      alt={accessory.prod_name}
-                      className="freq-item-image"
-                    />
-                  )}
+              return (
+                <div key={accessory.id} className="freq-modal-item">
+                  <div className="freq-image-wrapper">
+                    {firstImage && (
+                      <img
+                        src={`${ApiUrl}/uploads/computeraccessories/${firstImage}`}
+                        alt={accessory.prod_name}
+                        className="freq-item-image"
+                      />
+                    )}
+                  </div>
+                  <div className="freq-item-details">
+                    <span className="freq-item-name">{accessory.prod_name}</span>
+                    <span className="freq-item-price">₹{accessory.prod_price}</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    className="freq-item-checkbox"
+                    value={accessory.id}
+                    checked={selectedAccessories.includes(accessory.id.toString())}
+                    onChange={handleAccessorySelection}
+                  />
                 </div>
-                <div className="freq-item-details">
-                  <span className="freq-item-name">{accessory.prod_name}</span>
-                  <span className="freq-item-price">₹{accessory.prod_price}</span>
-                </div>
-                <input
-                  type="checkbox"
-                  className="freq-item-checkbox"
-                  value={accessory.id}
-                  checked={selectedAccessories.includes(accessory.id.toString())}
-                  onChange={handleAccessorySelection}
-                />
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       )}
 
-{computerAccessories.length > 0 && (
+      {Array.isArray(computerAccessories) && computerAccessories.length > 0 && (
         <button onClick={handleSaveAccessories} className="freq-save-btn">
           Add
         </button>
@@ -2074,6 +2091,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     </div>
   </div>
 )}
+
 
 
 

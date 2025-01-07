@@ -57,7 +57,7 @@ const Dashboard = () => {
         const totalCategories = new Set(ordersData.map(order => order.shipping_address)).size;
 
         setTotalOrders(totalOrders);
-        setTotalSales(new Intl.NumberFormat('en-IN').format(totalSales)); // Format with commas
+        setTotalSales(new Intl.NumberFormat('en-IN').format(totalSales)); // Format with commasc
         setTotalCustomers(totalCustomers);
         setTotalCategories(totalCategories);
 

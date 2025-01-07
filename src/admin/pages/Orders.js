@@ -443,7 +443,7 @@ const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
       />
       Delivered
     </label>
-    <label>
+    {/* <label>
       <input
         type="radio"
         name="deliveryStatus"
@@ -452,7 +452,7 @@ const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
         onChange={() => setFilterDeliveryStatus("Cancelled")}
       />
       Cancelled
-    </label>
+    </label> */}
   </div>
 
       <select
