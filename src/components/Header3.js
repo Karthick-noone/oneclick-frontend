@@ -1,162 +1,384 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { FaHome, FaLaptop, FaUsb, FaMobileAlt, FaVideo, FaPrint, FaHeadphones, FaVolumeUp, FaTv, FaAppleAlt, FaCog, FaRecycle, FaInfoCircle, FaEnvelope, FaQuestionCircle } from 'react-icons/fa';
-import './css/Header3.css'; // Adjust path as needed
+import React, { useState, useEffect, useRef } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import {
+  FaHome,
+  FaLaptop,
+  FaUsb,
+  FaMobileAlt,
+  FaVideo,
+  FaPrint,
+  FaHeadphones,
+  FaVolumeUp,
+  FaTv,
+  FaAppleAlt,
+  FaCog,
+  FaRecycle,
+  FaInfoCircle,
+  FaEnvelope,
+  FaQuestionCircle,
+} from "react-icons/fa";
+import "./css/Header3.css"; // Adjust path as needed
 
 const Header3 = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [showHeadphones, setShowHeadphones] = useState(false);
-    const [showMore, setShowMore] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [showHeadphones, setShowHeadphones] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
-    const location = useLocation(); // To get the current URL
+  const location = useLocation(); // To get the current URL
 
-    const headerRef = useRef(null); // Reference to the header
+  const headerRef = useRef(null); // Reference to the header
 
-    const toggleMenu = () => {
-        setIsOpen(!isOpen);
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const toggleHeadphonesDropdown = () => {
+    setShowHeadphones(!showHeadphones);
+    setShowMore(false); // Close the "More" dropdown
+  };
+
+  const toggleMoreDropdown = () => {
+    setShowMore(!showMore);
+    setShowHeadphones(false); // Close the "Headphones" dropdown
+  };
+
+  // Handle clicks outside of the component
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (headerRef.current && !headerRef.current.contains(event.target)) {
+        setShowHeadphones(false);
+        setShowMore(false);
+      }
     };
 
-    const toggleHeadphonesDropdown = () => {
-        setShowHeadphones(!showHeadphones);
-        setShowMore(false); // Close the "More" dropdown
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, []);
 
-    const toggleMoreDropdown = () => {
-        setShowMore(!showMore);
-        setShowHeadphones(false); // Close the "Headphones" dropdown
-    };
+  // Determine if any of the links are active
+  const isAudioActive = ["/Headphones", "/Speaker"].some((path) =>
+    location.pathname.includes(path)
+  );
+  const isAccessoriesActive = [
+    "/CCTVAccessories",
+    "/PrinterAccessories",
+    "/ComputerAccessories",
+    "/MobileAccessories",
+  ].some((path) => location.pathname.includes(path));
 
-    // Handle clicks outside of the component
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (headerRef.current && !headerRef.current.contains(event.target)) {
-                setShowHeadphones(false);
-                setShowMore(false);
-            }
-        };
+  // Determine which specific accessory is active
+  const isComputerAccessoriesActive =
+    location.pathname === "/ComputerAccessories";
+  const isMobileAccessoriesActive = location.pathname === "/MobileAccessories";
+  const isCCTVAccessoriesActive = location.pathname === "/CCTVAccessories";
+  const isPrinterAccessoriesActive =
+    location.pathname === "/PrinterAccessories";
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+  const isComputersActive = location.pathname.startsWith("/Computers"); // Match any path starting with "/Computers"
 
-    // Determine if any of the links are active
-    const isAudioActive = ['/Headphones', '/Speaker'].some((path) => location.pathname.includes(path));
-    const isAccessoriesActive = ['/CCTVAccessories','/PrinterAccessories','/ComputerAccessories', '/MobileAccessories'].some((path) => location.pathname.includes(path));
+  return (
+    <header className="header3" ref={headerRef}>
+      <div
+        style={{
+          position: isOpen ? "fixed" : "",
+          right: isOpen ? "" : "-80px",
+          top: !isOpen ? "-20px" : "10px",
+          zIndex: isOpen ? "9999" : "",
+        }}
+        className="hamburger"
+        onClick={toggleMenu}
+      >
+        {isOpen ? "✖" : "☰"}
+      </div>
+      <nav className={`nav ${isOpen ? "open" : ""}`}>
+        <NavLink
+          to="/"
+          exact
+          className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
+        >
+          <FaHome
+            className={`fa-icons ${location.pathname === "/" ? "active" : ""}`}
+          />{" "}
+          {isOpen ? "Home" : ""}
+        </NavLink>
+        <NavLink
+          to="/ComputerAdBanner"
+          className={`nav-link ${
+            location.pathname.startsWith("/computers") ||
+            location.pathname.startsWith("/ComputerAdBanner")
+              ? "active"
+              : ""
+          }`}
+        >
+          <FaLaptop
+            className={`fa-icons ${
+              location.pathname.startsWith("/computers") ||
+              location.pathname.startsWith("/ComputerAdBanner")
+                ? "active"
+                : ""
+            }`}
+          />{" "}
+          Computers
+        </NavLink>
 
-    // Determine which specific accessory is active
-    const isComputerAccessoriesActive = location.pathname === '/ComputerAccessories';
-    const isMobileAccessoriesActive = location.pathname === '/MobileAccessories';
-    const isCCTVAccessoriesActive = location.pathname === '/CCTVAccessories';
-    const isPrinterAccessoriesActive = location.pathname === '/PrinterAccessories';
+        <NavLink
+          to="/MobileAdBanner"
+          className={`nav-link ${
+            location.pathname.startsWith("/mobiles") ||
+            location.pathname.startsWith("/MobileAdBanner")
+              ? "active"
+              : ""
+          }`}
+        >
+          <FaMobileAlt
+            className={`fa-icons ${
+              location.pathname.startsWith("/mobiles") ||
+              location.pathname.startsWith("/MobileAdBanner")
+                ? "active"
+                : ""
+            }`}
+          />{" "}
+          Mobile
+        </NavLink>
 
-    return (
-        <header className="header3" ref={headerRef}>
-            <div
-                style={{ position: isOpen ? 'fixed' : '', right: isOpen ? '' : '-80px', top: !isOpen ? '-20px' : '10px', zIndex: isOpen ? '9999' : '' }}
-                className="hamburger"
-                onClick={toggleMenu}
-            >
-                {isOpen ? '✖' : '☰'}
+        <NavLink
+          to="/CCTVAdBanner"
+          className={`nav-link ${
+            location.pathname.startsWith("/cctv") ||
+            location.pathname.startsWith("/CCTVAdBanner")
+              ? "active"
+              : ""
+          }`}
+        >
+          <FaVideo
+            className={`fa-icons ${
+              location.pathname.startsWith("/cctv") ||
+              location.pathname.startsWith("/CCTVAdBanner")
+                ? "active"
+                : ""
+            }`}
+          />{" "}
+          CCTV
+        </NavLink>
+
+        {/* Parent Audio link */}
+        <div
+          className={`nav-item ${isAudioActive ? "active" : ""}`}
+          onClick={toggleHeadphonesDropdown}
+        >
+          <span className="activelink">
+            <FaHeadphones
+              className={`fa-icons ${isAudioActive ? "active" : ""}`}
+            />{" "}
+            Audio
+          </span>
+          {showHeadphones && (
+            <div className="dropdown">
+              <NavLink
+                to="/Headphones"
+                className={`nav-link ${
+                  location.pathname === "/Headphones" ? "active" : ""
+                }`}
+              >
+                <FaHeadphones
+                  className={`fa-icons ${
+                    location.pathname === "/Headphones" ? "active" : ""
+                  }`}
+                />{" "}
+                Headphones
+              </NavLink>
+              <NavLink
+                to="/Speaker"
+                className={`nav-link ${
+                  location.pathname === "/Speaker" ? "active" : ""
+                }`}
+              >
+                <FaVolumeUp
+                  className={`fa-icons ${
+                    location.pathname === "/Speaker" ? "active" : ""
+                  }`}
+                />{" "}
+                Speakers
+              </NavLink>
             </div>
-            <nav  className={`nav ${isOpen ? 'open' : ''}`}>
-                <NavLink   to="/" exact className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
-                    <FaHome   className={`fa-icons ${location.pathname === '/' ? 'active' : ''}`} /> {isOpen ? 'Home' : ''}
-                </NavLink>
-                <NavLink  /* to="/Computers" */ to="/ComputerAdBanner" className={`nav-link ${location.pathname === '/Computers' ? 'active' : ''}`}>
-                    <FaLaptop  className={`fa-icons ${location.pathname === '/Computers' || location.pathname === '/ComputerAdBanner'  ? 'active' : ''}`} /> Computers
-                </NavLink>
-                <NavLink /*  to="/Mobiles" */ to="/MobileAdBanner" className={`nav-link ${location.pathname === '/Mobiles' ? 'active' : ''}`}>
-                    <FaMobileAlt  className={`fa-icons ${location.pathname === '/Mobiles' || location.pathname === '/MobileAdBanner' ? 'active' : ''}`} /> Mobile
-                </NavLink>
-                <NavLink  /* to="/CCTV" */ to="/CCTVAdBanner" className={`nav-link ${location.pathname === '/CCTV' ? 'active' : ''}`}>
-                    <FaVideo  className={`fa-icons ${location.pathname === '/CCTV' || location.pathname === '/CCTVAdBanner' ? 'active' : ''}`} /> CCTV
-                </NavLink>
-                {/* Parent Audio link */}
-         <div className={`nav-item ${isAudioActive ? 'active' : ''}`} onClick={toggleHeadphonesDropdown}>
-                    <span  className='activelink'>
-                        <FaHeadphones  className={`fa-icons ${isAudioActive ? 'active' : ''}`} /> Audio
-                    </span>
-                    {showHeadphones && (
-                        <div className="dropdown">
-                            <NavLink  to="/Headphones" className={`nav-link ${location.pathname === '/Headphones' ? 'active' : ''}`}>
-                                <FaHeadphones  className={`fa-icons ${location.pathname === '/Headphones' ? 'active' : ''}`} /> Headphones
-                            </NavLink>
-                            <NavLink  to="/Speaker" className={`nav-link ${location.pathname === '/Speaker' ? 'active' : ''}`}>
-                                <FaVolumeUp  className={`fa-icons ${location.pathname === '/Speaker' ? 'active' : ''}`} /> Speakers
-                            </NavLink>
-                        </div>
-                    )}
-                </div>   
-                <NavLink  to="/Television" className={`nav-link ${location.pathname === '/Television' ? 'active' : ''}`}>
-                    <FaTv  className={`fa-icons ${location.pathname === '/Television' ? 'active' : ''}`} /> T.V & Home Cinema
-                </NavLink>
-                <NavLink  to="/Watch" className={`nav-link ${location.pathname === '/Watch' ? 'active' : ''}`}>
-                    <FaAppleAlt  className={`fa-icons ${location.pathname === '/Watch' ? 'active' : ''}`} /> Wearable Tech
-                </NavLink>
-                <NavLink  to="/Printers" className={`nav-link ${location.pathname === '/Printers' ? 'active' : ''}`}>
-                    <FaPrint  className={`fa-icons ${location.pathname === '/Printers' ? 'active' : ''}`} /> Printers
-                </NavLink>
-               
-                {/* Parent Accessories link */}
-                <div className={`nav-item ${isAccessoriesActive ? 'active' : ''}`} onClick={toggleMoreDropdown}>
-                    <span  className='activelink'>
-                        <FaCog  className={`fa-icons ${isAccessoriesActive ? 'active' : ''}`} /> Accessories
-                    </span>
-                    {showMore && (
-                        <div className="dropdown">
-                            <NavLink  to="/ComputerAccessories" className={`nav-link ${isComputerAccessoriesActive ? 'active' : ''}`}>
-                                <FaUsb className={`fa-icons ${isComputerAccessoriesActive ? 'active' : ''}`} /> Computer Accessories
-                            </NavLink>
-                            <NavLink to="/MobileAccessories" className={`nav-link ${isMobileAccessoriesActive ? 'active' : ''}`}>
-                                <FaMobileAlt className={`fa-icons ${isMobileAccessoriesActive ? 'active' : ''}`} /> Mobile Accessories
-                            </NavLink>
-                            <NavLink to="/CCTVAccessories" className={`nav-link ${isCCTVAccessoriesActive ? 'active' : ''}`}>
-                                <FaVideo className={`fa-icons ${isCCTVAccessoriesActive ? 'active' : ''}`} /> CCTV Accessories
-                            </NavLink>
-                            <NavLink to="/PrinterAccessories" className={`nav-link ${isPrinterAccessoriesActive ? 'active' : ''}`}>
-                                <FaPrint className={`fa-icons ${isPrinterAccessoriesActive ? 'active' : ''}`} /> Printer Accessories
-                            </NavLink>
-                        </div>
-                    )}
-                </div>
-                <NavLink  to="/Secondhandproducts" className={`nav-link ${location.pathname === '/Secondhandproducts' ? 'active' : ''}`}>
-                    <FaRecycle  className={`fa-icons ${location.pathname === '/Secondhandproducts' ? 'active' : ''}`} /> Refurbish
-                </NavLink>
-                <NavLink
-  to="/About"
-  className={`nav-link ${location.pathname === '/About' ? 'active' : ''}`}
-  style={{
-    display: window.innerWidth <= 768 ? 'flex' : 'none', // Show only on mobile
-  }}
->
-  <FaInfoCircle className={`fa-icons ${location.pathname === '/About' ? 'active' : ''}`} /> About
-</NavLink>
+          )}
+        </div>
+        <NavLink
+          to="/Television"
+          className={`nav-link ${
+            location.pathname === "/Television" ? "active" : ""
+          }`}
+        >
+          <FaTv
+            className={`fa-icons ${
+              location.pathname === "/Television" ? "active" : ""
+            }`}
+          />{" "}
+          T.V & Home Cinema
+        </NavLink>
+        <NavLink
+          to="/Watch"
+          className={`nav-link ${
+            location.pathname === "/Watch" ? "active" : ""
+          }`}
+        >
+          <FaAppleAlt
+            className={`fa-icons ${
+              location.pathname === "/Watch" ? "active" : ""
+            }`}
+          />{" "}
+          Wearable Tech
+        </NavLink>
+        <NavLink
+          to="/Printers"
+          className={`nav-link ${
+            location.pathname === "/Printers" ? "active" : ""
+          }`}
+        >
+          <FaPrint
+            className={`fa-icons ${
+              location.pathname === "/Printers" ? "active" : ""
+            }`}
+          />{" "}
+          Printers
+        </NavLink>
 
-<NavLink
-  to="/Contact"
-  className={`nav-link ${location.pathname === '/Contact' ? 'active' : ''}`}
-  style={{
-    display: window.innerWidth <= 768 ? 'flex' : 'none', // Show only on mobile
-  }}
->
-  <FaEnvelope className={`fa-icons ${location.pathname === '/Contact' ? 'active' : ''}`} /> Contact
-</NavLink>
+        {/* Parent Accessories link */}
+        <div
+          className={`nav-item ${isAccessoriesActive ? "active" : ""}`}
+          onClick={toggleMoreDropdown}
+        >
+          <span className="activelink">
+            <FaCog
+              className={`fa-icons ${isAccessoriesActive ? "active" : ""}`}
+            />{" "}
+            Accessories
+          </span>
+          {showMore && (
+            <div className="dropdown">
+              <NavLink
+                to="/ComputerAccessories"
+                className={`nav-link ${
+                  isComputerAccessoriesActive ? "active" : ""
+                }`}
+              >
+                <FaUsb
+                  className={`fa-icons ${
+                    isComputerAccessoriesActive ? "active" : ""
+                  }`}
+                />{" "}
+                Computer Accessories
+              </NavLink>
+              <NavLink
+                to="/MobileAccessories"
+                className={`nav-link ${
+                  isMobileAccessoriesActive ? "active" : ""
+                }`}
+              >
+                <FaMobileAlt
+                  className={`fa-icons ${
+                    isMobileAccessoriesActive ? "active" : ""
+                  }`}
+                />{" "}
+                Mobile Accessories
+              </NavLink>
+              <NavLink
+                to="/CCTVAccessories"
+                className={`nav-link ${
+                  isCCTVAccessoriesActive ? "active" : ""
+                }`}
+              >
+                <FaVideo
+                  className={`fa-icons ${
+                    isCCTVAccessoriesActive ? "active" : ""
+                  }`}
+                />{" "}
+                CCTV Accessories
+              </NavLink>
+              <NavLink
+                to="/PrinterAccessories"
+                className={`nav-link ${
+                  isPrinterAccessoriesActive ? "active" : ""
+                }`}
+              >
+                <FaPrint
+                  className={`fa-icons ${
+                    isPrinterAccessoriesActive ? "active" : ""
+                  }`}
+                />{" "}
+                Printer Accessories
+              </NavLink>
+            </div>
+          )}
+        </div>
+        <NavLink
+          to="/Secondhandproducts"
+          className={`nav-link ${
+            location.pathname === "/Secondhandproducts" ? "active" : ""
+          }`}
+        >
+          <FaRecycle
+            className={`fa-icons ${
+              location.pathname === "/Secondhandproducts" ? "active" : ""
+            }`}
+          />{" "}
+          Refurbish
+        </NavLink>
+        <NavLink
+          to="/About"
+          className={`nav-link ${
+            location.pathname === "/About" ? "active" : ""
+          }`}
+          style={{
+            display: window.innerWidth <= 768 ? "flex" : "none", // Show only on mobile
+          }}
+        >
+          <FaInfoCircle
+            className={`fa-icons ${
+              location.pathname === "/About" ? "active" : ""
+            }`}
+          />{" "}
+          About
+        </NavLink>
 
-<NavLink
-  to="/HelpCenter"
-  className={`nav-link ${location.pathname === '/HelpCenter' ? 'active' : ''}`}
-  style={{
-    display: window.innerWidth <= 768 ? 'flex' : 'none', // Show only on mobile
-  }}
->
-  <FaQuestionCircle className={`fa-icons ${location.pathname === '/HelpCenter' ? 'active' : ''}`} /> Help Center
-</NavLink>
+        <NavLink
+          to="/Contact"
+          className={`nav-link ${
+            location.pathname === "/Contact" ? "active" : ""
+          }`}
+          style={{
+            display: window.innerWidth <= 768 ? "flex" : "none", // Show only on mobile
+          }}
+        >
+          <FaEnvelope
+            className={`fa-icons ${
+              location.pathname === "/Contact" ? "active" : ""
+            }`}
+          />{" "}
+          Contact
+        </NavLink>
 
-            </nav>
-        </header>
-    );
+        <NavLink
+          to="/HelpCenter"
+          className={`nav-link ${
+            location.pathname === "/HelpCenter" ? "active" : ""
+          }`}
+          style={{
+            display: window.innerWidth <= 768 ? "flex" : "none", // Show only on mobile
+          }}
+        >
+          <FaQuestionCircle
+            className={`fa-icons ${
+              location.pathname === "/HelpCenter" ? "active" : ""
+            }`}
+          />{" "}
+          Help Center
+        </NavLink>
+      </nav>
+    </header>
+  );
 };
 
 export default Header3;

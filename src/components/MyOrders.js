@@ -7,6 +7,7 @@ import { ApiUrl } from "./ApiUrl";
 import Modal from 'react-modal'; // Install if needed using `npm install react-modal`
 import { FaTimes,FaCheck } from "react-icons/fa";
 import OrderTrackingModal from "./TrackingModal";
+import Swal from "sweetalert2";
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -14,7 +15,7 @@ const MyOrders = () => {
   const [productDetails, setProductDetails] = useState(null); // To store fetched product details
   const [modalIsOpen, setModalIsOpen] = useState(false); // To open and close modal
   const [deliveryStatus, setDeliveryStatus] = useState('');
-  const statuses = ['Order Confirmed', 'Shipped', 'Out for Delivery', 'Delivered']; // Define the statuses
+  const statuses = ['Order Placed', 'Shipped', 'Out for Delivery', 'Delivered']; // Define the statuses
   const [selectedStatus, setSelectedStatus] = useState('');
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState(null); // State for the current order ID
@@ -119,7 +120,53 @@ const MyOrders = () => {
   };
 
   const currentIndex = statuses.indexOf(deliveryStatus);
-  
+   const cancelOrder = async (orderId) => {
+      try {
+        const confirmation = await Swal.fire({
+          title: "Are you sure?",
+          text: "Do you really want to cancel this order? This action cannot be undone.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, cancel it!",
+        });
+    
+        if (confirmation.isConfirmed) {
+          const response = await fetch(`${ApiUrl}/cancelOrder`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ orderId }),
+          });
+    
+          const result = await response.json();
+          if (response.ok) {
+            await Swal.fire({
+              title: "Cancelled!",
+              text: result.message,
+              icon: "success",
+            }).then (() => {window.location.reload();})
+            // Refresh orders data
+            // fetchOrders();
+          } else {
+            await Swal.fire({
+              title: "Error!",
+              text: result.error || "Failed to cancel the order.",
+              icon: "error",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error cancelling order:", error);
+        await Swal.fire({
+          title: "Error!",
+          text: "An error occurred. Please try again later.",
+          icon: "error",
+        });
+      }
+    };
 
   return (
     <>
@@ -229,6 +276,19 @@ const MyOrders = () => {
             <p className="info-row">
               <span className="info-label">Shipping Address</span>
               <span className="info-value">{selectedOrder.shipping_address}</span>
+            </p>
+
+            <p>
+
+            <button
+                              className="btn btn-cancel"
+                              onClick={() => cancelOrder(selectedOrder.unique_id)}
+                              disabled={selectedOrder.delivery_status === "Cancelled"}
+                            >
+                              {selectedOrder.delivery_status === "Cancelled"
+                                ? "Order Cancelled"
+                                : "Cancel Order"}
+                            </button>
             </p>
           </>
         )}

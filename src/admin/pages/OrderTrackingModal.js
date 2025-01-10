@@ -12,12 +12,18 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   const [deliveryDate, setDeliveryDate] = useState(""); // Add state for delivery date
   const [loading, setLoading] = useState(false); // Loading state for spinner
 
-  const statuses = [
-    "Order Confirmed",
+  const regularStatuses = [
+    "Order Placed",
     "Shipped",
     "Out of Delivery",
     "Delivered",
   ]; // Define the statuses
+
+  const cancelledStatuses = ["Order Placed", "Cancelled"];
+
+  const isCancelled = deliveryStatus === "Cancelled";
+  const statuses = isCancelled ? cancelledStatuses : regularStatuses;
+
   const [orderDate, setOrderDate] = useState(""); // State for order date
 
   console.log("OrderTrackingModal opened for Order ID:", order_id); // Log the order ID
@@ -139,6 +145,10 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   // Get the index of the current delivery status
   const currentIndex = statuses.indexOf(deliveryStatus);
 
+
+
+
+
   return (
     <Modal
       isOpen={isOpen}
@@ -153,7 +163,7 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
           transform: "translate(-50%, -50%)",
           padding: "20px",
           borderRadius: "10px",
-          backgroundColor: "#fff",
+          backgroundColor: "#fff", // Light red for cancelled
           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
           width: "350px",
         },
@@ -179,30 +189,33 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
         &#10006; {/* Using a close icon (fatimes) */}
       </button>
       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-        Delivery Status
+      {isCancelled ? "Order Cancelled" : "Delivery Status"}
       </h2>
 
       {/* Delivery Date Input */}
-      <label htmlFor="delivery-date" style={{ marginBottom: "10px" }}>
-        Set Delivery Date:
-      </label>
-      <input
-        type="date"
-        id="delivery-date"
-        value={deliveryDate}
-        min={orderDate} // Set minimum date to order date
-        max={maxDate()} // Set maximum date to 30 days from order date
-        onChange={handleDateChange}
-        style={{
-          display: "block",
-          width: "100%",
-          padding: "10px",
-          marginBottom: "20px",
-          border: "1px solid #ccc",
-          borderRadius: "5px",
-        }}
-      />
-
+      {!isCancelled && (
+            <label htmlFor="delivery-date" style={{ marginBottom: "10px" }}>
+              Set Delivery Date:
+            </label>
+          )}
+      {!isCancelled && (
+            <input
+              type="date"
+              id="delivery-date"
+              value={deliveryDate}
+              min={orderDate}
+              max={orderDate && `${new Date(orderDate).getDate() + 30}`}
+              onChange={handleDateChange}
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "10px",
+                marginBottom: "20px",
+                border: "1px solid #ccc",
+                borderRadius: "5px",
+              }}
+            />
+          )}
       {/* Vertical Tracking Bar */}
       <div className="vertical-tracking-bar">
         {statuses.map((status, index) => (
@@ -232,6 +245,13 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
               value={status}
               checked={selectedStatus === status}
               onChange={handleStatusChange}
+              disabled={isCancelled}
+              style={{
+
+                display:isCancelled ?'none': "block",
+
+              }}
+
             />
             <label style={{ marginLeft: "10px" }}>{status}</label>
             {/* Display delivery date near 'Delivered' status */}
@@ -267,15 +287,24 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
               transition: "height 0.3s ease", // Optional: Add a transition for smoothness
             }}
           />
-{deliveryStatus !== 'Delivered' && (
-            <div className="tracking-dot2" style={{ top: `${((currentIndex + 1) * 100) / statuses.length}%` }} />
-          )}
+
+{deliveryStatus !== 'Delivered' && !isCancelled && (
+  <div
+    className="tracking-dot2"
+    style={{ top: `${((currentIndex + 1) * 100) / statuses.length}%` }}
+  />
+)}
+
         </div>
       </div>
 
       {/* Update Status Button */}
+
+      {!isCancelled && (
+
       <button
         onClick={handleUpdateStatus}
+        disabled={isCancelled}
         style={{
           marginTop: "20px",
           padding: "10px 20px",
@@ -291,6 +320,8 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
       >
         Update Status
       </button>
+
+      )}
       </>
          )}
     </Modal>

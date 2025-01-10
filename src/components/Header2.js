@@ -48,7 +48,6 @@ const Header2 = () => {
   const [username, setUsername] = useState("");
 
 
-
   useEffect(() => {
     NProgress.configure({ showSpinner: false }); // Disable spinner
 

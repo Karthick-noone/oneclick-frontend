@@ -22,8 +22,8 @@ const Orders = ({ year, setYear, month, setMonth }) => {
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState(null); // State for the current order ID
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterMonth, setFilterMonth] = useState('');
-  const [filterYear, setFilterYear] = useState('');
+  const [filterMonth, setFilterMonth] = useState("");
+  const [filterYear, setFilterYear] = useState("");
   // Function to handle search
   const [filterDeliveryStatus, setFilterDeliveryStatus] = useState("All");
 
@@ -40,12 +40,9 @@ const Orders = ({ year, setYear, month, setMonth }) => {
     monthRef.current.focus(); // Set focus back to the month field
   };
 
-
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
   };
-
-
 
   // Fetch order status from the backend
   const fetchOrderStatus = async (orderId) => {
@@ -81,34 +78,34 @@ const Orders = ({ year, setYear, month, setMonth }) => {
     }
   }, [navigate]);
 
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${ApiUrl}/fetchorders`);
+      const orders = response.data.reverse();
+
+      const ordersWithStatus = await Promise.all(
+        orders.map(async (order) => {
+          const deliveryStatus = await fetchOrderStatus(order.unique_id);
+          return {
+            ...order,
+            delivery_status: deliveryStatus,
+            products: order.products || [], // Ensure products is an array
+          };
+        })
+      );
+
+      setOrders(ordersWithStatus);
+    } catch (err) {
+      setError("Failed to fetch orders. Please try again later.");
+      console.error("Error fetching orders:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`${ApiUrl}/fetchorders`);
-        const orders = response.data.reverse();
-
-        const ordersWithStatus = await Promise.all(
-          orders.map(async (order) => {
-            const deliveryStatus = await fetchOrderStatus(order.unique_id);
-            return {
-              ...order,
-              delivery_status: deliveryStatus,
-              products: order.products || [], // Ensure products is an array
-            };
-          })
-        );
-
-        setOrders(ordersWithStatus);
-      } catch (err) {
-        setError("Failed to fetch orders. Please try again later.");
-        console.error("Error fetching orders:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
+    fetchOrders(); // Call fetchOrders when the component mounts
   }, []);
 
   const capitalizeFirstLetter = (string) => {
@@ -180,39 +177,50 @@ const Orders = ({ year, setYear, month, setMonth }) => {
   };
 
   const indexOfLastOrder = currentPage * itemsPerPage;
-const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
 
-// Filter orders based on the search query and additional filters
-const filteredOrders = orders.filter((order) => {
-  const orderDate = new Date(order.order_date); // Convert the order date to a Date object
-  const orderMonth = orderDate.getMonth() + 1; // Get month (0-based, so add 1)
-  const orderYear = orderDate.getFullYear(); // Get year
-  const normalizedStatus = order.delivery_status === "Order Confirmed" ? "New Order" : order.delivery_status;
+  // Filter orders based on the search query and additional filters
+  const filteredOrders = orders.filter((order) => {
+    const orderDate = new Date(order.order_date); // Convert the order date to a Date object
+    const orderMonth = orderDate.getMonth() + 1; // Get month (0-based, so add 1)
+    const orderYear = orderDate.getFullYear(); // Get year
+    const normalizedStatus =
+      order.delivery_status === "Order Placed"
+        ? "New Order"
+        : order.delivery_status;
 
-  return (
-    ((order.customerName &&
-      order.customerName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (order.unique_id &&
-        order.unique_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (order.payment_method &&
-        order.payment_method.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (normalizedStatus && normalizedStatus.toLowerCase().includes(searchQuery.toLowerCase())) || // Use normalized status
-      (order.status &&
-        order.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (order.order_date &&
-        order.order_date.toLowerCase().includes(searchQuery.toLowerCase()))) &&
-    (!filterMonth || orderMonth === parseInt(filterMonth)) && // Match month if filterMonth is set
-    (!filterYear || orderYear === parseInt(filterYear)) && 
-    (filterDeliveryStatus === "All" || order.delivery_status === filterDeliveryStatus) // Filter by selected delivery status
+    return (
+      ((order.customerName &&
+        order.customerName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (order.unique_id &&
+          order.unique_id.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (order.payment_method &&
+          order.payment_method
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())) ||
+        (normalizedStatus &&
+          normalizedStatus.toLowerCase().includes(searchQuery.toLowerCase())) || // Use normalized status
+        (order.status &&
+          order.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (order.order_date &&
+          order.order_date
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()))) &&
+      (!filterMonth || orderMonth === parseInt(filterMonth)) && // Match month if filterMonth is set
+      (!filterYear || orderYear === parseInt(filterYear)) &&
+      (filterDeliveryStatus === "All" ||
+        order.delivery_status === filterDeliveryStatus) // Filter by selected delivery status
+    );
+  });
 
+  // Calculate the total pages based on the filtered orders
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+
+  // Paginate filtered orders
+  const currentOrders = filteredOrders.slice(
+    indexOfFirstOrder,
+    indexOfLastOrder
   );
-});
-
-// Calculate the total pages based on the filtered orders
-const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-
-// Paginate filtered orders
-const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
@@ -381,414 +389,486 @@ const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
     printWindow.print();
   };
 
+  const cancelOrder = async (orderId) => {
+    try {
+      const confirmation = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you really want to cancel this order? This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, cancel it!",
+      });
+  
+      if (confirmation.isConfirmed) {
+        const response = await fetch(`${ApiUrl}/cancelOrder`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderId }),
+        });
+  
+        const result = await response.json();
+        if (response.ok) {
+          await Swal.fire({
+            title: "Cancelled!",
+            text: result.message,
+            icon: "success",
+          });
+          // Refresh orders data
+          fetchOrders();
+        } else {
+          await Swal.fire({
+            title: "Error!",
+            text: result.error || "Failed to cancel the order.",
+            icon: "error",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      await Swal.fire({
+        title: "Error!",
+        text: "An error occurred. Please try again later.",
+        icon: "error",
+      });
+    }
+  };
+
   return (
     <div className="orders-page">
-            <main className="staff-main-content">
+      <main className="staff-main-content">
+        <div className="orders-header">
+          <h2 className="orders-page-title">Orders</h2>
+        </div>
 
-      <div className="orders-header">
-        <h2 className="orders-page-title">Orders</h2>
-      </div>
-
-     
-      <div className="search-box2-container">
-
-      <div className="filter-radio-buttons">
-    <label>
-      <input
-        type="radio"
-        name="deliveryStatus"
-        value="All"
-        checked={filterDeliveryStatus === "All"}
-        onChange={() => setFilterDeliveryStatus("All")}
-      />
-      All
-    </label>
-    <label>
-      <input
-        type="radio"
-        name="deliveryStatus"
-        value="Order Confirmed"
-        checked={filterDeliveryStatus === "Order Confirmed"}
-        onChange={() => setFilterDeliveryStatus("Order Confirmed")}
-      />
-      New Order
-    </label>
-    <label>
-      <input
-        type="radio"
-        name="deliveryStatus"
-        value="Shipped"
-        checked={filterDeliveryStatus === "Shipped"}
-        onChange={() => setFilterDeliveryStatus("Shipped")}
-      />
-      Shipped
-    </label>
-    <label>
-      <input
-        type="radio"
-        name="deliveryStatus"
-        value="Out of Delivery"
-        checked={filterDeliveryStatus === "Out of Delivery"}
-        onChange={() => setFilterDeliveryStatus("Out of Delivery")}
-      />
-      Out of Delivery
-    </label>
-    <label>
-      <input
-        type="radio"
-        name="deliveryStatus"
-        value="Delivered"
-        checked={filterDeliveryStatus === "Delivered"}
-        onChange={() => setFilterDeliveryStatus("Delivered")}
-      />
-      Delivered
-    </label>
-    {/* <label>
-      <input
-        type="radio"
-        name="deliveryStatus"
-        value="Cancelled"
-        checked={filterDeliveryStatus === "Cancelled"}
-        onChange={() => setFilterDeliveryStatus("Cancelled")}
-      />
-      Cancelled
-    </label> */}
+        <div className="search-box2-container">
+        <div className="filters-container">
+    <div className="filter-radio-buttons">
+      <label>
+        <input
+          type="radio"
+          name="deliveryStatus"
+          value="All"
+          checked={filterDeliveryStatus === "All"}
+          onChange={() => setFilterDeliveryStatus("All")}
+        />
+        All
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="deliveryStatus"
+          value="Order Placed"
+          checked={filterDeliveryStatus === "Order Placed"}
+          onChange={() => setFilterDeliveryStatus("Order Placed")}
+        />
+        New Order
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="deliveryStatus"
+          value="Shipped"
+          checked={filterDeliveryStatus === "Shipped"}
+          onChange={() => setFilterDeliveryStatus("Shipped")}
+        />
+        Shipped
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="deliveryStatus"
+          value="Out of Delivery"
+          checked={filterDeliveryStatus === "Out of Delivery"}
+          onChange={() => setFilterDeliveryStatus("Out of Delivery")}
+        />
+        Out of Delivery
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="deliveryStatus"
+          value="Delivered"
+          checked={filterDeliveryStatus === "Delivered"}
+          onChange={() => setFilterDeliveryStatus("Delivered")}
+        />
+        Delivered
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="deliveryStatus"
+          value="Cancelled"
+          checked={filterDeliveryStatus === "Cancelled"}
+          onChange={() => setFilterDeliveryStatus("Cancelled")}
+        />
+        Cancelled
+      </label>
+    </div>
   </div>
 
-      <select
-    value={filterMonth}
-    onChange={(e) => setFilterMonth(e.target.value)}
-    className="filter-select"
-  >
-    <option value="">Months</option>
-    <option value="1">January</option>
-    <option value="2">February</option>
-    <option value="3">March</option>
-    <option value="4">April</option>
-    <option value="5">May</option>
-    <option value="6">June</option>
-    <option value="7">July</option>
-    <option value="8">August</option>
-    <option value="9">September</option>
-    <option value="10">October</option>
-    <option value="11">November</option>
-    <option value="12">December</option>
-  </select>
 
-  <select
-    value={filterYear}
-    onChange={(e) => setFilterYear(e.target.value)}
-    className="filter-select"
-  >
-    <option value="">Years</option> 
-    {/* {Array.from(new Set(orders.map(order => new Date(order.order_date).getFullYear())))
-      .sort()
-      .map((year) => (
+  <div className="month-year-container">
+    <select
+      value={filterMonth}
+      onChange={(e) => setFilterMonth(e.target.value)}
+      className="filter-select"
+    >
+      <option value="">Months</option>
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3">March</option>
+      <option value="4">April</option>
+      <option value="5">May</option>
+      <option value="6">June</option>
+      <option value="7">July</option>
+      <option value="8">August</option>
+      <option value="9">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select>
+
+    <select
+      value={filterYear}
+      onChange={(e) => setFilterYear(e.target.value)}
+      className="filter-select"
+    >
+      <option value="">Years</option>
+      {Array.from({ length: 11 }, (_, i) => 2023 + i).map((year) => (
         <option key={year} value={year}>
           {year}
         </option>
-      ))} */}
-      {Array.from({ length: 11 }, (_, i) => 2023 + i).map((year) => (
-  <option key={year} value={year}>
-    {year}
-  </option>
-))}
+      ))}
+    </select>
+  </div>
 
-  </select>
-        <input
-          type="text"
-          placeholder="Search"
-          value={searchQuery}
-          onChange={handleSearch}
-          className="search-box2"
-        />
-        {searchQuery && (
-          <span
-            className="clear-button"
-            onClick={() => setSearchQuery("")} // Clears the search query
-          >
-            X
-          </span>
-        )}
-      </div>
-      {/* Search Box */}
 
-      <div className="orders-content">
-      {loading ? (
-    <p>Loading...</p>
-  ) : error ? (
-    <p className="error-message">{error}</p>
-  ) : (
-          <div className="table-wrapper">
-            <table className="orders-table">
-              <thead>
-                <tr>
-                  <th>Sl.No</th>
-                  <th>Order ID</th>
-                  <th>Name</th>
-                  <th>Order Date</th>
-                  <th>Payment Status</th>
-                  <th>Payment Method</th>
-                  <th>Price</th>
-                  <th>View/Delete</th>
-                  <th>Delivery Status</th>
-                  <th>Current Status</th> {/* New Column */}
-                  <th>Print Invoice</th>
-                </tr>
-              </thead>
-              <tbody>
-              {currentOrders.length > 0 ? (
+          <input
+            type="text"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={handleSearch}
+            className="search-box2"
+          />
+          {searchQuery && (
+            <span
+              className="clear-button"
+              onClick={() => setSearchQuery("")} // Clears the search query
+            >
+              X
+            </span>
+          )}
+          
+        </div>
+        {/* Search Box */}
 
-                currentOrders // Use the currentOrders array for pagination
-                  .map((order, index) => (
-                    <tr key={order.unique_id}>
-                      <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                      <td>#{order.unique_id || "N/A"}</td>
-                      <td>
-                        {order.customerName
-                          ? capitalizeFirstLetter(order.customerName)
-                          : "N/A"}
-                      </td>
-                      <td>{formatDate(order.order_date)}</td>
-                      <td>
-                        <span
-                          className={`${
-                            order.status
-                              ? order.status.toLowerCase()
-                              : "unknown"
-                          }`}
+        <div className="orders-content">
+          {loading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p className="error-message">{error}</p>
+          ) : (
+            <div className="table-wrapper">
+              <table className="orders-table">
+                <thead>
+                  <tr>
+                    <th>Sl.No</th>
+                    <th>Order ID</th>
+                    {/* <th>Name</th> */}
+                    <th>Order Date</th>
+                    <th>Payment Status</th>
+                    <th>Payment Method</th>
+                    <th>Price</th>
+                    <th>View/Delete</th>
+                    <th>Delivery Status</th>
+                    <th>Current Status</th> {/* New Column */}
+                    <th>Print Invoice</th>
+                    <th>Cancel Order</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentOrders.length > 0 ? (
+                    currentOrders // Use the currentOrders array for pagination
+                      .map((order, index) => (
+                        <tr
+                          key={order.unique_id}
+                          className={
+                            order.delivery_status === "Cancelled"
+                              ? "row-cancelled"
+                              : ""
+                          }
                         >
-                          {order.status || "Unknown"}
-                        </span>
-                      </td>
-                      <td>{order.payment_method || "N/A"}</td>
-                      <td>₹{order.total_amount || "N/A"}</td>
-                      <td>
-                        <div className="btn-container">
-                          <button
-                            className="btn btn-view"
-                            onClick={() => openModal(order)}
-                          >
-                            <FaEye />
-                          </button>
-                          <button
-                            className="btn btn-delete"
-                            onClick={() => deleteOrder(order.unique_id)}
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-                      </td>
-                      <td>
-                        <center>
-                          <button
-                            onClick={() => openModal2(order)}
-                            className="btn btn-view"
-                          >
-                            <FaEye />
-                          </button>
-                        </center>
-                        <OrderTrackingModal
-                          isOpen={isModalOpen2}
-                          onRequestClose={closeModal2}
-                          order_id={currentOrderId} // Pass the order ID
-                        />
-                      </td>
-                      <td>
-  <span
-    className={
-      order.delivery_status === "Order Confirmed"
-        ? "status-new-order"
-        : order.delivery_status === "Shipped"
-        ? "status-shipped"
-        : order.delivery_status === "Delivered"
-        ? "status-delivered"
-        : order.delivery_status === "Out of Delivery"
-        ? "status-Out-of-Delivery"
-        : order.delivery_status === "Cancelled"
-        ? "status-cancelled"
-        : "status-unknown"
-    }
-  >
-    {order.delivery_status === "Order Confirmed"
-      ? "New Order"
-      : order.delivery_status || "Unknown"}
-  </span>
-</td>
-                      {/* Display delivery_status */}
-                      <td>
-                        <button
-                          className="btn btn-print"
-                          onClick={() => printInvoice(order, productDetails)}
-                        >
-                          <FaPrint style={{ fontSize: "16px" }} />
-                        </button>
+                          <td>
+                            {index + 1 + (currentPage - 1) * itemsPerPage}
+                          </td>
+                          <td>#{order.unique_id || "N/A"}</td>
+                          {/* <td>
+                            {order.customerName
+                              ? capitalizeFirstLetter(order.customerName)
+                              : "N/A"}
+                          </td> */}
+                          <td>{formatDate(order.order_date)}</td>
+                          <td>
+                            <span
+                              className={`${
+                                order.status
+                                  ? order.status.toLowerCase()
+                                  : "unknown"
+                              }`}
+                            >
+                              {order.status || "Unknown"}
+                            </span>
+                          </td>
+                          <td>{order.payment_method || "N/A"}</td>
+                          <td>₹{order.total_amount || "N/A"}</td>
+                          <td>
+                            <div className="btn-container">
+                              <button
+                                className="btn btn-view"
+                                onClick={() => openModal(order)}
+                              >
+                                <FaEye />
+                              </button>
+                              <button
+                                className="btn btn-delete"
+                                onClick={() => deleteOrder(order.unique_id)}
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          </td>
+                          <td>
+                            <center>
+                              <button
+                                onClick={() => openModal2(order)}
+                                className="btn btn-view"
+                              >
+                                <FaEye />
+                              </button>
+                            </center>
+                            <OrderTrackingModal
+                              isOpen={isModalOpen2}
+                              onRequestClose={closeModal2}
+                              order_id={currentOrderId} // Pass the order ID
+                            />
+                          </td>
+                          <td>
+                            <span
+                              className={
+                                order.delivery_status === "Order Placed"
+                                  ? "status-new-order"
+                                  : order.delivery_status === "Shipped"
+                                  ? "status-shipped"
+                                  : order.delivery_status === "Delivered"
+                                  ? "status-delivered"
+                                  : order.delivery_status === "Out of Delivery"
+                                  ? "status-Out-of-Delivery"
+                                  : order.delivery_status === "Cancelled"
+                                  ? "status-cancelled"
+                                  : "status-unknown"
+                              }
+                            >
+                              {order.delivery_status === "Order Placed"
+                                ? "New Order"
+                                : order.delivery_status || "Unknown"}
+                            </span>
+                          </td>
+                          {/* Display delivery_status */}
+                          <td>
+                            <button
+                              className="btn btn-print"
+                              onClick={() => 
+                                printInvoice(order, productDetails)
+                              }
+                            >
+                              <FaPrint style={{ fontSize: "16px" }} />
+                            </button>
+                          </td>
+                          <td>
+                            <button
+                              className="btn btn-cancel"
+                              onClick={() => cancelOrder(order.unique_id)}
+                              disabled={order.delivery_status === "Cancelled"}
+                            >
+                              {order.delivery_status === "Cancelled"
+                                ? "Cancelled"
+                                : "Cancel"}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="11"
+                        style={{ textAlign: "center", padding: "20px" }}
+                      >
+                        No record found
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="11" style={{ textAlign: "center", padding: "20px" }}>
-                      No record found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-        <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={closeModal}
-          contentLabel="Product Details"
-          className="custom-modal10"
-          overlayClassName="modal-overlay"
-        >
-          <h2>Order Details</h2>
-          <div className="order-details10">
-            <div className="details-and-image10">
-              <div className="product-info10">
-                {currentProduct &&
-                  currentProduct.prod_img &&
-                  // Check if prod_img is a string and parse it if necessary
-                  (() => {
-                    const images = Array.isArray(currentProduct.prod_img)
-                      ? currentProduct.prod_img
-                      : JSON.parse(currentProduct.prod_img || "[]");
+          <Modal
+            isOpen={modalIsOpen}
+            onRequestClose={closeModal}
+            contentLabel="Product Details"
+            className="custom-modal10"
+            overlayClassName="modal-overlay"
+          >
+            <h2>Order Details</h2>
+            <div className="order-details10">
+              <div className="details-and-image10">
+                <div className="product-info10">
+                  {currentProduct &&
+                    currentProduct.prod_img &&
+                    // Check if prod_img is a string and parse it if necessary
+                    (() => {
+                      const images = Array.isArray(currentProduct.prod_img)
+                        ? currentProduct.prod_img
+                        : JSON.parse(currentProduct.prod_img || "[]");
 
-                    // Display the first image if available
-                    const firstImage = images.length > 0 ? images[0] : null;
+                      // Display the first image if available
+                      const firstImage = images.length > 0 ? images[0] : null;
 
-                    return firstImage ? (
-                      <center>
-                        <img
-                          src={`${ApiUrl}/uploads/${currentProduct.category.toLowerCase()}/${firstImage}`}
-                          alt={currentProduct.prod_name}
-                          className="product-image10"
-                        />
-                      </center>
-                    ) : (
-                      <div>No image available</div> // Fallback message if no image is available
-                    );
-                  })()}
-                {currentProduct && (
-                  <>
-                    <p className="info-row">
-                      <span className="info-label">Product Name</span>
-                      <span className="info-value product-namee">
-                        {currentProduct.prod_name}
-                      </span>
-                    </p>
-                    <p className="info-row">
-                      <span className="info-label">Price</span>
-                      <span className="info-value ">
-                        ₹{currentProduct.prod_price}
-                      </span>
-                    </p>
-                    {/* <p className="info-row">
+                      return firstImage ? (
+                        <center>
+                          <img
+                            src={`${ApiUrl}/uploads/${currentProduct.category.toLowerCase()}/${firstImage}`}
+                            alt={currentProduct.prod_name}
+                            className="product-image10"
+                          />
+                        </center>
+                      ) : (
+                        <div>No image available</div> // Fallback message if no image is available
+                      );
+                    })()}
+                  {currentProduct && (
+                    <>
+                      <p className="info-row">
+                        <span className="info-label">Product Name</span>
+                        <span className="info-value product-namee">
+                          {currentProduct.prod_name}
+                        </span>
+                      </p>
+                      <p className="info-row">
+                        <span className="info-label">Price</span>
+                        <span className="info-value ">
+                          ₹{currentProduct.prod_price}
+                        </span>
+                      </p>
+                      {/* <p className="info-row">
                   <span className="info-label">Description</span>
                   <span className="info-value product-descriptionn">{currentProduct.prod_features}</span>
                 </p> */}
-                  </>
-                )}
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {selectedOrder && (
-              <>
-                <p className="info-row">
-                  <span className="info-label">Order ID</span>
-                  <span className="info-value">#{selectedOrder.unique_id}</span>
-                </p>
-                <p className="info-row">
-                  <span className="info-label">Ordered Date</span>
-                  <span className="info-value">
-                    {formatDate(selectedOrder.order_date)}
-                  </span>
-                </p>
-                {/* <p className="info-row">
+              {selectedOrder && (
+                <>
+                  <p className="info-row">
+                    <span className="info-label">Order ID</span>
+                    <span className="info-value">
+                      #{selectedOrder.unique_id}
+                    </span>
+                  </p>
+                  <p className="info-row">
+                    <span className="info-label">Ordered Date</span>
+                    <span className="info-value">
+                      {formatDate(selectedOrder.order_date)}
+                    </span>
+                  </p>
+                  {/* <p className="info-row">
               <span className="info-label">Payment Status</span>
               <span className={`info-value status ${selectedOrder.status ? selectedOrder.status.toLowerCase() : 'unknown'}`}>
                 {selectedOrder.status}
               </span>
             </p> */}
-                <p className="info-row">
-                  <span className="info-label">Total Amount</span>
-                  <span className="info-value">
-                    ₹{selectedOrder.total_amount}
-                  </span>
-                </p>
-                <p className="info-row">
-                  <span className="info-label">Shipping Address</span>
-                  <span className="info-value">
-                    {selectedOrder.shipping_address}
-                  </span>
-                </p>
-              </>
-            )}
+                  <p className="info-row">
+                    <span className="info-label">Total Amount</span>
+                    <span className="info-value">
+                      ₹{selectedOrder.total_amount}
+                    </span>
+                  </p>
+                  <p className="info-row">
+                    <span className="info-label">Shipping Address</span>
+                    <span className="info-value">
+                      {selectedOrder.shipping_address}
+                    </span>
+                  </p>
+                </>
+              )}
 
-            {/* Navigation Buttons */}
-            {productDetails && productDetails.length > 1 && (
-              <div className="navigation-buttons">
-                <button
-                  className="add-to-cart"
-                  onClick={handlePreviousProduct}
-                  disabled={!hasProducts || currentProductIndex === 0}
-                >
-                  &lt; Prev
-                </button>
-                <button
-                  style={{ marginLeft: "5px" }}
-                  className="add-to-cart"
-                  onClick={handleNextProduct}
-                  disabled={
-                    !hasProducts ||
-                    currentProductIndex === productDetails.length - 1
-                  }
-                >
-                  Next &gt;
-                </button>
-              </div>
-            )}
-          </div>
+              {/* Navigation Buttons */}
+              {productDetails && productDetails.length > 1 && (
+                <div className="navigation-buttons">
+                  <button
+                    className="add-to-cart"
+                    onClick={handlePreviousProduct}
+                    disabled={!hasProducts || currentProductIndex === 0}
+                  >
+                    &lt; Prev
+                  </button>
+                  <button
+                    style={{ marginLeft: "5px" }}
+                    className="add-to-cart"
+                    onClick={handleNextProduct}
+                    disabled={
+                      !hasProducts ||
+                      currentProductIndex === productDetails.length - 1
+                    }
+                  >
+                    Next &gt;
+                  </button>
+                </div>
+              )}
+            </div>
 
-          <button onClick={closeModal} className="modal-close-button10">
-            <FaTimes />
-          </button>
-        </Modal>
-
-        <div className="pagination-controls">
-          <button
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="pagination-button"
-          >
-            &lt;
-          </button>
-          {getPaginationPages().map((page, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                if (page !== "...") handlePageChange(page);
-              }}
-              className={`pagination-button ${
-                currentPage === page ? "active" : ""
-              }`}
-              disabled={page === "..."}
-            >
-              {page}
+            <button onClick={closeModal} className="modal-close-button10">
+              <FaTimes />
             </button>
-          ))}
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="pagination-button"
-          >
-            &gt;
-          </button>
+          </Modal>
+
+          <div className="pagination-controls">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="pagination-button"
+            >
+              &lt;
+            </button>
+            {getPaginationPages().map((page, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  if (page !== "...") handlePageChange(page);
+                }}
+                className={`pagination-button ${
+                  currentPage === page ? "active" : ""
+                }`}
+                disabled={page === "..."}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="pagination-button"
+            >
+              &gt;
+            </button>
+          </div>
         </div>
-      </div>
       </main>
     </div>
   );

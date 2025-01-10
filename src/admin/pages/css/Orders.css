@@ -9,6 +9,26 @@
 }
 
 
+.btn-cancel {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.btn-cancel:disabled {
+  background-color: #eecdcd;
+  cursor: not-allowed;
+  color: #dc3545;
+}
+
+
+.row-cancelled {
+  background-color: #ffe6e6; /* Light red background */
+  color: #585858; /* Dark red text */
+}
 
 
 .orders-page {
@@ -37,6 +57,7 @@
 }
 
 /* Search box container to align it with the table */
+/* Normal Styles - These styles will apply to larger screens */
 .search-box2-container {
   margin-bottom: 20px; /* Space between search and table */
   display: flex;
@@ -44,6 +65,7 @@
   width: 100%; /* Ensures it takes full width */
   position: relative;
 }
+
 .clear-button {
   position: absolute;
   right: 10px; /* Position the button on the right side */
@@ -59,8 +81,7 @@
 .filters-container {
   display: flex;
   gap: 10px;
-  justify-content: flex-end; /* Aligns the search box to the right */
-
+  justify-content: flex-end; /* Aligns the filters to the right */
   margin-bottom: 15px;
 }
 
@@ -73,7 +94,7 @@
 }
 
 .filter-select:focus,
-.filter-select.selected { /* Apply focus effect and selected style */
+.filter-select.selected {
   border-color: #007bff;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
@@ -81,6 +102,116 @@
 .clear-button:hover {
   color: #333;
 }
+
+.filter-radio-buttons {
+  display: flex;
+  flex-direction: row; /* Align radio buttons in a row */
+  gap: 20px; /* Adds space between the radio buttons */
+  padding: 10px;
+  flex-wrap: wrap; /* Allows wrapping if there are too many items */
+}
+
+.filter-radio-buttons label {
+  display: flex;
+  align-items: center; /* Centers the text and radio button vertically */
+  font-size: 14px; /* Set font size for labels */
+}
+
+.filter-radio-buttons input[type="radio"] {
+  margin-right: 3px; /* Adds space between the radio button and the label */
+  accent-color: #007bff; /* Change radio button color (optional) */
+}
+
+.search-box2 {
+  padding: 8px 12px;
+  width: 250px; /* Adjust the width as needed */
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 1px;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Adds light shadow */
+  transition: all 0.3s ease; /* Smooth transition for focus */
+}
+
+.search-box2:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Focus effect */
+}
+
+/* Responsive Styles - These styles will only apply for smaller screens */
+@media (max-width: 768px) {
+  .search-box2-container {
+    display: flex;
+    flex-direction: column; /* Stack the filters and search box vertically */
+    margin-bottom: 15px; /* Adjust margin for better spacing */
+    width: 100%; /* Ensure it takes full width */
+  }
+
+  /* Row 1: Filters */
+  .filters-container {
+    display: flex;
+    justify-content: space-between; /* Space the filters evenly */
+    gap: 10px; /* Add space between filter items */
+    margin-bottom: 15px;
+    flex-wrap: wrap; /* Ensure wrapping if items overflow */
+  }
+
+  /* Row 2: Month and Year */
+  .month-year-container {
+    display: flex;
+    gap: 10px; /* Space between month and year dropdown */
+    margin-bottom: 15px;
+  }
+
+  /* Row 3: Search Box */
+  .search-box2-container {
+    display: flex;
+    justify-content: flex-start; /* Align search input */
+    width: 100%;
+  }
+
+  .search-box2 {
+    width: 100%; /* Make search box take full width on smaller screens */
+    margin-top: 10px; /* Add space between search and other elements */
+  }
+
+  .clear-button {
+    font-size: 14px; /* Adjust clear button size */
+  }
+
+  /* Filters layout in a row */
+  .filter-radio-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%; /* Ensure the radio buttons fill the container */
+  }
+
+  .filter-radio-buttons label {
+    font-size: 14px; /* Adjust font size */
+    display: flex;
+    align-items: center; /* Align radio button and label */
+  }
+
+  .filter-select {
+    width: 100%; /* Make dropdowns take full width */
+  }
+}
+
+@media (max-width: 480px) {
+  .search-box2 {
+    width: 97% !important; /* Ensure search box is responsive on very small screens */
+  }
+
+  .filter-radio-buttons label {
+    font-size: 12px; /* Adjust font size of radio button labels */
+  }
+
+  .clear-button {
+    font-size: 12px; /* Adjust clear button size for small screens */
+  }
+} 
+
 
 .status-new-order {
   color: #007bff; /* Bright Blue for New Order */
@@ -106,29 +237,6 @@
   color: #6c757d; /* Muted Gray for Unknown */
 }
 
-.filter-radio-buttons {
-  display: flex;
-  flex-direction: row; /* Align radio buttons in a row */
-  gap: 20px; /* Adds space between the radio buttons */
-  padding: 10px;
-  flex-wrap: wrap; /* Allows wrapping if there are too many items */
-}
-
-.filter-radio-buttons label {
-  display: flex;
-  align-items: center; /* Centers the text and radio button vertically */
-  font-size: 14px; /* Set font size for labels */
-}
-
-.filter-radio-buttons input[type="radio"] {
-  margin-right: 3px; /* Adds space between the radio button and the label */
-  accent-color: #007bff; /* Change radio button color (optional) */
-}
-
-
-
-
-
 /* Styling for the search box */
 .search-box2 {
   padding: 8px 12px;
@@ -137,6 +245,7 @@
   border: 1px solid #ddd;
   border-radius: 1px;
   outline: none;
+  height: 36px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Adds light shadow */
   transition: all 0.3s ease; /* Smooth transition for focus */
 }
@@ -152,6 +261,39 @@
   margin-top: 20px; /* Space from search box */
 
 }
+
+.table-wrapper::-webkit-scrollbar {
+  width: 10px !important; /* Width of the vertical scrollbar */
+  height: 10px !important; /* Height of the horizontal scrollbar */
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background-color: #e91e63; /* Scrollbar thumb color */
+  border-radius: 10px; /* Round the corners of the scrollbar thumb */
+  border: 2px solid #f4f4f4; /* Optional: Add padding effect around thumb */
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: #c2185b; /* Darker color on hover */
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background-color: #f4f4f4; /* Scrollbar track color */
+  border-radius: 10px; /* Match thumb border-radius */
+}
+
+/* Custom scrollbar for Firefox */
+.table-wrapper {
+  scrollbar-width: thin; /* Make scrollbar thin */
+  scrollbar-color: #e91e63 #f4f4f4; /* Set thumb and track colors */
+}
+
+/* Optional: Table-specific styles for better appearance */
+.orders-table {
+  width: 100%; /* Make the table fill the wrapper */
+  border-collapse: collapse; /* Remove spacing between table cells */
+}
+
 
 .orders-table {
   width: 100%;
@@ -172,9 +314,9 @@
   color: #333;
 }
 
-.orders-table tbody tr:nth-child(even) {
+/* .orders-table tbody tr:nth-child(even) {
   background-color: #fafafa;
-}
+} */
 
 .orders-table tbody tr:hover {
   background-color: #f0f0f0; /* Highlight row on hover */
@@ -361,7 +503,7 @@
   max-width: 550px;
   margin: auto;
   position: relative;
-  margin-top: 30px;
+  margin-top: 100px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;

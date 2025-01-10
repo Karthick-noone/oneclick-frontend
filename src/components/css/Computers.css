@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 80vh; /* Adjust height to your preference */
+  height: 20vh; /* Adjust height to your preference */
   text-align: center;
   /* color: #555; */
   margin-left: 240px;
@@ -83,7 +83,7 @@
     background-color: #fff;
     text-align: center;
     height: auto; /* Set a fixed height for the card */
-    max-height: 380px; /* Set a fixed height for the card */
+    /* max-height: 400px; */
     margin-bottom: 10px; /* Space below each card */
     cursor: pointer;
 }
@@ -177,7 +177,7 @@
         /* margin-top: 50px; */
     }
     .add-to-cart{
-        width: 50%;
+        width: 70%;
     }
 
 
@@ -194,7 +194,7 @@
 
 @media (max-width: 480px) {
     .product-card {
-        width: calc(100% - 20px); /* Fit 1 card in a row for very small screens */
+        width: calc(50% - 10px); /* Fit 1 card in a row for very small screens */
     }
     
 }
