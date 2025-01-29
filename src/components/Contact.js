@@ -3,6 +3,7 @@ import Header2 from "./Header2";
 import Footer from "./footer";
 import { ApiUrl } from "./ApiUrl";
 import Swal from "sweetalert2";
+// import "./css/Contact.css";
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -228,6 +229,8 @@ const Contact = () => {
                   value={formData.firstName}
                   onChange={handleChange}
                   style={styles.inputLine}
+                  className="staff-input"
+
                 />
                 {errors.firstName && <span style={styles.error}>{errors.firstName}</span>}
               </div>
@@ -239,6 +242,8 @@ const Contact = () => {
                   value={formData.lastName}
                   onChange={handleChange}
                   style={styles.inputLine}
+                  className="staff-input"
+
                 />
                 {errors.lastName && <span style={styles.error}>{errors.lastName}</span>}
               </div>
@@ -252,6 +257,8 @@ const Contact = () => {
                   value={formData.email}
                   onChange={handleChange}
                   style={styles.inputLine}
+                  className="staff-input"
+
                 />
                 {errors.email && <span style={styles.error}>{errors.email}</span>}
               </div>
@@ -263,6 +270,8 @@ const Contact = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   style={styles.inputLine}
+                  className="staff-input"
+
                 />
                 {errors.subject && <span style={styles.error}>{errors.subject}</span>}
               </div>
@@ -276,6 +285,8 @@ const Contact = () => {
                   value={formData.number}
                   onChange={handleChange}
                   style={styles.inputLine}
+                  className="staff-input"
+
                 />
                 {errors.number && <span style={styles.error}>{errors.number}</span>}
               </div>
@@ -288,6 +299,8 @@ const Contact = () => {
                   value={formData.message}
                   onChange={handleChange}
                   style={styles.textarea}
+                  className="staff-input"
+
                 ></textarea>
                 {errors.message && <span style={styles.error}>{errors.message}</span>}
               </div>

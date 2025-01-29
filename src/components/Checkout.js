@@ -179,7 +179,7 @@ const Checkout = () => {
     // Calculate the total price of cart items
     const totalPrice = cartItems
       .reduce((total, item) => {
-        const price = parseFloat(item.price);
+        const price = parseFloat(item.prod_price);
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
   
         return (
@@ -188,7 +188,7 @@ const Checkout = () => {
       }, 0)
       .toFixed(2);
   
-    console.log("Calculated total price:", totalPrice); // Log the calculated total price
+    // console.log("Calculated total price:", totalPrice); // Log the calculated total price
   
     // Convert totalPrice to a float for comparison
     let finalPrice = parseFloat(totalPrice);
@@ -378,40 +378,76 @@ const Checkout = () => {
     }
   };
 
+  // useEffect(() => {
+  //   const fetchLocalStorageData = () => {
+  //     const storedEmail = localStorage.getItem("email");
+
+  //     if (storedEmail) {
+  //       const cartKey = `${storedEmail}-cart`;
+  //       const wishlistKey = `${storedEmail}-wishlist`;
+
+  //       const storedCartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
+  //       const storedWishlistItems =
+  //         JSON.parse(localStorage.getItem(wishlistKey)) || [];
+
+  //       const updatedCartItems = storedCartItems.map((item) => ({
+  //         ...item,
+  //         quantity: item.quantity || 1,
+  //       }));
+
+  //       const updatedWishlistItems = storedWishlistItems.map((item) => ({
+  //         ...item,
+  //         quantity: item.quantity || 1,
+  //       }));
+
+  //       setCartItems(updatedCartItems);
+  //       setWishlistItems(updatedWishlistItems);
+  //     }
+  //   };
+
+  //   fetchLocalStorageData();
+  //   // Fetch data every second (if needed)
+  //   const intervalId = setInterval(fetchLocalStorageData, 2000);
+
+  //   // Cleanup interval on component unmount
+  //   return () => clearInterval(intervalId);
+  // }, []);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const email = localStorage.getItem('email');
+
   useEffect(() => {
-    const fetchLocalStorageData = () => {
-      const storedEmail = localStorage.getItem("email");
+    if (email) {
+      // Function to fetch the cart items
+      const fetchCartItems = async () => {
+        try {
+          const response = await axios.post(`${ApiUrl}/get-cart-items`, {
+            email,
+            username: localStorage.getItem('username') // Send username if needed
+          });
+  
+          if (response.data.products) {
+            setCartItems(response.data.products); // Set the fetched products to state
+          }
+        } catch (error) {
+          console.error('Error fetching cart items:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      // Fetch cart items immediately
+      fetchCartItems();
+  
+      // Set an interval to fetch cart items every 5 seconds
+      const intervalId = setInterval(fetchCartItems, 1000); // 5000ms = 5 seconds
+  
+      // Clean up the interval on component unmount or when `email` changes
+      return () => clearInterval(intervalId);
+    }
+  }, [email]); // Dependency on `email` so it will trigger fetch when email changes
 
-      if (storedEmail) {
-        const cartKey = `${storedEmail}-cart`;
-        const wishlistKey = `${storedEmail}-wishlist`;
-
-        const storedCartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
-        const storedWishlistItems =
-          JSON.parse(localStorage.getItem(wishlistKey)) || [];
-
-        const updatedCartItems = storedCartItems.map((item) => ({
-          ...item,
-          quantity: item.quantity || 1,
-        }));
-
-        const updatedWishlistItems = storedWishlistItems.map((item) => ({
-          ...item,
-          quantity: item.quantity || 1,
-        }));
-
-        setCartItems(updatedCartItems);
-        setWishlistItems(updatedWishlistItems);
-      }
-    };
-
-    fetchLocalStorageData();
-    // Fetch data every second (if needed)
-    const intervalId = setInterval(fetchLocalStorageData, 2000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
 
   // const calculateTotalPrice = () => {
   //   return cartItems
@@ -434,7 +470,7 @@ const Checkout = () => {
     return cartItems
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
-        const price = parseFloat(item.price);
+        const price = parseFloat(item.prod_price);
         const discountPerItem = actual_price - price;
         return (
           total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
@@ -447,89 +483,83 @@ const Checkout = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
-  const updateCartItemQuantity = (itemId, itemCategory, newQuantity) => {
-    const updatedCartItems = cartItems.map((item) =>
-      item.id === itemId && item.category === itemCategory
-        ? { ...item, quantity: Math.max(newQuantity, 1) }
-        : item
-    );
-
-    setCartItems(updatedCartItems);
-
-    const storedEmail = localStorage.getItem("email");
-    if (storedEmail) {
-      const cartKey = `${storedEmail}-cart`;
-      localStorage.setItem(cartKey, JSON.stringify(updatedCartItems));
-    }
-  };
-
-  const removeFromCart = async (itemId, itemCategory) => {
-    // Display confirmation dialog
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, remove it!",
-    });
-
-    if (result.isConfirmed) {
-      // Proceed with removing the item from the cart
-      const updatedCartItems = cartItems.filter(
-        (item) => !(item.id === itemId && item.category === itemCategory)
+  const updateCartItemQuantity = async (itemId, newQuantity) => {
+    if (newQuantity <= 0) return; // Prevent reducing quantity below 1
+  
+    try {
+      // Update the cart item in the local state immediately for responsiveness
+      const updatedCartItems = cartItems.map((item) =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
       );
       setCartItems(updatedCartItems);
-
-      const storedEmail = localStorage.getItem("email");
-      if (storedEmail) {
-        const cartKey = `${storedEmail}-cart`;
-        localStorage.setItem(cartKey, JSON.stringify(updatedCartItems));
-
-        try {
-          const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
-            email: storedEmail,
-            itemId: itemId,
-            itemCategory: itemCategory,
-          });
-
-          if (response.status === 200) {
-            toast.success("Item removed from cart!", {
-              position: "top-right",
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          } else {
-            throw new Error("Unexpected response status");
-          }
-        } catch (error) {
-          console.error(
-            "Error removing item from cart:",
-            error.response || error.message || error
-          );
-          toast.error(
-            `An error occurred: ${
-              error.response?.data?.message || error.message
-            }`,
-            {
-              position: "top-right",
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            }
-          );
-        }
-      }
+  
+      // Send the updated quantity to the server
+      const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
+        email,
+        itemId,
+        quantity: newQuantity,
+      });
+  
+      // if (response.status === 200) {
+      //   toast.success(`Quantity updated to ${newQuantity}!`, {
+      //     position: "top-right",
+      //     autoClose: 2000,
+      //   });
+      // } else {
+      //   console.error("Failed to update item quantity");
+      //   toast.error("Failed to update item quantity", {
+      //     position: "top-right",
+      //     autoClose: 2000,
+      //   });
+      // }
+    } catch (error) {
+      console.error("Error updating item quantity:", error);
+      toast.error("Error updating item quantity", {
+        position: "top-right",
+        autoClose: 2000,
+      });
     }
   };
+  
+  
+  const removeFromCart = async (itemId, itemName, quantity) => {
+    try {
+      // Remove the item from the local state first
+      const updatedCartItems = cartItems.filter((item) => item.id !== itemId);
+      setCartItems(updatedCartItems);
+  
+      // Send the removal request to the server
+      const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
+        email,
+        itemId,
+        quantity,
+      });
+  
+      if (response.data.success) {
+        // Toast notification for successful removal
+        toast.success(`${itemName} has been removed from your cart!`, {
+          position: "top-right",
+          autoClose: 2000,
+          closeOnClick: true,
+        });
+      } else {
+        console.error('Failed to remove item from cart');
+        toast.error('Failed to remove item from cart!', {
+          position: "top-right",
+          autoClose: 2000,
+          closeOnClick: true,
+        });
+      }
+    } catch (error) {
+      console.error('Error removing item from cart:', error);
+      toast.error('Error removing item from cart!', {
+        position: "top-right",
+        autoClose: 2000,
+        closeOnClick: true,
+      });
+    }
+  };
+  
 
   //   const handlePayment = () => {
   //     // Display the message and exit the function
@@ -634,12 +664,12 @@ const Checkout = () => {
     }
   }, [addressDetails]);
 
-  const handlePlaceOrder = async (response) => {
+  const handlePlaceOrder = async () => {
     console.log("handlePlaceOrder function called");
-
+  
     // Use the selected address if available, otherwise fall back to the default address
     const addressToUse = selectedAddress || defaultAddress;
-
+  
     if (cartItems.length === 0) {
       Swal.fire({
         icon: "error",
@@ -650,47 +680,17 @@ const Checkout = () => {
       });
       return;
     }
-
-    // if (!addressToUse) {
-    //   console.log("No address selected or default address found");
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Address Required",
-    //     text: "Please select a shipping address.",
-    //     timer: 5000,
-    //     showConfirmButton: false,
-    //   });
-    //   return;
-    // }
+  
     if (!addressToUse) {
-      // Swal.fire({
-      //   icon: "error",
-      //   title: "No Address Selected",
-      //   text: "Please select a delivery address before proceeding with payment.",
-      //   timer: 2000,
-      //   showConfirmButton: false,
-      // });
       navigate("/UserAddress"); // Update the path to your UserAddress page
-
       return;
     }
-
-    console.log("Selected or Default Address ID:", addressToUse);
-    console.log("Address Details:", addressDetails);
-
-    // Log all address IDs to verify the correct comparison
-    console.log(
-      "All address IDs:",
-      addressDetails.map((address) => address.address_id)
-    );
-
-    // Find the address details using the address ID (either default or selected)
+  
     const selectedAddressDetails = addressDetails.find(
       (address) => String(address.address_id) === String(addressToUse)
     );
-
+  
     if (!selectedAddressDetails) {
-      console.log("Selected address details not found");
       Swal.fire({
         icon: "error",
         title: "Address Not Found",
@@ -700,92 +700,94 @@ const Checkout = () => {
       });
       return;
     }
-
-    // Construct the full address string
+  
     const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}, ${selectedAddressDetails.phone}`;
+  
+    // const enrichedCartItems = cartItems.map((item) => ({
+    //   id: item.id,
+    //   quantity: item.quantity,
+    //   price: item.prod_price,
+    //   name: item.prod_name,
+    //   image: item.image,
+    //   description: item.prod_description,
+    //   product_id: item.prod_id,
+    //   category: item.category,
+    // }));
 
-    // Log the full address to ensure it's formatted correctly
-    console.log("Full Address:", fullAddress);
-
-    // Enrich cart items with additional details
     const enrichedCartItems = cartItems.map((item) => ({
-      id: item.id,
-      quantity: item.quantity,
-      price: item.price,
-      name: item.name,
-      image: item.image,
-      description: item.description,
-      product_id: item.product_id,
-      category: item.category,
+      id: item.id,                    
+      quantity: item.quantity,         // Map 'prod_quantity' to 'quantity'
+      prod_price: item.prod_price,          // Map 'prod_price' to 'prod_price'
+      prod_name: item.prod_name,            // Map 'prod_name' to 'prod_name'
+      prod_img: item.image,               // Map 'prod_image' to 'image'
+      prod_description: item.prod_description, // Map 'prod_description' to 'prod_description'
+      prod_id: item.prod_id,
+      prod_category: item.category,         // Map 'prod_category' to 'category'
     }));
+    
 
-    // Log the enriched cart items to check their structure and content
-    console.log("Enriched Cart Items:", enrichedCartItems);
+    console.log("enrichedCartItems",enrichedCartItems)
+  
     const finalAmountToSend =
       newTotalAmount > 0 ? newTotalAmount : calculateTotalPrice();
-
-    // const orderData = {
-    //   user_id: userId,
-    //   total_amount: finalAmountToSend,
-    //   shipping_address: fullAddress,
-    //   address_id: addressToUse,
-    //   cartItems: enrichedCartItems,
-    //   payment_method: selectedPaymentMethod === "cod" ? "COD" : "Online", // Payment method based on selection
-    //   status: selectedPaymentMethod === "cod" ? "Pending" : "Paid", // Status based on selection
-    // };
-
+  
     const orderData = {
       user_id: userId,
       total_amount: finalAmountToSend,
       shipping_address: fullAddress,
       address_id: addressToUse,
       cartItems: enrichedCartItems,
-      payment_method: selectedPaymentMethod === "cod" 
-        ? "COD" 
-        : selectedPaymentMethod === "pickup"
-        ? "Pick Up From Store"
-        : "Online", // Payment method based on selection
-      status: selectedPaymentMethod === "cod" 
-        ? "Pending" 
-        : selectedPaymentMethod === "pickup"
-        ? "Ready for Pickup"
-        : "Paid", // Status based on selection
+      payment_method:
+        selectedPaymentMethod === "cod"
+          ? "COD"
+          : selectedPaymentMethod === "pickup"
+          ? "Pick Up From Store"
+          : "Online", // Payment method based on selection
+      status:
+        selectedPaymentMethod === "cod"
+          ? "Pending"
+          : selectedPaymentMethod === "pickup"
+          ? "Ready for Pickup"
+          : "Paid", // Status based on selection
     };
-    
-
-    console.log("Order Data:", orderData);
-
+  
     try {
+      // Send the order data and store cart items in the backend
       const response = await axios.post(`${ApiUrl}/place-order`, orderData);
-
+  
       if (response.status === 200) {
         console.log("Order placed successfully");
+  
         Swal.fire({
           icon: "success",
           title: "Order Placed",
           text: "Your order has been placed successfully!",
           timer: 5000,
           showConfirmButton: false,
-        }).then(() => {
-          clearCart(); // Call your function to clear the cart
+        }).then(async () => {
+          try {
+            // Call backend to clear the cart after placing order
+            await axios.post(`${ApiUrl}/clear-cart`, { email,cartItems });
+            console.log("Cart cleared successfully from the database");
+          } catch (clearCartError) {
+            console.error("Error clearing cart:", clearCartError.message);
+          }
+  
+          clearCart(); // Clear cart in local state
           const storedEmail = localStorage.getItem("email");
           if (storedEmail) {
-            const cartKey = `${storedEmail}-cart`; // Construct the cart key
-            localStorage.removeItem(cartKey); // Remove the cart from local storage
+            const cartKey = `${storedEmail}-cart`;
+            localStorage.removeItem(cartKey); // Clear local storage cart
           }
-
+  
           navigate("/MyOrders");
         });
-        // Clear cart or navigate to a confirmation page
       } else {
         console.log("Unexpected response status:", response.status);
         throw new Error("Unexpected response status");
       }
     } catch (error) {
-      console.error(
-        "Error placing order:",
-        error.response?.data || error.message
-      );
+      console.error("Error placing order:", error.response?.data || error.message);
       Swal.fire({
         icon: "error",
         title: "Order Error",
@@ -946,32 +948,13 @@ const Checkout = () => {
               ) : (
                 <div className="cart-list-container">
                   <ul className="cart-list">
-                    {cartItems
-                      .slice()
-                      .reverse()
-                      .map((item) => {
-                        let firstImage = ""; // Initialize firstImage
+                    { cartItems.map((item) => {
+      // Check if image is a stringified array and parse it
+      const images = Array.isArray(item.prod_img)
+        ? item.prod_img
+        : JSON.parse(item.prod_img || '[]'); // Handle if it's a stringified array
 
-                        // Check if item.image is a string or an array
-                        try {
-                          if (typeof item.image === "string") {
-                            // Attempt to parse it as JSON
-                            const images = JSON.parse(item.image); // Parse the JSON string
-
-                            // Handle case where images is an array
-                            if (Array.isArray(images) && images.length > 0) {
-                              firstImage = images[0].replace(/&quot;/g, ""); // Get the first image and remove &quot;
-                            } else {
-                              firstImage = item.image.replace(/&quot;/g, ""); // Treat it as a plain string if not an array
-                            }
-                          } else if (Array.isArray(item.image)) {
-                            // Handle case where item.image is already an array
-                            firstImage = item.image[0]; // Get the first image from the array
-                          }
-                        } catch (error) {
-                          console.error("Error parsing image:", error);
-                          firstImage = ""; // Reset firstImage on error
-                        }
+      const firstImage = images.length > 0 ? images[0] : null;
 
                         return (
                           <li
@@ -1003,9 +986,9 @@ const Checkout = () => {
                               onClick={() => handleProductClick(item.id)}
                             >
                               <p className="cart-product-name">{item.name}</p>
-                              {/* <p className="cart-product-name">
-                                {item.product_id}
-                              </p> */}
+                              <p className="cart-product-name">
+                                {item.prod_id}
+                              </p>
                               <p className="cart-product-description">
                                 {item.description}
                               </p>
@@ -1013,33 +996,22 @@ const Checkout = () => {
                             <div className="cart-product-price">
                               <div className="cart-quantity-controls">
                                 <button
-                                  onClick={() =>
-                                    updateCartItemQuantity(
-                                      item.id,
-                                      item.category,
-                                      Math.max(item.quantity - 1, 1)
-                                    )
-                                  }
+                                                  onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)}
+
                                 >
                                   -
                                 </button>
                                 <span>{item.quantity}</span>
                                 <button
-                                  onClick={() =>
-                                    updateCartItemQuantity(
-                                      item.id,
-                                      item.category,
-                                      item.quantity + 1
-                                    )
-                                  }
+                                                  onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)}
+
                                 >
                                   +
                                 </button>
                                 <FaTrash
                                   className="cart-remove-btn"
-                                  onClick={() =>
-                                    removeFromCart(item.id, item.category)
-                                  }
+                                  onClick={() => removeFromCart(item.id, item.prod_name, item.quantity)}
+
                                 />
                               </div>
                               <p
@@ -1052,7 +1024,7 @@ const Checkout = () => {
                               >
                                 ₹{item.actual_price}{" "}
                               </p>
-                              <p>₹{item.price * item.quantity}</p>
+                              <p>₹{item.prod_price * item.quantity}</p>
                             </div>
                           </li>
                         );

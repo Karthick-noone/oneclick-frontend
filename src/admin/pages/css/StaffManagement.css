@@ -66,13 +66,32 @@
 }
 
  /* Focus styles */
-.staff-input:focus {
+.staff-input:focus ,
+.staff-input3:focus 
+{
     border-color: #007bff; /* Change border color on focus */
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a glowing effect */
     outline: none; /* Remove default outline */
     transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
   }
-  
+
+  .staff-input:hover,
+  .staff-input3:hover
+   {
+  border-color: #0056b3; 
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); 
+}
+
+.custom-input:focus {
+  border-color: #007bff !important;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5) !important;
+  outline: none !important;
+}
+
+.custom-input:hover {
+  border-color: #0056b3 !important;
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6) !important;
+}
   
   .staff-error-input {
     border-color: red;

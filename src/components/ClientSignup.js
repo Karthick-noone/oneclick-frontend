@@ -291,6 +291,8 @@ const SignupPage = () => {
             value={formData.username}
             onChange={handleChange}
             style={styles.input}
+            className="staff-input"
+
           />
           {errors.username && <p style={styles.error}>{errors.username}</p>}
 
@@ -304,6 +306,8 @@ const SignupPage = () => {
             value={formData.email}
             onChange={handleChange}
             style={styles.input}
+            className="staff-input"
+
           />
           {errors.email && <p style={styles.error}>{errors.email}</p>}
 
@@ -321,6 +325,8 @@ const SignupPage = () => {
             value={formData.contactNumber}
             onChange={handleChange}
             style={styles.input}
+            className="staff-input"
+
           />
           {errors.contactNumber && (
             <p style={styles.error}>{errors.contactNumber}</p>
@@ -436,7 +442,7 @@ const styles = {
     margin: "20px auto",
     padding: "15px",
     borderRadius: "10px",
-    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0 0 5px rgba(0, 123, 255, 0.9)",
     backgroundColor: "rgba(0, 0, 0, 0.8)",
     position: "relative",
     zIndex: 2,

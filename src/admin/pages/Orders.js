@@ -400,7 +400,7 @@ const Orders = ({ year, setYear, month, setMonth }) => {
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, cancel it!",
       });
-  
+
       if (confirmation.isConfirmed) {
         const response = await fetch(`${ApiUrl}/cancelOrder`, {
           method: "POST",
@@ -409,7 +409,7 @@ const Orders = ({ year, setYear, month, setMonth }) => {
           },
           body: JSON.stringify({ orderId }),
         });
-  
+
         const result = await response.json();
         if (response.ok) {
           await Swal.fire({
@@ -445,107 +445,105 @@ const Orders = ({ year, setYear, month, setMonth }) => {
         </div>
 
         <div className="search-box2-container">
-        <div className="filters-container">
-    <div className="filter-radio-buttons">
-      <label>
-        <input
-          type="radio"
-          name="deliveryStatus"
-          value="All"
-          checked={filterDeliveryStatus === "All"}
-          onChange={() => setFilterDeliveryStatus("All")}
-        />
-        All
-      </label>
-      <label>
-        <input
-          type="radio"
-          name="deliveryStatus"
-          value="Order Placed"
-          checked={filterDeliveryStatus === "Order Placed"}
-          onChange={() => setFilterDeliveryStatus("Order Placed")}
-        />
-        New Order
-      </label>
-      <label>
-        <input
-          type="radio"
-          name="deliveryStatus"
-          value="Shipped"
-          checked={filterDeliveryStatus === "Shipped"}
-          onChange={() => setFilterDeliveryStatus("Shipped")}
-        />
-        Shipped
-      </label>
-      <label>
-        <input
-          type="radio"
-          name="deliveryStatus"
-          value="Out of Delivery"
-          checked={filterDeliveryStatus === "Out of Delivery"}
-          onChange={() => setFilterDeliveryStatus("Out of Delivery")}
-        />
-        Out of Delivery
-      </label>
-      <label>
-        <input
-          type="radio"
-          name="deliveryStatus"
-          value="Delivered"
-          checked={filterDeliveryStatus === "Delivered"}
-          onChange={() => setFilterDeliveryStatus("Delivered")}
-        />
-        Delivered
-      </label>
-      <label>
-        <input
-          type="radio"
-          name="deliveryStatus"
-          value="Cancelled"
-          checked={filterDeliveryStatus === "Cancelled"}
-          onChange={() => setFilterDeliveryStatus("Cancelled")}
-        />
-        Cancelled
-      </label>
-    </div>
-  </div>
+          <div className="filters-container">
+            <div className="filter-radio-buttons">
+              <label>
+                <input
+                  type="radio"
+                  name="deliveryStatus"
+                  value="All"
+                  checked={filterDeliveryStatus === "All"}
+                  onChange={() => setFilterDeliveryStatus("All")}
+                />
+                All
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="deliveryStatus"
+                  value="Order Placed"
+                  checked={filterDeliveryStatus === "Order Placed"}
+                  onChange={() => setFilterDeliveryStatus("Order Placed")}
+                />
+                New Order
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="deliveryStatus"
+                  value="Shipped"
+                  checked={filterDeliveryStatus === "Shipped"}
+                  onChange={() => setFilterDeliveryStatus("Shipped")}
+                />
+                Shipped
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="deliveryStatus"
+                  value="Out of Delivery"
+                  checked={filterDeliveryStatus === "Out of Delivery"}
+                  onChange={() => setFilterDeliveryStatus("Out of Delivery")}
+                />
+                Out of Delivery
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="deliveryStatus"
+                  value="Delivered"
+                  checked={filterDeliveryStatus === "Delivered"}
+                  onChange={() => setFilterDeliveryStatus("Delivered")}
+                />
+                Delivered
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="deliveryStatus"
+                  value="Cancelled"
+                  checked={filterDeliveryStatus === "Cancelled"}
+                  onChange={() => setFilterDeliveryStatus("Cancelled")}
+                />
+                Cancelled
+              </label>
+            </div>
+          </div>
 
+          <div className="month-year-container">
+            <select
+              value={filterMonth}
+              onChange={(e) => setFilterMonth(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">Months</option>
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
 
-  <div className="month-year-container">
-    <select
-      value={filterMonth}
-      onChange={(e) => setFilterMonth(e.target.value)}
-      className="filter-select"
-    >
-      <option value="">Months</option>
-      <option value="1">January</option>
-      <option value="2">February</option>
-      <option value="3">March</option>
-      <option value="4">April</option>
-      <option value="5">May</option>
-      <option value="6">June</option>
-      <option value="7">July</option>
-      <option value="8">August</option>
-      <option value="9">September</option>
-      <option value="10">October</option>
-      <option value="11">November</option>
-      <option value="12">December</option>
-    </select>
-
-    <select
-      value={filterYear}
-      onChange={(e) => setFilterYear(e.target.value)}
-      className="filter-select"
-    >
-      <option value="">Years</option>
-      {Array.from({ length: 11 }, (_, i) => 2023 + i).map((year) => (
-        <option key={year} value={year}>
-          {year}
-        </option>
-      ))}
-    </select>
-  </div>
-
+            <select
+              value={filterYear}
+              onChange={(e) => setFilterYear(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">Years</option>
+              {Array.from({ length: 11 }, (_, i) => 2023 + i).map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <input
             type="text"
@@ -562,7 +560,6 @@ const Orders = ({ year, setYear, month, setMonth }) => {
               X
             </span>
           )}
-          
         </div>
         {/* Search Box */}
 
@@ -599,6 +596,8 @@ const Orders = ({ year, setYear, month, setMonth }) => {
                           className={
                             order.delivery_status === "Cancelled"
                               ? "row-cancelled"
+                              : order.delivery_status === "Delivered"
+                              ? "row-delivered"
                               : ""
                           }
                         >
@@ -681,7 +680,7 @@ const Orders = ({ year, setYear, month, setMonth }) => {
                           <td>
                             <button
                               className="btn btn-print"
-                              onClick={() => 
+                              onClick={() =>
                                 printInvoice(order, productDetails)
                               }
                             >
@@ -692,7 +691,7 @@ const Orders = ({ year, setYear, month, setMonth }) => {
                             <button
                               className="btn btn-cancel"
                               onClick={() => cancelOrder(order.unique_id)}
-                              disabled={order.delivery_status === "Cancelled"}
+                              disabled={order.delivery_status === "Cancelled" || order.delivery_status === "Delivered"}
                             >
                               {order.delivery_status === "Cancelled"
                                 ? "Cancelled"

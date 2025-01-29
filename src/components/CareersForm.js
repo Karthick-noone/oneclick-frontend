@@ -262,6 +262,7 @@ const CareersForm = () => {
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
+              className="staff-input"
               style={formStyles.input}
             />
             {errors.firstName && <p style={formStyles.error}>{errors.firstName}</p>}
@@ -274,6 +275,8 @@ const CareersForm = () => {
               value={formData.lastName}
               onChange={handleChange}
               style={formStyles.input}
+              className="staff-input"
+
             />
             {errors.lastName && <p style={formStyles.error}>{errors.lastName}</p>}
           </label>
@@ -287,6 +290,8 @@ const CareersForm = () => {
               value={formData.email}
               onChange={handleChange}
               style={formStyles.input}
+              className="staff-input"
+
             />
             {errors.email && <p style={formStyles.error}>{errors.email}</p>}
           </label>
@@ -298,6 +303,7 @@ const CareersForm = () => {
               value={formData.phone}
               onChange={handleChange}
               style={formStyles.input}
+              className="staff-input"
             />
             {errors.phone && <p style={formStyles.error}>{errors.phone}</p>}
           </label>
@@ -310,6 +316,8 @@ const CareersForm = () => {
               value={formData.position}
               onChange={handleChange}
               style={formStyles.select}
+              className="staff-input"
+
             >
               <option value="">Select Position</option>
               <option value="inStoreSales">In-store Sales</option>
@@ -330,6 +338,8 @@ const CareersForm = () => {
               value={formData.startDate}
               onChange={handleChange}
               style={formStyles.input}
+              className="staff-input"
+
             />
             {errors.startDate && <p style={formStyles.error}>{errors.startDate}</p>}
           </label>
@@ -343,6 +353,8 @@ const CareersForm = () => {
               accept=".pdf,.doc,.docx"
               onChange={handleFileChange}
               style={formStyles.input}
+              className="staff-input"
+
             />
             {errors.resumeFile && <p style={formStyles.error}>{errors.resumeFile}</p>}
           </label>

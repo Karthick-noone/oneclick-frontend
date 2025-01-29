@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ApiUrl } from "../../components/ApiUrl";
 import Swal from "sweetalert2";
-
+import "./css/StaffManagement.css";
 const CouponManager = () => {
   const [coupons, setCoupons] = useState([]);
   const [couponName, setCouponName] = useState("");
@@ -118,6 +118,8 @@ const CouponManager = () => {
             onChange={(e) => setCouponName(e.target.value)}
             required
             style={styles.input}
+            className="custom-input"
+
           />
         </div>
         <div style={styles.inputGroup}>
@@ -128,6 +130,7 @@ const CouponManager = () => {
             onChange={handleValueChange}
             required
             style={styles.input}
+            className="custom-input"
           />
         </div>
         <div style={styles.inputGroup}>
@@ -139,6 +142,8 @@ const CouponManager = () => {
             onChange={(e) => setMinPurchaseLimit(e.target.value)}
             required
             style={styles.input}
+            className="custom-input"
+
           />
         </div>
 

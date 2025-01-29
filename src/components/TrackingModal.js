@@ -144,42 +144,42 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
                 </div>
 
                 <label style={{ marginLeft: "10px" }}>
-                  {/* Logic to conditionally display "Delivered" or "Delivery expected on" */}
-                  {deliveryStatus === "Delivered" && index === 3
-                    ? "Delivered" // Display 'Delivered' if status is 'Delivered'
-                    : index === 3
-                    ? "Delivery expected on " // Show "Delivery expected on" for the corresponding index
-                    : currentStatus}
-                  {/* Show delivery date next to "Delivery expected on" */}
-                  {index === 3 &&
-                    deliveryDate &&
-                    deliveryStatus !== "Delivered" && (
-                      <span style={{ fontWeight: "bold", marginLeft: "5px" }}>
-                        {deliveryDate}
-                        {(() => {
-                          const dateObj = new Date(deliveryDate);
-                          const day = String(dateObj.getDate()).padStart(
-                            2,
-                            "0"
-                          ); // Ensure day has leading zero
-                          const month = dateObj.toLocaleString("default", {
-                            month: "short",
-                          }); // Get month as short name
-                          const year = dateObj.getFullYear(); // Get year
+  {/* Logic to conditionally display "Delivered" or "Delivery expected on" */}
+  {deliveryStatus === "Delivered" && index === 3
+    ? "Delivered" // Display 'Delivered' if status is 'Delivered'
+    : index === 3
+    ? "Delivery expected on " // Show "Delivery expected on" for the corresponding index
+    : currentStatus}
 
-                          return `${day} ${month} ${year}`; // Return formatted date
-                        })()}
-                      </span>
-                    )}
-                  {/* Show delivery date next to "Delivered" */}
-                  {deliveryStatus === "Delivered" &&
-                    index === 4 &&
-                    deliveryDate && (
-                      <span style={{ fontWeight: "bold", marginLeft: "5px" }}>
-                        {deliveryDate}
-                      </span>
-                    )}
-                </label>
+  {/* Show delivery date next to "Delivery expected on" */}
+  {index === 3 && deliveryDate && deliveryStatus !== "Delivered" && (
+    <span style={{ fontWeight: "bold", marginLeft: "5px" }}>
+      {(() => {
+        const dateObj = new Date(deliveryDate);
+        const day = String(dateObj.getDate()).padStart(2, "0"); // Ensure day has leading zero
+        const month = dateObj.toLocaleString("default", { month: "short" }); // Get month as short name
+        const year = dateObj.getFullYear(); // Get year
+
+        return `${day} ${month} ${year}`; // Return formatted date
+      })()}
+    </span>
+  )}
+
+  {/* Show delivery date next to "Delivered" */}
+  {deliveryStatus === "Delivered" && index === 4 && deliveryDate && (
+    <span style={{ fontWeight: "bold", marginLeft: "5px" }}>
+      {(() => {
+        const dateObj = new Date(deliveryDate);
+        const day = String(dateObj.getDate()).padStart(2, "0"); // Ensure day has leading zero
+        const month = dateObj.toLocaleString("default", { month: "short" }); // Get month as short name
+        const year = dateObj.getFullYear(); // Get year
+
+        return `${day} ${month} ${year}`; // Return formatted date
+      })()}
+    </span>
+  )}
+</label>
+
               </div>
             ))}
             <div className="tracking-line-container">

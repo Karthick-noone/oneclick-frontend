@@ -107,6 +107,18 @@
   color: white;
 }
 
+
+.staff-input:focus {
+  border-color: #007bff !important; /* Change border color on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a glowing effect */
+  outline: none; /* Remove default outline */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+.staff-input:hover {
+border-color: #0056b3 !important; 
+box-shadow: 0 0 6px rgba(0, 86, 179, 0.6) !important; 
+}
 .button {
   padding: 10px;
   border-radius: 5px;

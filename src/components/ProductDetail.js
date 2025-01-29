@@ -8,8 +8,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { ApiUrl } from "./ApiUrl"; // Adjust the import path accordingly
 import "./css/ProductDetail.css"; // Ensure you create this CSS file
 import Header2 from "./Header2";
-import Sidebar from "./Sidebar";
-import { FaHeart } from "react-icons/fa"; // Import the heart icon from react-icons
+// import Sidebar from "./Sidebar";
+import { FaHeart,FaRegHeart } from "react-icons/fa"; // Import the heart icon from react-icons
 import Footer from "./footer";
 import { useNavigate } from "react-router-dom"; // Import useNavigate at the top
 import Slider from "react-slick"; // Import the slider component
@@ -35,7 +35,7 @@ const ProductDetail = ({ accessoryCategory }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null); // State to track the currently selected image
-
+  const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [currentStartIndex, setCurrentStartIndex] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showCarousel, setShowCarousel] = useState(false);
@@ -44,12 +44,12 @@ const ProductDetail = ({ accessoryCategory }) => {
   const [addToCartTriggered, setAddToCartTriggered] = useState(false); // Track if add to cart was triggered
   const [products, setProducts] = useState([]);
   const [coupons, setCoupons] = useState({}); // State to hold coupon codes for products
+  const [favorites, setFavorites] = useState({});
 
   // State for storing related items
   const [relatedItems, setRelatedItems] = useState([]);
   // State for tracking the current index for carousel
   const [currentStartIndex2, setStartIndex] = useState(0);
-
 
   const [remainingTime, setRemainingTime] = useState(null);
   const [isOfferActive, setIsOfferActive] = useState(true);
@@ -58,7 +58,7 @@ const ProductDetail = ({ accessoryCategory }) => {
     if (product && product.offer_end_time) {
       const now = new Date();
       const offerEndTime = new Date(product.offer_end_time);
-  
+
       // Set offer active based on whether the offer end time is in the future
       setIsOfferActive(offerEndTime > now);
     }
@@ -405,14 +405,121 @@ const ProductDetail = ({ accessoryCategory }) => {
     await handleAddToCart2(selectedAccessories, event);
   };
 
+  // const handleAddToCart = async (product, event) => {
+  //   if (!event) return; // Prevent further execution if event is undefined
+  //   event.stopPropagation();
+
+  //   const email = localStorage.getItem("email");
+  //   const username = localStorage.getItem("username");
+
+  //   if (!email || !username) {
+  //     toast.error("User is not logged in!", {
+  //       position: "top-right",
+  //       autoClose: 2000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //     });
+  //     window.location.href = "/login";
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await axios.post(`${ApiUrl}/verify-user`, {
+  //       email,
+  //       username,
+  //     });
+
+  //     if (response.data.exists) {
+  //       const cartKey = `${email}-cart`;
+  //       const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
+  //       const currentPrice =
+  //         isOfferActive && product.offer_price > 0
+  //           ? product.offer_price // Use offer_price if offer is active
+  //           : product.prod_price;
+  //       // Find existing item by id and category
+  //       const existingItem = cartItems.find(
+  //         (item) => item.id === product.id && item.category === product.category
+  //       );
+
+  //       if (existingItem) {
+  //         // Increase the quantity if the product already exists in the cart
+  //         existingItem.quantity += 1;
+  //         toast.info(
+  //           `Increased quantity of ${product.prod_name} in your cart!`,
+  //           {
+  //             position: "top-right",
+  //             autoClose: 2000,
+  //             hideProgressBar: false,
+  //             closeOnClick: true,
+  //             pauseOnHover: true,
+  //             draggable: true,
+  //             progress: undefined,
+  //           }
+  //         );
+  //       } else {
+  //         // Add new product to the cart
+  //         cartItems.push({
+  //           id: product.id,
+  //           name: product.prod_name,
+  //           price: currentPrice, // Use offer_price if it's valid, otherwise prod_price
+  //           actual_price: product.actual_price,
+  //           image: product.prod_img,
+  //           description: product.prod_features,
+  //           category: product.category,
+  //           deliverycharge: product.deliverycharge,
+  //           product_id: product.prod_id,
+  //           quantity: 1,
+  //         });
+
+  //         toast.success(`${product.prod_name} has been added to your cart!`, {
+  //           position: "top-right",
+  //           autoClose: 2000,
+  //           hideProgressBar: false,
+  //           closeOnClick: true,
+  //           pauseOnHover: true,
+  //           draggable: true,
+  //           progress: undefined,
+  //         });
+  //       }
+
+  //       // Save the updated cart in localStorage
+  //       localStorage.setItem(cartKey, JSON.stringify(cartItems));
+  //     } else {
+  //       toast.error("User not found!", {
+  //         position: "top-right",
+  //         autoClose: 2000,
+  //         hideProgressBar: false,
+  //         closeOnClick: true,
+  //         pauseOnHover: true,
+  //         draggable: true,
+  //         progress: undefined,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error verifying user or updating cart:", error);
+  //     toast.error("An error occurred while adding to cart.", {
+  //       position: "top-right",
+  //       autoClose: 2000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //     });
+  //   }
+  // };
+
   const handleAddToCart = async (product, event) => {
-    if (!event) return; // Prevent further execution if event is undefined
-    event.stopPropagation();
+    event.stopPropagation(); // Prevent the event from bubbling up
 
     const email = localStorage.getItem("email");
-    const username = localStorage.getItem("username");
 
-    if (!email || !username) {
+
+    // Check if the user is logged in
+    if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -426,237 +533,240 @@ const ProductDetail = ({ accessoryCategory }) => {
       return;
     }
 
+    // Set isAdding to true to disable the button while the request is in progress
+    setIsAdding(true);
+
     try {
-      const response = await axios.post(`${ApiUrl}/verify-user`, {
+      const response = await axios.post(`${ApiUrl}/add-to-cart`, {
         email,
-        username,
+        productId: product.id, // Send the product ID to be added to the cart
+        quantity: 1,
       });
 
-      if (response.data.exists) {
-        const cartKey = `${email}-cart`;
-        const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
-        const currentPrice = isOfferActive && product.offer_price > 0
-        ? product.offer_price  // Use offer_price if offer is active
-        : product.prod_price;
-        // Find existing item by id and category
-        const existingItem = cartItems.find(
-          (item) => item.id === product.id && item.category === product.category
-        );
-
-        if (existingItem) {
-          // Increase the quantity if the product already exists in the cart
-          existingItem.quantity += 1;
-          toast.info(
-            `Increased quantity of ${product.prod_name} in your cart!`,
-            {
-              position: "top-right",
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            }
-          );
-        } else {
-          // Add new product to the cart
-          cartItems.push({
-            id: product.id,
-            name: product.prod_name,
-            price: currentPrice, // Use offer_price if it's valid, otherwise prod_price
-            actual_price: product.actual_price,
-            image: product.prod_img,
-            description: product.prod_features,
-            category: product.category,
-            deliverycharge: product.deliverycharge,
-            product_id: product.prod_id,
-            quantity: 1,
-          });
-
-          toast.success(`${product.prod_name} has been added to your cart!`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-        }
-
-        // Save the updated cart in localStorage
-        localStorage.setItem(cartKey, JSON.stringify(cartItems));
-      } else {
-        toast.error("User not found!", {
+      // Handle the response
+      if (response.status === 200) {
+        toast.success(`${product.prod_name} added to your cart!`, {
           position: "top-right",
           autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
         });
       }
     } catch (error) {
-      console.error("Error verifying user or updating cart:", error);
-      toast.error("An error occurred while adding to cart.", {
+      console.error("Error adding item to cart:", error);
+      toast.error("Failed to add item to cart", {
         position: "top-right",
         autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
       });
+    } finally {
+      // Reset isAdding to false when the request is completed
+      setIsAdding(false);
     }
   };
 
-  const toggleFavorite = async (product, event) => {
-    console.log("product", product);
+  // const toggleFavorite = async (product, event) => {
+  //   console.log("product", product);
 
+  //   event.stopPropagation();
+
+  //   const email = localStorage.getItem("email");
+  //   const username = localStorage.getItem("username");
+
+  //   if (!email || !username) {
+  //     toast.error("User is not logged in!", {
+  //       position: "top-right",
+  //       autoClose: 2000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //     });
+  //     window.location.href = "/login";
+  //     return;
+  //   }
+
+  //   try {
+  //     // Verify the user in the database
+  //     const response = await axios.post(`${ApiUrl}/verify-user`, {
+  //       email: email,
+  //       username: username,
+  //     });
+
+  //     if (response.data.exists) {
+  //       if (isFavorite) {
+  //         // Remove from favorites
+  //         setIsFavorite(false);
+  //         removeFromWishlist(product.id);
+
+  //         // Update the wishlist in the database
+  //         await axios.post(`${ApiUrl}/update-user-wishlist`, {
+  //           email: email,
+  //           username: username,
+  //           action: "remove",
+  //           product,
+  //         });
+
+  //         toast.info(`${product.prod_name} removed from your wishlist.`, {
+  //           position: "top-right",
+  //           autoClose: 2000,
+  //           hideProgressBar: false,
+  //           closeOnClick: true,
+  //           pauseOnHover: true,
+  //           draggable: true,
+  //           progress: undefined,
+  //         });
+
+  //         // Remove product details from localStorage
+  //         const wishlistKey = `${email}-wishlist`;
+  //         const wishlistData =
+  //           JSON.parse(localStorage.getItem(wishlistKey)) || [];
+  //         console.log("wishlistData", wishlistData); // Check if all the necessary product details are stored.
+
+  //         const updatedWishlistData = wishlistData.filter(
+  //           (item) => item.id !== product.id
+  //         );
+  //         localStorage.setItem(
+  //           wishlistKey,
+  //           JSON.stringify(updatedWishlistData)
+  //         );
+
+  //         // Remove product from "favourites"
+  //         const favouritesKey = "favourites";
+  //         const currentFavourites = localStorage.getItem(favouritesKey) || "";
+  //         const newFavourites = currentFavourites
+  //           .split(",")
+  //           .filter(
+  //             (item) => item !== `faredheart-${product.prod_name}-${product.id}`
+  //           )
+  //           .join(",");
+  //         localStorage.setItem(favouritesKey, newFavourites);
+  //       } else {
+  //         // Add to favorites
+  //         setIsFavorite(true);
+  //         addToWishlist(product);
+
+  //         // Update the wishlist in the database
+  //         await axios.post(`${ApiUrl}/update-user-wishlist`, {
+  //           email: email,
+  //           username: username,
+  //           action: "add",
+  //           product,
+  //         });
+
+  //         toast.success(`${product.prod_name} added to your wishlist!`, {
+  //           position: "top-right",
+  //           autoClose: 2000,
+  //           hideProgressBar: false,
+  //           closeOnClick: true,
+  //           pauseOnHover: true,
+  //           draggable: true,
+  //           progress: undefined,
+  //         });
+
+  //         // Store product details in localStorage with email and wishlist
+  //         const wishlistKey = `${email}-wishlist`;
+  //         const wishlistData =
+  //           JSON.parse(localStorage.getItem(wishlistKey)) || [];
+  //         const productInWishlist = wishlistData.some(
+  //           (item) => item.id === product.id
+  //         );
+
+  //         if (!productInWishlist) {
+  //           // Store the product details into localStorage
+  //           wishlistData.push(product);
+  //           console.log("Wishlist Data Before Saving:", wishlistData); // Log wishlist before saving
+  //           localStorage.setItem(wishlistKey, JSON.stringify(wishlistData));
+  //         }
+
+  //         // Store the product name with "faredheart" in a comma-separated string
+  //         const favouritesKey = "favourites";
+  //         const currentFavourites = localStorage.getItem(favouritesKey) || "";
+  //         const newFavourites = `${currentFavourites},faredheart-${product.prod_name}-${product.id}`;
+  //         localStorage.setItem(favouritesKey, newFavourites);
+  //       }
+  //     } else {
+  //       toast.error("User not found!", {
+  //         position: "top-right",
+  //         autoClose: 2000,
+  //         hideProgressBar: false,
+  //         closeOnClick: true,
+  //         pauseOnHover: true,
+  //         draggable: true,
+  //         progress: undefined,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error verifying user or updating wishlist:", error);
+  //     toast.error("An error occurred while updating wishlist.", {
+  //       position: "top-right",
+  //       autoClose: 2000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //     });
+  //   }
+  // };
+
+  const handleToggleFavorite = async (product, event) => {
     event.stopPropagation();
-
+  
+    // Check if the user is logged in
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
-
+  
     if (!email || !username) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
       });
       window.location.href = "/login";
       return;
     }
-
+  
     try {
-      // Verify the user in the database
-      const response = await axios.post(`${ApiUrl}/verify-user`, {
-        email: email,
-        username: username,
-      });
-
-      if (response.data.exists) {
-        if (isFavorite) {
-          // Remove from favorites
-          setIsFavorite(false);
-          removeFromWishlist(product.id);
-
-          // Update the wishlist in the database
-          await axios.post(`${ApiUrl}/update-user-wishlist`, {
-            email: email,
-            username: username,
-            action: "remove",
-            product,
-          });
-
-          toast.info(`${product.prod_name} removed from your wishlist.`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-
-          // Remove product details from localStorage
-          const wishlistKey = `${email}-wishlist`;
-          const wishlistData =
-            JSON.parse(localStorage.getItem(wishlistKey)) || [];
-          console.log("wishlistData", wishlistData); // Check if all the necessary product details are stored.
-
-          const updatedWishlistData = wishlistData.filter(
-            (item) => item.id !== product.id
-          );
-          localStorage.setItem(
-            wishlistKey,
-            JSON.stringify(updatedWishlistData)
-          );
-
-          // Remove product from "favourites"
-          const favouritesKey = "favourites";
-          const currentFavourites = localStorage.getItem(favouritesKey) || "";
-          const newFavourites = currentFavourites
-            .split(",")
-            .filter(
-              (item) => item !== `faredheart-${product.prod_name}-${product.id}`
-            )
-            .join(",");
-          localStorage.setItem(favouritesKey, newFavourites);
-        } else {
-          // Add to favorites
-          setIsFavorite(true);
-          addToWishlist(product);
-
-          // Update the wishlist in the database
-          await axios.post(`${ApiUrl}/update-user-wishlist`, {
-            email: email,
-            username: username,
-            action: "add",
-            product,
-          });
-
-          toast.success(`${product.prod_name} added to your wishlist!`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-
-          // Store product details in localStorage with email and wishlist
-          const wishlistKey = `${email}-wishlist`;
-          const wishlistData =
-            JSON.parse(localStorage.getItem(wishlistKey)) || [];
-          const productInWishlist = wishlistData.some(
-            (item) => item.id === product.id
-          );
-
-          if (!productInWishlist) {
-            // Store the product details into localStorage
-            wishlistData.push(product);
-            console.log("Wishlist Data Before Saving:", wishlistData); // Log wishlist before saving
-            localStorage.setItem(wishlistKey, JSON.stringify(wishlistData));
-          }
-
-          // Store the product name with "faredheart" in a comma-separated string
-          const favouritesKey = "favourites";
-          const currentFavourites = localStorage.getItem(favouritesKey) || "";
-          const newFavourites = `${currentFavourites},faredheart-${product.prod_name}-${product.id}`;
-          localStorage.setItem(favouritesKey, newFavourites);
-        }
-      } else {
-        toast.error("User not found!", {
+      const isFavorite = favorites[`${product.id}`]; // Check if product is already in the wishlist
+  
+      if (isFavorite) {
+        // If already in wishlist, call remove API
+        console.log(`${product.prod_name} (ID: ${product.id}) is in the wishlist. Removing it.`);
+  
+        await axios.post(`${ApiUrl}/remove-from-wishlist`, {
+          email,
+          productId: product.id,
+        });
+  
+        console.log(`${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`);
+        toast.info(`${product.prod_name} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
+        });
+      } else {
+        // If not in wishlist, call add API
+        console.log(`${product.prod_name} (ID: ${product.id}) is not in the wishlist. Adding it.`);
+  
+        await axios.post(`${ApiUrl}/update-user-wishlist`, {
+          email,
+          username,
+          action: "add",
+          prod_id: product.id,
+        });
+  
+        console.log(`${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`);
+        toast.success(`${product.prod_name} added to your wishlist!`, {
+          position: "top-right",
+          autoClose: 2000,
         });
       }
     } catch (error) {
-      console.error("Error verifying user or updating wishlist:", error);
+      console.error("Error updating wishlist:", error);
       toast.error("An error occurred while updating wishlist.", {
         position: "top-right",
         autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
       });
     }
   };
-
+  
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -728,21 +838,23 @@ const ProductDetail = ({ accessoryCategory }) => {
   //   fetchRelatedAccessories();
   // }, [product]);
 
-
   useEffect(() => {
     const fetchRelatedAccessories = async () => {
       if (product && product.id) {
         console.log("Fetching related accessories for product ID:", product.id);
-  
+
         try {
           const url = `${ApiUrl}/products/accessories/${product.id}`;
           const response = await axios.get(url);
-          console.log("Fetched related accessories successfully:", response.data);
-  
+          console.log(
+            "Fetched related accessories successfully:",
+            response.data
+          );
+
           const accessoryIds = response.data.additional_accessories
             ? response.data.additional_accessories.split(",")
             : [];
-  
+
           if (accessoryIds.length > 0) {
             // Create an array of promises to fetch the details of each accessory
             const accessoryDetailsPromises = accessoryIds.map((id) =>
@@ -750,59 +862,72 @@ const ProductDetail = ({ accessoryCategory }) => {
                 .get(`${ApiUrl}/products/accessory-details/${id}`)
                 .catch((err) => {
                   // Handle individual errors
-                  console.error(`Error fetching accessory details for ID: ${id}`, err.response ? err.response.data : err.message);
+                  console.error(
+                    `Error fetching accessory details for ID: ${id}`,
+                    err.response ? err.response.data : err.message
+                  );
                   return null; // return null for failed request
                 })
             );
-  
+
             // Wait for all requests to complete
-            const accessoryDetailsResponses = await Promise.all(accessoryDetailsPromises);
-  
+            const accessoryDetailsResponses = await Promise.all(
+              accessoryDetailsPromises
+            );
+
             // Filter out null values (failed requests)
-            const validAccessories = accessoryDetailsResponses.filter((res) => res !== null);
-  
+            const validAccessories = accessoryDetailsResponses.filter(
+              (res) => res !== null
+            );
+
             // Map the valid responses to the required structure
             const accessories = validAccessories.map((res) => {
               const accessory = res.data;
-            
+
               let productImages = [];
               if (Array.isArray(accessory.prod_img)) {
                 productImages = accessory.prod_img; // Handle as an array if it's valid
               } else if (typeof accessory.prod_img === "string") {
                 productImages = [accessory.prod_img]; // Treat it as a single image (array format)
               }
-            
+
               // Ensure that prod_name exists before calling any methods
-              const productName = accessory.prod_name ? accessory.prod_name.toLowerCase() : "No Name";
-            
+              const productName = accessory.prod_name
+                ? accessory.prod_name.toLowerCase()
+                : "No Name";
+
               return {
                 id: accessory.id,
                 prod_name: productName,
                 prod_price: accessory.prod_price,
                 effectiveprice: accessory.effectiveprice,
-                category:accessory.category,
+                category: accessory.category,
                 prod_img: productImages.length > 0 ? productImages[0] : null, // Get the first image
               };
             });
-            
-  
+
             setRelatedAccessories(accessories);
             console.log("Fetched accessory details:", accessories);
           } else {
-            console.warn("No related accessories found for product ID:", product.id);
+            console.warn(
+              "No related accessories found for product ID:",
+              product.id
+            );
             setRelatedAccessories([]);
           }
         } catch (error) {
-          console.error("Error fetching related accessories:", error.response ? error.response.data : error.message);
+          console.error(
+            "Error fetching related accessories:",
+            error.response ? error.response.data : error.message
+          );
         }
       } else {
         console.warn("Product or product ID is undefined");
       }
     };
-  
+
     fetchRelatedAccessories();
   }, [product]);
-  
 
   useEffect(() => {
     const calculateRemainingTime = () => {
@@ -823,7 +948,9 @@ const ProductDetail = ({ accessoryCategory }) => {
       } else {
         const diff = endTime - now;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const hours = Math.floor(
+          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
@@ -840,10 +967,55 @@ const ProductDetail = ({ accessoryCategory }) => {
 
     return () => clearInterval(timer); // Cleanup on component unmount
   }, [product]);
-  
+
   // if (isLoading) {
   //   return <div>Loadingvbcvbcv...</div>;
   // }
+
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      const email = localStorage.getItem("email");
+      const username = localStorage.getItem("username");
+  
+      if (!email || !username) {
+        console.log("User not logged in");
+        return;
+      }
+  
+      try {
+        const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
+          email,
+          username,
+        });
+  
+        if (response.data.wishlist) {
+          const wishlist = response.data.wishlist;
+          const favoritesMap = {};
+  
+          // Set the favorites map based on product IDs in the wishlist
+          wishlist.forEach((item) => {
+            favoritesMap[`${item}`] = true; // Mark product ID as in wishlist
+          });
+  
+          setFavorites(favoritesMap);  // Update the favorites state
+        }
+      } catch (error) {
+        console.error("Error fetching wishlist:", error);
+      }
+    };
+  
+    // Fetch wishlist immediately
+    fetchWishlist();
+  
+    // Set an interval to fetch the wishlist every second
+    const intervalId = setInterval(() => {
+      fetchWishlist();
+    }, 100); // Update every second (1000ms)
+  
+    // Cleanup the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, []);
+  
 
   if (isLoading) {
     return (
@@ -985,7 +1157,6 @@ const ProductDetail = ({ accessoryCategory }) => {
 
 
   
-  
   return (
     <>
       <Header2 />
@@ -1120,12 +1291,13 @@ const ProductDetail = ({ accessoryCategory }) => {
                     </div>
 
                     <h2 className="product-detail-title">
-                      {product.prod_name.charAt(0).toUpperCase()+ product.prod_name.slice(1)}
+                      {product.prod_name.charAt(0).toUpperCase() +
+                        product.prod_name.slice(1)}
                     </h2>
                     {/* {product.offer_price} */}
 
                     {couponCode && couponCode.trim() ? (
-                    // {couponNumber > 0 ? (
+                      // {couponNumber > 0 ? (
                       <p
                         className="coupon-discount-label"
                         style={{
@@ -1141,117 +1313,136 @@ const ProductDetail = ({ accessoryCategory }) => {
                     )}
                     {/* <span style={{color:'grey'}}>({product.subtitle})</span> */}
                     <p>
+                      <div>
+                        <span>
+                          <span className="product-detail-price">
+                            ₹
+                            {isOfferActive && product.offer_price
+                              ? product.offer_price
+                              : product.prod_price}{" "}
+                          </span>{" "}
+                          M.R.P
+                          <span
+                            className="product-detail-actual-price"
+                            style={{ textDecoration: "line-through" }}
+                          >
+                            ₹{product.actual_price}{" "}
+                          </span>
+                        </span>
+                        <span
+                          className="offer-text"
+                          style={{ marginLeft: "12px" }}
+                        >
+                          <span
+                            className="save-tag"
+                            style={{ marginLeft: "5px" }}
+                          >
+                            <span>
+                              {Math.round(
+                                ((product.actual_price -
+                                  (isOfferActive && product.offer_price
+                                    ? product.offer_price
+                                    : product.prod_price)) /
+                                  product.actual_price) *
+                                  100
+                              )}
+                              % OFF
+                            </span>
+                          </span>
+                        </span>
 
-    <div>
-      <span>
-        <span className="product-detail-price">
-          ₹{isOfferActive && product.offer_price ? product.offer_price : product.prod_price}{" "}
-        </span>{" "}
-        M.R.P
-        <span
-          className="product-detail-actual-price"
-          style={{ textDecoration: "line-through" }}
-        >
-          ₹{product.actual_price}{" "}
-        </span>
-      </span>
-      <span className="offer-text" style={{ marginLeft: "12px" }}>
-        <span className="save-tag" style={{ marginLeft: "5px" }}>
-          <span>
-            {Math.round(
-              ((product.actual_price -
-                (isOfferActive && product.offer_price
-                  ? product.offer_price
-                  : product.prod_price)) /
-                product.actual_price) *
-                100
-            )}
-            % OFF
-          </span>
-        </span>
-      </span>
+                        <p className="offerr-tag">
+                          Save upto ₹
+                          {product.actual_price -
+                            (isOfferActive && product.offer_price
+                              ? product.offer_price
+                              : product.prod_price)}
+                        </p>
 
-      <p className="offerr-tag">
-        Save upto ₹
-        {product.actual_price -
-          (isOfferActive && product.offer_price
-            ? product.offer_price
-            : product.prod_price)}
-      </p>
-
-      {/* Timer display */}
-      {isOfferActive  && product.offer_price && remainingTime && (
-    <div className="offer-timer">
-      {remainingTime.days ? (
-        <p style={{ color: "red" }}>
-          {remainingTime.days} day(s) left for this offer
-        </p>
-      ) : (
-        <p>
-         Deals end in <span className="timer-tag"> {remainingTime.hours}h : {remainingTime.minutes}m : {remainingTime.seconds}s  </span> {/* Hurry up! */}
-        </p>
-      )}
-    </div>
-  )}
-    </div>
-</p>
-
+                        {/* Timer display */}
+                        {isOfferActive &&
+                          product.offer_price &&
+                          remainingTime && (
+                            <div className="offer-timer">
+                              {remainingTime.days ? (
+                                <p style={{ color: "red" }}>
+                                  {remainingTime.days} day(s) left for this
+                                  offer
+                                </p>
+                              ) : (
+                                <p>
+                                  Deals end in{" "}
+                                  <span className="timer-tag">
+                                    {" "}
+                                    {remainingTime.hours}h :{" "}
+                                    {remainingTime.minutes}m :{" "}
+                                    {remainingTime.seconds}s{" "}
+                                  </span>{" "}
+                                  {/* Hurry up! */}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                      </div>
+                    </p>
 
                     {/* </p> */}
                     <div className="coupon-box">
-  <div className="price-table">
-    <div className="price-row">
-      {/* Actual Price */}
-      <div
-        className="price-cell"
-        style={{ backgroundColor: "white" }}
-      >
-        <span className="price-label">Actual Price</span>
-        <span className="actual-priceee">
-          M.R.P. ₹
-          {coupons[product?.prod_id]
-            ? product?.offer_price || product?.prod_price
-            : product?.actual_price}
-        </span>
-      </div>
+                      <div className="price-table">
+                        <div className="price-row">
+                          {/* Actual Price */}
+                          <div
+                            className="price-cell"
+                            style={{ backgroundColor: "white" }}
+                          >
+                            <span className="price-label">Actual Price</span>
+                            <span className="actual-priceee">
+                              M.R.P. ₹
+                              {coupons[product?.prod_id]
+                                ? product?.offer_price || product?.prod_price
+                                : product?.actual_price}
+                            </span>
+                          </div>
 
-      {/* Discount */}
-      <div
-        className="price-cell"
-        style={{ backgroundColor: "white" }}
-      >
-        <span className="price-label">Discount</span>
-        <span className="discounted-priceee">
-          {coupons[product?.prod_id]
-            ? // If a coupon exists, calculate and round discount percentage
-              `${Math.round(
-                ((product?.actual_price - couponNumber) / product?.actual_price) *
-                  100
-              )}%`
-            : // If no coupon, calculate and round discount percentage
-              `${Math.round(
-                ((product?.actual_price -
-                  (product?.offer_price || product?.prod_price)) /
-                  product?.actual_price) *
-                  100
-              )}%`}
-        </span>
-      </div>
+                          {/* Discount */}
+                          <div
+                            className="price-cell"
+                            style={{ backgroundColor: "white" }}
+                          >
+                            <span className="price-label">Discount</span>
+                            <span className="discounted-priceee">
+                              {coupons[product?.prod_id]
+                                ? // If a coupon exists, calculate and round discount percentage
+                                  `${Math.round(
+                                    ((product?.actual_price - couponNumber) /
+                                      product?.actual_price) *
+                                      100
+                                  )}%`
+                                : // If no coupon, calculate and round discount percentage
+                                  `${Math.round(
+                                    ((product?.actual_price -
+                                      (product?.offer_price ||
+                                        product?.prod_price)) /
+                                      product?.actual_price) *
+                                      100
+                                  )}%`}
+                            </span>
+                          </div>
 
-      {/* Effective Price */}
-      <div className="price-cell">
-        <span className="price-label">Effective Price</span>
-        <span className="total-priceee">
-          ₹
-          {coupons[product?.prod_id]
-            ? (product?.offer_price || product?.prod_price) - couponNumber
-            : product?.offer_price || product?.prod_price}
-        </span>
-      </div>
-    </div>
-  </div>
-</div>
-
+                          {/* Effective Price */}
+                          <div className="price-cell">
+                            <span className="price-label">Effective Price</span>
+                            <span className="total-priceee">
+                              ₹
+                              {coupons[product?.prod_id]
+                                ? (product?.offer_price ||
+                                    product?.prod_price) - couponNumber
+                                : product?.offer_price || product?.prod_price}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
                     {product.status === "unavailable" ? (
                       <p className="product-detail-out-of-stock">
@@ -1264,13 +1455,26 @@ const ProductDetail = ({ accessoryCategory }) => {
                           onClick={(event) => handleAddToCart(product, event)}
                           className="product-detail-add-to-cart"
                         >
-                          ADD TO CART <span style={{marginLeft:'10px'}}>&gt;</span> 
+                          ADD TO CART{" "}
+                          <span style={{ marginLeft: "10px" }}>&gt;</span>
                         </button>
-                        <FaHeart
+                        {/* <FaHeart
                           title="Add to wishlist"
                           className={`heart-icon ${isFavorite ? "filled" : ""}`}
                           onClick={(event) => toggleFavorite(product, event)}
-                        />
+                        /> */}
+
+                         <span
+                            title={favorites[`${product.id}`] ? "Remove from Wishlist" : "Add to Wishlist"}
+                            className={`heart-icon ${favorites[`${product.id}`] ? "filled" : ""}`}
+                            onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
+                          >
+                            {favorites[`${product.id}`] ? (
+                              <FaHeart style={{ color: "red" }} /> // Filled heart
+                            ) : (
+                              <FaRegHeart /> // Empty heart
+                            )}
+                          </span>
                         <span
                           style={{
                             color: "green",
@@ -1337,7 +1541,10 @@ const ProductDetail = ({ accessoryCategory }) => {
                                       marginTop: "0",
                                     }}
                                   >
-                                    {accessory.prod_name.charAt(0).toUpperCase() + accessory.prod_name.slice(1)}
+                                    {accessory.prod_name
+                                      .charAt(0)
+                                      .toUpperCase() +
+                                      accessory.prod_name.slice(1)}
                                   </h5>
                                   <p
                                     style={{
@@ -1384,7 +1591,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                     </div>
                   )}
                 </div>
-
+   
                 <div className="product-features-row">
                   {/* <span>{product.category}</span> */}
                   <h3 className="product-features-title">
@@ -1404,9 +1611,15 @@ const ProductDetail = ({ accessoryCategory }) => {
                   product.category === "Computers" ? (
                     // Mobiles and Computers Specifications
                     <ul style={{ listStyleType: "none", padding: 0 }}>
+                      {product.memory && (
+                        <li style={listItemStyle}>
+                          <span style={labelStyle}>RAM</span>
+                          <span style={valueStyle}>{product.memory}</span>
+                        </li>
+                      )}
                       {product.storage && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}>Storage</span>
+                          <span style={labelStyle}>ROM</span>
                           <span style={valueStyle}>{product.storage}</span>
                         </li>
                       )}
@@ -1416,12 +1629,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                           <span style={valueStyle}>{product.camera}</span>
                         </li>
                       )}
-                      {product.memory && (
-                        <li style={listItemStyle}>
-                          <span style={labelStyle}>Memory</span>
-                          <span style={valueStyle}>{product.memory}</span>
-                        </li>
-                      )}
+
                       {product.processor && (
                         <li style={listItemStyle}>
                           <span style={labelStyle}>Processor</span>
@@ -1542,7 +1750,10 @@ const ProductDetail = ({ accessoryCategory }) => {
                                 className="related-product-image"
                               />
                               <p className="related-product-name">
-                                {relatedProduct.prod_name.charAt(0).toUpperCase() + relatedProduct.prod_name.slice(1)}
+                                {relatedProduct.prod_name
+                                  .charAt(0)
+                                  .toUpperCase() +
+                                  relatedProduct.prod_name.slice(1)}
                               </p>
                               {/* <p className="related-product-features">
                   {relatedProduct.prod_features}
@@ -1673,7 +1884,10 @@ const ProductDetail = ({ accessoryCategory }) => {
                               className="related-product-image"
                             />
                             <p className="related-product-name">
-                            {relatedProduct.prod_name.charAt(0).toUpperCase() + relatedProduct.prod_name.slice(1)}
+                              {relatedProduct.prod_name
+                                .charAt(0)
+                                .toUpperCase() +
+                                relatedProduct.prod_name.slice(1)}
                             </p>
                             {/* <p className="related-product-features">
                   {relatedProduct.prod_features}

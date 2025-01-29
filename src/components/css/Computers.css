@@ -83,7 +83,7 @@
     background-color: #fff;
     text-align: center;
     height: auto; /* Set a fixed height for the card */
-    /* max-height: 400px; */
+    max-height: 400px;
     margin-bottom: 10px; /* Space below each card */
     cursor: pointer;
 }

@@ -135,6 +135,8 @@ const ChangePassword = () => {
                     placeholder="Enter your old password"
                     required
                     style={{color:'black'}}
+                    className='custom-input'
+
                   />
                   <button
                     type="button"
@@ -158,6 +160,7 @@ const ChangePassword = () => {
                     placeholder="Enter your new password"
                     style={{color:'black'}}
                     required
+                    className='custom-input'
 
                   />
                   <button
@@ -182,6 +185,8 @@ const ChangePassword = () => {
                     placeholder="Confirm your new password"
                     required
                     style={{color:'black'}}
+                    className='custom-input'
+
 
                   />
                   <button

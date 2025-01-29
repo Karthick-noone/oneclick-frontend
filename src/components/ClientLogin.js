@@ -225,6 +225,7 @@ document.head.appendChild(styleElement);
             onChange={handleChange}
             style={styles.input}
             required
+            className="staff-input"
           />
           <label style={styles.label} htmlFor="name">Password</label>
           <div style={styles.passwordContainer}>
@@ -327,7 +328,7 @@ const styles = {
     margin: "30px auto",
     padding: "15px",
     borderRadius: "10px",
-    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0 0 5px rgba(0, 123, 255, 0.9)",
     backgroundColor: "rgba(0, 0, 0, 0.8)",
     marginTop: '100px',
     zIndex: 2,

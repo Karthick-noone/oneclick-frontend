@@ -258,50 +258,50 @@ const Header2 = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  useEffect(() => {
-    const fetchLocalStorageData = () => {
-      const storedEmail = localStorage.getItem("email");
+  // useEffect(() => {
+  //   const fetchLocalStorageData = () => {
+  //     const storedEmail = localStorage.getItem("email");
 
-      if (storedEmail) {
-        const cartKey = `${storedEmail}-cart`;
-        const wishlistKey = `${storedEmail}-wishlist`;
+  //     if (storedEmail) {
+  //       const cartKey = `${storedEmail}-cart`;
+  //       const wishlistKey = `${storedEmail}-wishlist`;
 
-        const storedCartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
-        const storedWishlistItems =
-          JSON.parse(localStorage.getItem(wishlistKey)) || [];
+  //       const storedCartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
+  //       const storedWishlistItems =
+  //         JSON.parse(localStorage.getItem(wishlistKey)) || [];
 
-        // Ensure quantity is set to 1 for items without a defined quantity
-        const updatedCartItems = storedCartItems.map((item) => ({
-          ...item,
-          quantity: item.quantity || 1, // Set default quantity to 1 if not defined
-        }));
+  //       // Ensure quantity is set to 1 for items without a defined quantity
+  //       const updatedCartItems = storedCartItems.map((item) => ({
+  //         ...item,
+  //         quantity: item.quantity || 1, // Set default quantity to 1 if not defined
+  //       }));
 
-        const updatedWishlistItems = storedWishlistItems.map((item) => ({
-          ...item,
-          quantity: item.quantity || 1, // Set default quantity to 1 if not defined
-        }));
+  //       const updatedWishlistItems = storedWishlistItems.map((item) => ({
+  //         ...item,
+  //         quantity: item.quantity || 1, // Set default quantity to 1 if not defined
+  //       }));
 
-        setCartItems(updatedCartItems);
-        setWishlistItems(updatedWishlistItems);
-      }
-    };
+  //       setCartItems(updatedCartItems);
+  //       setWishlistItems(updatedWishlistItems);
+  //     }
+  //   };
 
-    // Fetch data every second
-    const intervalId = setInterval(fetchLocalStorageData, 100);
+  //   // Fetch data every second
+  //   const intervalId = setInterval(fetchLocalStorageData, 100);
 
-    // Cleanup interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
+  //   // Cleanup interval on component unmount
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   const calculateTotalPrice = () => {
     // console.log(cartItems); // Before passing to Cart
 
     return cartItems
       .reduce((total, item) => {
-        const price = parseFloat(item.price);
+        const price = parseFloat(item.prod_price);
         return total + (isNaN(price) ? 0 : price * item.quantity);
       }, 0)
-      .toFixed(2);
+      .toFixed(0);
   };
 
   const discount = () => {
@@ -322,79 +322,157 @@ const Header2 = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0); // Ensure quantity is a valid number
   };
 
-  const updateCartItemQuantity = (itemId, itemCategory, newQuantity) => {
-    const updatedCartItems = cartItems.map((item) =>
-      item.id === itemId && item.category === itemCategory
-        ? { ...item, quantity: Math.max(newQuantity, 1) } // Ensure quantity does not go below 1
-        : item
-    );
+  // const updateCartItemQuantity = (itemId, itemCategory, newQuantity) => {
+  //   const updatedCartItems = cartItems.map((item) =>
+  //     item.id === itemId && item.category === itemCategory
+  //       ? { ...item, quantity: Math.max(newQuantity, 1) } // Ensure quantity does not go below 1
+  //       : item
+  //   );
 
-    setCartItems(updatedCartItems);
+  //   setCartItems(updatedCartItems);
 
-    const storedEmail = localStorage.getItem("email");
-    if (storedEmail) {
-      const cartKey = `${storedEmail}-cart`;
-      localStorage.setItem(cartKey, JSON.stringify(updatedCartItems));
+  //   const storedEmail = localStorage.getItem("email");
+  //   if (storedEmail) {
+  //     const cartKey = `${storedEmail}-cart`;
+  //     localStorage.setItem(cartKey, JSON.stringify(updatedCartItems));
+  //   }
+  // };
+
+  // const removeFromCart = async (itemId, itemCategory) => {
+  //   // Update local state
+  //   const updatedCartItems = cartItems.filter(
+  //     (item) => !(item.id === itemId && item.category === itemCategory)
+  //   );
+  //   setCartItems(updatedCartItems);
+
+  //   // Update localStorage
+  //   const storedEmail = localStorage.getItem("email");
+  //   if (storedEmail) {
+  //     const cartKey = `${storedEmail}-cart`;
+  //     localStorage.setItem(cartKey, JSON.stringify(updatedCartItems));
+
+  //     try {
+  //       // Remove item from the database
+  //       const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
+  //         email: storedEmail,
+  //         itemId: itemId,
+  //         itemCategory: itemCategory, // Ensure category is included
+  //       });
+
+  //       // Check for successful response
+  //       if (response.status === 200) {
+  //         toast.success("Item removed from cart!", {
+  //           position: "top-right",
+  //           autoClose: 2000,
+  //           hideProgressBar: false,
+  //           closeOnClick: true,
+  //           pauseOnHover: true,
+  //           draggable: true,
+  //           progress: undefined,
+  //         });
+  //       } else {
+  //         throw new Error("Unexpected response status");
+  //       }
+  //     } catch (error) {
+  //       console.error(
+  //         "Error removing item from cart:",
+  //         error.response || error.message || error
+  //       );
+  //       toast.error(
+  //         `An error occurred: ${
+  //           error.response?.data?.message || error.message
+  //         }`,
+  //         {
+  //           position: "top-right",
+  //           autoClose: 2000,
+  //           hideProgressBar: false,
+  //           closeOnClick: true,
+  //           pauseOnHover: true,
+  //           draggable: true,
+  //           progress: undefined,
+  //         }
+  //       );
+  //     }
+  //   }
+  // };
+
+  const updateCartItemQuantity = async (itemId, newQuantity) => {
+    if (newQuantity <= 0) return; // Prevent reducing quantity below 1
+  
+    try {
+      // Update the cart item in the local state immediately for responsiveness
+      const updatedCartItems = cartItems.map((item) =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
+      );
+      setCartItems(updatedCartItems);
+  
+      // Send the updated quantity to the server
+      const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
+        email,
+        itemId,
+        quantity: newQuantity,
+      });
+  
+      // if (response.status === 200) {
+      //   toast.success(`Quantity updated to ${newQuantity}!`, {
+      //     position: "top-right",
+      //     autoClose: 2000,
+      //   });
+      // } else {
+      //   console.error("Failed to update item quantity");
+      //   toast.error("Failed to update item quantity", {
+      //     position: "top-right",
+      //     autoClose: 2000,
+      //   });
+      // }
+    } catch (error) {
+      console.error("Error updating item quantity:", error);
+      toast.error("Error updating item quantity", {
+        position: "top-right",
+        autoClose: 2000,
+      });
     }
   };
-
-  const removeFromCart = async (itemId, itemCategory) => {
-    // Update local state
-    const updatedCartItems = cartItems.filter(
-      (item) => !(item.id === itemId && item.category === itemCategory)
-    );
-    setCartItems(updatedCartItems);
-
-    // Update localStorage
-    const storedEmail = localStorage.getItem("email");
-    if (storedEmail) {
-      const cartKey = `${storedEmail}-cart`;
-      localStorage.setItem(cartKey, JSON.stringify(updatedCartItems));
-
-      try {
-        // Remove item from the database
-        const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
-          email: storedEmail,
-          itemId: itemId,
-          itemCategory: itemCategory, // Ensure category is included
+  
+  
+  const removeFromCart = async (itemId, itemName, quantity) => {
+    try {
+      // Remove the item from the local state first
+      const updatedCartItems = cartItems.filter((item) => item.id !== itemId);
+      setCartItems(updatedCartItems);
+  
+      // Send the removal request to the server
+      const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
+        email,
+        itemId,
+        quantity,
+      });
+  
+      if (response.data.success) {
+        // Toast notification for successful removal
+        toast.success(`${itemName} has been removed from your cart!`, {
+          position: "top-right",
+          autoClose: 2000,
+          closeOnClick: true,
         });
-
-        // Check for successful response
-        if (response.status === 200) {
-          toast.success("Item removed from cart!", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-        } else {
-          throw new Error("Unexpected response status");
-        }
-      } catch (error) {
-        console.error(
-          "Error removing item from cart:",
-          error.response || error.message || error
-        );
-        toast.error(
-          `An error occurred: ${
-            error.response?.data?.message || error.message
-          }`,
-          {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          }
-        );
+      } else {
+        console.error('Failed to remove item from cart');
+        toast.error('Failed to remove item from cart!', {
+          position: "top-right",
+          autoClose: 2000,
+          closeOnClick: true,
+        });
       }
+    } catch (error) {
+      console.error('Error removing item from cart:', error);
+      toast.error('Error removing item from cart!', {
+        position: "top-right",
+        autoClose: 2000,
+        closeOnClick: true,
+      });
     }
   };
+  
 
   const sidebarRef = useRef(null);
   const wishlistRef = useRef(null);
@@ -583,7 +661,42 @@ const Header2 = () => {
   //   Speakers: 'Speaker',
   //   // Add other mappings as needed
   // };
+  const [isLoading, setIsLoading] = useState(true);
 
+  const email = localStorage.getItem('email');
+
+  useEffect(() => {
+    if (email) {
+      // Function to fetch the cart items
+      const fetchCartItems = async () => {
+        try {
+          const response = await axios.post(`${ApiUrl}/get-cart-items`, {
+            email,
+            username: localStorage.getItem('username') // Send username if needed
+          });
+  
+          if (response.data.products) {
+            setCartItems(response.data.products); // Set the fetched products to state
+          }
+        } catch (error) {
+          console.error('Error fetching cart items:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      // Fetch cart items immediately
+      fetchCartItems();
+  
+      // Set an interval to fetch cart items every 5 seconds
+      const intervalId = setInterval(fetchCartItems, 100); // 5000ms = 5 seconds
+  
+      // Clean up the interval on component unmount or when `email` changes
+      return () => clearInterval(intervalId);
+    }
+  }, [email]); // Dependency on `email` so it will trigger fetch when email changes
+  
+  
 
   return (
     <>
@@ -670,111 +783,84 @@ const Header2 = () => {
           </div>
           {isMobileView && <Header3 />}
         </div>
-        <div  ref={sidebarRef} className={`sidebarcart ${isSidebarOpen ? "open" : ""}`}>
-          <button
-            style={{ color: "black" }}
-            className="close-btn"
-            onClick={toggleSidebar}
-          >
-            <FaTimes />
-          </button>
-          <div className="sidebarcart-header">
-            <h3>Cart</h3>
-          </div>
-          <div className="sidebarcart-body">
-  {cartItems.length === 0 ? (
-    <p>Your cart is empty.</p>
-  ) : (
-    <ul>
-      {cartItems.slice().reverse().map((item) => {
-        // Check if image is an array or a string
-        const images = Array.isArray(item.image) 
-          ? item.image 
-          : JSON.parse(item.image || '[]'); // Handle JSON string
-        const firstImage = images.length > 0 ? images[0] : null; // Get the first image or null if not available
 
-        return (
-          <li key={item.id} className="cart-item">
-            {/* <Link style={{ textDecoration: 'none' }} to={`/${categoryMap[item.category] || item.category}`}> */}
 
-            <Link style={{ textDecoration: 'none' }} to={`/product/${item.id}`}>
-            {firstImage ? (
-                <img
-                  src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
-                  alt={item.name}
-                  loading="lazy"
-                  name="image"
-                />
-              ) : (
-                <div className="placeholder-image">No image available</div> // Fallback message
-              )}
-            </Link>
+     <div ref={sidebarRef} className={`sidebarcart ${isSidebarOpen ? 'open' : ''}`}>
+  <button style={{ color: 'black' }} className="close-btn" onClick={toggleSidebar}>
+    <FaTimes />
+  </button>
+  <div className="sidebarcart-header">
+    <h3>Cart</h3>
+  </div>
+  <div className="sidebarcart-body">
+    {isLoading ? (
+      <p>Your cart is empty.</p>
+    ) : cartItems.length === 0 ? (
+      <p>Your cart is empty.</p>
+    ) : (
+      <ul>
+        {cartItems.map((item) => {
+          // Check if image is a stringified array and parse it
+          const images = Array.isArray(item.prod_img)
+            ? item.prod_img
+            : JSON.parse(item.prod_img || '[]'); // Handle if it's a stringified array
 
-            <div className="item-details">
+          const firstImage = images.length > 0 ? images[0] : null; // Get the first image or fallback to null
+
+          return (
+            <li key={item.id} className="cart-item">
               <Link style={{ textDecoration: 'none' }} to={`/product/${item.id}`}>
-                <h3 className="item-name">{item.name}</h3>
-                <p className="item-features">{item.description}</p>
+                {firstImage ? (
+                  <img
+                    src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
+                    alt={item.prod_name}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="placeholder-image">No image available</div> // Fallback if no image is available
+                )}
               </Link>
-            </div>
+              <div className="item-details">
+                <Link style={{ textDecoration: 'none' }} to={`/product/${item.id}`}>
+                  <h3 className="item-name">{item.prod_name}</h3>
+                  <p className="item-features">{item.prod_features}</p>
+                </Link>
+              </div>
 
-            <div className="item-price">
-            <p style={{ color: 'red',textDecoration:"line-through", fontSize:'12px' }}>₹{item.actual_price}</p>
-
-              <p style={{ color: '#27ae60' }}> ₹{item.price * item.quantity}</p>
-              <div className="quantity-controls">
-                <button
-                  onClick={() =>
-                    updateCartItemQuantity(
-                      item.id,
-                      item.category,
-                      Math.max(item.quantity - 1, 1)
-                    )
-                  }
-                >
-                  -
-                </button>
-                <span>{item.quantity}</span>
-                <button
-                  onClick={() =>
-                    updateCartItemQuantity(
-                      item.id,
-                      item.category,
-                      item.quantity + 1
-                    )
-                  }
-                >
-                  +
+              <div className="item-price">
+                <p style={{ color: 'red', textDecoration: 'line-through', fontSize: '12px' }}>
+                  ₹{item.actual_price* item.quantity}
+                </p>
+                <p style={{ color: '#27ae60' }}> ₹{item.prod_price * item.quantity}</p>
+                <div className="quantity-controls">
+                  <button onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)}>-</button>
+                  <span>{item.quantity}</span>
+                  <button onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)}>+</button>
+                </div>
+                <button onClick={() => removeFromCart(item.id, item.prod_name, item.quantity)} className="remove-btn">
+                  Remove
                 </button>
               </div>
-              <button
-                onClick={() => removeFromCart(item.id, item.category)}
-                className="remove-btn"
-              >
-                Remove
-              </button>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
-  )}
-  <div className="cart-total">
-    <div className="sidebarcart-footer">
-    <span style={{fontSize:'14px', textDecoration:'line-through'}}>{discount()} </span>  
-      <p>₹{calculateTotalPrice()}</p>
-      <a
-        style={{ textDecoration: "none", color: "black" }}
-        href="/Cart"
-      >
-        <button className="change-btn">
-          View Cart <FaShoppingCart />{" "}
-        </button>
-      </a>
+            </li>
+          );
+        })}
+      </ul>
+    )}
+    <div className="cart-total">
+      <div className="sidebarcart-footer">
+        <p>₹{calculateTotalPrice()}</p>
+        <a style={{ textDecoration: 'none', color: 'black' }} href="/Cart">
+          <button className="change-btn">
+            View Cart <FaShoppingCart />
+          </button>
+        </a>
+      </div>
     </div>
   </div>
 </div>
 
-        </div>
+
+
         <WishlistSidebar
           isOpen={isWishlistOpen}
           toggleWishlist={toggleWishlist}

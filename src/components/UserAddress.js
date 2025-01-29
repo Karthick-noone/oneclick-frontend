@@ -638,6 +638,9 @@ const handleUpdate = async (e) => {
                   pattern="[A-Za-z\s]+"
                   title="Name should only contain letters and spaces"
                   required
+                  className="staff-input"
+                  autoFocus
+
                 />
               </div>
               <div className="form-group2">
@@ -649,6 +652,8 @@ const handleUpdate = async (e) => {
                   value={address.street}
                   onChange={handleChange}
                   required
+                  className="staff-input"
+
                 />
               </div>
             </div>
@@ -664,6 +669,8 @@ const handleUpdate = async (e) => {
                   pattern="[A-Za-z\s]+"
                   title="City should only contain letters and spaces"
                   required
+                  className="staff-input"
+
                 />
               </div>
               <div className="form-group2">
@@ -677,6 +684,8 @@ const handleUpdate = async (e) => {
                   pattern="[A-Za-z\s]+"
                   title="State should only contain letters and spaces"
                   required
+                  className="staff-input"
+
                 />
               </div>
             </div>
@@ -690,6 +699,8 @@ const handleUpdate = async (e) => {
                   value={address.postal_code}
                   onChange={handleChange}
                   required
+                  className="staff-input"
+
                 />
               </div>
               <div className="form-group2">
@@ -703,6 +714,8 @@ const handleUpdate = async (e) => {
                   pattern="[A-Za-z\s]+"
                   title="Country should only contain letters and spaces"
                   required
+                  className="staff-input"
+
                 />
               </div>
             </div>
@@ -717,6 +730,8 @@ const handleUpdate = async (e) => {
                 pattern="[0-9]{10}"
                 title="Phone number should be exactly 10 digits"
                 required
+                className="staff-input"
+
               />
             </div>
             <button className="adr-btn" type="submit">
@@ -851,6 +866,8 @@ const handleUpdate = async (e) => {
                       value={editingAddress.name}
                       onChange={handleChange2}
                       required
+                      className="staff-input3"
+
                     />
                   </div>
                   <div className="form-group2">
@@ -862,6 +879,8 @@ const handleUpdate = async (e) => {
                       value={editingAddress.street}
                       onChange={handleChange2}
                       required
+                      className="staff-input3"
+
                     />
                   </div>
                 </div>
@@ -875,6 +894,8 @@ const handleUpdate = async (e) => {
                       value={editingAddress.city}
                       onChange={handleChange2}
                       required
+                      className="staff-input3"
+
                     />
                   </div>
                   <div className="form-group2">
@@ -886,6 +907,8 @@ const handleUpdate = async (e) => {
                       value={editingAddress.state}
                       onChange={handleChange2}
                       required
+                      className="staff-input3"
+
                     />
                   </div>
                 </div>
@@ -899,6 +922,8 @@ const handleUpdate = async (e) => {
                       value={editingAddress.postal_code}
                       onChange={handleChange2}
                       required
+                      className="staff-input3"
+
                     />
                   </div>
                   <div className="form-group2">
@@ -910,6 +935,8 @@ const handleUpdate = async (e) => {
                       value={editingAddress.country}
                       onChange={handleChange2}
                       required
+                      className="staff-input3"
+
                     />
                   </div>
                 </div>
@@ -922,6 +949,8 @@ const handleUpdate = async (e) => {
                     value={editingAddress.phone}
                     onChange={handleChange2}
                     required
+                    className="staff-input3"
+
                   />
                 </div>
                 <button className="adr-btn" type="submit">

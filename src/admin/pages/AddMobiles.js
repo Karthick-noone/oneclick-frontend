@@ -1838,11 +1838,12 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                   </div>
                 </div>
                 <div className="laptops-product-details">
+                {/* <p className="laptops-product-features">{product.prod_id}</p> */}
+
                   <h3 className="laptops-product-name">{product.prod_name} {product.productStatus === 'unapproved' ? <span style={{color:'red'}}>({product.productStatus})</span> : null}</h3>                  {/* <h3 className="laptops-product-name">{product.prod_id}</h3> */}
                   <h3 className="laptops-product-subtitle">
                     {product.subtitle}
                   </h3>
-                  {/* <p className="laptops-product-features"></p> */}
                   <p className="laptops-product-actual-price">
                     M.R.P Price:{" "}
                     <span className="actual-price">

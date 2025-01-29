@@ -527,6 +527,35 @@
     border-radius: 4px;
     box-sizing: border-box;
   }
+/* Group related selectors for consistency */
+.laptops-card-input:focus, 
+.laptops-card-input1:focus, 
+.laptops-card-input2:focus, 
+.adminmodal-input:focus, 
+.adminmodal-input1:focus, 
+.adminmodal-input5:focus, 
+.feature-input:focus, 
+.feature-textarea:focus {
+  border-color: #007bff; /* Change border color on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a glowing effect */
+  outline: none; /* Remove default outline */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+
+/* Optional: Add hover effect for consistency */
+.laptops-card-input:hover, 
+.laptops-card-input1:hover, 
+.laptops-card-input2:hover, 
+.adminmodal-input:hover, 
+.adminmodal-input1:hover, 
+.adminmodal-input5:hover, 
+.feature-input:hover, 
+.feature-textarea:hover {
+  border-color: #0056b3; 
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); 
+}
+
   
   .laptops-card-input2 {
     width: 25%;

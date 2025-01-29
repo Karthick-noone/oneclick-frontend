@@ -187,8 +187,8 @@ const MyOrders = () => {
         </div>
         <p>Order Date: {formatDate(order.order_date)}</p>
         <p>Total Amount: ₹{order.total_amount}</p>
-        <button onClick={() => openModal(order)} className="view-details-button">View Details</button>
-        <button style={{marginLeft:'10px'}} onClick={() => openModal2(order)} className="view-details-button">Check Status</button>
+        <button onClick={() => openModal(order)} className="view-details-button">View Order</button>
+        <button style={{marginLeft:'10px'}} onClick={() => openModal2(order)} className="view-details-button">Track order</button>
         <OrderTrackingModal
                 isOpen={isModalOpen2}
                 onRequestClose={closeModal2}

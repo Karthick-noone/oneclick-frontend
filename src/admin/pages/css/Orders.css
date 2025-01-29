@@ -30,6 +30,11 @@
   color: #585858; /* Dark red text */
 }
 
+.row-delivered {
+  background-color: #e8ffe6; /* Light red background */
+  color: #585858; /* Dark red text */
+}
+
 
 .orders-page {
   margin-left: 250px; /* Adjust according to the width of the sidebar */
@@ -99,6 +104,11 @@
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
+.filter-select:hover {
+  border-color: #0056b3; 
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); 
+}
+
 .clear-button:hover {
   color: #333;
 }
@@ -136,6 +146,11 @@
 .search-box2:focus {
   border-color: #007bff;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Focus effect */
+}
+
+.search-box2:hover {
+  border-color: #0056b3; 
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); 
 }
 
 /* Responsive Styles - These styles will only apply for smaller screens */
