@@ -622,8 +622,8 @@ const Checkout = () => {
     const options = {
       key: "rzp_live_YExdymlgVGlrcC", // Replace with your Razorpay Test Key ID
       key_secret: "IUFWdAs57nzoQqnrPZM1pzzt", // Replace with your Razorpay Test Key ID
-      // key: "rzp_test_mtjdapiflomQkN", // Replace with your Razorpay Test Key ID karthick
-      // key_secret: "g13PipAk6MMAEj2Rr3lajUmJ", // Replace with your Razorpay Test Key ID
+      // key: "rzp_test_mtjdapiflomQkN", // Sample Razorpay Test Key ID (karthick)
+      // key_secret: "g13PipAk6MMAEj2Rr3lajUmJ", // Replace with your Razorpay Test Key ID(karthick)
       amount: finalAmountToSend * 100, // Amount in paise (Razorpay works in paise)
       currency: "INR",
       name: "One CLick",
