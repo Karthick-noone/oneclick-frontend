@@ -74,7 +74,7 @@
 .clear-button {
   position: absolute;
   right: 10px; /* Position the button on the right side */
-  top: 50%; /* Vertically center the button */
+  top: 35%; /* Vertically center the button */
   transform: translateY(-50%); /* Adjust vertical centering */
   background-color: transparent;
   border: none;
@@ -224,6 +224,8 @@
 
   .clear-button {
     font-size: 12px; /* Adjust clear button size for small screens */
+    margin-top: 93px;
+    margin-right: 10px;
   }
 } 
 
