@@ -127,9 +127,6 @@ const handleSubmit = async (e) => {
   setFormData({ staffname: "", username: "", password: "", status: "active" });
 };
 
-  
-  
-
   const handleDelete = (index) => {
     Swal.fire({
       title: "Are you sure?",

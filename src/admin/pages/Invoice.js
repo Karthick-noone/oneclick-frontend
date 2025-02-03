@@ -46,7 +46,7 @@ const Invoice = ({ order, productDetails }) => {
 
           {/* Center: Contact Info */}
           <div style={{ flex: "2", textAlign: "center" }}>
-            <p>Contact Us: 123849549</p>
+            <p>Contact Us: 9092206677</p>
             <p>Email: enquiryoneclick@gmail.com</p>
           </div>
 

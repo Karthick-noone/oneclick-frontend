@@ -401,6 +401,7 @@ const Orders = ({ year, setYear, month, setMonth }) => {
         confirmButtonText: "Yes, cancel it!",
       });
 
+      
       if (confirmation.isConfirmed) {
         const response = await fetch(`${ApiUrl}/cancelOrder`, {
           method: "POST",
