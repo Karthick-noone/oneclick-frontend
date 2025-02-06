@@ -445,6 +445,7 @@ const ProductList = () => {
                         src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
                         alt={product.prod_name}
                         className="custom-slider-image"
+                        loading="lazy"
                       />
                     ) : (
                       <div>No image available</div>
@@ -532,6 +533,7 @@ const ProductList = () => {
               Add to cart
             </button>
           )} */}
+          
                   </div>
 
                   {combinedProducts.length > 5 &&

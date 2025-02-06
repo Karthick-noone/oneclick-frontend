@@ -32,6 +32,7 @@ import Tracking from './pages/Tracking'; // Example page
 import CouponManager from './pages/CouponManager'; // Example page
 import StaffManagement from './pages/StaffManagement'; // Example page
 import Secondhandproducts from './pages/AddSecondhandproducts'; // Example page
+import NewProduct from './pages/NewProduct'; // Example page
 import { ThemeProvider } from './ThemeContext'; // Import ThemeProvider
 
 function App() {
@@ -80,6 +81,7 @@ function App() {
           <Route path="/CCTVAccessories" element={<CCTVAccessories />} />
           <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
+          <Route path="/NewProduct" element={<NewProduct />} />
 
           <Route path="/Orders" element={<ProtectedRoute element={<Orders />} restrictedRoles={['Staff']} />} />
           <Route path="/Customers" element={<ProtectedRoute element={<Customers />} restrictedRoles={['Staff']} />} />
