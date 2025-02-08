@@ -19,9 +19,13 @@
     width: 100%; /* Ensure full width of the swiper slide */
     padding: 10px;
     box-sizing: border-box;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 4px 6px  rgba(0, 0, 0, 0.1);
     border: 1px solid #ddd;
+     min-height: 400px; /* Ensure all cards have the same minimum height */
+    height: auto; /* Adjust height dynamically */
     cursor: pointer;
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 
 .custom-slider-product.blurred {

@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate at the top
 import Slider from "react-slick"; // Import the slider component
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { FaMemory, FaHdd, FaCamera, FaMicrochip, FaTv, FaBatteryFull, FaWifi, FaApple } from 'react-icons/fa';  // Import necessary icons
 
 import { useCart } from "../components/CartContext";
 import leftarrow from "./img/left.png";
@@ -562,6 +563,33 @@ const ProductDetail = ({ accessoryCategory }) => {
     }
   };
 
+  const handleBuyNow = (product, event) => {
+    event.stopPropagation(); // Prevent the event from bubbling up
+  
+    // Check if the user is logged in
+    const email = localStorage.getItem("email");
+    if (!email) {
+      toast.error("User is not logged in!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      window.location.href = "/login";
+      return;
+    }
+  
+    // Navigate to the purchase page with product details
+    navigate('/purchase', {
+      state: { product, email }, // Pass the product details and email (if needed)
+    });
+    console.log("product",product)
+
+  };
+
   // const toggleFavorite = async (product, event) => {
   //   console.log("product", product);
 
@@ -1041,7 +1069,7 @@ const ProductDetail = ({ accessoryCategory }) => {
 
   const couponCode = coupons[product?.prod_id]; // Use coupons object instead of product
 
-  console.log("couponCode", couponCode);
+  // console.log("couponCode", couponCode);
   // Ensure couponCode is a valid string and contains digits
   let couponNumber = null; // Default to null in case there's no number
 
@@ -1053,7 +1081,7 @@ const ProductDetail = ({ accessoryCategory }) => {
   }
 
   // Now you can safely use couponNumber
-  console.log("couponNumber", couponNumber); // Will log the coupon number or null if not found
+  // console.log("couponNumber", couponNumber); // Will log the coupon number or null if not found
   const gradientBackgrounds = [
     "linear-gradient(to bottom, #dcff8a, #f6f7d7)",
     "linear-gradient(to bottom, #dcff8a, #f6f7d7)",
@@ -1456,6 +1484,14 @@ const ProductDetail = ({ accessoryCategory }) => {
                           className="product-detail-add-to-cart"
                         >
                           ADD TO CART{" "}
+                          <span style={{ marginLeft: "10px" }}>+</span>
+                        </button>
+                        <button
+                          title="Buy Now"
+                          onClick={(event) => handleBuyNow(product, event)}
+                          className="product-detail-add-to-cart"
+                        >
+                          BUY NOW{" "}
                           <span style={{ marginLeft: "10px" }}>&gt;</span>
                         </button>
                         {/* <FaHeart
@@ -1483,7 +1519,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                             fontSize: "18px",
                           }}
                         >
-                          In Stock
+                          {/* In Stock */}
                         </span>
                       </div>
                     )}
@@ -1613,50 +1649,50 @@ const ProductDetail = ({ accessoryCategory }) => {
                     <ul style={{ listStyleType: "none", padding: 0 }}>
                       {product.memory && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}>RAM</span>
-                          <span style={valueStyle}>{product.memory}</span>
+                          <span style={labelStyle}><FaHdd style={iconStyle}/> RAM</span>
+                          <span style={valueStyle}>{product.memory} GB</span>
                         </li>
                       )}
                       {product.storage && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}>ROM</span>
-                          <span style={valueStyle}>{product.storage}</span>
+                          <span style={labelStyle}><FaMemory style={iconStyle} /> ROM</span>
+                          <span style={valueStyle}>{product.storage} GB</span>
                         </li>
                       )}
                       {product.camera && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}>Camera</span>
+                          <span style={labelStyle}><FaCamera  style={iconStyle}/> Camera</span>
                           <span style={valueStyle}>{product.camera}</span>
                         </li>
                       )}
 
                       {product.processor && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}>Processor</span>
+                          <span style={labelStyle}><FaMicrochip  style={iconStyle}/> Processor</span>
                           <span style={valueStyle}>{product.processor}</span>
                         </li>
                       )}
                       {product.display && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}>Display</span>
+                          <span style={labelStyle}><FaTv  style={iconStyle}/> Display</span>
                           <span style={valueStyle}>{product.display}</span>
                         </li>
                       )}
                       {product.os && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}>OS</span>
+                          <span style={labelStyle}><FaApple  style={iconStyle}/> OS</span>
                           <span style={valueStyle}>{product.os}</span>
                         </li>
                       )}
                       {product.network && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}>Network</span>
+                          <span style={labelStyle}><FaWifi  style={iconStyle}/> Network</span>
                           <span style={valueStyle}>{product.network}</span>
                         </li>
                       )}
                       {product.battery && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}>Battery</span>
+                          <span style={labelStyle}><FaBatteryFull  style={iconStyle}/> Battery</span>
                           <span style={valueStyle}>{product.battery}</span>
                         </li>
                       )}
@@ -1980,13 +2016,14 @@ const ProductDetail = ({ accessoryCategory }) => {
   /* Styling for the list items */
 }
 const listItemStyle = {
-  display: "flex",
-  flexDirection: "row", // Ensure the label and value are side by side
-  padding: "15px",
-  marginBottom: "15px", // Increased space between items
-  borderRadius: "8px", // Rounded corners
-  background: "linear-gradient(135deg, #f9f9f9, #f0f0f0)", // Light gradient for list items
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: '10px',
+  padding: '8px 12px',
+  borderRadius: '8px',
+  // backgroundColor: '#f9f9f9',
+  // border: '1px solid #ddd',
 };
 
 const labelStyle = {
@@ -1999,6 +2036,8 @@ const labelStyle = {
   width: "30%", // Increased width for label
   marginRight: "15px", // More space between label and value
   fontSize: "16px", // Slightly larger font for readability
+  display: 'flex',
+  alignItems: 'center',
 };
 
 const valueStyle = {
@@ -2009,6 +2048,12 @@ const valueStyle = {
   width: "70%", // Adjusted width for value
   fontSize: "16px", // Consistent font size
   fontWeight: "normal", // Regular weight for value
+};
+
+const iconStyle = {
+  marginRight: '8px',
+  fontSize: '18px',
+  color: '#007bff',
 };
 
 // Additional styles for description and text

@@ -86,6 +86,7 @@ const CareersForm = () => {
   //   return Object.keys(newErrors).length === 0;
   // };
 
+
   const validateForm = () => {
     const newErrors = {};
   
@@ -100,8 +101,8 @@ const CareersForm = () => {
       newErrors.email = 'Email is required.';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email address is invalid.';
-    } else if (!formData.email.endsWith('.com')) {
-      newErrors.email = 'Enter a valid email address.';
+    } else if (!/\.[a-z]{2,}$/.test(formData.email)) { // Relaxed check for email ending with any domain
+      newErrors.email = 'Enter a valid email address (e.g., .com, .org).';
     }
   
     // Phone number validation
@@ -120,10 +121,17 @@ const CareersForm = () => {
     // Resume file validation
     if (!resumeFile) newErrors.resumeFile = 'Resume file is required.';
   
-    // Set errors state and return boolean for form validity
+    // Set errors state
     setErrors(newErrors);
+  
+    // Clear errors after 5 seconds (timeout implementation)
+    setTimeout(() => {
+      setErrors({});
+    }, 5000);
+  
     return Object.keys(newErrors).length === 0;
   };
+  
   
 
   const handleChange = (e) => {
@@ -162,7 +170,7 @@ const CareersForm = () => {
 
     // Perform client-side validation
     if (!validateForm()) {
-        Swal.fire('Error!', 'Please fill in the required fields.', 'error');
+        // Swal.fire('Error!', 'Please fill in the required fields.', 'error');
         setIsSubmitting(false);
         return; // Prevent further execution if validation fails
     }

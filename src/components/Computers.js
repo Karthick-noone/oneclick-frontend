@@ -362,7 +362,7 @@ const filteredProducts = searchQuery
       {/* <Header1 /> */}
       <Header2 category={category} />
       {/* <Header3 /> */}
-      <span style={{ marginLeft: "20px", padding: "10px" }}>
+      <span style={{ marginLeft: "20px", padding: "10px", }}>
         <a style={{ textDecoration: "none", color: "black" }} href="/">
           Home{" "}
         </a>

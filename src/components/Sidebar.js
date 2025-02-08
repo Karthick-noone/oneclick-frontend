@@ -34,6 +34,7 @@ const Sidebar = () => {
                     <div style={{ display: isOpen ? 'block' : 'none' }} className="close-button" onClick={toggleSidebar}>
                         <FaTimes />
                     </div>
+                    
                     <h3>Browse by products</h3>
                     <ul>
                         <li>

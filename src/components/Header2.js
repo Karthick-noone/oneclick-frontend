@@ -701,7 +701,7 @@ const Header2 = () => {
   return (
     <>
       <header
-        style={{ position: "sticky", top: 0, zIndex: 1001 }}
+        // style={{ position: "sticky", top: 0, zIndex: 1001 }}
         className="header2"
       >
         <div className="company-name">

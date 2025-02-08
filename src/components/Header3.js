@@ -37,6 +37,32 @@ const Header3 = () => {
     setShowMore(false); // Close the "More" dropdown
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (showHeadphones) {
+        setShowHeadphones(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [showHeadphones]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (showMore) {
+        setShowMore(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [showMore]);
+
   const toggleMoreDropdown = () => {
     setShowMore(!showMore);
     setShowHeadphones(false); // Close the "Headphones" dropdown
@@ -79,7 +105,11 @@ const Header3 = () => {
   const isComputersActive = location.pathname.startsWith("/Computers"); // Match any path starting with "/Computers"
 
   return (
-    <header className="header3" ref={headerRef}>
+    <header
+      className="header3"
+      ref={headerRef}
+      style={{ position: "sticky", top: "84px", zIndex: 1001 }}
+    >
       <div
         style={{
           position: isOpen ? "fixed" : "",

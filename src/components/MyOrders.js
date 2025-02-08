@@ -21,6 +21,20 @@ const MyOrders = () => {
   const [currentOrderId, setCurrentOrderId] = useState(null); // State for the current order ID
  
 
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+
+    const handleBackButton = () => {
+      window.history.pushState(null, "", window.location.href);
+    };
+
+    window.addEventListener("popstate", handleBackButton);
+
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, []);
+
   const openModal2 = (order) => {
     console.log('Opening modal for order ID:', order.unique_id); // Log the order ID being opened
     setCurrentOrderId(order.unique_id); // Set the current order ID

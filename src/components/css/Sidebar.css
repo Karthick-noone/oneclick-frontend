@@ -13,20 +13,40 @@
 }
 
 
-
-/* Sidebar Styles */
 .sidebar {
-    position: fixed; /* Keeps the sidebar fixed in place */
-    top: 0;
+    position: sticky; /* Makes sidebar stick while scrolling */
+    top: 0; /* Stick to the top */
     left: 0;
     width: 250px;
-    height: 100%;
+    height: 100vh; /* Full height */
     background-color: #f8f8f8;
     border-right: 1px solid #ddd;
     padding: 20px;
-    transform: translateX(-100%); /* Initially hide the sidebar */
-    transition: transform 0.3s ease-in-out; /* Smooth transition */
-    z-index: 1000; /* Ensure it’s above other content */
+    overflow-y: auto; /* Enable scrolling if content is long */
+}
+
+/* Custom Scrollbar */
+.sidebar::-webkit-scrollbar {
+    width: 5px; /* Set the width of the scrollbar */
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Set the track color */
+    border-radius: 10px; /* Rounded corners for the track */
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #888; /* Set the color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners for the thumb */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker color on hover */
+}
+
+.sidebar::-webkit-scrollbar-button {
+    background: #ccc; /* Button color on the scrollbar */
 }
 
 .sidebar.open {
@@ -76,15 +96,20 @@
     }
 }
 
-@media (min-width: 769px) {
-    .toggle-button {
-        display: none; /* Hide the toggle button on larger screens */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed; /* Keep sidebar fixed for small screens */
+        transform: translateX(-100%); /* Initially hide sidebar */
+        transition: transform 0.3s ease-in-out;
+        width: 250px;
     }
 
-    .sidebar {
-        transform: translateX(0); /* Always show sidebar on larger screens */
-        position: static; /* Reset position */
-        width: 250px; /* Reset width */
+    .sidebar.open {
+        transform: translateX(0); /* Show sidebar when toggled */
+    }
+
+    .main-content {
+        margin-left: 0; /* No margin for smaller screens */
     }
 }
 

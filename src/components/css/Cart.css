@@ -30,10 +30,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
-  padding: 15px;
+  margin-bottom: 10px; /* Reduce the bottom margin */
+  padding: 10px; /* Reduce the padding */
   border-bottom: 1px solid #ddd;
 }
+
 
 .cart-product-image {
   width: 100px;
@@ -460,18 +461,34 @@
   font-size: 0.7em;
 }
 
-
 .cart-product-card {
   display: flex;
-  align-items: center;
+  flex-direction: column; /* Arrange the heading and products vertically */
+  align-items: flex-start; /* Align the content to the left */
   border: 1px solid #ddd;
   border-radius: 8px;
   margin-bottom: 15px;
   padding: 15px;
   background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.cart-product-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limits to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+
+.cart-product-card > div {
+  width: 100%; /* Ensure the divs inside take full width */
+}
+
+.cart-product-card strong {
+  font-size: 1.0rem;
+  margin-bottom: 10px; /* Space between the heading and the products */
+}
 /* Payment method container */
 .payment-methods {
   margin: 20px 0;

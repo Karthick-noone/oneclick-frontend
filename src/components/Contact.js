@@ -60,51 +60,68 @@ const Contact = () => {
   };
   
   
-  
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
-
+  
+    // First name validation
     if (!formData.firstName) {
       newErrors.firstName = "First Name is required";
       isValid = false;
     }
-
+  
+    // Last name validation
     if (!formData.lastName) {
       newErrors.lastName = "Last Name is required";
       isValid = false;
     }
-
+  
+    // Email validation
     if (!formData.email) {
       newErrors.email = "Email is required";
       isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email) || !formData.email.endsWith('.com')) {
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Enter a valid email address.";
       isValid = false;
+    } else if (!formData.email.endsWith('.com')) {
+      newErrors.email = "Enter a valid email address ending with .com.";
+      isValid = false;
     }
-
+  
+    // Subject validation
     if (!formData.subject) {
       newErrors.subject = "Subject is required";
       isValid = false;
     }
-
+  
+    // Message validation
     if (!formData.message) {
       newErrors.message = "Message is required";
       isValid = false;
     }
+  
+    // Contact number validation
     if (!formData.number) {
       newErrors.number = "Contact Number is required";
       isValid = false;
     }
-
+  
     if (formData.number && formData.number.length !== 10) {
       newErrors.number = "Number field must have exactly 10 digits.";
       isValid = false;
     }
-
+  
+    // Set errors and apply timeout to clear them
     setErrors(newErrors);
+    
+    // Timeout for error messages to clear after 3 seconds
+    setTimeout(() => {
+      setErrors({});
+    }, 3000); // Clear errors after 3 seconds
+  
     return isValid;
   };
+  
   const handleSubmit = (e) => {
     e.preventDefault();
   

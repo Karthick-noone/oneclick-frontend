@@ -14,10 +14,10 @@ const CouponManager = () => {
     try {
       const response = await axios.get(`${ApiUrl}/api/fetchcoupons`);
       setCoupons(response.data);
-      console.log("Fetched coupons successfully:", response.data);
+      // console.log("Fetched coupons successfully:", response.data);
     } catch (error) {
       console.error("Error fetching coupons:", error);
-      Swal.fire("Error", "Failed to fetch coupons. Please try again.", "error");
+      // Swal.fire("Error", "Failed to fetch coupons. Please try again.", "error");
     }
   };
 
@@ -77,8 +77,12 @@ const CouponManager = () => {
       if (result.isConfirmed) {
         await axios.delete(`${ApiUrl}/api/deletecoupons/${id}`);
         console.log(`Deleted coupon with ID: ${id}`);
-        Swal.fire("Deleted!", "Coupon has been deleted.", "success");
-        fetchCoupons();
+        Swal.fire("Deleted!", "Coupon has been deleted.", "success").then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500); // Delay of 1.5 seconds before reloading
+        });
+                fetchCoupons();
       }
     } catch (error) {
       console.error("Error deleting coupon:", error);
@@ -94,7 +98,6 @@ const CouponManager = () => {
     setEditingId(coupon.id);
     
   };
-
   const handleValueChange = (e) => {
     const value = e.target.value;
     

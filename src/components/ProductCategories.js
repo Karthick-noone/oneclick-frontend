@@ -466,7 +466,7 @@ const ProductList = () => {
                       )}
                     </span>
                     <h3 className="custom-slider-name">{product.prod_name}</h3>
-                    <span className="product-subtitle">{product.subtitle}</span>
+                    {product.subtitle && <span className="product-subtitle">{product.subtitle}</span>}
                     <p className="product-actual-price">
                       <span
                         className="product-price"

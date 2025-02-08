@@ -45,10 +45,10 @@ const WishlistSidebar = ({
         }
       } catch (error) {
         console.error("Error fetching wishlist:", error);
-        toast.error("Failed to load wishlist.", {
-          position: "top-right",
-          autoClose: 2000,
-        });
+        // toast.error("Failed to load wishlist.", {
+        //   position: "top-right",
+        //   autoClose: 2000,
+        // });
       }
     };
 
