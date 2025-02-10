@@ -563,11 +563,13 @@ const ComputersAd = () => {
           );
 
           if (response.ok) {
-            Swal.fire(
-              "Deleted!",
-              "Your product has been deleted.",
-              "success"
-            ).then(() => {
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your product has been deleted.",
+              icon: "success",
+              timer: 3000, // Set timeout for 3 seconds (3000 ms)
+              timerProgressBar: true, // Optional: show progress bar during the countdown
+            }).then(() => {
               // Optionally close the modal
               setModalIsOpen(false); // Close modal
 
