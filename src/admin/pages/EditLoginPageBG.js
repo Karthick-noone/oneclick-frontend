@@ -203,52 +203,34 @@ const EditSingleImageAd = () => {
   return (
     <div className="laptops-page">
       <div className="laptops-content">
-        <h2 className="laptops-page-title">Edit Login Page Background Image</h2>
+        <h2 className="laptops-page-title">Edit User Login Page Background Image</h2>
         <div className="laptops-card">
           <div className="laptops-card-header">
             <div className="laptops-card-item">Image(1920 X 1080)</div>
             {/* <div className="laptops-card-item">Category</div> */}
-            <div className="laptops-card-item">Action</div>
+            {/* <div className="laptops-card-item">Action</div> */}
           </div>
-          <div className="laptops-card-row">
-         
-            <input
-              type="file"
-              multiple
-              name='images'
-              onChange={handleImageChange}
-              className="laptops-card-input"
-              accept="image/*"  // This allows all image types
 
-            />
-         
-         {/* <select
-      name="category"
-      // value={editingProduct.category}
-      value={category}  // Bind the state to the select value
-      onChange={handleCategoryChange}  // Update category on change
-      // onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
-      className="laptops-card-input"
-    >
-      <option value="">Select Category</option>
-      <option value="Computers">Computer</option>
-      <option value="Mobiles">Mobile</option>
-      <option value="Printers">Printers</option>
-      <option value="Headphones">Headphone</option>
-      <option value="Speaker">Speaker</option>
-      <option value="CCTV">CCTV</option>
-      <option value="TV">TV</option>
-      <option value="Watch">Watch</option>
-      <option value="ComputerAccessories">Computer Accessories</option>
-      <option value="MobileAccessories">Mobile Accessories</option>
-      <option value="PrinterAccessories">Printer Accessories</option>
-              <option value="CCTVAccessories">CCTV Accessories</option>
-    </select> */}
-         
-            <button onClick={handleAddProduct} className="laptops-add-btn">Add</button>
-            <FaInfoCircle  style={{cursor:'pointer',fontSize:'18px'}} title="Add banner size image for better view (1920 X 1080)" />
+          <div className="ad-product-form">
+  <input
+    type="file"
+    multiple
+    name="images"
+    onChange={handleImageChange}
+    className="ad-form-input"
+    accept="image/*" // This allows all image types
+  />
 
-          </div>
+  <button onClick={handleAddProduct} className="ad-form-btn">
+    Add
+  </button>
+
+  <FaInfoCircle
+    className="ad-form-info"
+    title="Add banner size image for better view (1920 X 1080)"
+  />
+</div>
+
         </div>
       
         <div className="ad-cards-container">

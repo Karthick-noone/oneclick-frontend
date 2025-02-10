@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
-import { ApiUrl } from "../../components/ApiUrl";
+import { ApiUrl } from "./../../components/ApiUrl";
 import { FaEdit, FaTrash, FaEye, FaTimes } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick"; // Import Slider from react-slick
-import { FaInfoCircle, FaClone } from "react-icons/fa"; // Ensure to import any icons you need
+import { FaInfoCircle,FaClone } from "react-icons/fa"; // Ensure to import any icons you need
 import CouponEditPopup from "./CouponEditPopup";
 import EditCouponModal from "./EditCouponModal"; // Import the modal component
 
+
 import leftarrow from './img/left.png';
 import rightarrow from './img/right.png';
-
 // Set up the modal root element
 Modal.setAppElement("#root");
 
@@ -28,9 +28,11 @@ const Secondhandproducts = () => {
     subtitle: "",
     deliverycharge: "",
     category: "",
-    // coupon: "",
-    // coupon_expiry_date: "",
+    coupon: "",
+    coupon_expiry_date: "",
     actual_price: "", // Add actual price field
+    effectiveprice: "", // Add actual price field
+    
   });
   const [editingProduct, setEditingProduct] = useState(null); // To handle the product being edited
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal open/close state
@@ -55,6 +57,34 @@ const Secondhandproducts = () => {
   const [offerEndTime, setOfferEndTime] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
+
+
+  
+    const [isModalOpen2, setIsModalOpen2] = useState(false);
+      const [modalProductId, setModalProductId] = useState(null);
+      
+       useEffect(() => {
+          setTimeout(() => {
+            const section = document.querySelector(".laptops-products-list");
+            if (section) {
+              const offset = section.offsetTop - 70; // Adjust the margin (50px in this case)
+              window.scrollTo({ top: offset, behavior: "smooth" });
+            }
+          }, 100);
+        }, []);
+        // Handle opening modal and passing productId
+      
+        const openProductModal = (productId) => {
+          setModalProductId(productId);
+          setIsModalOpen2(true);
+        };
+      
+        const closeProductModal = () => {
+          setIsModalOpen2(false);
+          setModalProductId(null);
+        };
+  
+
 
   // Handle opening modal and passing productId
   const handleOpenOfferModal = (id) => { // Renamed function
@@ -116,7 +146,6 @@ const Secondhandproducts = () => {
       return;
     } 
   
-    
     const offerData = {
       offer_start_time: offerStartTime,
       offer_end_time: offerEndTime,
@@ -160,18 +189,20 @@ const Secondhandproducts = () => {
       }
     });
   };
+
+  
   const openPopup = (id, productName, prodPrice) => {
     // Set states
     setSelectedProductId(id);
     setSelectedProductPrice(prodPrice);
     setproductName(productName);
     setIsPopupOpen(true);
-
+  
     // Log the parameters passed
     console.log("Product ID passed:", id);
     console.log("Product Name passed:", productName);
     console.log("Product Price passed:", prodPrice);
-
+  
     // Use a timeout to log updated state after React processes the setState
     setTimeout(() => {
       console.log("Selected Product ID (state):", selectedProductId);
@@ -180,6 +211,7 @@ const Secondhandproducts = () => {
       console.log("Popup open status (state):", isPopupOpen);
     }, 100);
   };
+  
 
   const closePopup = () => {
     setIsPopupOpen(false);
@@ -213,85 +245,78 @@ const Secondhandproducts = () => {
   const handleCouponUpdated = () => {
     console.log("Coupon updated successfully!");
   };
-  const handleFileChange = (productId, event) => {
-    const files = Array.from(event.target.files); // Convert FileList to array
-    const resizedFiles = [];
+ const handleFileChange = (productId, event) => {
+  const files = Array.from(event.target.files); // Convert FileList to array
+  const resizedFiles = [];
 
-    files.forEach((file) => {
-      console.log(`Selected file for product ID ${productId}:`, file);
+  files.forEach((file) => {
+    console.log(`Selected file for product ID ${productId}:`, file);
 
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        const img = new Image();
-        img.src = e.target.result;
-        img.onload = () => {
-          console.log("Original image dimensions:", img.width, img.height);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      const img = new Image();
+      img.src = e.target.result;
+      img.onload = () => {
+        console.log("Original image dimensions:", img.width, img.height);
 
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Define max width
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 500; // Define max width
+        const scaleSize = MAX_WIDTH / img.width;
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleSize;
 
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          console.log("Resizing image to:", canvas.width, canvas.height);
+        console.log("Resizing image to:", canvas.width, canvas.height);
 
-          // Compress and convert to blob
-          canvas.toBlob(
-            (blob) => {
-              console.log(
-                "Resized image size (in KB):",
-                (blob.size / 1024).toFixed(2)
+        // Compress and convert to blob
+        canvas.toBlob(
+          (blob) => {
+            console.log("Resized image size (in KB):", (blob.size / 1024).toFixed(2));
+
+            if (blob.size / 1024 < 50) {
+              console.log("Image is under 50 KB, ready for upload.");
+              resizedFiles.push(blob); // Add resized image to array
+            } else {
+              console.log("Image still above 50 KB, applying further compression.");
+              canvas.toBlob(
+                (compressedBlob) => {
+                  console.log("Compressed image size (in KB):", (compressedBlob.size / 1024).toFixed(2));
+                  resizedFiles.push(compressedBlob);
+
+                  // Update state after all files processed
+                  if (resizedFiles.length === files.length) {
+                    setNewImages((prev) => ({
+                      ...prev,
+                      [productId]: resizedFiles,
+                    }));
+                  }
+                },
+                'image/jpeg',
+                0.7
               );
+            }
 
-              if (blob.size / 1024 < 50) {
-                console.log("Image is under 50 KB, ready for upload.");
-                resizedFiles.push(blob); // Add resized image to array
-              } else {
-                console.log(
-                  "Image still above 50 KB, applying further compression."
-                );
-                canvas.toBlob(
-                  (compressedBlob) => {
-                    console.log(
-                      "Compressed image size (in KB):",
-                      (compressedBlob.size / 1024).toFixed(2)
-                    );
-                    resizedFiles.push(compressedBlob);
-
-                    // Update state after all files processed
-                    if (resizedFiles.length === files.length) {
-                      setNewImages((prev) => ({
-                        ...prev,
-                        [productId]: resizedFiles,
-                      }));
-                    }
-                  },
-                  "image/jpeg",
-                  0.7
-                );
-              }
-
-              // Update state after all files processed
-              if (resizedFiles.length === files.length) {
-                setNewImages((prev) => ({
-                  ...prev,
-                  [productId]: resizedFiles,
-                }));
-              }
-            },
-            "image/jpeg",
-            0.8
-          );
-        };
+            // Update state after all files processed
+            if (resizedFiles.length === files.length) {
+              setNewImages((prev) => ({
+                ...prev,
+                [productId]: resizedFiles,
+              }));
+            }
+          },
+          'image/jpeg',
+          0.8
+        );
       };
-    });
-  };
+    };
+  });
+};
+
 
   const handleUploadImages = async (productId) => {
     if (!newImages[productId] || newImages[productId].length === 0) {
@@ -368,7 +393,6 @@ const Secondhandproducts = () => {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    // draggable: images.length > 1,
     arrows: false, // Show arrows
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
@@ -412,11 +436,7 @@ const Secondhandproducts = () => {
     //   }
     // }
 
-    if (
-      name === "price" ||
-      name === "actual_price" ||
-      name === "deliverycharge"
-    ) {
+    if (name === "price" || name === "actual_price" || name === "deliverycharge" || name === "effectiveprice") {
       // Allow only numeric characters for price and actual_price
       const isNumeric = value === "" || /^[0-9]*\.?[0-9]*$/.test(value);
       if (!isNumeric) {
@@ -441,7 +461,7 @@ const Secondhandproducts = () => {
     const file = event.target.files[0];
     if (file) {
       console.log("Selected image for upload:", file);
-
+  
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (e) => {
@@ -449,55 +469,48 @@ const Secondhandproducts = () => {
         img.src = e.target.result;
         img.onload = () => {
           console.log("Original image dimensions:", img.width, img.height);
-
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Define max width
+  
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 500;  // Define max width
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
-
-          const ctx = canvas.getContext("2d");
+  
+          const ctx = canvas.getContext('2d');
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
+  
           console.log("Resizing image to:", canvas.width, canvas.height);
-
+  
           // Compress image
           canvas.toBlob(
             (blob) => {
-              console.log(
-                "Resized image size (in KB):",
-                (blob.size / 1024).toFixed(2)
-              );
+              console.log("Resized image size (in KB):", (blob.size / 1024).toFixed(2));
               if (blob.size / 1024 < 50) {
                 console.log("Image is under 50 KB, ready for upload.");
                 setSelectedFile(blob); // Update state with resized image
               } else {
-                console.log(
-                  "Image still above 50 KB, applying further compression."
-                );
+                console.log("Image still above 50 KB, applying further compression.");
                 // Further compress if above 50 KB
                 canvas.toBlob(
                   (compressedBlob) => {
-                    console.log(
-                      "Compressed image size (in KB):",
-                      (compressedBlob.size / 1024).toFixed(2)
-                    );
+                    console.log("Compressed image size (in KB):", (compressedBlob.size / 1024).toFixed(2));
                     setSelectedFile(compressedBlob);
                   },
-                  "image/jpeg",
+                  'image/jpeg',
                   0.7
                 );
               }
             },
-            "image/jpeg",
+            'image/jpeg',
             0.8
           );
         };
       };
     }
   };
+  
 
   // Your existing handleImageUpdate function
   const handleImageUpdate = () => {
@@ -592,10 +605,10 @@ const Secondhandproducts = () => {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files); // Convert FileList to an array
     const resizedFiles = [];
-
+  
     files.forEach((file) => {
       console.log("Selected image for upload:", file);
-
+  
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (event) => {
@@ -603,40 +616,32 @@ const Secondhandproducts = () => {
         img.src = event.target.result;
         img.onload = () => {
           console.log("Original image dimensions:", img.width, img.height);
-
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Define max width
+  
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 500;  // Define max width
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
-
-          const ctx = canvas.getContext("2d");
+  
+          const ctx = canvas.getContext('2d');
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
+  
           console.log("Resizing image to:", canvas.width, canvas.height);
-
+  
           canvas.toBlob(
             (blob) => {
-              console.log(
-                "Resized image size (in KB):",
-                (blob.size / 1024).toFixed(2)
-              );
+              console.log("Resized image size (in KB):", (blob.size / 1024).toFixed(2));
               if (blob.size / 1024 < 50) {
                 console.log("Image is under 50 KB, ready for upload.");
                 resizedFiles.push(blob); // Add resized image to the array
               } else {
-                console.log(
-                  "Image still above 50 KB, applying further compression."
-                );
+                console.log("Image still above 50 KB, applying further compression.");
                 // Further compress if above 50 KB
                 canvas.toBlob(
                   (compressedBlob) => {
-                    console.log(
-                      "Compressed image size (in KB):",
-                      (compressedBlob.size / 1024).toFixed(2)
-                    );
+                    console.log("Compressed image size (in KB):", (compressedBlob.size / 1024).toFixed(2));
                     resizedFiles.push(compressedBlob);
                     // Update state after processing all files
                     if (resizedFiles.length === files.length) {
@@ -646,11 +651,11 @@ const Secondhandproducts = () => {
                       }));
                     }
                   },
-                  "image/jpeg",
+                  'image/jpeg',
                   0.7
                 );
               }
-
+  
               // Update state after processing all files
               if (resizedFiles.length === files.length) {
                 setNewProduct((prevProduct) => ({
@@ -659,14 +664,14 @@ const Secondhandproducts = () => {
                 }));
               }
             },
-            "image/jpeg",
+            'image/jpeg',
             0.8
           );
         };
       };
     });
   };
-
+  
   const handleAddProduct = async () => {
     if (newProduct.label && newProduct.label.length > 15) {
       Swal.fire({
@@ -756,7 +761,61 @@ const Secondhandproducts = () => {
       return;
     }
 
-    
+    // Validate coupon code and extract numeric part
+    const couponCode = newProduct.coupon; // Fetching the coupon code
+    const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
+
+    // Check if either coupon code or coupon expiry date is provided
+    // if (
+    //   (couponCode && !couponExpiryDate) ||
+    //   (!couponCode && couponExpiryDate)
+    // ) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
+    //   });
+    //   return;
+    // }
+
+    // Check if coupon code is provided and not just spaces
+    // if (couponCode && !couponCode.trim()) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Coupon code cannot be just spaces.",
+    //   });
+    //   return;
+    // }
+
+    // // Extract numeric part from coupon code
+    // const couponValueMatch = couponCode.match(/\d+/); // Regex to find the first numeric part in the coupon code
+    // const couponValue = couponValueMatch ? Number(couponValueMatch[0]) : 0; // Get the number or default to 0 if not found
+
+    // // Ensure the extracted coupon value is less than the product price
+    // if (couponValue >= Number(newProduct.price)) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Coupon discount must be less than the product price.",
+    //   });
+    //   return;
+    // }
+
+    // // Check if the coupon code contains at least one letter and one digit
+    // // const hasLetter = /[a-zA-Z]/.test(couponCode);
+    // if (couponCode && couponExpiryDate) {
+    //   const hasDigit = /\d/.test(couponCode);
+
+    //   if (!hasDigit) {
+    //     Swal.fire({
+    //       icon: "warning",
+    //       title: "Validation Error",
+    //       text: "Coupon code must contain price value like OFFER599.",
+    //     });
+    //     return;
+    //   }
+    // }
 // Fetch user role from localStorage
 const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
@@ -768,15 +827,15 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     formData.append("features", newProduct.features);
     formData.append("price", newProduct.price);
     formData.append("actual_price", newProduct.actual_price);
+    formData.append("effectiveprice", newProduct.effectiveprice);
     formData.append("label", newProduct.label);
+    formData.append("productStatus", productStatus);
     formData.append("subtitle", newProduct.subtitle);
     formData.append("deliverycharge", newProduct.deliverycharge);
-    formData.append("coupon_expiry_date", newProduct.coupon_expiry_date);
-    formData.append("coupon", newProduct.coupon);
+    // formData.append("coupon_expiry_date", newProduct.coupon_expiry_date);
+    // formData.append("coupon", newProduct.coupon);
     formData.append("category", newProduct.category); // Add category here
-    formData.append("productStatus", productStatus); // Add product status to the formData
-
-
+    
     // Append each image file to the FormData
     newProduct.images.forEach((image) => {
       formData.append("images", image); // Use 'images' for multiple file upload
@@ -807,8 +866,9 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
         label: "",
         subtitle: "",
         deliverycharge: "",
-        coupon_expiry_date: "",
-        coupon: "",
+        // coupon_expiry_date: "",
+        // coupon: "",
+        effectiveprice: "",
         category: "", // Clear the category here
       });
 
@@ -827,45 +887,47 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     let formattedDate = "";
     if (product.coupon_expiry_date) {
       const expiryDate = new Date(product.coupon_expiry_date);
+
       if (!isNaN(expiryDate)) {
+        // Format the date manually to YYYY-MM-DD without timezone conversion
         const year = expiryDate.getFullYear();
-        const month = String(expiryDate.getMonth() + 1).padStart(2, "0");
+        const month = String(expiryDate.getMonth() + 1).padStart(2, "0"); // Add 1 because months are 0-indexed
         const day = String(expiryDate.getDate()).padStart(2, "0");
         formattedDate = `${year}-${month}-${day}`;
       }
     }
-  
+
     setEditingProduct({
       id: product.id,
       name: product.prod_name,
-      image: null,
+      image: null, // reset image so the user has to select a new one if desired
       features: product.prod_features,
       price: product.prod_price,
       actual_price: product.actual_price,
+      effectiveprice: product.effectiveprice,
       label: product.offer_label,
       subtitle: product.subtitle,
       deliverycharge: product.deliverycharge,
       status: product.status,
       productStatus: product.productStatus,
-      coupon_expiry_date: formattedDate,
-      coupon: product.coupon,
+      // coupon_expiry_date: formattedDate,
+      // coupon: product.coupon,
       category: product.category,
     });
     setModalIsOpen(true);
+    openProductModal(false);
   };
-  
-  const handleUpdateProduct = async () => {
-    console.log("Editing Product State:", editingProduct);
 
+  const handleUpdateProduct = async () => {
     if (editingProduct.label && !editingProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
         title: "Validation Error",
-        text: "Label cannot be just spaces.",
+        text: "Label cannot be just spaces.Remove space",
       });
       return;
     }
-  
+
     // if (editingProduct.label && /\d/.test(editingProduct.label)) {
     //   Swal.fire({
     //     icon: "warning",
@@ -874,16 +936,26 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     //   });
     //   return;
     // }
-  
+
     if (editingProduct.label && editingProduct.label.length > 15) {
       Swal.fire({
         icon: "warning",
         title: "Validation Error",
-        text: "Label cannot exceed 15 characters.",
+        text: "Label cannot exceed 30 characters.",
       });
       return;
     }
-  
+
+    // Ensure label is not just spaces if provided
+    if (editingProduct.label && !editingProduct.label.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Validation Error",
+        text: "Label cannot be just spaces.",
+      });
+      return;
+    }
+
     if (Number(editingProduct.actual_price) <= Number(editingProduct.price)) {
       Swal.fire({
         icon: "warning",
@@ -892,7 +964,8 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
       });
       return;
     }
-  
+
+    // Validation checks
     if (!editingProduct.name.trim()) {
       Swal.fire({
         icon: "warning",
@@ -901,7 +974,6 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
       });
       return;
     }
-  
     if (!editingProduct.features.trim()) {
       Swal.fire({
         icon: "warning",
@@ -910,7 +982,14 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
       });
       return;
     }
-  
+    // if (!editingProduct.category.trim()) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Product category is required.",
+    //   });
+    //   return;
+    // }
     if (
       !editingProduct.price ||
       isNaN(editingProduct.price) ||
@@ -923,7 +1002,6 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
       });
       return;
     }
-  
     if (
       !editingProduct.actual_price ||
       isNaN(editingProduct.actual_price) ||
@@ -932,38 +1010,118 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
       Swal.fire({
         icon: "warning",
         title: "Validation Error",
-        text: "A valid actual product price is required.",
+        text: "A valid product price is required.",
       });
       return;
     }
-  
+
+    console.log("Editing Product State:", editingProduct);
+
+    // Check if id is set correctly
+    if (!editingProduct.id) {
+      console.error("Error: Product ID is missing.");
+      return;
+    }
+
+    // // Validate coupon code and extract numeric part
+    // const couponCode = editingProduct.coupon
+    //   ? editingProduct.coupon.trim()
+    //   : ""; // Trim coupon code to avoid spaces
+    // const couponExpiryDate =
+    //   editingProduct.coupon_expiry_date &&
+    //   editingProduct.coupon_expiry_date !== "0000-00-00"
+    //     ? editingProduct.coupon_expiry_date.trim()
+    //     : ""; // Treat "0000-00-00" as empty
+
+    // // Check if either coupon code or coupon expiry date is provided
+    // if (
+    //   (couponCode && !couponExpiryDate) ||
+    //   (!couponCode && couponExpiryDate)
+    // ) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
+    //   });
+    //   return;
+    // }
+
+    // // Check if coupon code is provided and not just spaces
+    // if (couponCode && !couponCode.trim()) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Coupon code cannot be just spaces.",
+    //   });
+    //   return;
+    // }
+
+    // if (couponCode && couponExpiryDate) {
+    //   const hasDigit = /\d/.test(couponCode);
+
+    //   if (!hasDigit) {
+    //     Swal.fire({
+    //       icon: "warning",
+    //       title: "Validation Error",
+    //       text: "Coupon code must contain price value like OFFER599.",
+    //     });
+    //     return;
+    //   }
+    // }
+
+    // // Extract numeric part from coupon code
+    // const couponValueMatch = couponCode.match(/\d+/); // Regex to find the first numeric part in the coupon code
+    // const couponValue = couponValueMatch ? Number(couponValueMatch[0]) : 0; // Get the number or default to 0 if not found
+
+    // // Ensure the extracted coupon value is less than the product price
+    // if (couponValue >= Number(editingProduct.price)) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Validation Error",
+    //     text: "Coupon discount must be less than the product price.",
+    //   });
+    //   return;
+    // }
+
+    // Log the product details that will be sent to the backend
+    console.log("Updating product with details:", {
+      name: editingProduct.name,
+      features: editingProduct.features,
+      price: editingProduct.price,
+      actual_price: editingProduct.actual_price,
+      label: editingProduct.label,
+      status: editingProduct.status,
+      coupon_expiry_date: editingProduct.coupon_expiry_date,
+      coupon: editingProduct.coupon,
+      image: editingProduct.image ? editingProduct.image.name : "No new image",
+    });
+
     const formData = new FormData();
     formData.append("name", editingProduct.name);
     formData.append("features", editingProduct.features);
-    formData.append("price", Number(editingProduct.price));
-    formData.append("actual_price", Number(editingProduct.actual_price));
+    formData.append("price", editingProduct.price);
+    formData.append("actual_price", editingProduct.actual_price);
+    formData.append("effectiveprice", editingProduct.effectiveprice);
     formData.append("status", editingProduct.status);
     formData.append("productStatus", editingProduct.productStatus);
     formData.append("label", editingProduct.label);
     formData.append("subtitle", editingProduct.subtitle);
-    formData.append("deliverycharge", Number(editingProduct.deliverycharge));
+    formData.append("deliverycharge", editingProduct.deliverycharge);
     // formData.append("coupon_expiry_date", editingProduct.coupon_expiry_date);
     // formData.append("coupon", editingProduct.coupon);
     formData.append("category", editingProduct.category);
-  
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
-
     if (editingProduct.image) {
       formData.append("image", editingProduct.image);
-      console.log("Image file attached:", editingProduct.image);
-
     }
-    console.log("Sending update request to:", `${ApiUrl}/updatesecondhandproducts/${editingProduct.id}`);
 
-  
     try {
+      // Log the request URL
+      console.log(
+        "Sending update request to:",
+        `${ApiUrl}/updatesecondhandproducts/${editingProduct.id}`
+      );
+
+      // Send the update request
       const response = await axios.put(
         `${ApiUrl}/updatesecondhandproducts/${editingProduct.id}`,
         formData,
@@ -973,20 +1131,32 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
           },
         }
       );
-  
+
+      // Log the response from the server
+      console.log("Update response:", response.data);
+
+      // Show success alert
       Swal.fire({
         icon: "success",
         title: "Product Updated",
         text: "The product has been updated successfully!",
       });
-  
+
+      // Fetch updated list of products
       const fetchResponse = await axios.get(`${ApiUrl}/adminfetchsecondhandproducts`);
       setProducts(fetchResponse.data);
-  
+
+      // Log successful fetch
+      console.log("Updated products list:", fetchResponse.data);
+
+      // Close the modal and reset the state
       setEditingProduct(null);
       setModalIsOpen(false);
     } catch (error) {
+      // Log any errors that occur
       console.error("Error updating product:", error);
+
+      // Show error alert
       Swal.fire({
         icon: "error",
         title: "Update Failed",
@@ -994,7 +1164,6 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
       });
     }
   };
-  
 
   const handleDeleteProduct = async (id) => {
     console.log("Attempting to delete product with ID:", id);
@@ -1057,6 +1226,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     setSelectedCoupon(couponToEdit);
     setIsEditingCoupon(true);
     setSelectedProductPrice(selectedProductPrice); // Pass the price from state
+
   };
 
   const overlayStyle = {
@@ -1162,7 +1332,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
   const today = new Date();
   const minDate = today.toISOString().split("T")[0]; // Format to YYYY-MM-DD
 
-  // Calculate max date (30 days from today)
+   // Calculate max date (30 days from today)
   const maxDate = new Date(today);
   maxDate.setDate(today.getDate() + 30);
   const maxDateStr = maxDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
@@ -1187,242 +1357,152 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     }
   };
 
-const role = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+  const role = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
 
-const handleCopyProduct = async (productId) => {
-  try {
-    const response = await fetch(`${ApiUrl}/api/copy-product/${productId}`, {
-      method: 'POST',
-    });
-
-    const data = await response.json();
-    if (response.ok) {
-      // Success alert using SweetAlert
-      Swal.fire({
-        title: 'Success!',
-        text: `Product copied successfully! New product ID: ${data.newProductId}`,
-        icon: 'success',
-        confirmButtonText: 'OK',
-      }).then(() => {
-        // After the alert closes, call the fetchProducts function
-       window.location.reload();
-      });
-    } else {
-      // Error alert using SweetAlert
-      Swal.fire({
-        title: 'Error!',
-        text: data.message,
-        icon: 'error',
-        confirmButtonText: 'OK',
-      });
-    }
-  } catch (error) {
-    console.error('Error copying product:', error);
-    // Generic error alert using SweetAlert
-    Swal.fire({
-      title: 'Oops!',
-      text: 'Something went wrong. Please try again.',
-      icon: 'error',
-      confirmButtonText: 'OK',
-    });
-  }
-};
-
+   const handleCopyProduct = async (productId) => {
+      try {
+        const response = await fetch(`${ApiUrl}/api/copy-product/${productId}`, {
+          method: 'POST',
+        });
+    
+        const data = await response.json();
+        if (response.ok) {
+          // Success alert using SweetAlert
+          Swal.fire({
+            title: 'Success!',
+            text: `Product copied successfully! New product ID: ${data.newProductId}`,
+            icon: 'success',
+            confirmButtonText: 'OK',
+          }).then(() => {
+            // After the alert closes, call the fetchProducts function
+           window.location.reload();
+          });
+        } else {
+          // Error alert using SweetAlert
+          Swal.fire({
+            title: 'Error!',
+            text: data.message,
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+        }
+      } catch (error) {
+        console.error('Error copying product:', error);
+        // Generic error alert using SweetAlert
+        Swal.fire({
+          title: 'Oops!',
+          text: 'Something went wrong. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+      }
+    };
 
   return (
     <div className="laptops-page">
       <div className="laptops-content">
-        <h2 className="laptops-page-title">Add Refurbished Products (Second hand products)</h2>
-        <div className="laptops-card">
-          <div className="laptops-card-header">
-            <div className="laptops-card-item">Product Name</div>
-            <div className="laptops-card-item">Product Image</div>
-            <div className="laptops-card-item">M.R.P Price</div>
-            <div className="laptops-card-item">Selling Price</div>
-            <div className="laptops-card-item">Label</div>
-            <div className="laptops-card-item">Subtitle</div>
-            <div className="laptops-card-item">Delivery charge</div>
-            {/* <div className="laptops-card-item">Category</div> */}
-          </div>
-
-          <div className="laptops-card-row">
+        <h2 className="laptops-page-title">Add Refubished Product (Second hand products)</h2>
+        <div className="laptops-form-container">
+          {/* Left Section */}
+          <div className="laptops-left-section">
+            <label className="laptops-label">Product Name</label>
             <input
               type="text"
               name="name"
               value={newProduct.name}
               onChange={handleChange}
-              placeholder="Enter name"
-              className="laptops-card-input"
-            />
-            <input
-              type="file"
-              multiple
-              onChange={handleImageChange}
-              className="laptops-card-inputt"
-              accept="image/*" // This allows all image types
+              className="laptops-input"
             />
 
+            <label className="laptops-label">M.R.P Price</label>
             <input
               type="text"
               name="actual_price"
               value={newProduct.actual_price}
               onChange={handleChange}
-              placeholder="Enter M.R.P price"
-              className="laptops-card-input"
+              className="laptops-input"
             />
+
+            <label className="laptops-label">Selling Price</label>
             <input
               type="text"
               name="price"
               value={newProduct.price}
               onChange={handleChange}
-              placeholder="Enter selling price"
-              className="laptops-card-input"
+              className="laptops-input"
             />
 
+            <label className="laptops-label">Label</label>
             <input
               type="text"
-              name="label" // New input for product label
-              value={newProduct.label} // Ensure to add label to the newProduct state
+              name="label"
+              value={newProduct.label}
               onChange={handleChange}
-              placeholder="(e.g., Best Price)"
-              className="laptops-card-input" // Use the same style class
+              className="laptops-input"
             />
-
-            <input
-              type="text"
-              name="subtitle" // New input for product subtitle
-              value={newProduct.subtitle} // Ensure to add subtitle to the newProduct state
-              onChange={handleChange}
-              placeholder="Enter subtitle"
-              className="laptops-card-input" // Use the same style class
-            />
-
-            <input
-              type="text"
-              name="deliverycharge" // New input for product deliverycharge
-              value={newProduct.deliverycharge} // Ensure to add deliverycharge to the newProduct state
-              onChange={handleChange}
-              placeholder="Enter Deliverycharge "
-              className="laptops-card-input" // Use the same style class
-            />
-
-            {/* {isPopupVisible && (
-              <div className="info-popup">
-                <div className="popup-content">
-                  <button className="close-button" onClick={handlePopupToggle}>
-                    X
-                  </button>
-                  <p>
-                    Enter features in the label field using '|' to separate
-                    them. Example:
-                    <br />
-                    <strong>
-                      Processor 13th Generation | Operating System Windows 11 |
-                      Graphic Card Xe Graphics | Memory 16 GB (SODIMM) | Storage
-                      512 GB
-                    </strong>
-                    <br />
-                    Click the `|` icon to quickly add the '|' character to your
-                    features.
-                  </p>
-                </div>
-              </div>
-            )} */}
-
-            {/* <select
-              name="category"
-              value={newProduct.category}
-              onChange={handleChange}
-              className="laptops-card-input"
-            >
-              <option value="">Select Category</option>
-              <option value="Computers">Computer</option>
-              <option value="Mobiles">Mobile</option>
-              <option value="Printers">Printers</option>
-              <option value="Headphones">Headphone</option>
-              <option value="Speakers">Speaker</option>
-              <option value="CCTV">CCTV</option>
-              <option value="TV">TV</option>
-              <option value="Watch">Watch</option>
-              <option value="ComputerAccessories">Computer Accessories</option>
-              <option value="MobileAccessories">Mobile Accessories</option>
-              <option value="PrinterAccessories">Printer Accessories</option>
-              <option value="CCTVAccessories">CCTV Accessories</option>
-            </select> */}
           </div>
 
-          {/* Separate Features Field */}
-          <div className="laptops-card-header">
-            {/* <div className="feature-1 laptops-card-item ">Coupon Code</div>
-            <div className="feature-1 laptops-card-item ">
-              Coupon Expiry date
-            </div> */}
-            <div className="feature-1 laptops-card-item ">Product Features</div>
-          </div>
-
-          <div className="features-input-container">
-            {/* <input
-              type="text"
-              name="coupon"
-              value={newProduct.coupon}
-              onChange={handleChange}
-              placeholder="Enter coupon code"
-              className="laptops-card-input2"
-            />
+          {/* Right Section */}
+          <div className="laptops-right-section">
+            <label className="laptops-label">Subtitle</label>
             <input
-              type="date"
-              name="coupon_expiry_date"
-              value={newProduct.coupon_expiry_date}
+              type="text"
+              name="subtitle"
+              value={newProduct.subtitle}
               onChange={handleChange}
-              placeholder="Enter expiry date"
-              className="laptops-card-input2"
-              min={minDate} // Set min date to today
-              max={maxDateStr} // Set max date to 30 days from today
-            /> */}
+              className="laptops-input"
+            />
+
+            <label className="laptops-label">Delivery Charge</label>
+            <input
+              type="text"
+              name="deliverycharge"
+              value={newProduct.deliverycharge}
+              onChange={handleChange}
+              className="laptops-input"
+            />
+
+            <label className="laptops-label">Product Image</label>
+            <input
+              accept="image/jpeg, image/png"
+              multiple
+              onChange={handleImageChange}
+              type="file"
+              className="laptops-file-input"
+            />
+
+            <label className="laptops-label">Features</label>
             <textarea
               name="features"
               value={newProduct.features}
               onChange={handleChange}
-              placeholder="Features"
-              className="laptops-card-input1"
-              rows="1"
+              className="laptops-textarea"
             ></textarea>
-            {/* <div className="pipe-icon" onClick={handleAddPipe}>
-              <p
-                title="Click here for separate the key value pair(eg.RAM | 8gb)"
-                className="pipe-character"
-              >
-                |
-              </p>
-            </div>
-            <div className="info-icon" onClick={handlePopupToggle}>
-              <FaInfoCircle className="info-icon-text" />
-            </div> */}
+            <button
+              onClick={() => handleAddProduct(newProduct)}
+              className="laptops-add-btn"
+            >
+              Add
+            </button>
           </div>
-
-          {/* Add Button */}
-          <button onClick={handleAddProduct} className="laptops-add-btn">
-            Add
-          </button>
         </div>
 
         <div className="laptops-products-list">
           {products.length > 0 &&
             products.map((product, index) => (
-              <div className="laptops-product-card">
+              <div className="laptops-product-card" key={product.id}>
                 {product.offer_label && (
                   <div className="product-label">{product.offer_label}</div>
                 )}
 
+                {/* Display product image */}
                 <div className="laptops-product-image">
                   <div className="slider-container">
-                    {" "}
-                    {/* Wrap the slider in a container for relative positioning */}
                     <Slider
                       {...{
                         ...settings,
-                        arrows: product.prod_img.length > 1, // Display arrows only if more than one image
+                        arrows: product.prod_img.length > 1,
                       }}
                     >
                       {product.prod_img.map((img, imgIndex) => (
@@ -1432,6 +1512,7 @@ const handleCopyProduct = async (productId) => {
                             alt={product.prod_name}
                             className="laptops-product-image"
                           />
+
                           <div className="image-actions">
                             <FaEdit
                               onClick={() => openModal(product.id, imgIndex)} // Pass product ID and image index
@@ -1451,254 +1532,31 @@ const handleCopyProduct = async (productId) => {
                     </Slider>
                   </div>
                 </div>
+
+                {/* Display product name */}
                 <div className="laptops-product-details">
-                  <h3 className="laptops-product-name">{product.prod_name} {product.productStatus === 'unapproved' ? <span style={{color:'red'}}>({product.productStatus})</span> : null}</h3>                  <h3 className="laptops-product-subtitle">
-                    {product.subtitle}
+                  <h3 className="laptops-product-name">
+                    {product.prod_name}
+                    {product.productStatus === "unapproved" && (
+                      <span style={{ color: "red" }}>
+                        ({product.productStatus})
+                      </span>
+                    )}
                   </h3>
-                  <p className="laptops-product-features">
-                    <span>{product.prod_features}</span>
-                    {/* <ul className="product-feature-list">
-                      {product.prod_features
-                        .split("|")
-                        .reduce((acc, feature, index, array) => {
-                          if (index % 2 === 0) {
-                            acc.push([
-                              feature.trim(),
-                              array[index + 1]?.trim() || "",
-                            ]);
-                          }
-                          return acc;
-                        }, [])
-                        .map((pair, index) => (
-                          <li key={index}>
-                            <span className="feature-key">{pair[0]}</span>
-                            <span className="feature-value">{pair[1]}</span>
-                          </li>
-                        ))}
-                    </ul> */}
-                  </p>
-                  
-                  <p className="laptops-product-actual-price">
-                    M.R.P Price:{" "}
-                    <span className="actual-price">
-                      ₹{product.actual_price}
-                    </span>
-                  </p>
-                  <p className="laptops-product-pricee">
-                    Selling Price: ₹{product.prod_price}
-                  </p>
-                  <p className="laptops-product-deliverycharge">
-                    Delivery charge: ₹{product.deliverycharge}
-                  </p>
 
-                  <p className="laptops-product-coupon">
-                    Coupon Code:
-                    <span
-                      onClick={() =>
-                        openPopup(
-                          product.prod_id,
-                          product.prod_name,
-                          product.prod_price
-                        )
-                      }
-                      style={{ cursor: "pointer" }}
-                    >
-                      <FaEdit className="faedit" title="Edit Coupon" />
-                    </span>
-                    <span
-                      onClick={() =>
-                        fetchCoupons(
-                          product.prod_id,
-                          product.prod_name,
-                          product.prod_price
-                        )
-                      }
-                      style={{ cursor: "pointer" }}
-                    >
-                      <FaEye className="faedit" title="View Coupon" />
-                    </span>
-                  </p>
-
-                  <CouponEditPopup
-                    isOpen={isPopupOpen}
-                    onClose={closePopup}
-                    productId={selectedProductId} // Correctly passed from state
-                    prodPrice={selectedProductPrice} // Correctly passed from state
-                    onCouponUpdated={handleCouponUpdated}
-                  />
-
-                  {isViewingCoupons && (
-                    <div className="pop-overlay">
-                      <div className="pop-content">
-                        <button
-                          onClick={() => setIsViewingCoupons(false)}
-                          className="fatimes"
-                        >
-                          <FaTimes color="black" size={20} />
-                        </button>
-                        <h4 className="coupon-title">
-                          Coupons forbvnmbvm {productName}
-                        </h4>
-                        {coupons.length > 0 ? (
-                          <ul className="coupons-list">
-                            {coupons.map((coupon, index) => (
-                              <li
-                                key={coupon.coupon_id}
-                                className="coupon-item"
-                              >
-                                <span className="serial-number">
-                                  {index + 1}.{" "}
-                                </span>{" "}
-                                {/* Serial number */}
-                               <span className="coupon-code">
-                                  {coupon.coupon_code}
-                                </span>{" "}
-                                - 
-
-                                <span className="coupon-code">
-                                  {coupon.discount_value}
-                                </span>{" "}
-
-                                -
-                                <span className="expiry-date">
-                                  Expires on:{" "}
-                                  {new Date(
-                                    coupon.expiry_date
-                                  ).toLocaleDateString("en-GB", {
-                                    day: "2-digit",
-                                    month: "short",
-                                    year: "numeric",
-                                  })}
-                                  <FaEdit
-                                    className="edit-icon"
-                                    title="Edit Expiry Date"
-                                    onClick={() =>
-                                      handleEditExpiry(coupon.coupon_id)
-                                    }
-                                  />
-                                  <FaTrash
-                                    className="delete-icon"
-                                    title="Delete Coupon"
-                                    onClick={() =>
-                                      handleDeleteCoupon(coupon.coupon_id)
-                                    }
-                                    style={{
-                                      marginLeft: "10px",
-                                      cursor: "pointer",
-                                    }}
-                                  />
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p>No coupons available for this product.</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-
-<div className="frequently-buy" style={{marginBottom:'10px'}}>
-                  <span className="frequently-buy-label">
-                   Make a copy of this product
-                  </span>
-                  <FaClone  
-                 onClick={() => handleCopyProduct(product.id)}
-                className="frequently-buy-icon"
-                /> 
+                  {/* "View" button to trigger modal */}
+                 
                 </div>
-                  <EditCouponModal
-                    isOpen={isEditingCoupon}
-                    onClose={() => setIsEditingCoupon(false)}
-                    coupon={selectedCoupon}
-                    productId={selectedProductId}
-                    productPrice={selectedProductPrice} // Selected product price
-                    onCouponUpdated={() => {
-                      // Refresh coupon list or update state as necessary
-                      // e.g., fetchCoupons();
-                    }}
-                  />
+
+                <div>
+                  <span style={{textDecoration:"line-through", color:'red', fontSize:'14px'}}>₹{product.actual_price}</span>  <span style={{color:'green',marginLeft:'5px'}}>₹{product.prod_price}</span>
                 </div>
-                {/* <div>
-                Label: {product.label}
-                </div> */}
-                
-<div
-  onClick={() => handleOpenOfferModal(product.id)} // Pass the productId as needed
-  className="offer-edit-btn"
->
-  <span className="offer-edit-text">Edit Price Offer</span>
-  <FaEdit className="offer-edit-icon" />
-
-</div>
-
-{/* Modal rendering */}
-{isOfferModalOpen && (
-  <div className="offer-modal-overlay">
-    <div className="offer-modal-content">
-      <button onClick={handleCloseOfferModal} className="offer-close-btn">
-        &times; {/* Use the "×" symbol for close */}
-      </button>
-      <h3 className="offer-modal-title">{isEditMode ? "Edit Price Offer" : "Add Price Offer"}</h3>
-      <form onSubmit={handleSubmit} className="offer-form">
-        <label className="offer-label">Offer Start Time</label>
-        <input
-          type="datetime-local"
-          value={offerStartTime}
-          onChange={(e) => setOfferStartTime(e.target.value)}
-          required
-          min={minDate}
-          className="offer-input"
-        />
-        <label className="offer-label">Offer End Time</label>
-        <input
-          type="datetime-local"
-          value={offerEndTime}
-          onChange={(e) => setOfferEndTime(e.target.value)}
-          required
-          min={minDate}
-          className="offer-input"
-        />
-        <label className="offer-label">Offer Price</label>
-        <input
-          type="number"
-          value={offerPrice}
-          onChange={handleChangePrice} // Custom handler for price
-          required
-          className="offer-input"
-        />
-        <button type="submit" className="offer-submit-btn">
-          {isEditMode ? "Update Offer" : "Add Offer"}
-        </button>
-      </form>
-
-      {isEditMode && (
-        <button onClick={handleDelete} className="offer-delete-btn">
-          Delete Offer
-        </button>
-      )}
-    </div>
-  </div>
-)}
-
-
-                <div className="upload-container">
-                  Upload more images
-                  <input
-                    style={{ marginTop: "10px" }}
-                    className="file-input"
-                    multiple
-                    type="file"
-                    onChange={(e) => handleFileChange(product.id, e)}
-                  />
-                  <button
-                    className="upload-button"
-                    onClick={() => handleUploadImages(product.id)}
+                <button
+                    className="view-details-btn"
+                    onClick={() => openProductModal(product.id)} // Pass product ID to open modal
                   >
-                    Upload Images
+                    <FaEye /> View Details
                   </button>
-                </div>
                 <div className="laptops-product-actions">
                   <button
                     onClick={() => handleEditProduct(product)}
@@ -1713,6 +1571,323 @@ const handleCopyProduct = async (productId) => {
                     <FaTrash /> Delete
                   </button>
                 </div>
+
+                {/* Modal for displaying product details */}
+                {isModalOpen2 && modalProductId === product.id && (
+                  <div className="product-details-modal">
+                    <div className="modal-overlay">
+                      <div className="modal-content3">
+                        <button
+                          onClick={closeProductModal}
+                          className="modal-close-btn"
+                        >
+                          &times; {/* Close button */}
+                        </button>
+                        <div className="laptops-modal-form-container">
+                          {/* <h3 className="modal-title">{product.prod_name}</h3> */}
+
+                          <div className="laptops-modal-content">
+                            <div className="laptops-modal-left-section">
+                              <p>
+                                <strong>Product Name</strong>
+                                <span>{product.prod_name}</span>
+                              </p>
+                              <p>
+                                <strong>Subtitle</strong>
+                                <span>{product.subtitle}</span>
+                              </p>
+                              <p>
+                                <strong>M.R.P Price</strong>
+                                <span>₹{product.actual_price}</span>
+                              </p>
+
+                              <p>
+                                <strong>Selling Price</strong>
+                                <span>₹{product.prod_price}</span>
+                              </p>
+                              <p>
+                                <strong>Delivery charge</strong>
+                                <span>₹{product.deliverycharge}</span>
+                              </p>
+                              <p>
+                         
+                                <strong>Features</strong>
+                                <span>{product.prod_features}</span>
+                              </p>
+                              <div className="laptops-product-actions">
+                                <button
+                                  onClick={() => handleEditProduct(product)}
+                                  className="laptops-action-btn"
+                                >
+                                  <FaEdit /> Edit
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleDeleteProduct(product.id)
+                                  }
+                                  className="laptops-action-btn"
+                                >
+                                  <FaTrash /> Delete
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="laptops-modal-right-section">
+                              <div
+                                onClick={() => handleOpenOfferModal(product.id)}
+                                className="offer-edit-btn"
+                              >
+                                <span className="offer-edit-text">
+                                  Edit Limited Time Offer
+                                </span>
+                                <FaEdit className="offer-edit-icon" />
+                              </div>
+
+                              {/* Modal Rendering */}
+                              {isOfferModalOpen && (
+                                <div className="offer-modal-overlay">
+                                  <div className="offer-modal-content">
+                                    <button
+                                      onClick={handleCloseOfferModal}
+                                      className="offer-close-btn"
+                                    >
+                                      &times;
+                                    </button>
+                                    <h3 className="offer-modal-title">
+                                      {isEditMode
+                                        ? "Edit Limited Time Price Offer"
+                                        : "Add Limited Time Price Offer"}
+                                    </h3>
+                                    <form
+                                      onSubmit={handleSubmit}
+                                      className="offer-form"
+                                    >
+                                      <label className="offer-label">
+                                        Offer Start Time
+                                      </label>
+                                      <input
+                                        type="datetime-local"
+                                        value={offerStartTime}
+                                        onChange={(e) =>
+                                          setOfferStartTime(e.target.value)
+                                        }
+                                        required
+                                        min={minDate}
+                                        className="offer-input"
+                                      />
+                                      <label className="offer-label">
+                                        Offer End Time
+                                      </label>
+                                      <input
+                                        type="datetime-local"
+                                        value={offerEndTime}
+                                        onChange={(e) =>
+                                          setOfferEndTime(e.target.value)
+                                        }
+                                        required
+                                        min={minDate}
+                                        className="offer-input"
+                                      />
+                                      <label className="offer-label">
+                                        Offer Price
+                                      </label>
+                                      <input
+                                        type="number"
+                                        value={offerPrice}
+                                        onChange={handleChangePrice}
+                                        required
+                                        className="offer-input"
+                                      />
+                                      <button
+                                        type="submit"
+                                        className="offer-submit-btn"
+                                      >
+                                        {isEditMode
+                                          ? "Update Offer"
+                                          : "Add Offer"}
+                                      </button>
+                                    </form>
+
+                                    {isEditMode && (
+                                      <button
+                                        onClick={handleDelete}
+                                        className="offer-delete-btn"
+                                      >
+                                        Delete Offer
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Upload Section */}
+                              <div className="upload-container">
+                                Upload more images
+                                <input
+                                  style={{ marginTop: "10px" }}
+                                  className="file-input"
+                                  multiple
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleFileChange(product.id, e)
+                                  }
+                                />
+                                <button
+                                  className="upload-button"
+                                  onClick={() => handleUploadImages(product.id)}
+                                >
+                                  Upload Images
+                                </button>
+                              </div>
+
+                              {/* Coupon Section */}
+                              <p className="laptops-product-coupon">
+                                Coupon Code:
+                                <span
+                                  onClick={() =>
+                                    openPopup(
+                                      product.prod_id,
+                                      product.prod_name,
+                                      product.prod_price
+                                    )
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <FaEdit
+                                    className="faedit"
+                                    title="Edit Coupon"
+                                  />
+                                </span>
+                                <span
+                                  onClick={() =>
+                                    fetchCoupons(
+                                      product.prod_id,
+                                      product.prod_name,
+                                      product.prod_price
+                                    )
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <FaEye
+                                    className="faedit"
+                                    title="View Coupon"
+                                  />
+                                </span>
+                              </p>
+
+                              <CouponEditPopup
+                                isOpen={isPopupOpen}
+                                onClose={closePopup}
+                                productId={selectedProductId}
+                                prodPrice={selectedProductPrice}
+                                onCouponUpdated={handleCouponUpdated}
+                              />
+
+                              {isViewingCoupons && (
+                                <div className="pop-overlay">
+                                  <div className="pop-content">
+                                    <button
+                                      onClick={() => setIsViewingCoupons(false)}
+                                      className="fatimes"
+                                    >
+                                      <FaTimes color="black" size={20} />
+                                    </button>
+                                    <h4 className="coupon-title">
+                                      Coupons for {productName}
+                                    </h4>
+                                    {coupons.length > 0 ? (
+                                      <ul className="coupons-list">
+                                        {coupons.map((coupon, index) => (
+                                          <li
+                                            key={coupon.coupon_id}
+                                            className="coupon-item"
+                                          >
+                                            <span className="serial-number">
+                                              {index + 1}.{" "}
+                                            </span>
+                                            <span className="coupon-code">
+                                              {coupon.coupon_code}
+                                            </span>{" "}
+                                            -
+                                            <span className="coupon-code">
+                                              {coupon.discount_value}
+                                            </span>{" "}
+                                            -
+                                            <span className="expiry-date">
+                                              Expires on:{" "}
+                                              {new Date(
+                                                coupon.expiry_date
+                                              ).toLocaleDateString("en-GB", {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric",
+                                              })}
+                                            </span>
+                                            <FaEdit
+                                              className="edit-icon"
+                                              title="Edit Expiry Date"
+                                              onClick={() =>
+                                                handleEditExpiry(
+                                                  coupon.coupon_id
+                                                )
+                                              }
+                                            />
+                                            <FaTrash
+                                              className="delete-icon"
+                                              title="Delete Coupon"
+                                              onClick={() =>
+                                                handleDeleteCoupon(
+                                                  coupon.coupon_id
+                                                )
+                                              }
+                                              style={{
+                                                marginLeft: "10px",
+                                                cursor: "pointer",
+                                              }}
+                                            />
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    ) : (
+                                      <p>
+                                        No coupons available for this product.
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              <EditCouponModal
+                                isOpen={isEditingCoupon}
+                                onClose={() => setIsEditingCoupon(false)}
+                                coupon={selectedCoupon}
+                                productId={selectedProductId}
+                                productPrice={selectedProductPrice}
+                                onCouponUpdated={() => {}}
+                              />
+
+                                <div
+                                                              className="frequently-buy"
+                                                              style={{ marginBottom: "10px" }}
+                                                            >
+                                                              <span className="frequently-buy-label">
+                                                                Make a copy of this product
+                                                              </span>
+                                                              <FaClone
+                                                                onClick={() => handleCopyProduct(product.id)}
+                                                                className="copy-icon"
+                                                              />
+                                                            </div>
+
+                              {/* Frequently Buy Section */}
+                            
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
         </div>
@@ -1774,229 +1949,215 @@ const handleCopyProduct = async (productId) => {
       {/* Modal for editing a product */}
       {/* Modal for editing a product */}
       {editingProduct && (
-        <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={() => setModalIsOpen(false)}
-          contentLabel="Edit Product"
-          className="adminmodal"
-          overlayClassName="adminmodal-overlay"
-        >
-          <div className="adminmodal-header">
-            <h2>Edit Product</h2>
-            <button
-              onClick={() => setModalIsOpen(false)}
-              className="adminmodal-close-btn"
-            >
-              &times; {/* or use a close icon */}
-            </button>
+                   <Modal
+                     isOpen={modalIsOpen}
+                     onRequestClose={() => setModalIsOpen(false)}
+                     contentLabel="Edit Product"
+                     className="editmodal"
+                     overlayClassName="adminmodal-overlay"
+                   >
+                     <div className="adminmodal-header">
+                       <h2>Edit Product</h2>
+                       <button
+                         onClick={() => setModalIsOpen(false)}
+                         className="adminmodal-close-btn"
+                       >
+                         &times;
+                       </button>
+                     </div>
+           
+                     <div className="adminmodal-body">
+                 <div className="part1">
+                         <div className="feature-item">
+                           <label className="feature-label">Name</label>
+                           <input
+                             type="text"
+                             name="name"
+                             value={editingProduct.name}
+                             onChange={(e) =>
+                               setEditingProduct({
+                                 ...editingProduct,
+                                 name: e.target.value,
+                               })
+                             }
+                             placeholder="Enter product name"
+                             className="adminmodal-input"
+                           />
+                         </div>
+                         <div className="feature-item">
+                           <label className="feature-label">Subtitle</label>
+           
+                           <input
+                             type="text"
+                             name="subtitle"
+                             value={editingProduct.subtitle}
+                             onChange={(e) =>
+                               setEditingProduct({
+                                 ...editingProduct,
+                                 subtitle: e.target.value,
+                               })
+                             }
+                             placeholder="Enter subtitle"
+                             className="adminmodal-input"
+                           />
+                         </div>
+           
+                         <div className="feature-item">
+                           <label className="feature-label">M.R.P Price</label>
+           
+                           <input
+                             type="text"
+                             name="actual_price"
+                             value={editingProduct.actual_price}
+                             onChange={(e) =>
+                               setEditingProduct({
+                                 ...editingProduct,
+                                 actual_price: e.target.value,
+                               })
+                             }
+                             placeholder="Enter actual price"
+                             className="adminmodal-input"
+                           />
+                         </div>
+           
+                         <div className="feature-item">
+                           <label className="feature-label">Price</label>
+           
+                           <input
+                             type="text"
+                             name="price"
+                             value={editingProduct.price}
+                             onChange={(e) =>
+                               setEditingProduct({
+                                 ...editingProduct,
+                                 price: e.target.value,
+                               })
+                             }
+                             placeholder="Enter product price"
+                             className="adminmodal-input"
+                           />
+                         </div>
+           
+                         <div className="feature-item">
+                           <label className="feature-label">Offer label</label>
+           
+                           <input
+                             type="text"
+                             name="label"
+                             value={editingProduct.label}
+                             onChange={(e) =>
+                               setEditingProduct({
+                                 ...editingProduct,
+                                 label: e.target.value,
+                               })
+                             }
+                             placeholder="Enter label"
+                             className="adminmodal-input"
+                           />
+                         </div>
+           
+                         <div className="feature-item">
+                           <label className="feature-label">Delivery charge</label>
+                           <input
+                             type="text"
+                             name="deliverycharge"
+                             value={editingProduct.deliverycharge}
+                             onChange={(e) =>
+                               setEditingProduct({
+                                 ...editingProduct,
+                                 deliverycharge: e.target.value,
+                               })
+                             }
+                             placeholder="Enter deliverycharge"
+                             className="adminmodal-input"
+                           />
+                         </div>
+      
+                       </div>
+           
+                       {/* Features Section */}
+                       <div className="part2">
+                         <div className="product-features-container">
+      
+                           {/* Others (Textarea) */}
+                           <div className="feature-item">
+                             <label className="feature-label">Features</label>
+                             <textarea
+                               name="others"
+                               value={editingProduct.features}
+                               onChange={(e) =>
+                                 setEditingProduct({
+                                   ...editingProduct,
+                                   features: e.target.value,
+                                 })
+                               }
+                               placeholder="Enter other features"
+                               className="feature-textarea"
+                               rows="4"
+                             />
+                           </div>
+           
+                           <div className="feature-item">
+                           <label className="feature-label">
+                             In Stock or Out Of Stock
+                           </label>
+           
+                           <select
+                             name="status"
+                             value={editingProduct.status}
+                             onChange={(e) =>
+                               setEditingProduct({
+                                 ...editingProduct,
+                                 status: e.target.value,
+                               })
+                             }
+                             className="adminmodal-input5"
+                           >
+                       <option value="available">In Stock</option>
+                       <option value="unavailable">Out Of Stock</option>
+                           </select>
+                           </div>
+           
+                           <div className="feature-item">
+           
+                   <label className="feature-label">Approve or Unapprove</label>
+           
+                   <select
+                              disabled={role === 'Staff'}
+           
+                       name="productStatus"
+                       value={editingProduct.productStatus}
+                       onChange={(e) =>
+                         setEditingProduct({ ...editingProduct, productStatus: e.target.value })
+                       }
+                       className="adminmodal-input5"
+                     >
+                       <option value="approved">Approve</option>
+                       <option value="unapproved">UnApprove</option>
+                     </select>
+                 
+                 </div>
+           
+                         <button
+                           onClick={handleUpdateProduct}
+                           className="adminmodal-update-btn"
+                         >
+                           Update
+                         </button>
+                         <button
+                           onClick={() => setModalIsOpen(false)}
+                           className="adminmodal-cancel-btn"
+                         >
+                           Cancel
+                         </button>
+                         </div>
+                       </div>
+                     </div>
+                   </Modal>
+                 )}
           </div>
-          <div className="feature-item">
-
-<label className="feature-label">Product Name</label>
-          <input
-            type="text"
-            name="name"
-            value={editingProduct.name}
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, name: e.target.value })
-            }
-            placeholder="Enter product name"
-            className="adminmodal-input"
-          />
-</div>
-          <div className="feature-item">
-          {/* Features Textarea with Icons */}
-          <div className="features-input-container">
-
-<label className="feature-label">Description</label>
-            <textarea
-              name="features"
-              value={editingProduct.features}
-              onChange={(e) =>
-                setEditingProduct({
-                  ...editingProduct,
-                  features: e.target.value,
-                })
-              }
-              placeholder="Enter product features"
-              className="adminmodal-input1"
-              rows="4" // Adjust as needed
-            ></textarea>
-            
-            {/* <div className="icons-container">
-              <div className="pipe-icon" onClick={handleUpdatePipe}>
-                <p className="pipe-character">|</p>
-              </div>
-              <div className="info-icon" onClick={handlePopupToggle}>
-                <FaInfoCircle className="info-icon-text" />
-              </div>
-            </div> */}
-          </div>
-          </div>
-          <div className="feature-item">
-
-<label className="feature-label">M.R.P Price</label>
-          <input
-            type="text"
-            name="actual_price"
-            value={editingProduct.actual_price}
-            onChange={(e) =>
-              setEditingProduct({
-                ...editingProduct,
-                actual_price: e.target.value,
-              })
-            }
-            placeholder="Enter actual price"
-            className="adminmodal-input"
-          />
-          </div>
-<div className="feature-item">
-
-<label className="feature-label">Selling Price</label>
-          <input
-            type="text"
-            name="price"
-            value={editingProduct.price}
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, price: e.target.value })
-            }
-            placeholder="Enter product price"
-            className="adminmodal-input"
-          />
-          </div>
-<div className="feature-item">
-
-<label className="feature-label">Offer Label</label>
-          <input
-            type="text"
-            name="label"
-            value={editingProduct.label}
-            onChange={(e) =>
-              setEditingProduct({
-                ...editingProduct,
-                label: e.target.value,
-              })
-            }
-            placeholder="Enter label"
-            className="adminmodal-input"
-          />
-          </div>
-<div className="feature-item">
-
-<label className="feature-label">Subtitle</label>
-          <input
-            type="text"
-            name="subtitle"
-            value={editingProduct.subtitle}
-            onChange={(e) =>
-              setEditingProduct({
-                ...editingProduct,
-                subtitle: e.target.value,
-              })
-            }
-            placeholder="Enter subtitle"
-            className="adminmodal-input"
-          />
-          </div>
-<div className="feature-item">
-
-<label className="feature-label">Delivery Charge</label>
-          <input
-            type="text"
-            name="deliverycharge"
-            value={editingProduct.deliverycharge}
-            onChange={(e) =>
-              setEditingProduct({
-                ...editingProduct,
-                deliverycharge: e.target.value,
-              })
-            }
-            placeholder="Enter deliverycharge"
-            className="adminmodal-input"
-          />
-          </div>
-          {/* <input
-            type="text"
-            name="coupon"
-            value={editingProduct.coupon}
-            onChange={(e) =>
-              setEditingProduct({
-                ...editingProduct,
-                coupon: e.target.value,
-              })
-            }
-            placeholder="Enter coupon code"
-            className="adminmodal-input"
-          />
-          <input
-            type="date"
-            name="coupon_expiry_date"
-            value={editingProduct.coupon_expiry_date}
-            onChange={(e) =>
-              setEditingProduct({
-                ...editingProduct,
-                coupon_expiry_date: e.target.value,
-              })
-            }
-            placeholder="Enter expiry date"
-            className="adminmodal-input"
-            min={minDate} 
-        max={maxDateStr}
-          /> */}
-<div className="feature-item">
-
-<label className="feature-label">In Stock or Out Of Stock</label>
-          <select
-            name="status"
-            value={editingProduct.status}
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, status: e.target.value })
-            }
-            className="adminmodal-input"
-          >
-            <option value="available">In Stock</option>
-            <option value="unavailable">Out Of Stock</option>
-          </select>
-</div>
-          <div className="feature-item">
-
-<label className="feature-label">Approve or Unapprove</label>
-
-
-<select
-           disabled={role === 'Staff'}
-
-    name="productStatus"
-    value={editingProduct.productStatus}
-    onChange={(e) =>
-      setEditingProduct({ ...editingProduct, productStatus: e.target.value })
-    }
-    className="adminmodal-input"
-  >
-    <option value="approved">Approve</option>
-    <option value="unapproved">UnApprove</option>
-  </select>
-
-</div>
-
-          <button
-            onClick={handleUpdateProduct}
-            className="adminmodal-update-btn"
-          >
-            Update
-          </button>
-          <button
-            onClick={() => setModalIsOpen(false)}
-            className="adminmodal-cancel-btn"
-          >
-            Cancel
-          </button>
-        </Modal>
-      )}
-    </div>
-  );
-};
-
+        );
+      };
 // Custom next arrow component
 const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;

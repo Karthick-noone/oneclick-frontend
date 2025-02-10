@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useref } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import { ApiUrl } from "./../../components/ApiUrl";
@@ -60,6 +60,34 @@ const CCTV = ({ isOpen, onClose }) => {
   const [offerEndTime, setOfferEndTime] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      const section = document.querySelector(".laptops-products-list");
+      if (section) {
+        const offset = section.offsetTop - 70; // Adjust the margin (50px in this case)
+        window.scrollTo({ top: offset, behavior: "smooth" });
+      }
+    }, 100);
+  }, []);
+  
+
+
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+    const [modalProductId, setModalProductId] = useState(null);
+    
+      // Handle opening modal and passing productId
+    
+      const openProductModal = (productId) => {
+        setModalProductId(productId);
+        setIsModalOpen2(true);
+      };
+    
+      const closeProductModal = () => {
+        setIsModalOpen2(false);
+        setModalProductId(null);
+      };
+
 
   // Handle opening modal and passing productId
   const handleOpenOfferModal = (id) => {
@@ -182,153 +210,158 @@ const CCTV = ({ isOpen, onClose }) => {
   };
 
   const handleOpenFrequentlyBuyModal = async (productId, category) => {
-      console.log("[INFO] Opening Frequently Buy Modal");
-      console.log(`[INFO] Product ID: ${productId}, Category: ${category}`);
-    
-      setCurrentProductId(productId);
-      setIsFrequentlyBuyModalOpen(true);
-    
-      try {
-        console.log("[INFO] Fetching accessories from API");
-        const response = await fetch(
-          `${ApiUrl}/getcctvaccessories?&productId=${productId}`
-        );
-    
-        if (!response.ok) {
-          const errorData = await response.text();
-          console.error("[ERROR] Failed to fetch accessories:", errorData);
-          return;
-        }
-    
-        const data = await response.json();
-        console.log("[INFO] Accessories fetched successfully:", data);
-    
-        // Check if the response contains the categoryAccessories array
-        if (Array.isArray(data.categoryAccessories)) {
-          setComputerAccessories(data.categoryAccessories);
-        } else {
-          console.error("[ERROR] categoryAccessories is not an array:", data.categoryAccessories);
-          setComputerAccessories([]); // Set to an empty array if there's an error
-        }
-    
-        // Parse the selected accessories if they exist
-        const selectedAccessories = data.additionalAccessories
-          ? data.additionalAccessories.split(",")
-          : [];
-        console.log("[INFO] Pre-selected accessories:", selectedAccessories);
-    
-        setSelectedAccessories(selectedAccessories);
-      } catch (error) {
-        console.error("[ERROR] Error while fetching accessories:", error);
+    console.log("[INFO] Opening Frequently Buy Modal");
+    console.log(`[INFO] Product ID: ${productId}, Category: ${category}`);
+
+    setCurrentProductId(productId);
+    setIsFrequentlyBuyModalOpen(true);
+
+    try {
+      console.log("[INFO] Fetching accessories from API");
+      const response = await fetch(
+        `${ApiUrl}/getcctvaccessories?&productId=${productId}`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error("[ERROR] Failed to fetch accessories:", errorData);
+        return;
       }
-    };
-    
-    const handleCloseFrequentlyBuyModal = () => {
-      console.log("[INFO] Closing Frequently Buy Modal");
-      setIsFrequentlyBuyModalOpen(false);
-      setSelectedAccessories([]);
-    };
-    
-    const handleAccessorySelection = async (e) => {
-      const accessoryId = e.target.value;
-      console.log(`[INFO] Accessory ID: ${accessoryId}, Checked: ${e.target.checked}`);
-    
-      if (e.target.checked) {
-        console.log("[INFO] Adding accessory to the selected list");
-        setSelectedAccessories((prev) => [...prev, accessoryId]);
+
+      const data = await response.json();
+      console.log("[INFO] Accessories fetched successfully:", data);
+
+      // Check if the response contains the categoryAccessories array
+      if (Array.isArray(data.categoryAccessories)) {
+        setComputerAccessories(data.categoryAccessories);
       } else {
-        console.log("[INFO] Removing accessory from the selected list");
-        setSelectedAccessories((prev) => prev.filter((id) => id !== accessoryId));
-    
-        try {
-          console.log("[INFO] Removing accessory from the backend");
-          const response = await fetch(`${ApiUrl}/removefrequentlybuy`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              productId: currentProductId,
-              accessoryId: accessoryId,
-            }),
-          });
-    
-          if (response.ok) {
-            const data = await response.text();
-            console.log("[INFO] Accessory removed successfully:", data);
-          } else {
-            const errorData = await response.text();
-            console.error("[ERROR] Error removing accessory:", errorData);
-          }
-        } catch (error) {
-          console.error("[ERROR] Error during accessory removal fetch:", error);
-        }
+        console.error(
+          "[ERROR] categoryAccessories is not an array:",
+          data.categoryAccessories
+        );
+        setComputerAccessories([]); // Set to an empty array if there's an error
       }
-    };
-    
-    // const handleAddAccessories = () => {
-    //   console.log("[INFO] Navigating to Add Accessories page");
-    //   navigate("/Admin/ComputerAccessories");
-    // };
-    
-    const handleSaveAccessories = async () => {
-      // if (selectedAccessories.length === 0) {
-      //   Swal.fire({
-      //     icon: "warning",
-      //     title: "No Accessories Selected",
-      //     text: "Please select at least one accessory to update.",
-      //     confirmButtonColor: "#ff9800",
-      //   });
-      //   return; // Prevent saving when no accessories are selected
-      // }
-    
-      console.log("[INFO] Saving selected accessories");
-      const payload = {
-        id: currentProductId,
-        accessoryIds: selectedAccessories.join(","),
-      };
-      console.log("[INFO] Payload for saving accessories:", payload);
-    
+
+      // Parse the selected accessories if they exist
+      const selectedAccessories = data.additionalAccessories
+        ? data.additionalAccessories.split(",")
+        : [];
+      console.log("[INFO] Pre-selected accessories:", selectedAccessories);
+
+      setSelectedAccessories(selectedAccessories);
+    } catch (error) {
+      console.error("[ERROR] Error while fetching accessories:", error);
+    }
+  };
+
+  const handleCloseFrequentlyBuyModal = () => {
+    console.log("[INFO] Closing Frequently Buy Modal");
+    setIsFrequentlyBuyModalOpen(false);
+    setSelectedAccessories([]);
+  };
+
+  const handleAccessorySelection = async (e) => {
+    const accessoryId = e.target.value;
+    console.log(
+      `[INFO] Accessory ID: ${accessoryId}, Checked: ${e.target.checked}`
+    );
+
+    if (e.target.checked) {
+      console.log("[INFO] Adding accessory to the selected list");
+      setSelectedAccessories((prev) => [...prev, accessoryId]);
+    } else {
+      console.log("[INFO] Removing accessory from the selected list");
+      setSelectedAccessories((prev) => prev.filter((id) => id !== accessoryId));
+
       try {
-        const response = await fetch(`${ApiUrl}/addfrequentlybuy`, {
+        console.log("[INFO] Removing accessory from the backend");
+        const response = await fetch(`${ApiUrl}/removefrequentlybuy`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            productId: currentProductId,
+            accessoryId: accessoryId,
+          }),
         });
-    
+
         if (response.ok) {
           const data = await response.text();
-          console.log("[INFO] Accessories updated successfully:", data);
-    
-          Swal.fire({
-            icon: "success",
-            title: "Success",
-            text: "Accessories have been updated successfully!",
-            confirmButtonColor: "#4caf50",
-          });
+          console.log("[INFO] Accessory removed successfully:", data);
         } else {
           const errorData = await response.text();
-          console.error("[ERROR] Failed to update accessories:", errorData);
-    
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to update accessories. Please try again.",
-            confirmButtonColor: "#f44336",
-          });
+          console.error("[ERROR] Error removing accessory:", errorData);
         }
       } catch (error) {
-        console.error("[ERROR] Unexpected error during save operation:", error);
-    
+        console.error("[ERROR] Error during accessory removal fetch:", error);
+      }
+    }
+  };
+
+  // const handleAddAccessories = () => {
+  //   console.log("[INFO] Navigating to Add Accessories page");
+  //   navigate("/Admin/ComputerAccessories");
+  // };
+
+  const handleSaveAccessories = async () => {
+    // if (selectedAccessories.length === 0) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "No Accessories Selected",
+    //     text: "Please select at least one accessory to update.",
+    //     confirmButtonColor: "#ff9800",
+    //   });
+    //   return; // Prevent saving when no accessories are selected
+    // }
+
+    console.log("[INFO] Saving selected accessories");
+    const payload = {
+      id: currentProductId,
+      accessoryIds: selectedAccessories.join(","),
+    };
+    console.log("[INFO] Payload for saving accessories:", payload);
+
+    try {
+      const response = await fetch(`${ApiUrl}/addfrequentlybuy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const data = await response.text();
+        console.log("[INFO] Accessories updated successfully:", data);
+
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Accessories have been updated successfully!",
+          confirmButtonColor: "#4caf50",
+        });
+      } else {
+        const errorData = await response.text();
+        console.error("[ERROR] Failed to update accessories:", errorData);
+
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An unexpected error occurred. Please try again later.",
+          text: "Failed to update accessories. Please try again.",
           confirmButtonColor: "#f44336",
         });
       }
-    
-      setIsFrequentlyBuyModalOpen(false);
-      setSelectedAccessories([]);
-    };
+    } catch (error) {
+      console.error("[ERROR] Unexpected error during save operation:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An unexpected error occurred. Please try again later.",
+        confirmButtonColor: "#f44336",
+      });
+    }
+
+    setIsFrequentlyBuyModalOpen(false);
+    setSelectedAccessories([]);
+  };
   const openPopup = (id, productName, prodPrice) => {
     // Set states
     setSelectedProductId(id);
@@ -1018,7 +1051,9 @@ const CCTV = ({ isOpen, onClose }) => {
       coupon: product.coupon,
       category: product.category,
     });
-    setModalIsOpen(true);
+    setModalIsOpen(true); 
+       openProductModal(false);
+
   };
 
   const handleUpdateProduct = async () => {
@@ -1403,195 +1438,106 @@ const CCTV = ({ isOpen, onClose }) => {
     <div className="laptops-page">
       <div className="laptops-content">
         <h2 className="laptops-page-title">Add CCTV</h2>
-        <div className="laptops-card">
-          <div className="laptops-card-header">
-            <div className="laptops-card-item">Product Name</div>
-            <div className="laptops-card-item">Product Image</div>
-            <div className="laptops-card-item">M.R.P Price</div>
-            <div className="laptops-card-item">Selling Price</div>
-            <div className="laptops-card-item">Label</div>
-            <div className="laptops-card-item">Subtitle</div>
-            <div className="laptops-card-item">Delivery charge</div>
-            {/* <div className="laptops-card-item">Category</div> */}
-          </div>
-
-          <div className="laptops-card-row">
+        <div className="laptops-form-container">
+          {/* Left Section */}
+          <div className="laptops-left-section">
+            <label className="laptops-label">Product Name</label>
             <input
               type="text"
               name="name"
               value={newProduct.name}
               onChange={handleChange}
-              placeholder="Enter name"
-              className="laptops-card-input"
-            />
-            <input
-              type="file"
-              multiple
-              onChange={handleImageChange}
-              className="laptops-card-inputt"
-              accept="image/*" // This allows all image types
+              className="laptops-input"
             />
 
+            <label className="laptops-label">M.R.P Price</label>
             <input
               type="text"
               name="actual_price"
               value={newProduct.actual_price}
               onChange={handleChange}
-              placeholder="Enter M.R.P price"
-              className="laptops-card-input"
+              className="laptops-input"
             />
+
+            <label className="laptops-label">Selling Price</label>
             <input
               type="text"
               name="price"
               value={newProduct.price}
               onChange={handleChange}
-              placeholder="Enter selling price"
-              className="laptops-card-input"
+              className="laptops-input"
             />
 
+            <label className="laptops-label">Label</label>
             <input
               type="text"
-              name="label" // New input for product label
-              value={newProduct.label} // Ensure to add label to the newProduct state
+              name="label"
+              value={newProduct.label}
               onChange={handleChange}
-              placeholder="(e.g., Best Price)"
-              className="laptops-card-input" // Use the same style class
+              className="laptops-input"
             />
-
-            <input
-              type="text"
-              name="subtitle" // New input for product subtitle
-              value={newProduct.subtitle} // Ensure to add subtitle to the newProduct state
-              onChange={handleChange}
-              placeholder="Enter subtitle"
-              className="laptops-card-input" // Use the same style class
-            />
-
-            <input
-              type="text"
-              name="deliverycharge" // New input for product deliverycharge
-              value={newProduct.deliverycharge} // Ensure to add deliverycharge to the newProduct state
-              onChange={handleChange}
-              placeholder="Enter Deliverycharge "
-              className="laptops-card-input" // Use the same style class
-            />
-
-            {/* {isPopupVisible && (
-              <div className="info-popup">
-                <div className="popup-content">
-                  <button className="close-button" onClick={handlePopupToggle}>
-                    X
-                  </button>
-                  <p>
-                    Enter features in the label field using '|' to separate
-                    them. Example:
-                    <br />
-                    <strong>
-                      Processor 13th Generation | Operating System Windows 11 |
-                      Graphic Card Xe Graphics | Memory 16 GB (SODIMM) | Storage
-                      512 GB
-                    </strong>
-                    <br />
-                    Click the `|` icon to quickly add the '|' character to your
-                    features.
-                  </p>
-                </div>
-              </div>
-            )} */}
-
-            {/* <select
-              name="category"
-              value={newProduct.category}
-              onChange={handleChange}
-              className="laptops-card-input"
-            >
-              <option value="">Select Category</option>
-              <option value="Computers">Computer</option>
-              <option value="Mobiles">Mobile</option>
-              <option value="Printers">Printers</option>
-              <option value="Headphones">Headphone</option>
-              <option value="Speakers">Speaker</option>
-              <option value="CCTV">CCTV</option>
-              <option value="TV">TV</option>
-              <option value="Watch">Watch</option>
-              <option value="ComputerAccessories">Computer Accessories</option>
-              <option value="MobileAccessories">Mobile Accessories</option>
-              <option value="PrinterAccessories">Printer Accessories</option>
-              <option value="CCTVAccessories">CCTV Accessories</option>
-            </select> */}
           </div>
 
-          {/* Separate Features Field */}
-          <div className="laptops-card-header">
-            {/* <div className="feature-1 laptops-card-item ">Coupon Code</div>
-            <div className="feature-1 laptops-card-item ">
-              Coupon Expiry date
-            </div> */}
-            <div className="feature-1 laptops-card-item ">Product Features</div>
-          </div>
-
-          <div className="features-input-container">
-            {/* <input
-              type="text"
-              name="coupon"
-              value={newProduct.coupon}
-              onChange={handleChange}
-              placeholder="Enter coupon code"
-              className="laptops-card-input2"
-            />
+          {/* Right Section */}
+          <div className="laptops-right-section">
+            <label className="laptops-label">Subtitle</label>
             <input
-              type="date"
-              name="coupon_expiry_date"
-              value={newProduct.coupon_expiry_date}
+              type="text"
+              name="subtitle"
+              value={newProduct.subtitle}
               onChange={handleChange}
-              placeholder="Enter expiry date"
-              className="laptops-card-input2"
-              min={minDate} // Set min date to today
-              max={maxDateStr} // Set max date to 30 days from today
-            /> */}
+              className="laptops-input"
+            />
+
+            <label className="laptops-label">Delivery Charge</label>
+            <input
+              type="text"
+              name="deliverycharge"
+              value={newProduct.deliverycharge}
+              onChange={handleChange}
+              className="laptops-input"
+            />
+
+            <label className="laptops-label">Product Image</label>
+            <input
+              accept="image/jpeg, image/png"
+              multiple
+              onChange={handleImageChange}
+              type="file"
+              className="laptops-file-input"
+            />
+
+            <label className="laptops-label">Features</label>
             <textarea
               name="features"
               value={newProduct.features}
               onChange={handleChange}
-              placeholder="Features"
-              className="laptops-card-input1"
-              rows="1"
+              className="laptops-textarea"
             ></textarea>
-            {/* <div className="pipe-icon" onClick={handleAddPipe}>
-              <p
-                title="Click here for separate the key value pair(eg.RAM | 8gb)"
-                className="pipe-character"
-              >
-                |
-              </p>
-            </div>
-            <div className="info-icon" onClick={handlePopupToggle}>
-              <FaInfoCircle className="info-icon-text" />
-            </div> */}
+            <button
+              onClick={() => handleAddProduct(newProduct)}
+              className="laptops-add-btn"
+            >
+              Add
+            </button>
           </div>
-
-          {/* Add Button */}
-          <button onClick={handleAddProduct} className="laptops-add-btn">
-            Add
-          </button>
         </div>
 
         <div className="laptops-products-list">
           {products.length > 0 &&
             products.map((product, index) => (
-              <div className="laptops-product-card">
+              <div className="laptops-product-card" key={product.id}>
                 {product.offer_label && (
                   <div className="product-label">{product.offer_label}</div>
                 )}
 
+                {/* Display product image */}
                 <div className="laptops-product-image">
                   <div className="slider-container">
-                    {" "}
-                    {/* Wrap the slider in a container for relative positioning */}
                     <Slider
                       {...{
                         ...settings,
-                        arrows: product.prod_img.length > 1, // Display arrows only if more than one image
+                        arrows: product.prod_img.length > 1,
                       }}
                     >
                       {product.prod_img.map((img, imgIndex) => (
@@ -1601,6 +1547,7 @@ const CCTV = ({ isOpen, onClose }) => {
                             alt={product.prod_name}
                             className="laptops-product-image"
                           />
+
                           <div className="image-actions">
                             <FaEdit
                               onClick={() => openModal(product.id, imgIndex)} // Pass product ID and image index
@@ -1620,337 +1567,31 @@ const CCTV = ({ isOpen, onClose }) => {
                     </Slider>
                   </div>
                 </div>
+
+                {/* Display product name */}
                 <div className="laptops-product-details">
                   <h3 className="laptops-product-name">
-                    {product.prod_name}{" "}
-                    {product.productStatus === "unapproved" ? (
+                    {product.prod_name}
+                    {product.productStatus === "unapproved" && (
                       <span style={{ color: "red" }}>
                         ({product.productStatus})
                       </span>
-                    ) : null}
-                  </h3>{" "}
-                  <h3 className="laptops-product-subtitle">
-                    {product.subtitle}
+                    )}
                   </h3>
-                  <p className="laptops-product-features">
-                    <span>{product.prod_features}</span>
-                    {/* <ul className="product-feature-list">
-                      {product.prod_features
-                        .split("|")
-                        .reduce((acc, feature, index, array) => {
-                          if (index % 2 === 0) {
-                            acc.push([
-                              feature.trim(),
-                              array[index + 1]?.trim() || "",
-                            ]);
-                          }
-                          return acc;
-                        }, [])
-                        .map((pair, index) => (
-                          <li key={index}>
-                            <span className="feature-key">{pair[0]}</span>
-                            <span className="feature-value">{pair[1]}</span>
-                          </li>
-                        ))}
-                    </ul> */}
-                  </p>
-                  
-                  <p className="laptops-product-actual-price">
-                    M.R.P Price:{" "}
-                    <span className="actual-price">
-                      ₹{product.actual_price}
-                    </span>
-                  </p>
-                  <p className="laptops-product-pricee">
-                    Selling Price: ₹{product.prod_price}
-                  </p>
-                  <p className="laptops-product-deliverycharge">
-                    Delivery charge: ₹{product.deliverycharge}
-                  </p>
-                  <p className="laptops-product-coupon">
-                    Coupon Code:
-                    <span
-                      onClick={() =>
-                        openPopup(
-                          product.prod_id,
-                          product.prod_name,
-                          product.prod_price
-                        )
-                      }
-                      style={{ cursor: "pointer" }}
-                    >
-                      <FaEdit className="faedit" title="Edit Coupon" />
-                    </span>
-                    <span
-                      onClick={() =>
-                        fetchCoupons(
-                          product.prod_id,
-                          product.prod_name,
-                          product.prod_price
-                        )
-                      }
-                      style={{ cursor: "pointer" }}
-                    >
-                      <FaEye className="faedit" title="View Coupon" />
-                    </span>
-                  </p>
-                  <CouponEditPopup
-                    isOpen={isPopupOpen}
-                    onClose={closePopup}
-                    productId={selectedProductId} // Correctly passed from state
-                    prodPrice={selectedProductPrice} // Correctly passed from state
-                    onCouponUpdated={handleCouponUpdated}
-                  />
-                  {isViewingCoupons && (
-                    <div className="pop-overlay">
-                      <div className="pop-content">
-                        <button
-                          onClick={() => setIsViewingCoupons(false)}
-                          className="fatimes"
-                        >
-                          <FaTimes color="black" size={20} />
-                        </button>
-                        <h4 className="coupon-title">
-                          Coupons forbvnmbvm {productName}
-                        </h4>
-                        {coupons.length > 0 ? (
-                          <ul className="coupons-list">
-                            {coupons.map((coupon, index) => (
-                              <li
-                                key={coupon.coupon_id}
-                                className="coupon-item"
-                              >
-                                <span className="serial-number">
-                                  {index + 1}.{" "}
-                                </span>{" "}
-                                {/* Serial number */}
-                                <span className="coupon-code">
-                                  {coupon.coupon_code}
-                                </span>{" "}
-                                -
-                                <span className="coupon-code">
-                                  {coupon.discount_value}
-                                </span>{" "}
-                                -
-                                <span className="expiry-date">
-                                  Expires on:{" "}
-                                  {new Date(
-                                    coupon.expiry_date
-                                  ).toLocaleDateString("en-GB", {
-                                    day: "2-digit",
-                                    month: "short",
-                                    year: "numeric",
-                                  })}
-                                  <FaEdit
-                                    className="edit-icon"
-                                    title="Edit Expiry Date"
-                                    onClick={() =>
-                                      handleEditExpiry(coupon.coupon_id)
-                                    }
-                                  />
-                                  <FaTrash
-                                    className="delete-icon"
-                                    title="Delete Coupon"
-                                    onClick={() =>
-                                      handleDeleteCoupon(coupon.coupon_id)
-                                    }
-                                    style={{
-                                      marginLeft: "10px",
-                                      cursor: "pointer",
-                                    }}
-                                  />
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p>No coupons available for this product.</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  <EditCouponModal
-                    isOpen={isEditingCoupon}
-                    onClose={() => setIsEditingCoupon(false)}
-                    coupon={selectedCoupon}
-                    productId={selectedProductId}
-                    productPrice={selectedProductPrice} // Selected product price
-                    onCouponUpdated={() => {
-                      // Refresh coupon list or update state as necessary
-                      // e.g., fetchCoupons();
-                    }}
-                  />
-                </div>
-                {/* <div>
-                Label: {product.label}
-                </div> */}
 
-                <div
-                  className="frequently-buy"
-                  style={{ marginBottom: "10px" }}
-                >
-                  <span className="frequently-buy-label">
-                    Make a copy of this product
-                  </span>
-                  <FaClone
-                    onClick={() => handleCopyProduct(product.id)}
-                    className="frequently-buy-icon"
-                  />
-                </div>
-                <div className="frequently-buy">
-                  <span className="frequently-buy-label">
-                    Frequently Buy Products
-                  </span>
-                  <FaPlusCircle
-                    className="frequently-buy-icon"
-                    onClick={() =>
-                      handleOpenFrequentlyBuyModal(product.id, product.category)
-                    }
-                  />
+                  {/* "View" button to trigger modal */}
+                 
                 </div>
 
-                {isFrequentlyBuyModalOpen && (
-                  <div className="freq-modal-overlay">
-                    <div className="freq-modal-content">
-                      <button onClick={handleCloseFrequentlyBuyModal} className="freq-modal-close-btn">
-                        <FaTimes />
-                      </button>
-                      <h3 className="freq-modal-title">Select Accessories</h3>
-                
-                      {Array.isArray(computerAccessories) && computerAccessories.length === 0 ? (
-                        <div className="no-accessories-message">
-                          <p>No accessories added to this category</p>
-                          <button onClick={handleAddAccessories} className="add-accessories-btn">
-                            Add Accessories
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="freq-modal-list">
-                          {Array.isArray(computerAccessories) &&
-                            computerAccessories.map((accessory) => {
-                              const images = Array.isArray(accessory.prod_img)
-                                ? accessory.prod_img
-                                : JSON.parse(accessory.prod_img || "[]");
-                              const firstImage = images[0];
-                
-                              return (
-                                <div key={accessory.id} className="freq-modal-item">
-                                  <div className="freq-image-wrapper">
-                                    {firstImage && (
-                                      <img
-                                        src={`${ApiUrl}/uploads/cctvaccessories/${firstImage}`}
-                                        alt={accessory.prod_name}
-                                        className="freq-item-image"
-                                      />
-                                    )}
-                                  </div>
-                                  <div className="freq-item-details">
-                                    <span className="freq-item-name">{accessory.prod_name}</span>
-                                    <span className="freq-item-price">₹{accessory.prod_price}</span>
-                                  </div>
-                                  <input
-                                    type="checkbox"
-                                    className="freq-item-checkbox"
-                                    value={accessory.id}
-                                    checked={selectedAccessories.includes(accessory.id.toString())}
-                                    onChange={handleAccessorySelection}
-                                  />
-                                </div>
-                              );
-                            })}
-                        </div>
-                      )}
-                
-                      {Array.isArray(computerAccessories) && computerAccessories.length > 0 && (
-                        <button onClick={handleSaveAccessories} className="freq-save-btn">
-                          Add
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <div
-                  onClick={() => handleOpenOfferModal(product.id)} // Pass the productId as needed
-                  className="offer-edit-btn"
-                >
-                  <span className="offer-edit-text">Edit Price Offer</span>
-                  <FaEdit className="offer-edit-icon" />
+                <div>
+                  <span style={{textDecoration:"line-through", color:'red', fontSize:'14px'}}>₹{product.actual_price}</span>  <span style={{color:'green',marginLeft:'5px'}}>₹{product.prod_price}</span>
                 </div>
-
-                {/* Modal rendering */}
-                {isOfferModalOpen && (
-                  <div className="offer-modal-overlay">
-                    <div className="offer-modal-content">
-                      <button
-                        onClick={handleCloseOfferModal}
-                        className="offer-close-btn"
-                      >
-                        &times; {/* Use the "×" symbol for close */}
-                      </button>
-                      <h3 className="offer-modal-title">
-                        {isEditMode ? "Edit Price Offer" : "Add Price Offer"}
-                      </h3>
-                      <form onSubmit={handleSubmit} className="offer-form">
-                        <label className="offer-label">Offer Start Time</label>
-                        <input
-                          type="datetime-local"
-                          value={offerStartTime}
-                          onChange={(e) => setOfferStartTime(e.target.value)}
-                          required
-                          min={minDate}
-                          className="offer-input"
-                        />
-                        <label className="offer-label">Offer End Time</label>
-                        <input
-                          type="datetime-local"
-                          value={offerEndTime}
-                          onChange={(e) => setOfferEndTime(e.target.value)}
-                          required
-                          min={minDate}
-                          className="offer-input"
-                        />
-                        <label className="offer-label">Offer Price</label>
-                        <input
-                          type="number"
-                          value={offerPrice}
-                          onChange={handleChangePrice} // Custom handler for price
-                          required
-                          className="offer-input"
-                        />
-                        <button type="submit" className="offer-submit-btn">
-                          {isEditMode ? "Update Offer" : "Add Offer"}
-                        </button>
-                      </form>
-
-                      {isEditMode && (
-                        <button
-                          onClick={handleDelete}
-                          className="offer-delete-btn"
-                        >
-                          Delete Offer
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <div className="upload-container">
-                  Upload more images
-                  <input
-                    style={{ marginTop: "10px" }}
-                    className="file-input"
-                    multiple
-                    type="file"
-                    onChange={(e) => handleFileChange(product.id, e)}
-                  />
-                  <button
-                    className="upload-button"
-                    onClick={() => handleUploadImages(product.id)}
+                <button
+                    className="view-details-btn"
+                    onClick={() => openProductModal(product.id)} // Pass product ID to open modal
                   >
-                    Upload Images
+                    <FaEye /> View Details
                   </button>
-                </div>
                 <div className="laptops-product-actions">
                   <button
                     onClick={() => handleEditProduct(product)}
@@ -1965,9 +1606,434 @@ const CCTV = ({ isOpen, onClose }) => {
                     <FaTrash /> Delete
                   </button>
                 </div>
+
+                {/* Modal for displaying product details */}
+                {isModalOpen2 && modalProductId === product.id && (
+                  <div className="product-details-modal">
+                    <div className="modal-overlay">
+                      <div className="modal-content">
+                        <button
+                          onClick={closeProductModal}
+                          className="modal-close-btn"
+                        >
+                          &times; {/* Close button */}
+                        </button>
+                        <div className="laptops-modal-form-container">
+                          {/* <h3 className="modal-title">{product.prod_name}</h3> */}
+
+                          <div className="laptops-modal-content">
+                            <div className="laptops-modal-left-section">
+                              <p>
+                                <strong>Product Name</strong>
+                                <span>{product.prod_name}</span>
+                              </p>
+                              <p>
+                                <strong>Subtitle</strong>
+                                <span>{product.subtitle}</span>
+                              </p>
+                              <p>
+                                <strong>M.R.P Price</strong>
+                                <span>₹{product.actual_price}</span>
+                              </p>
+
+                              <p>
+                                <strong>Selling Price</strong>
+                                <span>₹{product.prod_price}</span>
+                              </p>
+                              <p>
+                                <strong>Delivery charge</strong>
+                                <span>₹{product.deliverycharge}</span>
+                              </p>
+                              <p>
+                         
+                                <strong>Features</strong>
+                                <span>{product.prod_features}</span>
+                              </p>
+                              <div className="laptops-product-actions">
+                                <button
+                                  onClick={() => handleEditProduct(product)}
+                                  className="laptops-action-btn"
+                                >
+                                  <FaEdit /> Edit
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleDeleteProduct(product.id)
+                                  }
+                                  className="laptops-action-btn"
+                                >
+                                  <FaTrash /> Delete
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="laptops-modal-right-section">
+                              <div
+                                onClick={() => handleOpenOfferModal(product.id)}
+                                className="offer-edit-btn"
+                              >
+                                <span className="offer-edit-text">
+                                  Edit Limited Time Offer
+                                </span>
+                                <FaEdit className="offer-edit-icon" />
+                              </div>
+
+                              {/* Modal Rendering */}
+                              {isOfferModalOpen && (
+                                <div className="offer-modal-overlay">
+                                  <div className="offer-modal-content">
+                                    <button
+                                      onClick={handleCloseOfferModal}
+                                      className="offer-close-btn"
+                                    >
+                                      &times;
+                                    </button>
+                                    <h3 className="offer-modal-title">
+                                      {isEditMode
+                                        ? "Edit Limited Time Price Offer"
+                                        : "Add Limited Time Price Offer"}
+                                    </h3>
+                                    <form
+                                      onSubmit={handleSubmit}
+                                      className="offer-form"
+                                    >
+                                      <label className="offer-label">
+                                        Offer Start Time
+                                      </label>
+                                      <input
+                                        type="datetime-local"
+                                        value={offerStartTime}
+                                        onChange={(e) =>
+                                          setOfferStartTime(e.target.value)
+                                        }
+                                        required
+                                        min={minDate}
+                                        className="offer-input"
+                                      />
+                                      <label className="offer-label">
+                                        Offer End Time
+                                      </label>
+                                      <input
+                                        type="datetime-local"
+                                        value={offerEndTime}
+                                        onChange={(e) =>
+                                          setOfferEndTime(e.target.value)
+                                        }
+                                        required
+                                        min={minDate}
+                                        className="offer-input"
+                                      />
+                                      <label className="offer-label">
+                                        Offer Price
+                                      </label>
+                                      <input
+                                        type="number"
+                                        value={offerPrice}
+                                        onChange={handleChangePrice}
+                                        required
+                                        className="offer-input"
+                                      />
+                                      <button
+                                        type="submit"
+                                        className="offer-submit-btn"
+                                      >
+                                        {isEditMode
+                                          ? "Update Offer"
+                                          : "Add Offer"}
+                                      </button>
+                                    </form>
+
+                                    {isEditMode && (
+                                      <button
+                                        onClick={handleDelete}
+                                        className="offer-delete-btn"
+                                      >
+                                        Delete Offer
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Upload Section */}
+                              <div className="upload-container">
+                                Upload more images
+                                <input
+                                  style={{ marginTop: "10px" }}
+                                  className="file-input"
+                                  multiple
+                                  type="file"
+                                  onChange={(e) =>
+                                    handleFileChange(product.id, e)
+                                  }
+                                />
+                                <button
+                                  className="upload-button"
+                                  onClick={() => handleUploadImages(product.id)}
+                                >
+                                  Upload Images
+                                </button>
+                              </div>
+
+                              {/* Coupon Section */}
+                              <p className="laptops-product-coupon">
+                                Coupon Code:
+                                <span
+                                  onClick={() =>
+                                    openPopup(
+                                      product.prod_id,
+                                      product.prod_name,
+                                      product.prod_price
+                                    )
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <FaEdit
+                                    className="faedit"
+                                    title="Edit Coupon"
+                                  />
+                                </span>
+                                <span
+                                  onClick={() =>
+                                    fetchCoupons(
+                                      product.prod_id,
+                                      product.prod_name,
+                                      product.prod_price
+                                    )
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <FaEye
+                                    className="faedit"
+                                    title="View Coupon"
+                                  />
+                                </span>
+                              </p>
+
+                              <CouponEditPopup
+                                isOpen={isPopupOpen}
+                                onClose={closePopup}
+                                productId={selectedProductId}
+                                prodPrice={selectedProductPrice}
+                                onCouponUpdated={handleCouponUpdated}
+                              />
+
+                              {isViewingCoupons && (
+                                <div className="pop-overlay">
+                                  <div className="pop-content">
+                                    <button
+                                      onClick={() => setIsViewingCoupons(false)}
+                                      className="fatimes"
+                                    >
+                                      <FaTimes color="black" size={20} />
+                                    </button>
+                                    <h4 className="coupon-title">
+                                      Coupons for {productName}
+                                    </h4>
+                                    {coupons.length > 0 ? (
+                                      <ul className="coupons-list">
+                                        {coupons.map((coupon, index) => (
+                                          <li
+                                            key={coupon.coupon_id}
+                                            className="coupon-item"
+                                          >
+                                            <span className="serial-number">
+                                              {index + 1}.{" "}
+                                            </span>
+                                            <span className="coupon-code">
+                                              {coupon.coupon_code}
+                                            </span>{" "}
+                                            -
+                                            <span className="coupon-code">
+                                              {coupon.discount_value}
+                                            </span>{" "}
+                                            -
+                                            <span className="expiry-date">
+                                              Expires on:{" "}
+                                              {new Date(
+                                                coupon.expiry_date
+                                              ).toLocaleDateString("en-GB", {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric",
+                                              })}
+                                            </span>
+                                            <FaEdit
+                                              className="edit-icon"
+                                              title="Edit Expiry Date"
+                                              onClick={() =>
+                                                handleEditExpiry(
+                                                  coupon.coupon_id
+                                                )
+                                              }
+                                            />
+                                            <FaTrash
+                                              className="delete-icon"
+                                              title="Delete Coupon"
+                                              onClick={() =>
+                                                handleDeleteCoupon(
+                                                  coupon.coupon_id
+                                                )
+                                              }
+                                              style={{
+                                                marginLeft: "10px",
+                                                cursor: "pointer",
+                                              }}
+                                            />
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    ) : (
+                                      <p>
+                                        No coupons available for this product.
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              <EditCouponModal
+                                isOpen={isEditingCoupon}
+                                onClose={() => setIsEditingCoupon(false)}
+                                coupon={selectedCoupon}
+                                productId={selectedProductId}
+                                productPrice={selectedProductPrice}
+                                onCouponUpdated={() => {}}
+                              />
+
+                              {/* Frequently Buy Section */}
+                              <div
+                                className="frequently-buy"
+                                style={{ marginBottom: "10px" }}
+                              >
+                                <span className="frequently-buy-label">
+                                  Make a copy of this product
+                                </span>
+                                <FaClone
+                                  onClick={() => handleCopyProduct(product.id)}
+                                  className="copy-icon"
+                                />
+                              </div>
+
+                              <div className="frequently-buy">
+                                <span className="frequently-buy-label">
+                                  Frequently Buy Products
+                                </span>
+                                <FaPlusCircle
+                                  className="frequently-buy-icon"
+                                  onClick={() =>
+                                    handleOpenFrequentlyBuyModal(
+                                      product.id,
+                                      product.category
+                                    )
+                                  }
+                                />
+                              </div>
+
+                              {isFrequentlyBuyModalOpen && (
+                                <div className="freq-modal-overlay">
+                                  <div className="freq-modal-content">
+                                    <button
+                                      onClick={handleCloseFrequentlyBuyModal}
+                                      className="freq-modal-close-btn"
+                                    >
+                                      <FaTimes />
+                                    </button>
+                                    <h3 className="freq-modal-title">
+                                      Select Accessories
+                                    </h3>
+                                    {Array.isArray(computerAccessories) &&
+                                    computerAccessories.length === 0 ? (
+                                      <div className="no-accessories-message">
+                                        <p>
+                                          No accessories added to this category
+                                        </p>
+                                        <button
+                                          onClick={handleAddAccessories}
+                                          className="add-accessories-btn"
+                                        >
+                                          Add Accessories
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <div className="freq-modal-list">
+                                        {Array.isArray(computerAccessories) &&
+                                          computerAccessories.map(
+                                            (accessory) => {
+                                              const images = Array.isArray(
+                                                accessory.prod_img
+                                              )
+                                                ? accessory.prod_img
+                                                : JSON.parse(
+                                                    accessory.prod_img || "[]"
+                                                  );
+                                              const firstImage = images[0];
+
+                                              return (
+                                                <div
+                                                  key={accessory.id}
+                                                  className="freq-modal-item"
+                                                >
+                                                  <div className="freq-image-wrapper">
+                                                    {firstImage && (
+                                                      <img
+                                                        src={`${ApiUrl}/uploads/cctvaccessories/${firstImage}`}
+                                                        alt={
+                                                          accessory.prod_name
+                                                        }
+                                                        className="freq-item-image"
+                                                      />
+                                                    )}
+                                                  </div>
+                                                  <div className="freq-item-details">
+                                                    <span className="freq-item-name">
+                                                      {accessory.prod_name}
+                                                    </span>
+                                                    <span className="freq-item-price">
+                                                      ₹{accessory.prod_price}
+                                                    </span>
+                                                  </div>
+                                                  <input
+                                                    type="checkbox"
+                                                    className="freq-item-checkbox"
+                                                    value={accessory.id}
+                                                    checked={selectedAccessories.includes(
+                                                      accessory.id.toString()
+                                                    )}
+                                                    onChange={
+                                                      handleAccessorySelection
+                                                    }
+                                                  />
+                                                </div>
+                                              );
+                                            }
+                                          )}
+                                      </div>
+                                    )}
+                                    {Array.isArray(computerAccessories) &&
+                                      computerAccessories.length > 0 && (
+                                        <button
+                                          onClick={handleSaveAccessories}
+                                          className="freq-save-btn"
+                                        >
+                                          Add
+                                        </button>
+                                      )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
         </div>
+
+
       </div>
       {/* Modal for Image Upload */}
       <Modal
@@ -2025,217 +2091,213 @@ const CCTV = ({ isOpen, onClose }) => {
 
       {/* Modal for editing a product */}
       {/* Modal for editing a product */}
-      {editingProduct && (
-        <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={() => setModalIsOpen(false)}
-          contentLabel="Edit Product"
-          className="adminmodal"
-          overlayClassName="adminmodal-overlay"
-        >
-          <div className="adminmodal-header">
-            <h2>Edit Product</h2>
-            <button
-              onClick={() => setModalIsOpen(false)}
-              className="adminmodal-close-btn"
-            >
-              &times; {/* or use a close icon */}
-            </button>
-          </div>
-          <div className="feature-item">
-            <label className="feature-label">Product Name</label>
-            <input
-              type="text"
-              name="name"
-              value={editingProduct.name}
-              onChange={(e) =>
-                setEditingProduct({ ...editingProduct, name: e.target.value })
-              }
-              placeholder="Enter product name"
-              className="adminmodal-input"
-            />
-          </div>
-          <div className="feature-item">
-            {/* Features Textarea with Icons */}
-            <div className="features-input-container">
-              <label className="feature-label">Description</label>
-              <textarea
-                name="features"
-                value={editingProduct.features}
-                onChange={(e) =>
-                  setEditingProduct({
-                    ...editingProduct,
-                    features: e.target.value,
-                  })
-                }
-                placeholder="Enter product features"
-                className="adminmodal-input1"
-                rows="4" // Adjust as needed
-              ></textarea>
+       {editingProduct && (
+             <Modal
+               isOpen={modalIsOpen}
+               onRequestClose={() => setModalIsOpen(false)}
+               contentLabel="Edit Product"
+               className="editmodal"
+               overlayClassName="adminmodal-overlay"
+             >
+               <div className="adminmodal-header">
+                 <h2>Edit Product</h2>
+                 <button
+                   onClick={() => setModalIsOpen(false)}
+                   className="adminmodal-close-btn"
+                 >
+                   &times;
+                 </button>
+               </div>
+     
+               <div className="adminmodal-body">
+           <div className="part1">
+                   <div className="feature-item">
+                     <label className="feature-label">Name</label>
+                     <input
+                       type="text"
+                       name="name"
+                       value={editingProduct.name}
+                       onChange={(e) =>
+                         setEditingProduct({
+                           ...editingProduct,
+                           name: e.target.value,
+                         })
+                       }
+                       placeholder="Enter product name"
+                       className="adminmodal-input"
+                     />
+                   </div>
+                   <div className="feature-item">
+                     <label className="feature-label">Subtitle</label>
+     
+                     <input
+                       type="text"
+                       name="subtitle"
+                       value={editingProduct.subtitle}
+                       onChange={(e) =>
+                         setEditingProduct({
+                           ...editingProduct,
+                           subtitle: e.target.value,
+                         })
+                       }
+                       placeholder="Enter subtitle"
+                       className="adminmodal-input"
+                     />
+                   </div>
+     
+                   <div className="feature-item">
+                     <label className="feature-label">M.R.P Price</label>
+     
+                     <input
+                       type="text"
+                       name="actual_price"
+                       value={editingProduct.actual_price}
+                       onChange={(e) =>
+                         setEditingProduct({
+                           ...editingProduct,
+                           actual_price: e.target.value,
+                         })
+                       }
+                       placeholder="Enter actual price"
+                       className="adminmodal-input"
+                     />
+                   </div>
+     
+                   <div className="feature-item">
+                     <label className="feature-label">Price</label>
+     
+                     <input
+                       type="text"
+                       name="price"
+                       value={editingProduct.price}
+                       onChange={(e) =>
+                         setEditingProduct({
+                           ...editingProduct,
+                           price: e.target.value,
+                         })
+                       }
+                       placeholder="Enter product price"
+                       className="adminmodal-input"
+                     />
+                   </div>
+     
+                   <div className="feature-item">
+                     <label className="feature-label">Offer label</label>
+     
+                     <input
+                       type="text"
+                       name="label"
+                       value={editingProduct.label}
+                       onChange={(e) =>
+                         setEditingProduct({
+                           ...editingProduct,
+                           label: e.target.value,
+                         })
+                       }
+                       placeholder="Enter label"
+                       className="adminmodal-input"
+                     />
+                   </div>
+     
+                   <div className="feature-item">
+                     <label className="feature-label">Delivery charge</label>
+                     <input
+                       type="text"
+                       name="deliverycharge"
+                       value={editingProduct.deliverycharge}
+                       onChange={(e) =>
+                         setEditingProduct({
+                           ...editingProduct,
+                           deliverycharge: e.target.value,
+                         })
+                       }
+                       placeholder="Enter deliverycharge"
+                       className="adminmodal-input"
+                     />
+                   </div>
 
-              {/* <div className="icons-container">
-              <div className="pipe-icon" onClick={handleUpdatePipe}>
-                <p className="pipe-character">|</p>
-              </div>
-              <div className="info-icon" onClick={handlePopupToggle}>
-                <FaInfoCircle className="info-icon-text" />
-              </div>
-            </div> */}
-            </div>
-          </div>
-          <div className="feature-item">
-            <label className="feature-label">M.R.P Price</label>
-            <input
-              type="text"
-              name="actual_price"
-              value={editingProduct.actual_price}
-              onChange={(e) =>
-                setEditingProduct({
-                  ...editingProduct,
-                  actual_price: e.target.value,
-                })
-              }
-              placeholder="Enter actual price"
-              className="adminmodal-input"
-            />
-          </div>
-          <div className="feature-item">
-            <label className="feature-label">Selling Price</label>
-            <input
-              type="text"
-              name="price"
-              value={editingProduct.price}
-              onChange={(e) =>
-                setEditingProduct({ ...editingProduct, price: e.target.value })
-              }
-              placeholder="Enter product price"
-              className="adminmodal-input"
-            />
-          </div>
-          <div className="feature-item">
-            <label className="feature-label">Offer Label</label>
-            <input
-              type="text"
-              name="label"
-              value={editingProduct.label}
-              onChange={(e) =>
-                setEditingProduct({
-                  ...editingProduct,
-                  label: e.target.value,
-                })
-              }
-              placeholder="Enter label"
-              className="adminmodal-input"
-            />
-          </div>
-          <div className="feature-item">
-            <label className="feature-label">Subtitle</label>
-            <input
-              type="text"
-              name="subtitle"
-              value={editingProduct.subtitle}
-              onChange={(e) =>
-                setEditingProduct({
-                  ...editingProduct,
-                  subtitle: e.target.value,
-                })
-              }
-              placeholder="Enter subtitle"
-              className="adminmodal-input"
-            />
-          </div>
-          <div className="feature-item">
-            <label className="feature-label">Delivery Charge</label>
-            <input
-              type="text"
-              name="deliverycharge"
-              value={editingProduct.deliverycharge}
-              onChange={(e) =>
-                setEditingProduct({
-                  ...editingProduct,
-                  deliverycharge: e.target.value,
-                })
-              }
-              placeholder="Enter deliverycharge"
-              className="adminmodal-input"
-            />
-          </div>
-          {/* <input
-            type="text"
-            name="coupon"
-            value={editingProduct.coupon}
-            onChange={(e) =>
-              setEditingProduct({
-                ...editingProduct,
-                coupon: e.target.value,
-              })
-            }
-            placeholder="Enter coupon code"
-            className="adminmodal-input"
-          />
-          <input
-            type="date"
-            name="coupon_expiry_date"
-            value={editingProduct.coupon_expiry_date}
-            onChange={(e) =>
-              setEditingProduct({
-                ...editingProduct,
-                coupon_expiry_date: e.target.value,
-              })
-            }
-            placeholder="Enter expiry date"
-            className="adminmodal-input"
-            min={minDate} 
-        max={maxDateStr}
-          /> */}
-          <div className="feature-item">
-            <label className="feature-label">In Stock or Out Of Stock</label>
-            <select
-              name="status"
-              value={editingProduct.status}
-              onChange={(e) =>
-                setEditingProduct({ ...editingProduct, status: e.target.value })
-              }
-              className="adminmodal-input"
-            >
-              <option value="available">In Stock</option>
-              <option value="unavailable">Out Of Stock</option>
-            </select>
-          </div>
-          <div className="feature-item">
-            <label className="feature-label">Approve or Unapprove</label>
+                 </div>
+     
+                 {/* Features Section */}
+                 <div className="part2">
+                   <div className="product-features-container">
 
-            <select
-              disabled={role === "Staff"}
-              name="productStatus"
-              value={editingProduct.productStatus}
-              onChange={(e) =>
-                setEditingProduct({
-                  ...editingProduct,
-                  productStatus: e.target.value,
-                })
-              }
-              className="adminmodal-input"
-            >
-              <option value="approved">Approve</option>
-              <option value="unapproved">UnApprove</option>
-            </select>
-          </div>
-
-          <button
-            onClick={handleUpdateProduct}
-            className="adminmodal-update-btn"
-          >
-            Update
-          </button>
-          <button
-            onClick={() => setModalIsOpen(false)}
-            className="adminmodal-cancel-btn"
-          >
-            Cancel
-          </button>
-        </Modal>
-      )}
+                     {/* Others (Textarea) */}
+                     <div className="feature-item">
+                       <label className="feature-label">Features</label>
+                       <textarea
+                         name="others"
+                         value={editingProduct.features}
+                         onChange={(e) =>
+                           setEditingProduct({
+                             ...editingProduct,
+                             features: e.target.value,
+                           })
+                         }
+                         placeholder="Enter other features"
+                         className="feature-textarea"
+                         rows="4"
+                       />
+                     </div>
+     
+                     <div className="feature-item">
+                     <label className="feature-label">
+                       In Stock or Out Of Stock
+                     </label>
+     
+                     <select
+                       name="status"
+                       value={editingProduct.status}
+                       onChange={(e) =>
+                         setEditingProduct({
+                           ...editingProduct,
+                           status: e.target.value,
+                         })
+                       }
+                       className="adminmodal-input5"
+                     >
+                 <option value="available">In Stock</option>
+                 <option value="unavailable">Out Of Stock</option>
+                     </select>
+                     </div>
+     
+                     <div className="feature-item">
+     
+             <label className="feature-label">Approve or Unapprove</label>
+     
+             <select
+                        disabled={role === 'Staff'}
+     
+                 name="productStatus"
+                 value={editingProduct.productStatus}
+                 onChange={(e) =>
+                   setEditingProduct({ ...editingProduct, productStatus: e.target.value })
+                 }
+                 className="adminmodal-input5"
+               >
+                 <option value="approved">Approve</option>
+                 <option value="unapproved">UnApprove</option>
+               </select>
+           
+           </div>
+     
+                   <button
+                     onClick={handleUpdateProduct}
+                     className="adminmodal-update-btn"
+                   >
+                     Update
+                   </button>
+                   <button
+                     onClick={() => setModalIsOpen(false)}
+                     className="adminmodal-cancel-btn"
+                   >
+                     Cancel
+                   </button>
+                   </div>
+                 </div>
+               </div>
+             </Modal>
+           )}
     </div>
   );
 };

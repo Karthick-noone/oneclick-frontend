@@ -69,6 +69,20 @@
     cursor: pointer; /* Pointer cursor on hover */
     transition: background-color 0.3s; /* Smooth transition for background color */
   }
+  @media (max-width: 768px) {
+  .pop-content {
+    background: white; /* White background for the popup */
+    border-radius: 10px; /* Slightly rounded corners */
+    width: 310px; /* Fixed width */
+    height: 350px; /* Fixed height */
+    position: relative; /* Relative positioning for close button */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
+    overflow: hidden; /* Hide overflow to remove scrollbar */
+    padding: 20px; /* Add padding for better spacing */
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+
+  }
+  }
   
   .coupon-btn:hover {
     background-color: #0056b3; /* Darker shade on hover */

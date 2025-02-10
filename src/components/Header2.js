@@ -12,7 +12,7 @@ import {
   FaShoppingBag,
   FaAddressBook,
   FaPowerOff,
-  FaBox
+  FaBox,
 } from "react-icons/fa";
 import "./../styles.css"; // Adjust path as needed
 import "./css/Header2.css"; // Adjust path as needed
@@ -26,8 +26,8 @@ import { ApiUrl } from "./ApiUrl";
 import axios from "axios";
 import Header3 from "./Header3";
 import Swal from "sweetalert2";
-import 'nprogress/nprogress.css';
-import NProgress from 'nprogress';
+import "nprogress/nprogress.css";
+import NProgress from "nprogress";
 
 const Header2 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -47,7 +47,6 @@ const Header2 = () => {
   const dropdownRef = useRef(null);
   const [username, setUsername] = useState("");
 
-
   useEffect(() => {
     NProgress.configure({ showSpinner: false }); // Disable spinner
 
@@ -65,7 +64,7 @@ const Header2 = () => {
   useEffect(() => {
     // Fetch the username from local storage
     const storedUsername = localStorage.getItem("username");
-    
+
     // Update state with the stored username
     if (storedUsername) {
       setUsername(storedUsername);
@@ -124,106 +123,207 @@ const Header2 = () => {
   };
 
   const keywordMapping = [
-    { term: "Computers", keywords: ["laptop", "laptops", "desktop", "desktops", "computer", "computers", "notebook"] },
-    { term: "Mobiles", keywords: ["mobile", "mobiles", "smartphone", "smartphones", "phones", "phone", "android",] }, // Added xiomi and redmi here
+    {
+      term: "Computers",
+      keywords: [
+        "laptop",
+        "laptops",
+        "desktop",
+        "desktops",
+        "computer",
+        "computers",
+        "notebook",
+      ],
+    },
+    {
+      term: "Mobiles",
+      keywords: [
+        "mobile",
+        "mobiles",
+        "smartphone",
+        "smartphones",
+        "phones",
+        "phone",
+        "android",
+      ],
+    }, // Added xiomi and redmi here
     { term: "CCTV", keywords: ["cctv", "security camera", "surveillance"] },
-    { term: "Printers", keywords: ["printer","printers", "scanner","scanners", "fax"] },
-    { term: "ComputerAccessories", keywords: ["keyboard", "mouse", "monitor", "webcam", "laptop charger", "adapter"] },
-    { term: "MobileAccessories", keywords: ["charger", "mobile charger", "back cover", "back case", "flip cover", "case", "screen protector", "power bank", "c type charger"] },
-    { term: "Headphones", keywords: ["headphone", "headphones", "earphone", "earphones", "earbuds", "headset", "wireless headphone", "wired headphone", "wired headphones"] },
-    { term: "Speaker", keywords: ["speaker", "speakers", "bluetooth speaker", "audio", "home theatre"] },
+    {
+      term: "Printers",
+      keywords: ["printer", "printers", "scanner", "scanners", "fax"],
+    },
+    {
+      term: "ComputerAccessories",
+      keywords: [
+        "keyboard",
+        "mouse",
+        "monitor",
+        "webcam",
+        "laptop charger",
+        "adapter",
+      ],
+    },
+    {
+      term: "MobileAccessories",
+      keywords: [
+        "charger",
+        "mobile charger",
+        "back cover",
+        "back case",
+        "flip cover",
+        "case",
+        "screen protector",
+        "power bank",
+        "c type charger",
+      ],
+    },
+    {
+      term: "Headphones",
+      keywords: [
+        "headphone",
+        "headphones",
+        "earphone",
+        "earphones",
+        "earbuds",
+        "headset",
+        "wireless headphone",
+        "wired headphone",
+        "wired headphones",
+      ],
+    },
+    {
+      term: "Speaker",
+      keywords: [
+        "speaker",
+        "speakers",
+        "bluetooth speaker",
+        "audio",
+        "home theatre",
+      ],
+    },
     { term: "Television", keywords: ["television", "tv", "tele"] },
-    { term: "Watch", keywords: ["watch", "smart watch", "time", "clock", "wall clock"] }
+    {
+      term: "Watch",
+      keywords: ["watch", "smart watch", "time", "clock", "wall clock"],
+    },
   ];
-  
+
   const synonymMapping = {
     xiaomi: "redmi",
-    redmi: "redmi" // This can help in consistency for checks
+    redmi: "redmi", // This can help in consistency for checks
   };
-  
+
   const handleSearch = async () => {
     let searchTerm = searchQuery.trim().toLowerCase(); // Convert input to lowercase for comparison
     console.log("Search term:", searchTerm); // Log the search term
-  
+
     // Map the search term if it's a synonym
     if (synonymMapping[searchTerm]) {
       searchTerm = synonymMapping[searchTerm]; // Replace the term with its synonym
       console.log("Mapped search term:", searchTerm); // Log the mapped term
     }
-  
+
     if (searchTerm) {
       // 1. First, check locally using priority categories
-      const foundCategory = keywordMapping.find(mapping => 
-        mapping.term !== "ComputerAccessories" && mapping.term !== "MobileAccessories" &&
-        mapping.keywords.some(keyword => searchTerm === keyword.toLowerCase()) // Use exact match
+      const foundCategory = keywordMapping.find(
+        (mapping) =>
+          mapping.term !== "ComputerAccessories" &&
+          mapping.term !== "MobileAccessories" &&
+          mapping.keywords.some(
+            (keyword) => searchTerm === keyword.toLowerCase()
+          ) // Use exact match
       );
-  
+
       console.log("Found category in priority categories:", foundCategory); // Log found category
-  
+
       if (foundCategory) {
         // If a priority category match is found, navigate to that category
         console.log(`Navigating to category: ${foundCategory.term}`); // Log navigation
-        navigate(`/${encodeURIComponent(foundCategory.term)}?search=${encodeURIComponent(searchTerm)}`);
+        navigate(
+          `/${encodeURIComponent(
+            foundCategory.term
+          )}?search=${encodeURIComponent(searchTerm)}`
+        );
       } else {
         // 2. If no priority category found, check for accessories
-        const accessoryFound = keywordMapping.find(mapping => 
-          (mapping.term === "ComputerAccessories" || mapping.term === "MobileAccessories") &&
-          mapping.keywords.some(keyword => searchTerm === keyword.toLowerCase()) // Use exact match
+        const accessoryFound = keywordMapping.find(
+          (mapping) =>
+            (mapping.term === "ComputerAccessories" ||
+              mapping.term === "MobileAccessories") &&
+            mapping.keywords.some(
+              (keyword) => searchTerm === keyword.toLowerCase()
+            ) // Use exact match
         );
-  
+
         console.log("Found category in accessories:", accessoryFound); // Log found accessory
-  
+
         if (accessoryFound) {
-          console.log(`Navigating to accessory category: ${accessoryFound.term}`); // Log navigation to accessory
-          navigate(`/${encodeURIComponent(accessoryFound.term)}?search=${encodeURIComponent(searchTerm)}`);
+          console.log(
+            `Navigating to accessory category: ${accessoryFound.term}`
+          ); // Log navigation to accessory
+          navigate(
+            `/${encodeURIComponent(
+              accessoryFound.term
+            )}?search=${encodeURIComponent(searchTerm)}`
+          );
         } else {
           // 3. If no local match, call the backend API for suggestions
-          console.log("No local match found, calling backend API for suggestions.");
+          console.log(
+            "No local match found, calling backend API for suggestions."
+          );
           try {
-            const response = await fetch(`${ApiUrl}/api/suggestions?query=${encodeURIComponent(searchQuery.trim())}`);
-            
+            const response = await fetch(
+              `${ApiUrl}/api/suggestions?query=${encodeURIComponent(
+                searchQuery.trim()
+              )}`
+            );
+
             if (response.ok) {
               const data = await response.json();
               console.log("API response data:", data); // Log API response
-  
+
               if (data.category) {
                 let category = data.category;
-  
+
                 // Explicitly handle backend response for "tv"
-                if (category.toLowerCase() === 'tv') {
-                  category = 'TeleVision';
-                } else if (searchQuery.trim().toLowerCase() === 'cctv') {
-                  category = 'CCTV';
+                if (category.toLowerCase() === "tv") {
+                  category = "TeleVision";
+                } else if (searchQuery.trim().toLowerCase() === "cctv") {
+                  category = "CCTV";
                 }
-  
+
                 console.log(`Navigating to category from API: ${category}`); // Log navigation from API
-                navigate(`/${encodeURIComponent(category)}?search=${encodeURIComponent(searchTerm)}`);
+                navigate(
+                  `/${encodeURIComponent(category)}?search=${encodeURIComponent(
+                    searchTerm
+                  )}`
+                );
               } else {
                 // If the backend doesn't return a category, show "Product not found"
                 console.warn("No category returned from API."); // Log warning
                 Swal.fire({
-                  title: 'Product not found',
-                  text: 'We could not find any products matching your search.',
-                  icon: 'warning',
-                  confirmButtonText: 'OK'
+                  title: "Product not found",
+                  text: "We could not find any products matching your search.",
+                  icon: "warning",
+                  confirmButtonText: "OK",
                 });
               }
             } else {
               console.error("Failed to fetch suggestions from API."); // Log error
               Swal.fire({
-                title: 'Product not found',
-                text: 'We could not find any products matching your search.',
-                icon: 'warning',
-                confirmButtonText: 'OK'
+                title: "Product not found",
+                text: "We could not find any products matching your search.",
+                icon: "warning",
+                confirmButtonText: "OK",
               });
             }
           } catch (error) {
             console.error("Error during search:", error); // Log error
             Swal.fire({
-              title: 'Error',
-              text: 'An error occurred while searching.',
-              icon: 'error',
-              confirmButtonText: 'OK'
+              title: "Error",
+              text: "An error occurred while searching.",
+              icon: "error",
+              confirmButtonText: "OK",
             });
           }
         }
@@ -232,15 +332,14 @@ const Header2 = () => {
       console.warn("Search term is empty."); // Log warning for empty search term
     }
   };
-  
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       console.log("Enter key pressed, initiating search."); // Log enter key press
       handleSearch();
     }
   };
-  
-  
+
   // const handleSuggestionClick = (suggestion) => {
   //   setSearchQuery(suggestion);
   //   setIsDropdownOpen3(false);
@@ -316,7 +415,6 @@ const Header2 = () => {
       }, 0)
       .toFixed(2);
   };
-
 
   const getTotalItemsCount = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0); // Ensure quantity is a valid number
@@ -398,21 +496,21 @@ const Header2 = () => {
 
   const updateCartItemQuantity = async (itemId, newQuantity) => {
     if (newQuantity <= 0) return; // Prevent reducing quantity below 1
-  
+
     try {
       // Update the cart item in the local state immediately for responsiveness
       const updatedCartItems = cartItems.map((item) =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       );
       setCartItems(updatedCartItems);
-  
+
       // Send the updated quantity to the server
       const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
         email,
         itemId,
         quantity: newQuantity,
       });
-  
+
       // if (response.status === 200) {
       //   toast.success(`Quantity updated to ${newQuantity}!`, {
       //     position: "top-right",
@@ -433,21 +531,20 @@ const Header2 = () => {
       });
     }
   };
-  
-  
+
   const removeFromCart = async (itemId, itemName, quantity) => {
     try {
       // Remove the item from the local state first
       const updatedCartItems = cartItems.filter((item) => item.id !== itemId);
       setCartItems(updatedCartItems);
-  
+
       // Send the removal request to the server
       const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
         email,
         itemId,
         quantity,
       });
-  
+
       if (response.data.success) {
         // Toast notification for successful removal
         toast.success(`${itemName} has been removed from your cart!`, {
@@ -456,23 +553,22 @@ const Header2 = () => {
           closeOnClick: true,
         });
       } else {
-        console.error('Failed to remove item from cart');
-        toast.error('Failed to remove item from cart!', {
+        console.error("Failed to remove item from cart");
+        toast.error("Failed to remove item from cart!", {
           position: "top-right",
           autoClose: 2000,
           closeOnClick: true,
         });
       }
     } catch (error) {
-      console.error('Error removing item from cart:', error);
-      toast.error('Error removing item from cart!', {
+      console.error("Error removing item from cart:", error);
+      toast.error("Error removing item from cart!", {
         position: "top-right",
         autoClose: 2000,
         closeOnClick: true,
       });
     }
   };
-  
 
   const sidebarRef = useRef(null);
   const wishlistRef = useRef(null);
@@ -655,7 +751,6 @@ const Header2 = () => {
   //   console.log("Wishlist Items:", wishlistItems);
   // }, [cartItems, wishlistItems]);
 
-
   // const categoryMap = {
   //   TV: 'Television',
   //   Speakers: 'Speaker',
@@ -663,7 +758,7 @@ const Header2 = () => {
   // };
   const [isLoading, setIsLoading] = useState(true);
 
-  const email = localStorage.getItem('email');
+  const email = localStorage.getItem("email");
 
   useEffect(() => {
     if (email) {
@@ -672,31 +767,29 @@ const Header2 = () => {
         try {
           const response = await axios.post(`${ApiUrl}/get-cart-items`, {
             email,
-            username: localStorage.getItem('username') // Send username if needed
+            username: localStorage.getItem("username"), // Send username if needed
           });
-  
+
           if (response.data.products) {
             setCartItems(response.data.products); // Set the fetched products to state
           }
         } catch (error) {
-          console.error('Error fetching cart items:', error);
+          console.error("Error fetching cart items:", error);
         } finally {
           setIsLoading(false);
         }
       };
-  
+
       // Fetch cart items immediately
       fetchCartItems();
-  
+
       // Set an interval to fetch cart items every 5 seconds
       const intervalId = setInterval(fetchCartItems, 100); // 5000ms = 5 seconds
-  
+
       // Clean up the interval on component unmount or when `email` changes
       return () => clearInterval(intervalId);
     }
   }, [email]); // Dependency on `email` so it will trigger fetch when email changes
-  
-  
 
   return (
     <>
@@ -706,62 +799,92 @@ const Header2 = () => {
       >
         <div className="company-name">
           <a href="/">
-            <img src={logo} width={"230px"} style={{marginLeft:'50px'}} alt="Company Logo" />
+            <img
+              src={logo}
+              width={"230px"}
+              style={{ marginLeft: "50px" }}
+              alt="Company Logo"
+            />
           </a>
         </div>
         <div className="search-box">
-  <input
-    type="text"
-    className="searchboxinput"
-    value={searchQuery}
-    onChange={handleSearchInputChange}
-    onKeyPress={handleKeyPress}
-    placeholder="Search for products..."
-  />
-  <div className="search-icon-container" onClick={handleSearch}>
-    <FaSearch className="search-icon" />
-  </div>
-</div>
-
+          <input
+            type="text"
+            className="searchboxinput"
+            value={searchQuery}
+            onChange={handleSearchInputChange}
+            onKeyPress={handleKeyPress}
+            placeholder="Search for products..."
+          />
+          <div className="search-icon-container" onClick={handleSearch}>
+            <FaSearch className="search-icon" />
+          </div>
+        </div>
 
         <div className="iconss">
-          <FaUser  title={username || "Login"} style={{color:'white'}} className="users"  onClick={toggleUserCard} />
+          <FaUser
+            title={username || "Login"}
+            style={{ color: "white" }}
+            className="users"
+            onClick={toggleUserCard}
+          />
 
           {isDropdownOpen && (
-              <div className="dropdown-menu" ref={dropdownRef}>
-                <a href="/About">
-                  <div
-                    className="dropdown-item"
-                    onClick={() => handleMenuClick("About")}
-                  >
-                    <FaInfoCircle style={{color:'#333'}} className="dropdown-icon" />
-                    <span>About</span>
-                  </div>
-                </a>
-                <a href="/Contact">
-                  <div
-                    className="dropdown-item"
-                    onClick={() => handleMenuClick("Contact")}
-                  >
-                    <FaEnvelope style={{color:'#333'}}className="dropdown-icon" />
-                    <span>Contact</span>
-                  </div>
-                </a>
-                <a href="/HelpCenter">
-                  <div
-                    className="dropdown-item"
-                    onClick={() => handleMenuClick("Help Center")}
-                  >
-                    <FaQuestionCircle style={{color:'#333'}}className="dropdown-icon" />
-                    <span>Help Center</span>
-                  </div>
-                </a>
-              </div>
-            )}
-          <FaHeart style={{color:'white'}} title="Wish List" onClick={toggleWishlist} />
+            <div className="dropdown-menu" ref={dropdownRef}>
+              <a href="/About">
+                <div
+                  className="dropdown-item"
+                  onClick={() => handleMenuClick("About")}
+                >
+                  <FaInfoCircle
+                    style={{ color: "#333" }}
+                    className="dropdown-icon"
+                  />
+                  <span>About</span>
+                </div>
+              </a>
+              <a href="/Contact">
+                <div
+                  className="dropdown-item"
+                  onClick={() => handleMenuClick("Contact")}
+                >
+                  <FaEnvelope
+                    style={{ color: "#333" }}
+                    className="dropdown-icon"
+                  />
+                  <span>Contact</span>
+                </div>
+              </a>
+              <a href="/HelpCenter">
+                <div
+                  className="dropdown-item"
+                  onClick={() => handleMenuClick("Help Center")}
+                >
+                  <FaQuestionCircle
+                    style={{ color: "#333" }}
+                    className="dropdown-icon"
+                  />
+                  <span>Help Center</span>
+                </div>
+              </a>
+            </div>
+          )}
+          <FaHeart
+            style={{ color: "white" }}
+            title="Wish List"
+            onClick={toggleWishlist}
+          />
           <div className="cart-icon-container">
-            <FaShoppingCart style={{color:'white',marginTop:'4px'}} title="Cart" onClick={toggleSidebar} />
-            <FaEllipsisV style={{color:'white'}} className="dots" onClick={handleToggleDropdown} />
+            <FaShoppingCart
+              style={{ color: "white", marginTop: "4px" }}
+              title="Cart"
+              onClick={toggleSidebar}
+            />
+            <FaEllipsisV
+              style={{ color: "white" }}
+              className="dots"
+              onClick={handleToggleDropdown}
+            />
 
             {getTotalItemsCount() > 0 && (
               <span className="cart-count">{getTotalItemsCount()}</span>
@@ -769,97 +892,162 @@ const Header2 = () => {
 
             {isDropdownOpen4 && (
               <div ref={dropdownRef} className="dropdownnn-container">
-              <div className="dropdownnn-content">
-                <a href="/UserAddress"><FaAddressBook style={{color:"#333"}} className="iicon" /> My Addresses</a>
-                {/* <a href="/my-subscription"><FaCalendarCheck /> My Subscription</a> */}
-                <a href="/MyAccount"><FaUser style={{color:"#333"}}  className="iicon"  /> My Account</a>
-                <a href="/MyOrders"><FaBox  style={{color:"#333"}} className="iicon"  /> My Orders</a>
-                <a href="/Cart"><FaShoppingBag style={{color:"#333"}} className="iicon" />Cart</a>
-                <hr />
-                <a href="#" onClick={handleLogout}><FaPowerOff style={{color:"#333"}} /> Logout</a>
+                <div className="dropdownnn-content">
+                  <a href="/UserAddress">
+                    <FaAddressBook
+                      style={{ color: "#333" }}
+                      className="iicon"
+                    />{" "}
+                    My Addresses
+                  </a>
+                  {/* <a href="/my-subscription"><FaCalendarCheck /> My Subscription</a> */}
+                  <a href="/MyAccount">
+                    <FaUser style={{ color: "#333" }} className="iicon" /> My
+                    Account
+                  </a>
+                  <a href="/MyOrders">
+                    <FaBox style={{ color: "#333" }} className="iicon" /> My
+                    Orders
+                  </a>
+                  <a href="/Cart">
+                    <FaShoppingBag
+                      style={{ color: "#333" }}
+                      className="iicon"
+                    />
+                    Cart
+                  </a>
+                  <hr />
+                  <a href="#" onClick={handleLogout}>
+                    <FaPowerOff style={{ color: "#333" }} /> Logout
+                  </a>
+                </div>
               </div>
-            </div>
             )}
           </div>
           {isMobileView && <Header3 />}
         </div>
 
-
-     <div ref={sidebarRef} className={`sidebarcart ${isSidebarOpen ? 'open' : ''}`}>
-  <button style={{ color: 'black' }} className="close-btn" onClick={toggleSidebar}>
-    <FaTimes />
-  </button>
-  <div className="sidebarcart-header">
-    <h3>Cart</h3>
-  </div>
-  <div className="sidebarcart-body">
-    {isLoading ? (
-      <p>Your cart is empty.</p>
-    ) : cartItems.length === 0 ? (
-      <p>Your cart is empty.</p>
-    ) : (
-      <ul>
-        {cartItems.map((item) => {
-          // Check if image is a stringified array and parse it
-          const images = Array.isArray(item.prod_img)
-            ? item.prod_img
-            : JSON.parse(item.prod_img || '[]'); // Handle if it's a stringified array
-
-          const firstImage = images.length > 0 ? images[0] : null; // Get the first image or fallback to null
-
-          return (
-            <li key={item.id} className="cart-item">
-              <Link style={{ textDecoration: 'none' }} to={`/product/${item.id}`}>
-                {firstImage ? (
-                  <img
-                    src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
-                    alt={item.prod_name}
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="placeholder-image">No image available</div> // Fallback if no image is available
-                )}
-              </Link>
-              <div className="item-details">
-                <Link style={{ textDecoration: 'none' }} to={`/product/${item.id}`}>
-                  <h3 className="item-name">{item.prod_name}</h3>
-                  <p className="item-features">{item.prod_features}</p>
-                </Link>
-              </div>
-
-              <div className="item-price">
-                <p style={{ color: 'red', textDecoration: 'line-through', fontSize: '12px' }}>
-                  ₹{item.actual_price* item.quantity}
-                </p>
-                <p style={{ color: '#27ae60' }}> ₹{item.prod_price * item.quantity}</p>
-                <div className="quantity-controls">
-                  <button onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)}>-</button>
-                  <span>{item.quantity}</span>
-                  <button onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)}>+</button>
-                </div>
-                <button onClick={() => removeFromCart(item.id, item.prod_name, item.quantity)} className="remove-btn">
-                  Remove
-                </button>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    )}
-    <div className="cart-total">
-      <div className="sidebarcart-footer">
-        <p>₹{calculateTotalPrice()}</p>
-        <a style={{ textDecoration: 'none', color: 'black' }} href="/Cart">
-          <button className="change-btn">
-            View Cart <FaShoppingCart />
+        <div
+          ref={sidebarRef}
+          className={`sidebarcart ${isSidebarOpen ? "open" : ""}`}
+        >
+          <button
+            style={{ color: "black" }}
+            className="close-btn"
+            onClick={toggleSidebar}
+          >
+            <FaTimes />
           </button>
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
+          <div className="sidebarcart-header">
+            <h3>Cart</h3>
+          </div>
+          <div className="sidebarcart-body">
+            {isLoading ? (
+              <p>Your cart is empty.</p>
+            ) : cartItems.length === 0 ? (
+              <p>Your cart is empty.</p>
+            ) : (
+              <ul>
+                {cartItems.map((item) => {
+                  // Check if image is a stringified array and parse it
+                  const images = Array.isArray(item.prod_img)
+                    ? item.prod_img
+                    : JSON.parse(item.prod_img || "[]"); // Handle if it's a stringified array
 
+                  const firstImage = images.length > 0 ? images[0] : null; // Get the first image or fallback to null
 
+                  return (
+                    <li key={item.id} className="cart-item">
+                      <Link
+                        style={{ textDecoration: "none" }}
+                        to={`/product/${item.id}`}
+                      >
+                        {firstImage ? (
+                          <img
+                            src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
+                            alt={item.prod_name}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="placeholder-image">
+                            No image available
+                          </div> // Fallback if no image is available
+                        )}
+                      </Link>
+                      <div className="item-details">
+                        <Link
+                          style={{ textDecoration: "none" }}
+                          to={`/product/${item.id}`}
+                        >
+                          <h3 className="item-name">{item.prod_name}</h3>
+                          <p className="item-features">{item.prod_features}</p>
+                        </Link>
+                      </div>
+
+                      <div className="item-price">
+                        <p
+                          style={{
+                            color: "red",
+                            textDecoration: "line-through",
+                            fontSize: "12px",
+                          }}
+                        >
+                          ₹{item.actual_price * item.quantity}
+                        </p>
+                        <p style={{ color: "#27ae60" }}>
+                          {" "}
+                          ₹{item.prod_price * item.quantity}
+                        </p>
+                        <div className="quantity-controls">
+                          <button
+                            onClick={() =>
+                              updateCartItemQuantity(item.id, item.quantity - 1)
+                            }
+                          >
+                            -
+                          </button>
+                          <span>{item.quantity}</span>
+                          <button
+                            onClick={() =>
+                              updateCartItemQuantity(item.id, item.quantity + 1)
+                            }
+                          >
+                            +
+                          </button>
+                        </div>
+                        <button
+                          onClick={() =>
+                            removeFromCart(
+                              item.id,
+                              item.prod_name,
+                              item.quantity
+                            )
+                          }
+                          className="remove-btn"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            <div className="cart-total">
+              <div className="sidebarcart-footer">
+                <p>₹{calculateTotalPrice()}</p>
+                <a
+                  style={{ textDecoration: "none", color: "black" }}
+                  href="/Cart"
+                >
+                  <button className="change-btn">
+                    View Cart <FaShoppingCart />
+                  </button>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <WishlistSidebar
           isOpen={isWishlistOpen}
@@ -867,7 +1055,6 @@ const Header2 = () => {
           wishlistItems={wishlistItems}
           removeFromWishlist={removeFromWishlist}
           wishlistRef={wishlistRef} // Pass the ref
-
         />
         {isUserCardOpen && user && (
           <div className="user-card-container" ref={userCardRef}>

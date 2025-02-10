@@ -365,28 +365,26 @@ const EditHomePagesAd = () => {
         <div className="laptops-card">
           <div className="laptops-card-header">
             <div className="laptops-card-item">Image(2000 x 600)</div>
-            <div className="laptops-card-item">Category</div>
-            <div className="laptops-card-item">Action</div>
           </div>
-          <div className="laptops-card-row">
-         
+          
+
+           <div className="ad-product-form">
             <input
               type="file"
               multiple
-              name='images'
+              name="images"
               onChange={handleImageChange}
-              className="laptops-card-input"
-              accept="image/*"  // This allows all image types
-
+              className="ad-form-input"
+              accept="image/jpg, image/png" // This allows all image types
             />
-         
-         <select
+
+<select
       name="category"
       // value={editingProduct.category}
       value={category}  // Bind the state to the select value
       onChange={handleCategoryChange}  // Update category on change
       // onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
-      className="laptops-card-input"
+      className="ad-form-input"
     >
       <option value="">Select Category</option>
       <option value="Computers">Computer</option>
@@ -402,8 +400,11 @@ const EditHomePagesAd = () => {
       <option value="PrinterAccessories">Printer Accessories</option>
               <option value="CCTVAccessories">CCTV Accessories</option>
     </select>
-         
-            <button onClick={handleAddProduct} className="laptops-add-btn">Add</button>
+          
+            <button onClick={handleAddProduct} className="ad-form-btn">
+              Add
+            </button>
+          
             <FaInfoCircle  style={{cursor:'pointer',fontSize:'18px'}} title="Add banner size image for better view (1920x600)" />
 
           </div>

@@ -667,6 +667,29 @@ gap: 10px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow for hover */
 }
 
+.product-detail-buy-now {
+  padding: 10px 24px;
+  background: linear-gradient(145deg, #007bff, #0056b3); /* Blue gradient */
+  color: #fff;
+  font-size: 1em;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;  
+  font-family: Calibri, sans-serif;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.product-detail-buy-now:hover {
+  background: linear-gradient(145deg, #0056b3, #007bff);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+
 .product-detail-add-to-cart span {
   margin-left: 10px;
   font-size: 1.2em; /* Slightly larger arrow for a bolder look */
@@ -711,6 +734,20 @@ gap: 10px;
   .product-detail-info {
     padding: 15px;
   }
+  .product-detail-add-to-cart {
+    font-size: 14px;
+    padding: 15px;
+  }
+  .product-detail-buy-now {
+    font-size: 14px;
+    padding: 15px;
+
+  }
+  .heart-icon {
+
+    margin-top: 16px;
+  }
+
 
   .product-detail-title {
     font-size: 1.8em;
@@ -886,7 +923,10 @@ gap: 10px;
   }
 
   .product-detail-add-to-cart {
-    width: 60%;
+    width: 50%;
+  }
+  .product-detail-buy-now {
+    width: 50%;
   }
 
   .product-detail-small-image {
