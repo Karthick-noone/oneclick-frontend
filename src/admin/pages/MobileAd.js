@@ -745,7 +745,7 @@ const MobileAd = () => {
               name="images"
               onChange={handleImageChange}
               className="ad-form-input"
-              accept="image/jpg, image/png" // This allows all image types
+              accept="image/jpeg, image/png" // This allows all image types
             />
 
             <input
@@ -833,7 +833,7 @@ const MobileAd = () => {
                 />
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg, image/png"
                   onChange={(e) => handleImageChange(e, true)} // Pass true to indicate it's a banner image
                   className="filee-input" // Unique class for file input
                 />
@@ -908,7 +908,7 @@ const MobileAd = () => {
                 />
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg, image/png"
                   onChange={(e) => handleImageChange2(e, true)} // Pass true to indicate it's a banner image
                   className="filee-inputt" // Unique class for file input
                 />
@@ -983,7 +983,7 @@ const MobileAd = () => {
       </div>
 
       {/* Modal for editing a product */}
-      {editingProduct && (
+       {editingProduct && (
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={() => setModalIsOpen(false)}
@@ -991,24 +991,21 @@ const MobileAd = () => {
           className="adminmodal"
           overlayClassName="adminmodal-overlay"
         >
-          
           <div className="adminmodal-header">
             <h2>Edit Image and Brand Name</h2>
-            <button
-              onClick={() => setModalIsOpen(false)}
-              className="adminmodal-close-btn"
-            >
-              {/* &times;  */}
-            </button>
           </div>
-
+      
+          <button className="close-button" onClick={() => setModalIsOpen(false)}>
+            &times;
+          </button>
+      
           <input
             type="file"
-            onChange={(e) => handleFileChange(e)} // Use the new handler for file change
+            onChange={(e) => handleFileChange(e)}
             className="adminmodal-input"
-            accept="image/jpeg, image/png" // This allows all image types
+            accept="image/jpeg, image/png"
           />
-
+      
           <input
             type="text"
             name="brand_name"
@@ -1019,26 +1016,18 @@ const MobileAd = () => {
                 brand_name: e.target.value,
               })
             }
-            placeholder="Enter brand_name"
+            placeholder="Enter brand name"
             className="adminmodal-input"
           />
-         
-
-          <button
-            onClick={handleUpdateProduct}
-            className="adminmodal-update-btn"
-          >
+      
+          <button onClick={handleUpdateProduct} className="adminmodal-update-btn">
             Update
           </button>
-          <button
-            onClick={handleDeleteProduct}
-            className="adminmodal-cancel-btn"
-          >
+          <button onClick={handleDeleteProduct} className="adminmodal-cancel-btn">
             Delete
           </button>
         </Modal>
       )}
-
      
     </div>
   );

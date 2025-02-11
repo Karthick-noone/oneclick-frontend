@@ -428,7 +428,7 @@ const EditSingleImageAd = () => {
               name="images"
               onChange={handleImageChange}
               className="ad-form-input"
-              accept="image/jpg, image/png" // This allows all image types
+              accept="image/jpeg, image/png" // This allows all image types
             />
 
             <select
@@ -529,7 +529,8 @@ const EditSingleImageAd = () => {
             type="file"
             onChange={onChangeCompressedImage}
             className="adminmodal-input"
-            accept="image/*" // Allow all image types
+            accept="image/jpeg, image/png"
+ // Allow all image types
           />
 
           {/* Dropdown for Category Selection */}

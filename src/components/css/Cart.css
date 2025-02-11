@@ -50,11 +50,24 @@
 .cart-product-name {
   margin: 0;
   font-size: 1em;
+
 }
 
 .cart-product-description {
   margin: 5px 0 0;
   color: #666;
+}
+
+.buy-product-name {
+  margin: 0;
+  font-size: 1em;
+
+}
+
+.buy-product-description {
+  margin: 5px 0 0;
+  color: #666;
+  width: 30%;
 }
 .cart-product-description {
   display: -webkit-box; /* Use a box layout for controlling text lines */
@@ -67,7 +80,31 @@
   line-height: 1.5; /* Set line height */
   max-height: 3em; /* 1.5 * 2 lines = 3em max height */
 }
+
+.buy-product-description {
+  display: -webkit-box; /* Use a box layout for controlling text lines */
+  -webkit-box-orient: vertical; /* Set orientation to vertical */
+  overflow: hidden; /* Hide any overflowing content */
+  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+  white-space: normal; /* Allow text to wrap */
+
+  font-size: 16px; /* Adjust as per your design */
+  line-height: 1.5; /* Set line height */
+  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+}
 .cart-product-name {
+  display: -webkit-box; /* Use a box layout for controlling text lines */
+  -webkit-box-orient: vertical; /* Set orientation to vertical */
+  overflow: hidden; /* Hide any overflowing content */
+  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+  white-space: normal; /* Allow text to wrap */
+
+  font-size: 16px; /* Adjust as per your design */
+  line-height: 1.5; /* Set line height */
+  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+}
+
+.buy-product-name {
   display: -webkit-box; /* Use a box layout for controlling text lines */
   -webkit-box-orient: vertical; /* Set orientation to vertical */
   overflow: hidden; /* Hide any overflowing content */

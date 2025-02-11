@@ -13,6 +13,23 @@
 
 }
 
+.sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.submenu.active {
+  display: block; /* Show the active submenu */
+  position: relative;
+  top: 0;
+}
+
+.sidebar .submenu.active {
+  order: -1; /* Make sure the active submenu is at the top */
+}
+
 .slidebar.collapsed {
   width: 90px;
 }

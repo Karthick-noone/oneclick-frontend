@@ -6,11 +6,18 @@ import { ApiUrl } from "../../components/ApiUrl";
 import Modal from "react-modal"; // Install if needed using `npm install react-modal`
 import Swal from "sweetalert2"; // For better confirmation, install with `npm install sweetalert2`
 import OrderTrackingModal from "./OrderTrackingModal";
-import { FaEye, FaTimes, FaTrash, FaPrint } from "react-icons/fa";
+import {
+  FaEye,
+  FaTimes,
+  FaTrash,
+  FaPrint,
+  FaEdit,
+  FaCheck,
+} from "react-icons/fa";
 
 import ReactDOMServer from "react-dom/server"; // Add this import at the top
 import Invoice from "./Invoice";
-const Orders = ({ year, setYear, month, setMonth }) => {
+const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,6 +33,64 @@ const Orders = ({ year, setYear, month, setMonth }) => {
   const [filterYear, setFilterYear] = useState("");
   // Function to handle search
   const [filterDeliveryStatus, setFilterDeliveryStatus] = useState("All");
+  const [editingRow, setEditingRow] = useState(null); // Track the row being edited
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const handleStatusChange = (e) => {
+    const newStatus = e.target.value;
+    setSelectedStatus(newStatus);
+    console.log("Selected status:", newStatus); // Log the selected status
+  };
+
+  const handleSaveClick = async (orderId) => {
+    // Find the order that is being edited
+    const order = orders.find((order) => order.unique_id === orderId);
+
+    // Check if there is a change in the selected status
+    if (selectedStatus === order?.status) {
+      console.log("No status change, ignoring update."); // Log if no change
+      setEditingRow(null); // Close the select dropdown without making changes
+      return; // Exit without making any further changes
+    }
+
+    console.log("Saving new status:", selectedStatus); // Log when saving
+
+    try {
+      // Send the status update to the backend
+      const response = await fetch(`${ApiUrl}/api/update-order-status`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: orderId,
+          status: selectedStatus,
+        }),
+      });
+
+      if (response.ok) {
+        console.log("Status updated successfully!"); // Log success
+
+        // Directly update the status in the UI state
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order.unique_id === orderId
+              ? { ...order, status: selectedStatus } // Update only the row being edited
+              : order
+          )
+        );
+
+        // Optionally, refetch the updated order list to ensure data consistency
+        await fetchOrders();
+      } else {
+        console.error("Failed to update the status."); // Log failure
+      }
+    } catch (error) {
+      console.error("Error updating status:", error); // Log any errors
+    } finally {
+      setEditingRow(null); // Stop editing after saving
+    }
+  };
 
   const yearRef = useRef(null);
   const monthRef = useRef(null);
@@ -401,7 +466,6 @@ const Orders = ({ year, setYear, month, setMonth }) => {
         confirmButtonText: "Yes, cancel it!",
       });
 
-      
       if (confirmation.isConfirmed) {
         const response = await fetch(`${ApiUrl}/cancelOrder`, {
           method: "POST",
@@ -594,6 +658,8 @@ const Orders = ({ year, setYear, month, setMonth }) => {
                       .map((order, index) => (
                         <tr
                           key={order.unique_id}
+                          order={order}
+                          updateOrderStatus={updateOrderStatus}
                           className={
                             order.delivery_status === "Cancelled"
                               ? "row-cancelled"
@@ -612,17 +678,65 @@ const Orders = ({ year, setYear, month, setMonth }) => {
                               : "N/A"}
                           </td> */}
                           <td>{formatDate(order.order_date)}</td>
-                          <td>
-                            <span
-                              className={`${
-                                order.status
-                                  ? order.status.toLowerCase()
-                                  : "unknown"
-                              }`}
-                            >
-                              {order.status || "Unknown"}
-                            </span>
+                          <td style={{ width: "100%", position: "relative" }}>
+                            {editingRow === order.unique_id ? (
+                              <>
+                                <select
+                                  value={selectedStatus}
+                                  onChange={handleStatusChange}
+                                  style={{
+                                    display: "inline", // Keeps the select inline
+                                  }}
+                                >
+                                  <option value="Pending">Pending</option>
+                                  <option value="Paid">Paid</option>
+                                </select>
+                                <FaCheck
+                                  className="tick-icon"
+                                  onClick={() =>
+                                    handleSaveClick(order.unique_id)
+                                  }
+                                  style={{
+                                    cursor: "pointer",
+                                    color: "green",
+                                    position: "absolute", // Position the icon to the right
+                                    right: "30px", // Keeps the icon close to the right edge
+                                  }}
+                                />
+                              </>
+                            ) : (
+                              <>
+                                <span
+                                  className={
+                                    order?.status?.toLowerCase() || "unknown"
+                                  }
+                                  style={{
+                                    display: "inline",
+                                  }}
+                                >
+                                  {order?.status || "Unknown"}
+                                </span>
+                                <FaEdit
+                                  className="edit-icon"
+                                  onClick={() => {
+                                    if (order.delivery_status !== "Cancelled") {
+                                      setEditingRow(order.unique_id);
+                                      setSelectedStatus(order.status);
+                                    }
+                                  }}
+                                  style={{
+                                    cursor:
+                                      order.delivery_status === "Cancelled"
+                                        ? "not-allowed"
+                                        : "pointer", // Disable cursor on cancel
+                                    position: "absolute",
+                                    right: "30px",
+                                  }}
+                                />
+                              </>
+                            )}
                           </td>
+
                           <td>{order.payment_method || "N/A"}</td>
                           <td>₹{order.total_amount || "N/A"}</td>
                           <td>
@@ -692,7 +806,10 @@ const Orders = ({ year, setYear, month, setMonth }) => {
                             <button
                               className="btn btn-cancel"
                               onClick={() => cancelOrder(order.unique_id)}
-                              disabled={order.delivery_status === "Cancelled" || order.delivery_status === "Delivered"}
+                              disabled={
+                                order.delivery_status === "Cancelled" ||
+                                order.delivery_status === "Delivered"
+                              }
                             >
                               {order.delivery_status === "Cancelled"
                                 ? "Cancelled"

@@ -332,8 +332,24 @@ const ProductDetailPage = () => {
   
   
 
+  const handleEditProduct = (product, index = null, isBanner = false, bannerKeyword = "") => {
+    console.log("Editing product:", product);
+  
+    setEditingProduct({
+      id: product.id,
+      brand_name: product.brand_name,
+      images: [],
+    });
+  
+    setEditingImageIndex(index);
+    setIsBannerEdit(isBanner);
+    setBannerKeyword(bannerKeyword);
+  
+    setModalIsOpen(true);
+  };
+  
   const handleUpdateProduct = async () => {
-    console.log("Updating product:", editingProduct); // Log the current state of the editing product
+    console.log("Updating product:", editingProduct);
   
     if (!editingProduct.id) {
       console.error("Error: Product ID is missing.");
@@ -352,38 +368,34 @@ const ProductDetailPage = () => {
   
     const formData = new FormData();
     formData.append("brand_name", editingProduct.brand_name);
-    
-    editingProduct.images.forEach((image) => {
-      console.log("Appending image:", image); // Log each image being appended
-      formData.append("images", image);
-    });
+  
+    if (selectedFiles) {
+      // Add "product_banner_" prefix to the file name
+      const prefixedImageName = `product_banner_${selectedFiles.name}`;
+      formData.append("image", new File([selectedFiles], prefixedImageName));
+    }
   
     try {
-      console.log("Sending update request for product ID:", editingProduct.id); // Log the request
-      await axios.put(
-        `${ApiUrl}/mobileupdateofferspage/${editingProduct.id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      console.log("Sending update request for product ID:", editingProduct.id);
+      await axios.put(`${ApiUrl}/mobileupdateofferspage/${editingProduct.id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
   
       Swal.fire({
         icon: "success",
         title: "Product Updated",
         text: "The product has been updated successfully!",
-      }).then(() => {
-        return axios.get(`${ApiUrl}/fetchmobileofferspage`);
-      }).then((fetchResponse) => {
-        console.log("Updated product list:", fetchResponse.data); // Log the updated product list
-        setProducts(fetchResponse.data);
-        setEditingProduct(null);
-        setModalIsOpen(false);
-      });
+      }).then(() => axios.get(`${ApiUrl}/fetchmobileofferspage`))
+        .then((fetchResponse) => {
+          console.log("Updated product list:", fetchResponse.data);
+          setProducts(fetchResponse.data);
+          setEditingProduct(null);
+          setModalIsOpen(false);
+        });
     } catch (error) {
-      console.error("Error updating product:", error); // Log any errors
+      console.error("Error updating product:", error);
       Swal.fire({
         icon: "error",
         title: "Update Failed",
@@ -393,17 +405,7 @@ const ProductDetailPage = () => {
   };
   
 
-  const handleEditProduct = (product) => {
-    console.log("Editing product:", product); // Log the product being edited
   
-    setEditingProduct({
-      id: product.id,
-      brand_name: product.brand_name,
-      images: [], // Reset images, the user has to select new ones if desired
-    });
-  
-    setModalIsOpen(true);
-  };
   
   const handleEditImage = (product, index) => {
     console.log(`Editing image for product ID: ${product.id} at index: ${index}`);
@@ -616,7 +618,7 @@ return (
       />
       <input
         type="file"
-        accept="image/*"
+        accept="image/jpeg, image/png"
         onChange={(e) => handleImageChange(e, true)} // Pass true to indicate it's a banner image
         className="filee-input" // Unique class for file input
       />
@@ -639,32 +641,15 @@ return (
          <div style={{ textAlign: 'center', marginTop: '10px' }}>
             <span style={{ fontWeight: 'bold' }}>Banner Image {index + 1}</span>
           </div>
-          <p style={{ marginTop: '30px' }} className="brand-name">{product.brand_name}</p> {/* Display brand name */}
+          <p style={{ marginTop: '30px' }} className="pc-product-brand">{product.brand_name}</p> {/* Display brand name */}
 
           <img
             src={`${ApiUrl}/uploads/offerspage/${product.image}`} // Construct the image URL for the product
             alt={`Banner for ${product.brand_name}`} // Alt text for accessibility
-            className="banner-image" // Class for styling
+            className="pc-product-image" // Class for styling
             style={{ width: '875px', marginTop: '10px', height: 'auto' }} // Styling for the image
           />
           
-          {/* Image action icons */}
-          <div className="image-action" style={{ position: 'absolute', top: '30px', right: '-10px' }}>
-            <span
-              className="edit-iconn"
-              onClick={() => handleSecondEditIcon(product, index, 'product_banner_')} // Pass the entire product object
-              style={{ cursor: 'pointer', color: '#fff' }} // Adjust icon style if needed
-            >
-              ✏️
-            </span>
-            <span
-              className="delete-iconn"
-              onClick={() => handleDeleteImage(product, index)} // Pass the entire product object
-              style={{ cursor: 'pointer', color: '#fff', marginLeft: '10px' }} // Adjust icon style if needed
-            >
-              {/* 🗑️ */}
-            </span>
-          </div>
           <button
             onClick={() => handleEditProduct(product)}
             className="laptops-edit-btnn"
@@ -700,14 +685,20 @@ return (
         overlayClassName="adminmodal-overlay"
       >
         <div className="adminmodal-header">
-          <h2>Edit Brand Name</h2>
-          <button
-            onClick={() => setModalIsOpen(false)}
-            className="adminmodal-close-btn"
-          >
-            &times; {/* or use a close icon */}
-          </button>
+          <h2>Edit Image and Brand Name</h2>
+        
         </div>
+        <button className="close-button" onClick={() => setModalIsOpen(false)}>
+            &times;
+          </button>
+
+        <input
+          type="file"
+          onChange={(e) => handleFileChange(e)} // Use the new handler for file change
+          className="adminmodal-input"
+          accept="image/jpeg, image/png" // This allows all image types
+        />
+
         <input
           type="text"
           name="brand_name"
@@ -718,6 +709,8 @@ return (
           placeholder="Enter brand_name"
           className="adminmodal-input"
         />
+
+
 
         <button
           onClick={handleUpdateProduct}
@@ -752,12 +745,7 @@ return (
           </button>
         </div>
 
-        <input
-          type="file"
-          onChange={(e) => handleFileChange(e)} // Use the new handler for file change
-          className="adminmodal-input"
-          accept="image/*" // This allows all image types
-        />
+       
 
         <div className="adminmodal-footer">
           <button

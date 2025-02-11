@@ -2277,7 +2277,8 @@ const Computers = () => {
         <h2 style={titleStyle}>Update this image</h2>
         <input
           type="file"
-          accept="image/*"
+          accept="image/jpeg, image/png"
+
           onChange={handleImageUpload} // Keep this function for handling file selection
           style={inputStyle}
         />

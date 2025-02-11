@@ -51,7 +51,7 @@ const BuyNow = () => {
   const location = useLocation();
   const { product, email } = location.state || {}; // Get product and email
 
-  console.log("products", product);
+  // console.log("products", product);
 
   const [quantity, setQuantity] = useState(1);
 
@@ -111,15 +111,12 @@ const BuyNow = () => {
   };
 
   const handleApplyCoupon = async (couponCode, product) => {
-
     if (!product || !product.prod_id) {
       console.error("Invalid product data, missing prod_id");
       setMessage("Invalid product data.");
       setMessageType("error");
       return;
     }
-
- 
 
     if (!couponCode.trim()) {
       // If the coupon input is empty, show a message and exit the function
@@ -137,7 +134,6 @@ const BuyNow = () => {
     }
 
     try {
-    
       const productIds = [product.prod_id];
       //   console.log("Product IDs to be sent:", productIds);
 
@@ -201,18 +197,21 @@ const BuyNow = () => {
     }
   };
 
-
-
-  const calculateTotalPrice = (product, quantity, couponValue, minPurchaseLimit) => {
+  const calculateTotalPrice = (
+    product,
+    quantity,
+    couponValue,
+    minPurchaseLimit
+  ) => {
     console.log("Calculating total price...");
 
     if (!product || typeof product !== "object") {
-        console.error("Invalid product data:", product);
-        return "0.00";
+      console.error("Invalid product data:", product);
+      return "0.00";
     }
 
     const price = parseFloat(product.prod_price) || 0;
-    const delivery_charge = parseInt(product.deliverycharge) || 0;  // ✅ Ensure it's 0 if missing
+    const delivery_charge = parseInt(product.deliverycharge) || 0; // ✅ Ensure it's 0 if missing
 
     quantity = quantity > 0 ? quantity : 1;
 
@@ -225,23 +224,25 @@ const BuyNow = () => {
 
     let finalPrice = totalPrice;
     if (minPurchaseLimit && totalPrice >= minPurchaseLimit) {
-        if (couponValue > 0) {
-            finalPrice -= couponValue;
-            console.log(`Coupon applied. Discount: ₹${couponValue}, New Total: ₹${finalPrice}`);
-        } else {
-            console.log("No valid coupon applied.");
-        }
+      if (couponValue > 0) {
+        finalPrice -= couponValue;
+        console.log(
+          `Coupon applied. Discount: ₹${couponValue}, New Total: ₹${finalPrice}`
+        );
+      } else {
+        console.log("No valid coupon applied.");
+      }
     } else {
-        console.log("Total price below minimum purchase limit. Coupon not applied.");
+      console.log(
+        "Total price below minimum purchase limit. Coupon not applied."
+      );
     }
 
     finalPrice = Math.max(finalPrice, 0);
     console.log("Final Price (after adjustments):", finalPrice);
 
     return finalPrice.toFixed(2);
-};
-
-
+  };
 
   useEffect(() => {
     // Fetch the username from local storage when the component mounts
@@ -251,13 +252,9 @@ const BuyNow = () => {
     }
   }, []);
 
-
-
   const handlePaymentMethodChange = (event) => {
     setSelectedPaymentMethod(event.target.value);
   };
-
-  
 
   // Memoize fetchAddress function using useCallback to avoid re-creating it on each render
   const fetchAddress = useCallback(
@@ -370,7 +367,6 @@ const BuyNow = () => {
     }
   };
 
- 
   const handlePayment = () => {
     console.log("Selected Address:", selectedAddress); // Debugging output
 
@@ -378,12 +374,10 @@ const BuyNow = () => {
     const addressToUse = selectedAddress || defaultAddress;
 
     if (!addressToUse) {
-    
       navigate("/UserAddress"); // Update the path to your UserAddress page
 
       return;
     }
- 
 
     const selectedAddressDetails = addressDetails.find(
       (address) => String(address.address_id) === String(addressToUse)
@@ -394,10 +388,9 @@ const BuyNow = () => {
     const name = `${selectedAddressDetails.name}`;
     const email = localStorage.getItem("email");
 
- 
     const options = {
-    //   key: "rzp_live_YExdymlgVGlrcC", // Replace with your Razorpay Test Key ID
-    //   key_secret: "IUFWdAs57nzoQqnrPZM1pzzt", // Replace with your Razorpay Test Key ID
+      //   key: "rzp_live_YExdymlgVGlrcC", // Replace with your Razorpay Test Key ID
+      //   key_secret: "IUFWdAs57nzoQqnrPZM1pzzt", // Replace with your Razorpay Test Key ID
       key: "rzp_test_mtjdapiflomQkN", // Sample Razorpay Test Key ID (karthick)
       key_secret: "g13PipAk6MMAEj2Rr3lajUmJ", // Replace with your Razorpay Test Key ID(karthick)
       amount: finalAmountToSend * 100, // Amount in paise (Razorpay works in paise)
@@ -520,7 +513,7 @@ const BuyNow = () => {
         selectedPaymentMethod === "cod"
           ? "Pending"
           : selectedPaymentMethod === "pickup"
-          ? "Ready for Pickup"
+          ? "Pending"
           : "Paid",
     };
 
@@ -539,9 +532,8 @@ const BuyNow = () => {
           timer: 5000,
           showConfirmButton: false,
         }).then(() => {
-            window.history.replaceState(null, "", "/MyOrders");
-            navigate("/MyOrders");
-
+          window.history.replaceState(null, "", "/MyOrders");
+          navigate("/MyOrders");
         });
       } else {
         console.warn("Unexpected response status:", response.status);
@@ -564,13 +556,10 @@ const BuyNow = () => {
     }
   };
 
- 
-
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
 
- 
   const images = Array.isArray(product.prod_img)
     ? product.prod_img
     : JSON.parse(product.prod_img || "[]");
@@ -579,7 +568,6 @@ const BuyNow = () => {
   const discount2 = (product.actual_price - product.prod_price) * quantity;
 
   const delivery_charge = parseInt(product.deliverycharge) || 0;
-
 
   // console.log("deliverycharge...",delivery_charge)
 
@@ -719,11 +707,14 @@ const BuyNow = () => {
 
                     {/* Product details */}
                     {/* <div style={{ cursor: "pointer" }} className="cart-product-details"> */}
-                    <p className="cart-product-name">{product.prod_name}</p>
+                    <p className="buy-product-name">{product.prod_name}</p>
                     {/* </div> */}
-                    <p className="cart-product-description">
-                      {product.prod_features}
-                    </p>
+
+                    {product.prod_features && (
+                      <p className="buy-product-description">
+                        {product.prod_features}
+                      </p>
+                    )}
 
                     {/* Price and quantity */}
                     <div className="cart-product-price">
@@ -787,8 +778,8 @@ const BuyNow = () => {
               <span>
                 {/* <span style={{ textDecoration: "line-through" }}>₹50</span>{" "}
                 <span style={{ color: "green" }}>FREE Delivery</span> */}
-  <span>₹{delivery_charge ? delivery_charge : 0}</span>
-  </span>
+                <span>₹{delivery_charge ? delivery_charge : 0}</span>
+              </span>
             </div>
             <div className="summary-item">
               <span>Coupon Discount</span>
@@ -844,13 +835,11 @@ const BuyNow = () => {
             <div className="summary-item">
               <strong>Total Amount</strong>
               <span style={{ fontWeight: "bold" }}>
-               
                 {finalPrice}
                 {/* {totalpurchaseamount} */}
               </span>
             </div>
             <hr />
-          
             <center>
               <h4 style={{ marginTop: "10px" }}>Select Payment Method</h4>
             </center>
@@ -938,8 +927,6 @@ const BuyNow = () => {
                   </div>
                 )}
               </div>
-
-          
             </div>
             {isModalOpen && (
               <div className="modal4-overlay">
