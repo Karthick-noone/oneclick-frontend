@@ -2,7 +2,8 @@
   display: flex;                     /* Use flexbox to arrange items */
   flex-wrap: wrap;                  /* Allow wrapping of cards to the next line */
   gap: 30px;                        /* Adjust the gap between product cards */
-  justify-content: flex-start;       /* Align items to the start of the container */
+  justify-content: center;       
+  /* justify-content: flex-start;        */
   align-items: center;               /* Center the cards vertically if they are in different rows */
   max-width: 100%;                  /* Allow the container to take full width */
   margin: 10px auto;                /* Center the container horizontally with auto margins */
@@ -151,21 +152,21 @@
   
   .ad-image {
     width: 100%; /* Make the image take up the full width of the container */
-    height: auto; /* Fixed height for uniformity */
-    object-fit: cover; /* Crop the image to fit within the dimensions */
+    height: 120px; /* Fixed height for uniformity */
+    object-fit: contain; /* Crop the image to fit within the dimensions */
     border-radius: 5px;
   }
   
   .ad-image3 {
     width: 100%; /* Make the image take up the full width of the container */
-    height: auto; /* Fixed height for uniformity */
+    height: 320px; /* Fixed height for uniformity */
     object-fit: cover; /* Crop the image to fit within the dimensions */
     border-radius: 5px;
   }
   
   .ad-image4 {
     width: 100%; /* Make the image take up the full width of the container */
-    height: auto; /* Fixed height for uniformity */
+    height: 350px; /* Fixed height for uniformity */
     object-fit: contain; /* Crop the image to fit within the dimensions */
     border-radius: 5px;
   }

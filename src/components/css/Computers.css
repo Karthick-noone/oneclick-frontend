@@ -1,4 +1,83 @@
+.btn-container {
+    display: flex;
+    gap: 15px; /* Space between the two buttons */
+    justify-content: flex-start; /* Align buttons to the left */
+    margin-top: 20px; /* Space above the buttons */
+  }
+  
+  .addToCart,
+  .buy-now {
+    padding: 11px 18px;
+    font-size: 11px;
+    font-weight: bold;
+    /* border-radius: 5px; */
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    background-size: 200% 200%; /* Makes the gradient fill the button */
+  }
+  
+  .addToCart {
+    background: linear-gradient(45deg, #4caf50, #81c784); /* Green gradient */
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .addToCart:hover {
+    background: linear-gradient(135deg, #4caf50, #81c784); /* Hover with rotated gradient */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .addToCart:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(72, 199, 106, 0.6);
+  }
+  
+  .buy-now {
+    background: linear-gradient(45deg, #ff9800, #ffb74d); /* Orange gradient */
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .buy-now:hover {
+    background: linear-gradient(135deg, #ff9800, #ffb74d); /* Hover with rotated gradient */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .buy-now:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.6);
+  }
+  
+  .buy-now span {
+    margin-left: 10px;
+    font-size: 18px;
+    transform: translateY(2px);
+  }
+  
 
+  
+  button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  
+  @media (max-width: 768px) {
+    .btn-container {
+      flex-direction: column; /* Stack buttons vertically on smaller screens */
+      align-items: center;
+    }
+  
+    .addToCart,
+    .buy-now {
+      width: 100%;
+      margin-bottom: 10px; /* Space between buttons when stacked */
+    }
+  }
+  
 .no-products-message {
   display: flex;
   flex-direction: column;
@@ -14,7 +93,7 @@
   font-size: 24px;
   margin-bottom: 10px;
 }
-
+    
 .no-products-message p {
   font-size: 18px;
   /* color: #777; */
@@ -74,54 +153,55 @@
 }
 
 .product-card {
-    position: relative;
-    /* border: 1px solid #ddd; */
-    /* border-radius: 8px; */
-    overflow: hidden;
-    width: calc(25% - 20px); /* Adjust to fit 4 cards in a row */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    text-align: center;
-    height: auto; /* Set a fixed height for the card */
-    max-height: 400px;
-    margin-bottom: 10px; /* Space below each card */
-    cursor: pointer;
+  position: relative;
+  width: calc(25% - 20px); /* Ensures 4 cards in a row */
+  height: 420px; /* Fixed height for uniformity */
+  max-height: 420px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  background-color: #fff;
+  text-align: center;
+  /* border-radius: 8px; */
+  margin-bottom: 15px; /* Space below each card */
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distributes content evenly */
+  padding: 15px;
+  transition: transform 0.2s ease-in-out;
 }
 
+
+
 .product-image {
-    width: 100%;
-    height: 200px;
-    object-fit: contain;
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  margin-bottom: 10px;
 }
 
 .product-name {
-    font-size: 16px;
-    margin: 5px 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 5px 0;
 }
 
-.product-description {
-    font-size: 14px;
-    color: #666;
-    margin: 0 0 10px;
-}
 .product-subtitle2 {
-    font-size: 13px;
-    color: grey;
+  font-size: 13px;
+  color: grey;
 }
 
 .product-price {
-    font-size: 20px;
-    color: #27ae60;
-    margin: 10px 0;
-    font-weight: bold;
-    margin-right: 5px;
+  font-size: 20px;
+  color: #27ae60;
+  font-weight: bold;
+  margin-right: 5px;
 }
+
 .product-actual-price {
-    font-size: 15px;
-    color: red;
-    margin: 10px 0;
-    /* font-weight: bold; */
-    /* text-decoration: line-through; */
+  font-size: 15px;
+  color: red;
+  text-decoration: line-through;
 }
 
 .add-to-cart {

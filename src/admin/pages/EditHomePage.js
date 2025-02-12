@@ -194,6 +194,7 @@ const EditHomePagesAd = () => {
           icon: 'success',
           title: 'Image Deleted',
           text: 'The image has been deleted successfully!',
+          timer:3000,
         }).then(() => {
           window.location.reload();
         });
@@ -416,18 +417,24 @@ const EditHomePagesAd = () => {
               <div key={product.id} className="ad-card3">
                 <div >
                   {product.image ? (
+
+                    <>
                     <img
                       src={`${ApiUrl}/uploads/edithomepage/${product.image}`}
                       alt="Ad"
                       className="ad-image"
                     />
+
+                    <button
+                    onClick={() => handleEditProduct(product)} // Pass 'true' for portrait images
+                    className="laptops-edit-btnn"
+                  >
+                    Edit
+                  </button></>
                   ) : (
                     <p>No image available.Please add one image for advertisement.</p>
                   )}
-                  <div className="image-actions">
-                    <span className="edit-icon" onClick={() => handleEditProduct(product)}>✏️</span>
-                    <span className="delete-icon" onClick={() => handleDeleteImage(product)}>🗑️</span>
-                  </div>
+               
                 </div>
 
                 <div>Category - {product.category}</div>
@@ -459,13 +466,13 @@ const EditHomePagesAd = () => {
       type="file"
       onChange={handleImageSelection}
       className="adminmodal-input"
-      accept="image/jpeg, image/png"  // Allow all image types
+      accept="image/jpeg, image/png"
     />
 
     {/* Dropdown for Category Selection */}
     <select
       name="category"
-      value={editingProduct.category || ''}  // Ensure category is controlled
+      value={editingProduct.category || ''}
       onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
       className="adminmodal-input"
     >
@@ -481,12 +488,13 @@ const EditHomePagesAd = () => {
       <option value="ComputerAccessories">Computer Accessories</option>
       <option value="MobileAccessories">Mobile Accessories</option>
       <option value="PrinterAccessories">Printer Accessories</option>
-              <option value="CCTVAccessories">CCTV Accessories</option>
+      <option value="CCTVAccessories">CCTV Accessories</option>
     </select>
 
     {/* Update and Cancel Buttons */}
     <button onClick={handleUpdateImage} className="adminmodal-update-btn">Update</button>
-    <button onClick={() => setModalIsOpen(false)} className="adminmodal-cancel-btn">Cancel</button>
+    {/* <button onClick={() => setModalIsOpen(false)} className="adminmodal-cancel-btn">Cancel</button> */}
+    <button onClick={() => handleDeleteImage(editingProduct)} className="adminmodal-cancel-btn">Delete</button>
   </Modal>
 )}
 

@@ -8,10 +8,13 @@
 .another-container {
   padding: 3px;
   background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 -2px 5px rgba(0, 0, 0, 0.3), 
-              -2px 0 5px rgba(0, 0, 0, 0.3), 2px 0 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 -2px 5px rgba(0, 0, 0, 0.3),
+    -2px 0 5px rgba(0, 0, 0, 0.3), 2px 0 5px rgba(0, 0, 0, 0.3);
 }
 
+.bannerr-container4 {
+  margin-top: 10px;
+}
 
 @media (max-width: 768px) {
   .side-row {
@@ -53,7 +56,6 @@
 .side-row:hover {
   scrollbar-color: #ffb03a #f9e5d6; /* Change thumb color on hover */
 }
-
 
 .accessory-item {
   display: flex;
@@ -161,7 +163,11 @@
   /* white-space: nowrap; /* Remove this if you want text to wrap */
 }
 .timer-tag {
-  background: linear-gradient(145deg, #3498db, #2980b9); /* Gradient for depth */
+  background: linear-gradient(
+    145deg,
+    #3498db,
+    #2980b9
+  ); /* Gradient for depth */
   padding: 4px 12px;
   border-radius: 5px;
   color: #fff; /* White text for contrast */
@@ -172,7 +178,6 @@
   display: inline-block; /* Allows expansion based on content */
   /* white-space: nowrap; /* Remove this if you want text to wrap */
 }
-
 
 .coupon-box {
   text-align: center; /* Center the title */
@@ -307,8 +312,9 @@
   display: flex;
   flex-wrap: wrap;
   /* justify-content: space-between;  */
-  justify-content: center; 
-gap: 10px;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 40px;
 }
 
 /* For the product details row */
@@ -316,9 +322,7 @@ gap: 10px;
   width: 100%; /* Take 60% of the width in larger screens */
 }
 
-
 /* For the product detail image */
-
 
 /* Media query for responsive view */
 @media screen and (max-width: 768px) {
@@ -393,13 +397,10 @@ gap: 10px;
     font-size: 1.1em; /* Further reduce title size on mobile */
   }
 
-  
-
   .product-feature-item {
     font-size: 0.85em; /* Even smaller font size for features */
   }
 }
-
 
 .related-products-section {
   margin-top: 5px;
@@ -419,8 +420,9 @@ gap: 10px;
   transition: transform 0.5s ease; /* Smooth transition */
   margin-left: 55px;
 
-  transform: translateX(var(--translate-x, 0)); /* Use CSS variable for dynamic transform */
-
+  transform: translateX(
+    var(--translate-x, 0)
+  ); /* Use CSS variable for dynamic transform */
 }
 
 .product-detail-image-container {
@@ -446,8 +448,6 @@ gap: 10px;
   margin: 0 auto; /* Centers the image horizontally within its container */
 }
 
-
-
 .related-product-card {
   width: 200px;
   padding: 10px;
@@ -464,10 +464,8 @@ gap: 10px;
   transform: scale(1.05);
 }
 
-.coupon-discount-label{
-
-  font-family: 'Sacramento', cursive;
-
+.coupon-discount-label {
+  font-family: "Sacramento", cursive;
 }
 .related-product-image {
   width: 100%;
@@ -498,8 +496,8 @@ gap: 10px;
   gap: 10px;
   padding: 7px;
   background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 -2px 5px rgba(0, 0, 0, 0.3), 
-              -2px 0 5px rgba(0, 0, 0, 0.3), 2px 0 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 -2px 5px rgba(0, 0, 0, 0.3),
+    -2px 0 5px rgba(0, 0, 0, 0.3), 2px 0 5px rgba(0, 0, 0, 0.3);
   /* margin-left: 90px; */
 }
 
@@ -520,8 +518,6 @@ gap: 10px;
   margin-top: 20px;
   position: relative;
 }
-
-
 
 .product-detail-info {
   /* width: 100%; */
@@ -645,7 +641,11 @@ gap: 10px;
 
 .product-detail-add-to-cart {
   padding: 10px 24px; /* Increased padding for a larger button */
-  background: linear-gradient(145deg, #ff7f50, #d9534f); /* Orange to red gradient */
+  background: linear-gradient(
+    145deg,
+    #ff7f50,
+    #d9534f
+  ); /* Orange to red gradient */
   color: #fff;
   font-size: 1em; /* Slightly bigger font for better readability */
   font-weight: bold;
@@ -675,7 +675,7 @@ gap: 10px;
   font-weight: bold;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;  
+  transition: all 0.3s ease;
   font-family: Calibri, sans-serif;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-transform: uppercase;
@@ -689,7 +689,6 @@ gap: 10px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-
 .product-detail-add-to-cart span {
   margin-left: 10px;
   font-size: 1.2em; /* Slightly larger arrow for a bolder look */
@@ -699,7 +698,6 @@ gap: 10px;
   outline: none; /* Remove focus outline */
   box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.5); /* Add focus ring */
 }
-
 
 /* Heart Icon */
 .heart-icon {
@@ -741,13 +739,10 @@ gap: 10px;
   .product-detail-buy-now {
     font-size: 14px;
     padding: 15px;
-
   }
   .heart-icon {
-
     margin-top: 16px;
   }
-
 
   .product-detail-title {
     font-size: 1.8em;
@@ -903,15 +898,24 @@ gap: 10px;
     width: 100%;
     height: auto;
     position: relative;
-  margin-left: 0px;
+    margin-left: 0px;
+}
 
-  }
+.zoom-container {
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-  .product-detail-image {
+.product-detail-image {
     max-width: 100%;
     max-height: 300px;
     object-fit: contain;
-  }
+    transition: transform 0.1s ease-in-out;
+    /* cursor: pointer; */
+}
 
   .related-products-grid {
     flex-direction: column;
@@ -960,9 +964,7 @@ gap: 10px;
   /* z-index: 1003; */
 }
 
-
 /* General container styles for the product detail image section */
-
 
 /* Carousel container for image slider */
 
@@ -973,7 +975,6 @@ gap: 10px;
   width: 100%; /* Ensures the carousel takes up full width */
 }
 /* Product image style */
-
 
 /* Styles for the product label (e.g., "Offer", "New") */
 .product-label2 {
@@ -990,7 +991,6 @@ gap: 10px;
 
 /* Slick Carousel Dot Navigation Style */
 
-
 /* Optional: Style for Slick's arrows (if enabled) */
 .slick-prev,
 .slick-next {
@@ -1003,16 +1003,14 @@ gap: 10px;
 
 .slick-prev {
   left: 10px;
-  
 }
 
 .slick-next {
   right: 10px;
 }
 
-
-.slick-prev:before, .slick-next:before{
-
+.slick-prev:before,
+.slick-next:before {
   display: none;
 }
 /* Additional mobile responsive adjustments */
@@ -1025,7 +1023,8 @@ gap: 10px;
     bottom: 20px;
   }
 
-  .slick-prev, .slick-next {
+  .slick-prev,
+  .slick-next {
     font-size: 20px;
   }
 }
@@ -1035,8 +1034,6 @@ gap: 10px;
     border-radius: 4px; /* Smaller radius for mobile */
   }
 }
-
-
 
 .product-label2 {
   position: absolute; /* Use absolute positioning */
@@ -1052,7 +1049,7 @@ gap: 10px;
   box-shadow: 0 4px 15px rgba(0, 160, 152, 0.75); /* Glow effect */
   text-transform: uppercase; /* Make label uppercase */
   letter-spacing: 1px; /* Add letter spacing for style */
-  /* transform: rotate(-30deg);  */ 
+  /* transform: rotate(-30deg);  */
   animation: shine 2s infinite linear; /* Add a shine animation */
 }
 
@@ -1061,10 +1058,6 @@ gap: 10px;
   width: 100%;
   text-align: center;
 }
-
-
-
-
 
 .product-detail-carousel-image {
   width: 490px; /* Set your desired fixed width */

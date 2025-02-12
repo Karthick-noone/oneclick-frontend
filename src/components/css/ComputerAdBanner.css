@@ -18,9 +18,9 @@ border-radius: 5px;
   /* max-height: 3; */
 }
 
-.banner-image:hover {
-  transform: scale(1.02); /* Slightly zoom in on hover */
-}
+/* .banner-image:hover {  
+  transform: scale(1.02); 
+} */
 .potrait-container2 {
   display: grid; /* Use grid layout */
   grid-template-columns: repeat(5, 1fr); /* Five columns */

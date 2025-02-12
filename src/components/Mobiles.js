@@ -172,6 +172,32 @@ const filteredProducts = searchQuery
     }
   };
 
+  const handleBuyNow = (product, event) => {
+    event.stopPropagation(); // Prevent the event from bubbling up
+
+    // Check if the user is logged in
+    const email = localStorage.getItem("email");
+    if (!email) {
+      toast.error("User is not logged in!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      window.location.href = "/login";
+      return;
+    }
+
+    // Navigate to the purchase page with product details
+    navigate("/purchase", {
+      state: { product, email }, // Pass the product details and email (if needed)
+    });
+    console.log("product", product);
+  };
+
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
 
@@ -398,7 +424,7 @@ const filteredProducts = searchQuery
                   >
        <div className="product-actions">
   <img
-    src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${product.prod_img}`}
+                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[0]}`}
     alt={product.prod_name}
     className="product-image"
   />
@@ -458,12 +484,21 @@ const filteredProducts = searchQuery
                         Out of Stock
                       </p>
                     ) : (
+                     <div className="btn-container">
                       <button
                         onClick={(event) => handleAddToCart(product, event)}
-                        className="add-to-cart"
+                        className="addToCart"
                       >
-                        Add to cart
+                        ADD TO CART
                       </button>
+                      <button
+                        title="Buy Now"
+                        onClick={(event) => handleBuyNow(product, event)}
+                        className="buy-now"
+                      >
+                        BUY NOW
+                      </button>
+                    </div>
                     )}
 <><br />
 {/* {coupons[product.prod_id] && ( // Access using prod_id
@@ -497,7 +532,7 @@ const filteredProducts = searchQuery
 
 <div className="product-actions">
   <img
-    src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${product.prod_img}`}
+                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[0]}`}
     alt={product.prod_name}
     className="product-image"
   />
@@ -555,12 +590,21 @@ const filteredProducts = searchQuery
                         Out of Stock
                       </p>
                     ) : (
+                     <div className="btn-container">
                       <button
                         onClick={(event) => handleAddToCart(product, event)}
-                        className="add-to-cart"
+                        className="addToCart"
                       >
-                        Add to cart
+                        ADD TO CART
                       </button>
+                      <button
+                        title="Buy Now"
+                        onClick={(event) => handleBuyNow(product, event)}
+                        className="buy-now"
+                      >
+                        BUY NOW
+                      </button>
+                    </div>
                     )}
 
 <><br />

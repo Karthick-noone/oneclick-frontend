@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import { useParams } from "react-router-dom"; // Import useParams to get the product ID from the URL
 import axios from "axios";
 // import { toast } from "react-toastify";
@@ -54,6 +54,11 @@ const ProductDetail = ({ accessoryCategory }) => {
 
   const [remainingTime, setRemainingTime] = useState(null);
   const [isOfferActive, setIsOfferActive] = useState(true);
+
+  const [zoomStyle, setZoomStyle] = useState({});
+  const zoomRef = useRef(null);
+  
+ 
 
   useEffect(() => {
     if (product && product.offer_end_time) {
@@ -919,6 +924,23 @@ const ProductDetail = ({ accessoryCategory }) => {
     ? product.prod_img
     : JSON.parse(product.prod_img || "[]");
 
+    const handleMouseMove = (e) => {
+      const image = zoomRef.current;
+      if (!image) return;
+    
+      const { left, top, width, height } = image.getBoundingClientRect();
+      const x = ((e.clientX - left) / width) * 100;
+      const y = ((e.clientY - top) / height) * 100;
+    
+      setZoomStyle({
+        transformOrigin: `${x}% ${y}%`,
+        transform: "scale(2)", // Adjust scale for zoom level
+      });
+    };
+    
+    const hasMultipleImages = images.length > 1;
+  
+
   // const firstImage = images.length > 0 ? images[0] : null; // Get the first image or null if not available
 
   const couponCode = coupons[product?.prod_id]; // Use coupons object instead of product
@@ -1068,80 +1090,31 @@ const ProductDetail = ({ accessoryCategory }) => {
                 </a>
               </div>
 
-              {/* Main Image and Product Details in the same row */}
-
-              {/* <div className="product-detail-image-container">
-             
-              <div className="carousel-container">
-              {product.offer_label && (
-                <div className="product-label2">{product.offer_label}</div>
-              )}
-                {images.length > 1 && (
-                  <img
-                    src={leftarrow}
-                    onClick={handlePrev2}
-                    className="carousel2-arrow left-arrow"
-                    width={"37px"}
-                    alt=""
-                  />
-
-                  // <button onClick={handlePrev2} className="carousel-arrow left-arrow">
-                  //   &lt;
-                  // </button>
-                )}
-
-                {images.length > 0 && currentIndex < images.length ? (
-                  <img
-                    src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                      images[currentIndex]
-                    }`}
-                    alt={product.prod_name}
-                    className="product-detail-image"
-                  />
-                ) : (
-                  <div>No image available</div> // Fallback message if no image is available
-                )}
-
-                {images.length > 1 && (
-                  // <button onClick={handleNext2} className="carousel-arrow right-arrow">
-                  //   &gt;
-                  // </button>
-                  <img
-                    src={rightarrow}
-                    onClick={handleNext2}
-                    // style={{ marginTop: "-10px" }}
-                    className="carousel2-arrow right-arrow"
-                    width={"37px"}
-                    alt=""
-                  />
-                )}
-              </div>
-              
-            </div> */}
               <div className="product-detail-image-container">
-                <div className="carousel-container">
-                  {product.offer_label && (
-                    <div className="product-label2">{product.offer_label}</div>
-                  )}
+    <div className="carousel-container">
+      {product.offer_label && <div className="product-label2">{product.offer_label}</div>}
 
-                  {/* Slider component for images */}
-                  <Slider {...settings}>
-                    {images.length > 0 ? (
-                      images.map((image, index) => (
-                        <div key={index}>
-                          <img
-                            src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${image}`}
-                            alt={product.prod_name}
-                            className="product-detail-image"
-                          />
-                        </div>
-                      ))
-                    ) : (
-                      <div>No image available</div> // Fallback message if no image is available
-                    )}
-                  </Slider>
-                </div>
-              </div>
+      <Slider {...settings}>
+        {images.length > 0 ? (
+          images.map((image, index) => (
+            <div key={index} className="zoom-container">
+              <img
+                ref={zoomRef}
+                src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${image}`}
+                alt={product.prod_name}
+                className="product-detail-image"
+                onMouseMove={!hasMultipleImages ? handleMouseMove : null} // Apply zoom only if 1 image
+                onMouseLeave={() => setZoomStyle({})} // Reset zoom when mouse leaves
+                style={zoomStyle}
+              />
+            </div>
+          ))
+        ) : (
+          <div>No image available</div>
+        )}
+      </Slider>
+    </div>
+  </div>
 
               <div className="side-row">
                 <div className="product-main-row">
@@ -1695,7 +1668,6 @@ const ProductDetail = ({ accessoryCategory }) => {
                   </div>
                 </div>
               )}
-
             <div className="bannerr-container4">
               {filteredBanners.length > 0 ? (
                 <div>

@@ -238,6 +238,7 @@ const EditSingleImageAd = () => {
           icon: "success",
           title: "Image Deleted",
           text: "The image has been deleted successfully!",
+          timer:3000
         }).then(() => {
           window.location.reload();
         });
@@ -471,30 +472,24 @@ const EditSingleImageAd = () => {
               <div key={product.id} className="ad-cardd">
                 <div className="ad-image-container">
                   {product.image ? (
+                    <>
                     <img
                       src={`${ApiUrl}/uploads/singleadpage/${product.image}`}
                       alt="Ad"
                       className="ad-image3"
                     />
+                    <button
+                    onClick={() => handleEditProduct(product)} // Pass 'true' for portrait images
+                    className="laptops-edit-btnn"
+                  >
+                    Edit
+                  </button></>
                   ) : (
                     <p>
                       No image available.Please add one image for advertisement.
                     </p>
                   )}
-                  <div className="image-actions">
-                    <span
-                      className="edit-icon"
-                      onClick={() => handleEditProduct(product)}
-                    >
-                      ✏️
-                    </span>
-                    <span
-                      className="delete-icon"
-                      onClick={() => handleDeleteImage(product)}
-                    >
-                      🗑️
-                    </span>
-                  </div>
+              
                 </div>
 
                 <div>Category - {product.category}</div>
@@ -507,68 +502,56 @@ const EditSingleImageAd = () => {
       </div>
 
       {editingProduct && (
-        <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={() => setModalIsOpen(false)}
-          contentLabel="Edit Image and Category"
-          className="adminmodal"
-          overlayClassName="adminmodal-overlay"
-        >
-          <div className="adminmodal-header">
-            <h2>Edit Image and Category</h2>
-            <button
-              onClick={() => setModalIsOpen(false)}
-              className="adminmodal-close-btn"
-            >
-              &times;
-            </button>
-          </div>
+  <Modal
+    isOpen={modalIsOpen}
+    onRequestClose={() => setModalIsOpen(false)}
+    contentLabel="Edit Image and Category"
+    className="adminmodal"
+    overlayClassName="adminmodal-overlay"
+  >
+    <div className="adminmodal-header">
+      <h2>Edit Image and Category</h2>
+      <button onClick={() => setModalIsOpen(false)} className="adminmodal-close-btn">
+        &times;
+      </button>
+    </div>
 
-          {/* Input for Image Upload */}
-          <input
-            type="file"
-            onChange={onChangeCompressedImage}
-            className="adminmodal-input"
-            accept="image/jpeg, image/png"
- // Allow all image types
-          />
+    {/* Input for Image Upload */}
+    <input
+      type="file"
+      onChange={onChangeCompressedImage}
+      className="adminmodal-input"
+      accept="image/jpeg, image/png"
+    />
 
-          {/* Dropdown for Category Selection */}
-          <select
-            name="category"
-            value={editingProduct.category || ""} // Ensure category is controlled
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, category: e.target.value })
-            }
-            className="adminmodal-input"
-          >
-            <option value="">Select Category</option>
-            <option value="Computers">Computer</option>
-            <option value="Mobiles">Mobile</option>
-            <option value="Printers">Printers</option>
-            <option value="Headphones">Headphone</option>
-            <option value="Speaker">Speaker</option>
-            <option value="CCTV">CCTV</option>
-            <option value="TV">TV</option>
-            <option value="Watch">Watch</option>
-            <option value="ComputerAccessories">Computer Accessories</option>
-            <option value="MobileAccessories">Mobile Accessories</option>
-            <option value="PrinterAccessories">Printer Accessories</option>
-            <option value="CCTVAccessories">CCTV Accessories</option>
-          </select>
+    {/* Dropdown for Category Selection */}
+    <select
+      name="category"
+      value={editingProduct.category || ''}
+      onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+      className="adminmodal-input"
+    >
+      <option value="">Select Category</option>
+      <option value="Computers">Computer</option>
+      <option value="Mobiles">Mobile</option>
+      <option value="Printers">Printers</option>
+      <option value="Headphones">Headphone</option>
+      <option value="Speaker">Speaker</option>
+      <option value="CCTV">CCTV</option>
+      <option value="TV">TV</option>
+      <option value="Watch">Watch</option>
+      <option value="ComputerAccessories">Computer Accessories</option>
+      <option value="MobileAccessories">Mobile Accessories</option>
+      <option value="PrinterAccessories">Printer Accessories</option>
+      <option value="CCTVAccessories">CCTV Accessories</option>
+    </select>
 
-          {/* Update and Cancel Buttons */}
-          <button onClick={handleUpdateImage} className="adminmodal-update-btn">
-            Update
-          </button>
-          <button
-            onClick={() => setModalIsOpen(false)}
-            className="adminmodal-cancel-btn"
-          >
-            Cancel
-          </button>
-        </Modal>
-      )}
+    {/* Update and Cancel Buttons */}
+    <button onClick={handleUpdateImage} className="adminmodal-update-btn">Update</button>
+    {/* <button onClick={() => setModalIsOpen(false)} className="adminmodal-cancel-btn">Cancel</button> */}
+    <button onClick={() => handleDeleteImage(editingProduct)} className="adminmodal-cancel-btn">Delete</button>
+  </Modal>
+)}
     </div>
   );
 };
