@@ -2,7 +2,7 @@
     display: flex;
     gap: 15px; /* Space between the two buttons */
     justify-content: flex-start; /* Align buttons to the left */
-    margin-top: 20px; /* Space above the buttons */
+    margin-top: 2px;
   }
   
   .addToCart,
@@ -183,12 +183,13 @@
   font-size: 16px;
   font-weight: bold;
   color: #333;
-  margin: 5px 0;
+  /* margin: 1px 0; */
 }
 
 .product-subtitle2 {
   font-size: 13px;
   color: grey;
+  /* margin: 2px; */
 }
 
 .product-price {
@@ -198,11 +199,11 @@
   margin-right: 5px;
 }
 
-.product-actual-price {
+/* .product-actual-price {
   font-size: 15px;
   color: red;
   text-decoration: line-through;
-}
+} */
 
 .add-to-cart {
     background-color: #ff6600;

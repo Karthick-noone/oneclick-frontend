@@ -533,7 +533,7 @@ const filteredProducts = searchQuery
 
 <div className="product-actions">
   <img
-                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[0]}`}
+                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
     alt={product.prod_name}
     className="product-image"
   />

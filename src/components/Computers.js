@@ -414,8 +414,10 @@ const Computers = () => {
             // If filteredProducts is empty, fallback to using all products
             products.map((product) => {
               // Parse the prod_img if it's a JSON string; assuming it's an array
-              const images = product.prod_img.split(',');
-
+              const images = Array.isArray(product.prod_img)
+                ? product.prod_img
+                : JSON.parse(product.prod_img);
+              const firstImage = images[0]; // Get the first image
 
               return (
                 <div
@@ -425,8 +427,9 @@ const Computers = () => {
                 >
                   <div className="product-actions">
                     <img
-  src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[0]}`}
-
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
+                        firstImage
+                      }`}
                       alt={product.prod_name}
                       className="product-image"
                     />
@@ -450,11 +453,12 @@ const Computers = () => {
                   </div>
 
                   <h3 className="product-name">{product.prod_name}</h3>
+
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
                   <span className="product-subtitle2">{product.subtitle}</span>
                   {/* <p className="product-description">
-                      {product.prod_features}
-                    </p> */}
+                            {product.prod_features}
+                          </p> */}
                   <p>
                     <span>
                       <span className="product-price">
@@ -465,7 +469,7 @@ const Computers = () => {
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through" }}
+                        style={{ textDecoration: "line-through", color:'red' }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -522,7 +526,13 @@ const Computers = () => {
                   )}
                   <>
                     <br />
-               
+                    {/* {coupons[product.prod_id] && ( // Access using prod_id
+                <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
+                  <span>
+                    Coupon Available
+                  </span>
+                </div>
+              )} */}
                   </>
                 </div>
               );
@@ -547,8 +557,9 @@ const Computers = () => {
 
                   <div className="product-actions">
                     <img
-                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[0]}`}
-
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
+                        images[0]
+                      }`}
                       alt={product.prod_name}
                       className="product-image"
                     />
@@ -574,8 +585,8 @@ const Computers = () => {
                   <h3 className="product-name">{product.prod_name}</h3>
                   <span className="product-subtitle2">{product.subtitle}</span>
                   {/* <p className="product-description">
-                      {product.prod_features}
-                    </p> */}
+                            {product.prod_features}
+                          </p> */}
 
                   <p>
                     <span>
@@ -587,7 +598,7 @@ const Computers = () => {
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through" }}
+                        style={{ textDecoration: "line-through", color:'red' }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -647,12 +658,12 @@ const Computers = () => {
                   <>
                     <br />
                     {/* {coupons[product.prod_id] && ( // Access using prod_id
-          <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
-            <span>
-              Coupon Available
-            </span>
-          </div>
-        )} */}
+                <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
+                  <span>
+                    Coupon Available
+                  </span>
+                </div>
+              )} */}
                   </>
                 </div>
               );

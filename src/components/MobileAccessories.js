@@ -452,7 +452,7 @@ const filteredProducts = searchQuery
                    <p >
                       <span >
                     <span className="product-price">₹{product.prod_price}</span>
-                    <span style={{marginRight:'5px',fontSize:'15px'}}>M.R.P</span><span className="product-actual-price" style={{ textDecoration: "line-through" }}>₹{product.actual_price}</span>
+                    <span style={{marginRight:'5px',fontSize:'15px'}}>M.R.P</span><span className="product-actual-price" style={{ textDecoration: "line-through", color:'red' }}>₹{product.actual_price}</span>
                       </span>
                       <p style={{ color: "green", marginLeft: "10px",marginBottom: "10px" }}>
                         (
@@ -530,7 +530,7 @@ const filteredProducts = searchQuery
 
 <div className="product-actions">
   <img
-                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[0]}`}
+                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
     alt={product.prod_name}
     className="product-image"
   />
@@ -557,7 +557,7 @@ const filteredProducts = searchQuery
                     <p >
                       <span >
                     <span className="product-price">₹{product.prod_price}</span>
-                    <span style={{marginRight:'5px',fontSize:'15px'}}>M.R.P</span><span className="product-actual-price" style={{ textDecoration: "line-through" }}>₹{product.actual_price}</span>
+                    <span style={{marginRight:'5px',fontSize:'15px'}}>M.R.P</span><span className="product-actual-price" style={{ textDecoration: "line-through", color:'red' }}>₹{product.actual_price}</span>
                       </span>
                       <p style={{ color: "green", marginLeft: "10px",marginBottom: "10px" }}>
                         (
