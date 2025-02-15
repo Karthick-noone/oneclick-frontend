@@ -494,43 +494,48 @@ const Header2 = () => {
   //   }
   // };
 
-  const updateCartItemQuantity = async (itemId, newQuantity) => {
+ const updateCartItemQuantity = async (itemId, newQuantity) => {
     if (newQuantity <= 0) return; // Prevent reducing quantity below 1
 
-    try {
-      // Update the cart item in the local state immediately for responsiveness
-      const updatedCartItems = cartItems.map((item) =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      );
-      setCartItems(updatedCartItems);
-
-      // Send the updated quantity to the server
-      const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
-        email,
-        itemId,
-        quantity: newQuantity,
-      });
-
-      // if (response.status === 200) {
-      //   toast.success(`Quantity updated to ${newQuantity}!`, {
-      //     position: "top-right",
-      //     autoClose: 2000,
-      //   });
-      // } else {
-      //   console.error("Failed to update item quantity");
-      //   toast.error("Failed to update item quantity", {
-      //     position: "top-right",
-      //     autoClose: 2000,
-      //   });
-      // }
-    } catch (error) {
-      console.error("Error updating item quantity:", error);
-      toast.error("Error updating item quantity", {
-        position: "top-right",
-        autoClose: 2000,
-      });
+    const email = localStorage.getItem("email"); // Ensure email is fetched properly
+    if (!email) {
+        toast.error("User is not logged in!", {
+            position: "top-right",
+            autoClose: 2000,
+        });
+        return;
     }
-  };
+
+    try {
+        // Send the updated quantity to the server
+        const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
+            email,
+            itemId,
+            quantity: newQuantity,
+        });
+
+        if (response.status === 200) {
+            // Update the cart item in the local state only after a successful API call
+            setCartItems((prevCartItems) =>
+                prevCartItems.map((item) =>
+                    item.id === itemId ? { ...item, quantity: newQuantity } : item
+                )
+            );
+        } else {
+            toast.error("Failed to update item quantity", {
+                position: "top-right",
+                autoClose: 2000,
+            });
+        }
+    } catch (error) {
+        console.error("Error updating item quantity:", error);
+        toast.error("Error updating item quantity", {
+            position: "top-right",
+            autoClose: 2000,
+        });
+    }
+};
+
 
   const removeFromCart = async (itemId, itemName, quantity) => {
     try {

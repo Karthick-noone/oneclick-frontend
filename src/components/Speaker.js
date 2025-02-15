@@ -509,6 +509,7 @@ const Speakers = () => {
                       <button
                         onClick={(event) => handleAddToCart(product, event)}
                         className="addToCart"
+                        title="Add To Cart"
                       >
                         ADD TO CART
                       </button>
@@ -639,6 +640,7 @@ const Speakers = () => {
                       <button
                         onClick={(event) => handleAddToCart(product, event)}
                         className="addToCart"
+                        title="Add To Cart"
                       >
                         ADD TO CART
                       </button>

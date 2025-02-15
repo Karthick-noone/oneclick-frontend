@@ -279,116 +279,52 @@ const ProductDetail = ({ accessoryCategory }) => {
       setIsFavorite(productIsFavorite);
     }
   }, [product]); // Dependency on product
+  
 
   const handleAddToCart2 = async (selectedAccessories, event) => {
-    if (!event) return; // Prevent further execution if event is undefined
-    event.stopPropagation();
+    if (!event) return;
+    event.stopPropagation(); // Prevent event bubbling
 
     const email = localStorage.getItem("email");
-    const username = localStorage.getItem("username");
 
-    if (!email || !username) {
+    if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
       });
       window.location.href = "/login";
       return;
     }
 
+    setIsAdding(true); // Disable button while processing
+
     try {
-      const response = await axios.post(`${ApiUrl}/verify-user`, {
-        email,
-        username,
-      });
+      for (const accessoryId of selectedAccessories) {
+        const accessory = relatedAccessories.find((acc) => acc.id === accessoryId);
+        if (accessory) {
+          await axios.post(`${ApiUrl}/add-to-cart`, {
+            email,
+            productId: accessory.id,
+            quantity: 1,
+          });
 
-      if (response.data.exists) {
-        const cartKey = `${email}-cart`;
-        const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
-
-        // Add selected accessories to the cart
-        selectedAccessories.forEach((accessoryId) => {
-          const accessory = relatedAccessories.find(
-            (acc) => acc.id === accessoryId
-          );
-          if (accessory) {
-            const existingAccessory = cartItems.find(
-              (item) => item.id === accessory.id
-            );
-            if (existingAccessory) {
-              existingAccessory.quantity += 1; // Increase quantity if it already exists
-              toast.info(
-                `Increased quantity of ${accessory.prod_name} in your cart!`,
-                {
-                  position: "top-right",
-                  autoClose: 2000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                }
-              );
-            } else {
-              cartItems.push({
-                id: accessory.id,
-                name: accessory.prod_name,
-                price: accessory.effectiveprice,
-                actual_price: accessory.prod_price,
-                image: accessory.prod_img,
-                description: accessory.prod_features,
-                category: accessory.category,
-                deliverycharge: product.deliverycharge,
-                product_id: accessory.prod_id,
-                quantity: 1,
-              });
-              toast.success(
-                `${accessory.prod_name} has been added to your cart!`,
-                {
-                  position: "top-right",
-                  autoClose: 2000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                }
-              );
-            }
-          }
-        });
-
-        // Save the updated cart in localStorage
-        localStorage.setItem(cartKey, JSON.stringify(cartItems));
-      } else {
-        toast.error("User not found!", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+          toast.success(`${accessory.prod_name} added to your cart!`, {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        }
       }
     } catch (error) {
-      console.error("Error verifying user or updating cart:", error);
-      toast.error("An error occurred while adding to cart.", {
+      console.error("Error adding item to cart:", error);
+      toast.error("Failed to add item to cart", {
         position: "top-right",
         autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
       });
+    } finally {
+      setIsAdding(false); // Enable button after completion
     }
-  };
+};
+
 
   const handleAddToCartWithAccessories = async (selectedAccessories, event) => {
     // Check if at least one accessory is selected
@@ -1306,7 +1242,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                     ) : (
                       <div className="add-to-cart-container">
                         <button
-                          title="Add to cart"
+                          title="Add To Cart"
                           onClick={(event) => handleAddToCart(product, event)}
                           className="product-detail-add-to-cart"
                         >
@@ -1438,7 +1374,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                           })}
                         </div>
                         <button
-                          title="Add to cart"
+                          title="Add To Cart"
                           onClick={(event) =>
                             handleAddToCartWithAccessories(
                               selectedAccessories,
