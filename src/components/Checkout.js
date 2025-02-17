@@ -52,22 +52,22 @@ const Checkout = () => {
     try {
       const response = await axios.get(`${ApiUrl}/api/fetchcoupons`);
       setCoupons(response.data); // Set the coupons in state
-  
+
       // Debugging: Check the response structure
       console.log("Fetched coupons successfully:", response.data);
-  
+
       // Extract the values for couponValue and minPurchaseLimit
       const validCoupon = response.data[0]; // Assuming only one coupon exists in the array
       if (validCoupon) {
         const couponValue = validCoupon.value;
         const minPurchaseLimit = validCoupon.min_purchase_limit;
-  
+
         // Log the variables
         console.log("Coupon Value:", couponValue);
         console.log("Min Purchase Limit:", minPurchaseLimit);
-  
+
         // Optionally set the state if needed
-        setCouponValue(couponValue);
+        // setCouponValue(couponValue);
         setMinPurchaseLimit(minPurchaseLimit);
       } else {
         console.log("No coupons available.");
@@ -77,7 +77,6 @@ const Checkout = () => {
       Swal.fire("Error", "Failed to fetch coupons. Please try again.", "error");
     }
   };
-  
 
   useEffect(() => {
     fetchCoupons();
@@ -97,9 +96,8 @@ const Checkout = () => {
     }
   };
 
-  const handleApplyCoupon = async (couponCode) => {
+  const handleApplyCoupon = async (couponCode) => { 
     if (!couponCode.trim()) {
-      // If the coupon input is empty, show a message and exit the function
       setMessage("Please enter a coupon code.");
       setMessageType("error");
       return;
@@ -109,72 +107,79 @@ const Checkout = () => {
       setMessageType("warning");
       return;
     }
-
+  
     try {
       console.log("Applying coupon:", couponCode, "for all products in cart");
-
-      // Collect all product IDs from cartItems
-      const productIds = cartItems.map((item) => item.product_id);
-
-      console.log("productIds", productIds);
-
+      const productIds = cartItems.map((item) => item.prod_id);
+      console.log("Product IDs:", productIds);
+  
       // Calculate the total price before applying the coupon
-      const calculatedTotalPrice = calculateTotalPrice();
+      let calculatedTotalPrice = calculateTotalPrice();
       console.log("Total price before applying coupon:", calculatedTotalPrice);
-
-      // Send request to backend to apply coupon for all products
+  
       const response = await axios.post(`${ApiUrl}/api/apply-coupon`, {
         couponCode,
-        product_ids: productIds, // Send all product IDs
+        product_ids: productIds,
       });
-
-      console.log("Response from server:", response.data); // Log the server response
-
+  
+      console.log("Response from server:", response.data);
+  
       if (response.data.success) {
-        const discount = response.data.discount; // Get discount from the response
+        let discount = 0;
+        let apiMinPurchaseLimit = Number(response.data.min_purchase_limit);
+  
+        // Check which discount value is provided by the API
+        if (response.data.discount1 !== undefined) {
+          discount = Number(response.data.discount1);
+          setCouponValue(discount);
+          setDiscountAmount(0);
+  
+          if (Number(calculatedTotalPrice) < apiMinPurchaseLimit) {
+            setMessage(`Minimum purchase of ₹${apiMinPurchaseLimit} required.`);
+            setMessageType("error");
+            return;
+          }
+        } else if (response.data.discount2 !== undefined) {
+          discount = Number(response.data.discount2);
+          setDiscountAmount(discount);
+          setCouponValue(0);
+        }
+  
         console.log("Discount received:", discount);
-
-        // Store the discount in state
-        setDiscountAmount(discount); // Save the discount amount for future use
-
-        // Calculate the new total amount after applying the discount
-        const newAmount = calculatedTotalPrice - discount;
-        console.log("New total amount after applying discount:", newAmount);
-
-        // Update the total amount state
+  
+        let newAmount = Number(calculatedTotalPrice) - discount;
+        if (newAmount < 0) newAmount = 0;
+  
         setTotalAmount(newAmount);
-        setNewTotalAmount(newAmount); // Update the new total amount state
-
-        // Mark the coupon as applied
-        setIsCouponApplied(true); // Prevent the coupon from being applied again
-
-        // Display success message in green
+        setNewTotalAmount(newAmount);
+        setMinPurchaseLimit(apiMinPurchaseLimit);
+  
+        setIsCouponApplied(true);
         setMessage("Coupon applied successfully!");
-        setMessageType("success"); // Set message type to success
-
-        // Clear the coupon input field
+        setMessageType("success");
         setCoupon("");
-
-        // Set a timeout to clear the message after 3 seconds
+  
         setTimeout(() => {
-          setMessage(""); // Clear the message after 3 seconds
-          setMessageType(""); // Clear the message type
+          setMessage("");
+          setMessageType("");
         }, 3000);
       } else {
-        console.log("Coupon application failed:", response.data.message); // Log failure message
-        // Display error message in red
         setMessage(response.data.message || "Failed to apply coupon.");
-        setMessageType("error"); // Set message type to error
+        setMessageType("error");
       }
     } catch (error) {
-      console.error("Error applying coupon:", error); // Log the error details
-      setMessage(
-        error.response ? error.response.data.error : "Error applying coupon"
-      );
-      setMessageType("error"); // Set message type to error
+      console.error("Error applying coupon:", error);
+      
+      if (error.response && error.response.data.error === "Coupon has expired.") {
+        setMessage("This coupon has expired.");
+      } else {
+        setMessage("Invalid or expired coupon.");
+      }
+  
+      setMessageType("error");
     }
   };
-
+  
   const calculateTotalPrice = () => {
     // Calculate the total price of cart items
     const totalPrice = cartItems
@@ -188,9 +193,6 @@ const Checkout = () => {
       }, 0)
       .toFixed(2);
   
-    // console.log("Calculated total price:", totalPrice); // Log the calculated total price
-  
-    // Convert totalPrice to a float for comparison
     let finalPrice = parseFloat(totalPrice);
   
     // Check if the total price exceeds the min purchase limit
@@ -204,11 +206,11 @@ const Checkout = () => {
       console.log("Total price is below minimum purchase limit. Coupon not applied.");
     }
   
-    // Ensure price is not negative
     finalPrice = finalPrice < 0 ? 0 : finalPrice;
   
     return finalPrice.toFixed(2);
   };
+  
   
   
 
@@ -415,7 +417,7 @@ const Checkout = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const email = localStorage.getItem('email');
+  const email = localStorage.getItem("email");
 
   useEffect(() => {
     if (email) {
@@ -424,30 +426,29 @@ const Checkout = () => {
         try {
           const response = await axios.post(`${ApiUrl}/get-cart-items`, {
             email,
-            username: localStorage.getItem('username') // Send username if needed
+            username: localStorage.getItem("username"), // Send username if needed
           });
-  
+
           if (response.data.products) {
             setCartItems(response.data.products); // Set the fetched products to state
           }
         } catch (error) {
-          console.error('Error fetching cart items:', error);
+          console.error("Error fetching cart items:", error);
         } finally {
           setIsLoading(false);
         }
       };
-  
+
       // Fetch cart items immediately
       fetchCartItems();
-  
+
       // Set an interval to fetch cart items every 5 seconds
       const intervalId = setInterval(fetchCartItems, 1000); // 5000ms = 5 seconds
-  
+
       // Clean up the interval on component unmount or when `email` changes
       return () => clearInterval(intervalId);
     }
   }, [email]); // Dependency on `email` so it will trigger fetch when email changes
-
 
   // const calculateTotalPrice = () => {
   //   return cartItems
@@ -458,11 +459,11 @@ const Checkout = () => {
   //     .toFixed(2);
   // };
 
-  const calculateActualPrice = () => {
+  const calculateSellingPrice = () => {
     return cartItems
       .reduce((total, item) => {
-        const actual_price = parseFloat(item.actual_price);
-        return total + (isNaN(actual_price) ? 0 : actual_price * item.quantity);
+        const prod_price = parseFloat(item.prod_price);
+        return total + (isNaN(prod_price) ? 0 : prod_price * item.quantity);
       }, 0)
       .toFixed(2);
   };
@@ -485,21 +486,21 @@ const Checkout = () => {
 
   const updateCartItemQuantity = async (itemId, newQuantity) => {
     if (newQuantity <= 0) return; // Prevent reducing quantity below 1
-  
+
     try {
       // Update the cart item in the local state immediately for responsiveness
       const updatedCartItems = cartItems.map((item) =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       );
       setCartItems(updatedCartItems);
-  
+
       // Send the updated quantity to the server
       const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
         email,
         itemId,
         quantity: newQuantity,
       });
-  
+
       // if (response.status === 200) {
       //   toast.success(`Quantity updated to ${newQuantity}!`, {
       //     position: "top-right",
@@ -520,21 +521,20 @@ const Checkout = () => {
       });
     }
   };
-  
-  
+
   const removeFromCart = async (itemId, itemName, quantity) => {
     try {
       // Remove the item from the local state first
       const updatedCartItems = cartItems.filter((item) => item.id !== itemId);
       setCartItems(updatedCartItems);
-  
+
       // Send the removal request to the server
       const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
         email,
         itemId,
         quantity,
       });
-  
+
       if (response.data.success) {
         // Toast notification for successful removal
         toast.success(`${itemName} has been removed from your cart!`, {
@@ -543,23 +543,22 @@ const Checkout = () => {
           closeOnClick: true,
         });
       } else {
-        console.error('Failed to remove item from cart');
-        toast.error('Failed to remove item from cart!', {
+        console.error("Failed to remove item from cart");
+        toast.error("Failed to remove item from cart!", {
           position: "top-right",
           autoClose: 2000,
           closeOnClick: true,
         });
       }
     } catch (error) {
-      console.error('Error removing item from cart:', error);
-      toast.error('Error removing item from cart!', {
+      console.error("Error removing item from cart:", error);
+      toast.error("Error removing item from cart!", {
         position: "top-right",
         autoClose: 2000,
         closeOnClick: true,
       });
     }
   };
-  
 
   //   const handlePayment = () => {
   //     // Display the message and exit the function
@@ -666,10 +665,10 @@ const Checkout = () => {
 
   const handlePlaceOrder = async () => {
     console.log("handlePlaceOrder function called");
-  
+
     // Use the selected address if available, otherwise fall back to the default address
     const addressToUse = selectedAddress || defaultAddress;
-  
+
     if (cartItems.length === 0) {
       Swal.fire({
         icon: "error",
@@ -680,16 +679,16 @@ const Checkout = () => {
       });
       return;
     }
-  
+
     if (!addressToUse) {
       navigate("/UserAddress"); // Update the path to your UserAddress page
       return;
     }
-  
+
     const selectedAddressDetails = addressDetails.find(
       (address) => String(address.address_id) === String(addressToUse)
     );
-  
+
     if (!selectedAddressDetails) {
       Swal.fire({
         icon: "error",
@@ -700,9 +699,9 @@ const Checkout = () => {
       });
       return;
     }
-  
+
     const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}, ${selectedAddressDetails.phone}`;
-  
+
     // const enrichedCartItems = cartItems.map((item) => ({
     //   id: item.id,
     //   quantity: item.quantity,
@@ -715,22 +714,21 @@ const Checkout = () => {
     // }));
 
     const enrichedCartItems = cartItems.map((item) => ({
-      id: item.id,                    
-      quantity: item.quantity,         // Map 'prod_quantity' to 'quantity'
-      prod_price: item.prod_price,          // Map 'prod_price' to 'prod_price'
-      prod_name: item.prod_name,            // Map 'prod_name' to 'prod_name'
-      prod_img: item.image,               // Map 'prod_image' to 'image'
+      id: item.id,
+      quantity: item.quantity, // Map 'prod_quantity' to 'quantity'
+      prod_price: item.prod_price, // Map 'prod_price' to 'prod_price'
+      prod_name: item.prod_name, // Map 'prod_name' to 'prod_name'
+      prod_img: item.image, // Map 'prod_image' to 'image'
       prod_description: item.prod_description, // Map 'prod_description' to 'prod_description'
       prod_id: item.prod_id,
-      prod_category: item.category,         // Map 'prod_category' to 'category'
+      prod_category: item.category, // Map 'prod_category' to 'category'
     }));
-    
 
-    console.log("enrichedCartItems",enrichedCartItems)
-  
+    console.log("enrichedCartItems", enrichedCartItems);
+
     const finalAmountToSend =
       newTotalAmount > 0 ? newTotalAmount : calculateTotalPrice();
-  
+
     const orderData = {
       user_id: userId,
       total_amount: finalAmountToSend,
@@ -750,14 +748,14 @@ const Checkout = () => {
           ? "Ready for Pickup"
           : "Paid", // Status based on selection
     };
-  
+
     try {
       // Send the order data and store cart items in the backend
       const response = await axios.post(`${ApiUrl}/place-order`, orderData);
-  
+
       if (response.status === 200) {
         console.log("Order placed successfully");
-  
+
         Swal.fire({
           icon: "success",
           title: "Order Placed",
@@ -767,19 +765,19 @@ const Checkout = () => {
         }).then(async () => {
           try {
             // Call backend to clear the cart after placing order
-            await axios.post(`${ApiUrl}/clear-cart`, { email,cartItems });
+            await axios.post(`${ApiUrl}/clear-cart`, { email, cartItems });
             console.log("Cart cleared successfully from the database");
           } catch (clearCartError) {
             console.error("Error clearing cart:", clearCartError.message);
           }
-  
+
           clearCart(); // Clear cart in local state
           const storedEmail = localStorage.getItem("email");
           if (storedEmail) {
             const cartKey = `${storedEmail}-cart`;
             localStorage.removeItem(cartKey); // Clear local storage cart
           }
-  
+
           navigate("/MyOrders");
         });
       } else {
@@ -787,7 +785,10 @@ const Checkout = () => {
         throw new Error("Unexpected response status");
       }
     } catch (error) {
-      console.error("Error placing order:", error.response?.data || error.message);
+      console.error(
+        "Error placing order:",
+        error.response?.data || error.message
+      );
       Swal.fire({
         icon: "error",
         title: "Order Error",
@@ -948,87 +949,102 @@ const Checkout = () => {
               ) : (
                 <div className="cart-list-container">
                   <ul className="cart-list">
-                    { cartItems.map((item) => {
-      // Check if image is a stringified array and parse it
-      const images = Array.isArray(item.prod_img)
-        ? item.prod_img
-        : JSON.parse(item.prod_img || '[]'); // Handle if it's a stringified array
+                    {cartItems.map((item) => {
+                      // Check if image is a stringified array and parse it
+                      const images = Array.isArray(item.prod_img)
+                        ? item.prod_img
+                        : JSON.parse(item.prod_img || "[]"); // Handle if it's a stringified array
 
-      const firstImage = images.length > 0 ? images[0] : null;
+                      const firstImage = images.length > 0 ? images[0] : null;
 
-                        return (
-                          <li
-                            key={item.id}
-                            className="cart-product d-flex align-items-center"
-                          >
-                            {firstImage ? (
-                              <div
-                                key={item.id}
-                                onClick={() => handleProductClick(item.id)}
-                                style={{ cursor: "pointer" }}
-                              >
-                                <img
-                                  src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
-                                  alt={item.name}
-                                  loading="lazy"
-                                  className="cart-product-image"
-                                />
-                              </div>
-                            ) : (
-                              <div className="placeholder-image">
-                                No image available
-                              </div> // Placeholder for missing image
-                            )}
+                      return (
+                        <li
+                          key={item.id}
+                          className="cart-product d-flex align-items-center"
+                        >
+                          {firstImage ? (
                             <div
-                              style={{ cursor: "pointer" }}
-                              className="cart-product-details"
                               key={item.id}
                               onClick={() => handleProductClick(item.id)}
+                              style={{ cursor: "pointer" }}
                             >
-                              <p className="cart-product-name">{item.name}</p>
-                              <p className="cart-product-name">
+                              <img
+                                src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
+                                alt={item.name}
+                                loading="lazy"
+                                className="cart-product-image"
+                              />
+                            </div>
+                          ) : (
+                            <div className="placeholder-image">
+                              No image available
+                            </div> // Placeholder for missing image
+                          )}
+                          <div
+                            style={{ cursor: "pointer" }}
+                            className="cart-product-details"
+                            key={item.id}
+                            onClick={() => handleProductClick(item.id)}
+                          >
+                            <p className="cart-product-name">
+                              {item.prod_name}
+                            </p>
+                            {/* <p className="cart-product-name">
                                 {item.prod_id}
-                              </p>
-                              <p className="cart-product-description">
-                                {item.description}
-                              </p>
-                            </div>
-                            <div className="cart-product-price">
-                              <div className="cart-quantity-controls">
-                                <button
-                                                  onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)}
-
-                                >
-                                  -
-                                </button>
-                                <span>{item.quantity}</span>
-                                <button
-                                                  onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)}
-
-                                >
-                                  +
-                                </button>
-                                <FaTrash
-                                  className="cart-remove-btn"
-                                  onClick={() => removeFromCart(item.id, item.prod_name, item.quantity)}
-
-                                />
-                              </div>
-                              <p
-                                style={{
-                                  color: "red",
-                                  textDecoration: "line-through",
-                                  fontSize: "13px",
-                                  marginRight: "5px",
-                                }}
+                              </p> */}
+                            <p className="cart-product-description">
+                              {item.prod_features}
+                            </p>
+                          </div>
+                          <div className="cart-product-price">
+                            <div className="cart-quantity-controls">
+                              <button
+                                onClick={() =>
+                                  updateCartItemQuantity(
+                                    item.id,
+                                    item.quantity - 1
+                                  )
+                                }
                               >
-                                ₹{item.actual_price}{" "}
-                              </p>
-                              <p>₹{item.prod_price * item.quantity}</p>
+                                -
+                              </button>
+                              <span>{item.quantity}</span>
+                              <button
+                                onClick={() =>
+                                  updateCartItemQuantity(
+                                    item.id,
+                                    item.quantity + 1
+                                  )
+                                }
+                              >
+                                +
+                              </button>
+                              <FaTrash
+                                className="cart-remove-btn"
+                                onClick={() =>
+                                  removeFromCart(
+                                    item.id,
+                                    item.prod_name,
+                                    item.quantity
+                                  )
+                                }
+                              />
                             </div>
-                          </li>
-                        );
-                      })}
+                            <p
+                              style={{
+                                color: "red",
+                                textDecoration: "line-through",
+                                fontSize: "13px",
+                                marginRight: "5px",
+                              }}
+                            >
+                              ₹{item.actual_price}{" "}
+                            </p>
+                            <p>₹{item.prod_price * item.quantity}</p>
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
 
                   <button
@@ -1054,8 +1070,9 @@ const Checkout = () => {
           </div>
 
           <div className="cart-summary">
-          <h4 style={{ marginTop: "10px",marginBottom:'5px' }}>Price Summary:</h4>
-
+            <h4 style={{ marginTop: "10px", marginBottom: "5px" }}>
+              Price Summary:
+            </h4>
             <div className="summary-item">
               <span>
                 Price (
@@ -1064,11 +1081,12 @@ const Checkout = () => {
                   : `${getTotalItemsCount()} items`}
                 )
               </span>
-              <span>₹{calculateActualPrice()}</span>
+              <span>₹{calculateSellingPrice()}</span>
             </div>
             <div className="summary-item">
               <span>Discount</span>
-              <span style={{ color: "green" }}>- ₹{discount()}</span>
+              {/* <span style={{ color: "green" }}>- ₹{discount()}</span> */}
+              <span style={{ color: "green" }}>- ₹0</span>
             </div>
             {/* <div className="summary-item">
               <span>Platform fee</span>
@@ -1090,14 +1108,16 @@ const Checkout = () => {
               </span>
             </div>
             {parseFloat(calculateTotalPrice()) >= minPurchaseLimit && (
-  <div className="summary-item">
-    <span>Extra Offer for Purchasing Over ₹{minPurchaseLimit}</span>
-    <span style={{ color: "green" }}>
-      - ₹{couponValue.toFixed(2)}
-    </span>
-  </div>
-)}
-
+            <div className="summary-item">
+              <span>
+                Extra Discount on Orders Over ₹{minPurchaseLimit} <br />
+                (Apply coupon)
+              </span>
+              <span style={{ color: "green" }}>
+                - ₹{couponValue.toFixed(2)}
+              </span>
+            </div>
+            )}
             <div className="summary-item">
               {/* Input for coupon code */}
               <input

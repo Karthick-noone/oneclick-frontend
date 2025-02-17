@@ -110,137 +110,118 @@ const BuyNow = () => {
     }
   };
 
-  const handleApplyCoupon = async (couponCode, product) => {
-    if (!product || !product.prod_id) {
-      console.error("Invalid product data, missing prod_id");
-      setMessage("Invalid product data.");
-      setMessageType("error");
-      return;
-    }
-
+  const handleApplyCoupon = async (couponCode) => { 
     if (!couponCode.trim()) {
-      // If the coupon input is empty, show a message and exit the function
       setMessage("Please enter a coupon code.");
       setMessageType("error");
-      console.log("Coupon code is empty");
       return;
     }
-
     if (isCouponApplied) {
       setMessage("Coupon has already been applied!");
       setMessageType("warning");
-      console.log("Coupon has already been applied.");
       return;
     }
-
+  
     try {
-      const productIds = [product.prod_id];
-      //   console.log("Product IDs to be sent:", productIds);
-
+      console.log("Applying coupon:", couponCode, "for all products in cart");
+      const productIds = cartItems.map((item) => item.prod_id);
+      console.log("Product IDs:", productIds);
+  
       // Calculate the total price before applying the coupon
-      const calculatedTotalPrice = calculateTotalPrice();
-      //   console.log("Total price before applying coupon:", calculatedTotalPrice);
-
-      // Send request to backend to apply coupon for the product
+      let calculatedTotalPrice = calculateTotalPrice();
+      console.log("Total price before applying coupon:", calculatedTotalPrice);
+  
       const response = await axios.post(`${ApiUrl}/api/apply-coupon`, {
         couponCode,
-        product_ids: productIds, // Send the product ID
+        product_ids: productIds,
       });
-
-      //   console.log("Response from backend:", response.data);
-
+  
+      console.log("Response from server:", response.data);
+  
       if (response.data.success) {
-        const discount = response.data.discount; // Get discount from the response
-        console.log(
-          "Coupon applied successfully. Discount received:",
-          discount
-        );
-
-        // Store the discount in state
-        setDiscountAmount(discount); // Save the discount amount for future use
-
-        // Calculate the new total amount after applying the discount
-        const newAmount = calculatedTotalPrice - discount;
-        console.log("New total amount after applying discount:", newAmount);
-
-        // Update the total amount state
+        let discount = 0;
+        let apiMinPurchaseLimit = Number(response.data.min_purchase_limit);
+  
+        // Check which discount value is provided by the API
+        if (response.data.discount1 !== undefined) {
+          discount = Number(response.data.discount1);
+          setCouponValue(discount);
+          setDiscountAmount(0);
+  
+          if (Number(calculatedTotalPrice) < apiMinPurchaseLimit) {
+            setMessage(`Minimum purchase of ₹${apiMinPurchaseLimit} required.`);
+            setMessageType("error");
+            return;
+          }
+        } else if (response.data.discount2 !== undefined) {
+          discount = Number(response.data.discount2);
+          setDiscountAmount(discount);
+          setCouponValue(0);
+        }
+  
+        console.log("Discount received:", discount);
+  
+        let newAmount = Number(calculatedTotalPrice) - discount;
+        if (newAmount < 0) newAmount = 0;
+  
         setTotalAmount(newAmount);
-        setNewTotalAmount(newAmount); // Update the new total amount state
-
-        // Mark the coupon as applied
-        setIsCouponApplied(true); // Prevent the coupon from being applied again
-
-        // Display success message in green
+        setNewTotalAmount(newAmount);
+        setMinPurchaseLimit(apiMinPurchaseLimit);
+  
+        setIsCouponApplied(true);
         setMessage("Coupon applied successfully!");
-        setMessageType("success"); // Set message type to success
-
-        // Clear the coupon input field
+        setMessageType("success");
         setCoupon("");
-
-        // Set a timeout to clear the message after 3 seconds
+  
         setTimeout(() => {
-          setMessage(""); // Clear the message after 3 seconds
-          setMessageType(""); // Clear the message type
+          setMessage("");
+          setMessageType("");
         }, 3000);
       } else {
-        console.log("Coupon application failed:", response.data.message);
-        // Display error message in red
         setMessage(response.data.message || "Failed to apply coupon.");
-        setMessageType("error"); // Set message type to error
+        setMessageType("error");
       }
     } catch (error) {
-      console.error("Error applying coupon:", error); // Log the error details
-      setMessage(
-        error.response ? error.response.data.error : "Error applying coupon"
-      );
-      setMessageType("error"); // Set message type to error
+      console.error("Error applying coupon:", error);
+      
+      if (error.response && error.response.data.error === "Coupon has expired.") {
+        setMessage("This coupon has expired.");
+      } else {
+        setMessage("Invalid or expired coupon.");
+      }
+  
+      setMessageType("error");
     }
   };
-
-  const calculateTotalPrice = (
-    product,
-    quantity,
-    couponValue,
-    minPurchaseLimit
-  ) => {
-    console.log("Calculating total price...");
-
-    if (!product || typeof product !== "object") {
-      console.error("Invalid product data:", product);
-      return "0.00";
-    }
-
-    const price = parseFloat(product.prod_price) || 0;
-    const delivery_charge = parseInt(product.deliverycharge) || 0; // ✅ Ensure it's 0 if missing
-
-    quantity = quantity > 0 ? quantity : 1;
-
-    console.log("Product Price:", price);
-    console.log("Quantity:", quantity);
-    console.log("Delivery Charge:", delivery_charge);
-
-    let totalPrice = price * quantity + delivery_charge;
-    console.log("Total Price (before discount):", totalPrice);
-
-    let finalPrice = totalPrice;
-    if (minPurchaseLimit && totalPrice >= minPurchaseLimit) {
-      if (couponValue > 0) {
-        finalPrice -= couponValue;
-        console.log(
-          `Coupon applied. Discount: ₹${couponValue}, New Total: ₹${finalPrice}`
+  
+  const calculateTotalPrice = () => {
+    // Calculate the total price of cart items
+    const totalPrice = cartItems
+      .reduce((total, item) => {
+        const price = parseFloat(item.prod_price);
+        const deliveryCharge = parseFloat(item.deliverycharge || 0);
+  
+        return (
+          total + (isNaN(price) ? 0 : price * item.quantity) + deliveryCharge
         );
-      } else {
-        console.log("No valid coupon applied.");
+      }, 0)
+      .toFixed(2);
+  
+    let finalPrice = parseFloat(totalPrice);
+  
+    // Check if the total price exceeds the min purchase limit
+    if (finalPrice >= minPurchaseLimit) {
+      // Apply coupon if total price meets the minimum limit
+      if (couponValue > 0) {
+        finalPrice -= couponValue; // Apply coupon discount
+        console.log("Coupon applied. Discounted price:", finalPrice);
       }
     } else {
-      console.log(
-        "Total price below minimum purchase limit. Coupon not applied."
-      );
+      console.log("Total price is below minimum purchase limit. Coupon not applied.");
     }
-
-    finalPrice = Math.max(finalPrice, 0);
-    console.log("Final Price (after adjustments):", finalPrice);
-
+  
+    finalPrice = finalPrice < 0 ? 0 : finalPrice;
+  
     return finalPrice.toFixed(2);
   };
 
@@ -763,11 +744,12 @@ const BuyNow = () => {
                   : `${getTotalItemsCount()} items`} */}
                 {quantity} Item)
               </span>
-              <span>₹{product.actual_price * quantity}</span>
+              <span>₹{product.prod_price * quantity}</span>
             </div>
             <div className="summary-item">
               <span>Discount</span>
-              <span style={{ color: "green" }}>- ₹{discount2}</span>
+              {/* <span style={{ color: "green" }}>- ₹{discount2}</span> */}
+              <span style={{ color: "green" }}>- ₹0</span>
             </div>
             {/* <div className="summary-item">
               <span>Platform fee</span>
@@ -788,13 +770,16 @@ const BuyNow = () => {
                 {/* <span style={{ color: "green" }}>FREE Delivery</span> */}
               </span>
             </div>
-            {minPurchaseLimit > 0 && finalPrice >= minPurchaseLimit && (
-              <div className="summary-item">
-                <span>Extra Offer for Purchasing Over ₹{minPurchaseLimit}</span>
-                <span style={{ color: "green" }}>
-                  - ₹{couponValue.toFixed(2)}
-                </span>
-              </div>
+            {parseFloat(calculateTotalPrice()) >= minPurchaseLimit && (
+            <div className="summary-item">
+              <span>
+                Extra Discount on Orders Over ₹{minPurchaseLimit} <br />
+                (Apply coupon)
+              </span>
+              <span style={{ color: "green" }}>
+                - ₹{couponValue.toFixed(2)}
+              </span>
+            </div>
             )}
             <div className="summary-item">
               {/* Input for coupon code */}

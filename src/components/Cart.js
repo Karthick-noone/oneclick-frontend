@@ -225,11 +225,11 @@ useEffect(() => {
       }, 0)
       .toFixed(2);
   };
-  const calculateActualPrice = () => {
+  const calculateSellingPrice = () => {
     return cartItems
       .reduce((total, item) => {
-        const actual_price = parseFloat(item.actual_price);
-        return total + (isNaN(actual_price) ? 0 : actual_price * item.quantity);
+        const prod_price = parseFloat(item.prod_price);
+        return total + (isNaN(prod_price) ? 0 : prod_price * item.quantity);
       }, 0)
       .toFixed(2);
   };
@@ -687,11 +687,12 @@ loading="lazy"
           <div className="cart-summary">
             <div className="summary-item">
             <span>Price ({getTotalItemsCount() === 1 ? '1 item' : `${getTotalItemsCount()} items`})</span>
-              <span>₹{calculateActualPrice()}</span>
+              <span>₹{calculateSellingPrice()}</span>
             </div>
             <div className="summary-item">
               <span>Discount</span>
-              <span style={{color:'green'}}>- ₹{discount()}</span>
+              {/* <span style={{color:'green'}}>- ₹{discount()}</span> */}
+              <span style={{color:'green'}}>- ₹0</span>
             </div>
             <div className="summary-item">
               <span>Platform fee</span>

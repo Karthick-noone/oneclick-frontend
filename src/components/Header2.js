@@ -494,48 +494,47 @@ const Header2 = () => {
   //   }
   // };
 
- const updateCartItemQuantity = async (itemId, newQuantity) => {
+  const updateCartItemQuantity = async (itemId, newQuantity) => {
     if (newQuantity <= 0) return; // Prevent reducing quantity below 1
 
     const email = localStorage.getItem("email"); // Ensure email is fetched properly
     if (!email) {
-        toast.error("User is not logged in!", {
-            position: "top-right",
-            autoClose: 2000,
-        });
-        return;
+      toast.error("User is not logged in!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      return;
     }
 
     try {
-        // Send the updated quantity to the server
-        const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
-            email,
-            itemId,
-            quantity: newQuantity,
-        });
+      // Send the updated quantity to the server
+      const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
+        email,
+        itemId,
+        quantity: newQuantity,
+      });
 
-        if (response.status === 200) {
-            // Update the cart item in the local state only after a successful API call
-            setCartItems((prevCartItems) =>
-                prevCartItems.map((item) =>
-                    item.id === itemId ? { ...item, quantity: newQuantity } : item
-                )
-            );
-        } else {
-            toast.error("Failed to update item quantity", {
-                position: "top-right",
-                autoClose: 2000,
-            });
-        }
+      if (response.status === 200) {
+        // Update the cart item in the local state only after a successful API call
+        setCartItems((prevCartItems) =>
+          prevCartItems.map((item) =>
+            item.id === itemId ? { ...item, quantity: newQuantity } : item
+          )
+        );
+      } else {
+        toast.error("Failed to update item quantity", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
     } catch (error) {
-        console.error("Error updating item quantity:", error);
-        toast.error("Error updating item quantity", {
-            position: "top-right",
-            autoClose: 2000,
-        });
+      console.error("Error updating item quantity:", error);
+      toast.error("Error updating item quantity", {
+        position: "top-right",
+        autoClose: 2000,
+      });
     }
-};
-
+  };
 
   const removeFromCart = async (itemId, itemName, quantity) => {
     try {
@@ -714,6 +713,7 @@ const Header2 = () => {
           itemId: itemId,
         });
 
+        
         // Check for successful response
         if (response.status === 200) {
           toast.success("Item removed from wishlist!", {
