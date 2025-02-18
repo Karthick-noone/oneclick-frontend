@@ -62,7 +62,8 @@ const LoginPage = () => {
     }
 
     try {
-      const loginUrl = role === "Admin" ? `${ApiUrl}/adminlogin` : `${ApiUrl}/stafflogin`;
+      const loginUrl =
+        role === "Admin" ? `${ApiUrl}/adminlogin` : `${ApiUrl}/stafflogin`;
       const response = await fetch(loginUrl, {
         method: "POST",
         headers: {
@@ -75,7 +76,7 @@ const LoginPage = () => {
 
       if (response.ok) {
         localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userRole", role);  // Store the role (Admin/Staff)
+        localStorage.setItem("userRole", role); // Store the role (Admin/Staff)
         // localStorage.setItem("staffname", username);  // Store the role (Admin/Staff)
         if (role === "Staff" && result.staff) {
           // Store staff's name in localStorage
@@ -209,34 +210,36 @@ const LoginPage = () => {
           <h1>{role} Login</h1>
           <p>Enter your credentials to access your account</p>
         </div>
-        <form className="login-form" onSubmit={handleSubmit}>
-        <div className="radio-group">
-
-        <div className="radio-wrapper">
-            {/* <label> */}
+        <form className="login-form" onSubmit={handleSubmit} autoComplete="off">
+          <div className="radio-group">
+            <div className="radio-wrapper">
+              {/* <label> */}
               <input
                 type="radio"
                 name="role"
                 value="Admin"
-                checked={role === 'Admin'}
+                checked={role === "Admin"}
                 onChange={handleRoleChange}
                 className="radio-input"
-
-              />     <label htmlFor="admin" className="radio-label">Admin</label>
-
-            {/* </label> */}
-            {/* <label> */}
+              />{" "}
+              <label htmlFor="admin" className="radio-label">
+                Admin
+              </label>
+              {/* </label> */}
+              {/* <label> */}
               <input
                 type="radio"
                 name="role"
                 value="Staff"
-                checked={role === 'Staff'}
+                checked={role === "Staff"}
                 onChange={handleRoleChange}
                 className="radio-input"
-              />     <label htmlFor="admin" className="radio-label">Staff</label>
-
-            {/* </label> */}
-          </div>
+              />{" "}
+              <label htmlFor="admin" className="radio-label">
+                Staff
+              </label>
+              {/* </label> */}
+            </div>
           </div>
           <div className="form-group">
             <label
@@ -274,12 +277,15 @@ const LoginPage = () => {
                 onChange={handleChange}
                 placeholder="Enter your password"
                 required
-                className={`staff-input ${showPassword ? "" : "password-hidden"}`}
-
+                className={`staff-input ${
+                  showPassword ? "" : "password-hidden"
+                }`}
               />
-              <span 
-              style={{color:'white'}}
-              onClick={togglePasswordVisibility} className="eye-icon">
+              <span
+                style={{ color: "white" }}
+                onClick={togglePasswordVisibility}
+                className="eye-icon"
+              >
                 {showPassword ? <FaEye /> : <FaEyeSlash />}
               </span>
             </div>

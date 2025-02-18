@@ -13,11 +13,11 @@ const Slidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isEditPageOpen, setIsEditPageOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const [isOfferPageOpen, setIsOfferPageOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
-  // const userRole = localStorage.getItem("userRole"); // e.g., 'Staff' or 'admin'
 
   useEffect(() => {
     const loggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -35,6 +35,7 @@ const Slidebar = () => {
       if (!prev) {
         setIsEditPageOpen(false); // Close Edit Pages submenu
         setIsOfferPageOpen(false); // Close Offer Pages submenu
+        setIsReportOpen(false); // Close Reports submenu
       }
       return !prev;
     });
@@ -45,6 +46,7 @@ const Slidebar = () => {
       if (!prev) {
         setIsProductsOpen(false); // Close Products submenu
         setIsOfferPageOpen(false); // Close Offer Pages submenu
+        setIsReportOpen(false); // Close Reports submenu
       }
       return !prev;
     });
@@ -55,11 +57,22 @@ const Slidebar = () => {
       if (!prev) {
         setIsProductsOpen(false); // Close Products submenu
         setIsEditPageOpen(false); // Close Edit Pages submenu
+        setIsReportOpen(false); // Close Reports submenu
       }
       return !prev;
     });
   };
-  
+
+  const toggleReports = () => {
+    setIsReportOpen((prev) => {
+      if (!prev) {
+        setIsProductsOpen(false); // Close Products submenu
+        setIsEditPageOpen(false); // Close Edit Pages submenu
+        setIsOfferPageOpen(false); // Close Offer Pages submenu
+      }
+      return !prev;
+    });
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -72,7 +85,6 @@ const Slidebar = () => {
   }, []);
 
   const isActive = (path) => (location.pathname === path ? 'active' : '');
-
 
   // Check if any product-related route is active
   const isProductActive = () => {
@@ -88,7 +100,7 @@ const Slidebar = () => {
       isActive('/Admin/ComputerAccessories') ||
       isActive('/Admin/MobileAccessories') ||
       isActive('/Admin/PrinterAccessories') ||
-      isActive('/Admin/CCTVAccessories')    ||
+      isActive('/Admin/CCTVAccessories') ||
       isActive('/Admin/secondhandproducts')   
     );
   };
@@ -114,24 +126,36 @@ const Slidebar = () => {
     );
   };
 
+
+  const isReportActive = () => {
+    return (
+      isActive('/Admin/reports') ||
+      isActive('/Admin/SalesReport') ||
+      isActive('/Admin/CustomersReport') 
+      // isActive('/Admin/ProductDetailPage')
+    );
+  };
+
   // Set the products submenu to open if any product route is active
   useEffect(() => {
     if (isProductActive()) {
       setIsProductsOpen(true);
       setIsEditPageOpen(false); // Close Edit Pages submenu
       setIsOfferPageOpen(false); // Close Offer Pages submenu
+      setIsReportOpen(false); // Close Reports submenu
     } else if (isEditPageActive()) {
       setIsEditPageOpen(true);
       setIsProductsOpen(false); // Close Products submenu
       setIsOfferPageOpen(false); // Close Offer Pages submenu
+      setIsReportOpen(false); // Close Reports submenu
     } else if (isOfferPageActive()) {
       setIsOfferPageOpen(true);
       setIsProductsOpen(false); // Close Products submenu
       setIsEditPageOpen(false); // Close Edit Pages submenu
+      setIsReportOpen(false); // Close Reports submenu
     }
   }, []); // Run on component mount
   
-
   const userRole = localStorage.getItem("userRole"); // Assuming "Staff" or "admin"
 
   return (
@@ -228,11 +252,27 @@ const Slidebar = () => {
               <FaUsers className="menu-icon" /> {isOpen && 'Customers'}
             </a>
           </li>
-          <li>
+
+          {/* <li>
             <a href="/Admin/reports" className={isActive('/Admin/reports')}>
               <FaChartLine className="menu-icon" /> {isOpen && 'Reports'}
             </a>
+          </li> */}
+
+          <li className={`submenu ${isReportOpen ? 'open' : ''}`}>
+            <a href="#" onClick={toggleReports} className={isReportActive() ? 'active' : ''}>
+              <FaChartLine className="menu-icon" /> {isOpen && 'Reports'}
+              {isOpen && (isReportOpen ? <FaChevronDown className="submenu-icon" /> : <FaChevronRight className="submenu-icon" />)}
+            </a>
+            {isOpen && isReportOpen && (
+              <ul className="submenu-items">
+                <li><a href="/Admin/reports" className={isActive('/Admin/reports')}>Order Report</a></li>
+                <li><a href="/Admin/SalesReport" className={isActive('/Admin/SalesReport')}>Sales Report</a></li>
+                <li><a href="/Admin/CustomerReports" className={isActive('/Admin/CustomerReports')}>Customer Reports</a></li>
+              </ul> 
+            )}
           </li>
+          
           <li>
             <a href="/Admin/StaffManagement" className={isActive('/Admin/StaffManagement')}>
               <FaUsers className="menu-icon" /> {isOpen && 'Staff Management'}

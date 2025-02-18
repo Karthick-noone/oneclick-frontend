@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './css/Reports.css';  // Import external CSS
-import { ApiUrl } from '../../components/ApiUrl';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./css/Reports.css"; // Import external CSS
+import { ApiUrl } from "../../components/ApiUrl";
+import { FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const Reports = () => {
   const navigate = useNavigate();
   const [salesReport, setSalesReport] = useState([]);
   const [ordersReport, setOrdersReport] = useState([]);
   const [customersReport, setCustomersReport] = useState([]);
+  const [address, setAddress] = useState(null);
 
   // Pagination States for Orders, Sales, and Customers Reports
   const [currentPageOrders, setCurrentPageOrders] = useState(1);
@@ -16,14 +19,48 @@ const Reports = () => {
   const [currentPageCustomers, setCurrentPageCustomers] = useState(1);
 
   const [itemsPerPage] = useState(10); // Number of items per page
+  const userId = localStorage.getItem("user_id");
+  const [user, setUser] = useState({ username: "", email: "" });
+
+  useEffect(() => {
+    // Fetch user data (profile info) from localStorage or API
+    // Example: You may fetch user info via API or just use stored data
+    // Assuming you have user info in localStorage as an example
+    const storedUser = {
+      username: localStorage.getItem("username"),
+      email: localStorage.getItem("email"),
+    };
+    setUser(storedUser);
+
+    // Fetch address for the user
+    axios
+      .get(`${ApiUrl}/singleaddress/${userId}`)
+      .then((response) => {
+        const address = response.data[0];
+        console.log(address);
+        setAddress(address); // Assuming the address array is returned and we need the first entry
+      })
+      .catch((error) => {
+        console.error("Error fetching address:", error);
+      });
+  }, [userId]);
 
   const fetchSalesReport = async () => {
     try {
       const response = await axios.get(`${ApiUrl}/api/salesreport`);
       setSalesReport(response.data);
     } catch (error) {
-      console.error('Error fetching sales report:', error);
+      console.error("Error fetching sales report:", error);
     }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
   };
 
   useEffect(() => {
@@ -34,9 +71,11 @@ const Reports = () => {
   const fetchOrdersReport = async () => {
     try {
       const response = await axios.get(`${ApiUrl}/api/ordersreport`);
-      setOrdersReport(response.data);
+      const details = response.data
+      console.log(details)
+      setOrdersReport(details);
     } catch (error) {
-      console.error('Error fetching orders report:', error);
+      console.error("Error fetching orders report:", error);
     }
   };
 
@@ -46,7 +85,7 @@ const Reports = () => {
       const response = await axios.get(`${ApiUrl}/api/customersreport`);
       setCustomersReport(response.data);
     } catch (error) {
-      console.error('Error fetching customers report:', error);
+      console.error("Error fetching customers report:", error);
     }
   };
 
@@ -62,23 +101,45 @@ const Reports = () => {
     }
   }, [navigate]);
 
-  // Pagination Logic for Orders Report
+  
+
+  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // const years = [2023, 2024, 2025]; // Example years
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const statuses = ['Pending', 'Paid', 'Refund', 'Refund Pending'];
+
+  // Filter orders based on year, month, and status
+  const filteredOrders = ordersReport.filter(order => {
+    const orderYear = new Date(order.order_date).getFullYear();
+    const orderMonth = new Date(order.order_date).getMonth(); // 0 for January, 1 for February, etc.
+    
+    return (
+      (selectedYear ? orderYear === parseInt(selectedYear) : true) &&
+      (selectedMonth ? orderMonth === months.indexOf(selectedMonth) : true) &&
+      (selectedStatus ? order.status === selectedStatus : true) &&
+      (searchQuery ? 
+        order.unique_id.toLowerCase().includes(searchQuery.toLowerCase()) ||  // Filter by unique ID
+        order.username.toLowerCase().includes(searchQuery.toLowerCase()) || // Filter by username
+        (address && address.phone && address.phone.includes(searchQuery)) // Filter by phone if available
+        : true)
+    );
+  });
+
+  // Pagination Logic
   const indexOfLastOrderItem = currentPageOrders * itemsPerPage;
   const indexOfFirstOrderItem = indexOfLastOrderItem - itemsPerPage;
-  const currentOrders = ordersReport.slice(indexOfFirstOrderItem, indexOfLastOrderItem);
+  const currentOrders = filteredOrders.slice(indexOfFirstOrderItem, indexOfLastOrderItem);
 
-  // Pagination Logic for Sales Report
-  const indexOfLastSalesItem = currentPageSales * itemsPerPage;
-  const indexOfFirstSalesItem = indexOfLastSalesItem - itemsPerPage;
-  const currentSales = salesReport.slice(indexOfFirstSalesItem, indexOfLastSalesItem);
+  // Pagination Logic for total pages
+  const totalOrderPages = Math.ceil(filteredOrders.length / itemsPerPage);
 
-  // Pagination Logic for Customers Report
-  const indexOfLastCustomerItem = currentPageCustomers * itemsPerPage;
-  const indexOfFirstCustomerItem = indexOfLastCustomerItem - itemsPerPage;
-  const currentCustomers = customersReport.slice(indexOfFirstCustomerItem, indexOfLastCustomerItem);
-
-  // Calculate total pages
-  const totalOrderPages = Math.ceil(ordersReport.length / itemsPerPage);
   const totalSalesPages = Math.ceil(salesReport.length / itemsPerPage);
   const totalCustomerPages = Math.ceil(customersReport.length / itemsPerPage);
 
@@ -93,11 +154,17 @@ const Reports = () => {
         pages.push(i);
       }
     } else {
-      const leftBoundary = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-      const rightBoundary = Math.min(totalPages, currentPage + Math.floor(maxPagesToShow / 2));
+      const leftBoundary = Math.max(
+        1,
+        currentPage - Math.floor(maxPagesToShow / 2)
+      );
+      const rightBoundary = Math.min(
+        totalPages,
+        currentPage + Math.floor(maxPagesToShow / 2)
+      );
 
       if (leftBoundary > 2) {
-        pages.push(1, '...');
+        pages.push(1, "...");
       } else {
         for (let i = 1; i < leftBoundary; i++) {
           pages.push(i);
@@ -109,7 +176,7 @@ const Reports = () => {
       }
 
       if (rightBoundary < totalPages - 1) {
-        pages.push('...', totalPages);
+        pages.push("...", totalPages);
       } else {
         for (let i = rightBoundary + 1; i <= totalPages; i++) {
           pages.push(i);
@@ -121,7 +188,7 @@ const Reports = () => {
       <button
         key={index}
         onClick={() => handlePageChange(page, setCurrentPage)}
-        className={currentPage === page ? 'active' : ''}
+        className={currentPage === page ? "active" : ""}
       >
         {page}
       </button>
@@ -130,77 +197,114 @@ const Reports = () => {
 
   // Pagination handlers
   const handlePageChange = (pageNumber, setCurrentPage) => {
-    if (pageNumber === '...') return;
+    if (pageNumber === "...") return;
     setCurrentPage(pageNumber);
   };
 
-  const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  // const capitalizeFirstLetter = (string) => {
+  //   return string.toUpperCase() + string.slice(1).toLowerCase();
+  // };
+
+  // Delete order function
+  const deleteOrder = async (orderId) => {
+    const confirmed = await Swal.fire({
+      title: "Do you want to delete this order?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (confirmed.isConfirmed) {
+      try {
+        await axios.delete(`${ApiUrl}/deleteOrder/${orderId}`);
+        // setOrders(orders.filter((order) => order.unique_id !== orderId)); // Update the order state
+        
+        Swal.fire("Deleted!", "Your order has been deleted.", "success");
+        fetchOrdersReport();
+      } catch (error) {
+        console.error("Error deleting order:", error);
+        Swal.fire(
+          "Error!",
+          "Failed to delete the order. Please try again later.",
+          "error"
+        );
+      }
+    }
   };
 
   return (
     <div className="reports-container">
-      <section className="staff-main-content">
-      <div className="orders-header">
-        <h2 className="orders-page-title">Sales Report</h2>
-      </div>        <div className="table-wrapper">
-          <table className="styled-table">
-            <thead>
-              <tr>
-                <th>Product Name</th>
-                <th>Category</th>
-                <th>Total Sales (₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentSales.length > 0 ? (
-                currentSales.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.product_name}</td>
-                    <td>{item.category}</td>
-                    <td>{item.sales}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3">No sales data available.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        {/* Pagination Controls for Sales Report */}
-        <div className="pagination-controls">
-          <button
-            onClick={() => handlePageChange(currentPageSales - 1, setCurrentPageSales)}
-            disabled={currentPageSales === 1}
-          >
-            &lt;
-          </button>
-          {getPaginationPages(totalSalesPages, currentPageSales, setCurrentPageSales)}
-          <button
-            onClick={() => handlePageChange(currentPageSales + 1, setCurrentPageSales)}
-            disabled={currentPageSales === totalSalesPages}
-          >
-            &gt;
-          </button>
-        </div>
-      </section>
+     
 
       {/* Orders Report */}
       <section className="staff-main-content">
-      <div className="orders-header">
-        <h2 className="orders-page-title">Order Report</h2>
-      </div>        
+        <div className="orders-header">
+          <h2 className="orders-page-title">Order Report</h2>
+        </div>
         <div className="table-wrapper">
+
+        <div className="filters">
+        <input
+          type="text"
+          placeholder="Search by username"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+        />
+        
+        <select
+              id="year"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              style={{width:'25px'}}
+            >
+              {Array.from(
+                { length: 5 },
+                (_, i) => new Date().getFullYear() - i
+              ).map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+
+            <select
+              id="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              style={{width:'25px'}}
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                <option key={month} value={month}>
+                  {new Date(0, month - 1).toLocaleString("en-US", {
+                    month: "long",
+                  })}
+                </option>
+              ))}
+            </select>
+
+        <select onChange={e => setSelectedStatus(e.target.value)} value={selectedStatus}>
+          <option value="">Order Status</option>
+          {statuses.map(status => (
+            <option key={status} value={status}>{status}</option>
+          ))}
+        </select>
+      </div>
+
           <table className="styled-table">
             <thead>
               <tr>
                 <th>Sl.No</th>
                 <th>Order ID</th>
+                <th>Order Date</th>
                 <th>User Name</th>
+                <th>User Mobile</th>
                 <th>Total Amount (₹)</th>
+                <th>Payment Method</th>
                 <th>Order Status</th>
+                <th>Delete</th>
               </tr>
             </thead>
             <tbody>
@@ -208,9 +312,23 @@ const Reports = () => {
                 <tr key={index}>
                   <td>{indexOfFirstOrderItem + index + 1}</td>
                   <td>#{order.unique_id}</td>
-                  <td>{capitalizeFirstLetter(order.user_name)}</td>
+                  <td>{formatDate(order.order_date)}</td>
+                  <td>{order.username}</td>
+
+                  {address ? (
+                    <td>{address.phone}</td>
+                  ) : (
+                    <p className="ac-no-address">No number available</p>
+                  )}{" "}
                   <td>{order.total_amount}</td>
+                  <td>{order.payment_method}</td>
                   <td>{order.status}</td>
+                  <td> <button
+                                                  className="btn btn-delete"
+                                                  onClick={() => deleteOrder(order.unique_id)}
+                                                >
+                                                  <FaTrash />
+                                                </button></td>
                 </tr>
               ))}
             </tbody>
@@ -219,14 +337,22 @@ const Reports = () => {
         {/* Pagination Controls for Orders Report */}
         <div className="pagination-controls">
           <button
-            onClick={() => handlePageChange(currentPageOrders - 1, setCurrentPageOrders)}
+            onClick={() =>
+              handlePageChange(currentPageOrders - 1, setCurrentPageOrders)
+            }
             disabled={currentPageOrders === 1}
           >
             &lt;
           </button>
-          {getPaginationPages(totalOrderPages, currentPageOrders, setCurrentPageOrders)}
+          {getPaginationPages(
+            totalOrderPages,
+            currentPageOrders,
+            setCurrentPageOrders
+          )}
           <button
-            onClick={() => handlePageChange(currentPageOrders + 1, setCurrentPageOrders)}
+            onClick={() =>
+              handlePageChange(currentPageOrders + 1, setCurrentPageOrders)
+            }
             disabled={currentPageOrders === totalOrderPages}
           >
             &gt;
@@ -235,46 +361,7 @@ const Reports = () => {
       </section>
 
       {/* Customers Report */}
-      <section className="staff-main-content">
-      <div className="orders-header">
-        <h2 className="orders-page-title">Customer Report</h2>
-      </div>          <div className="table-wrapper">
-          <table className="styled-table">
-            <thead>
-              <tr>
-                <th>User Name</th>
-                <th>Total Orders</th>
-                <th>Total Spent (₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentCustomers.map((customer, index) => (
-                <tr key={index}>
-                  <td>{capitalizeFirstLetter(customer.user_name)}</td>
-                  <td>{customer.total_orders}</td>
-                  <td>{customer.total_spent}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {/* Pagination Controls for Customers Report */}
-        <div className="pagination-controls">
-          <button
-            onClick={() => handlePageChange(currentPageCustomers - 1, setCurrentPageCustomers)}
-            disabled={currentPageCustomers === 1}
-          >
-            &lt;
-          </button>
-          {getPaginationPages(totalCustomerPages, currentPageCustomers, setCurrentPageCustomers)}
-          <button
-            onClick={() => handlePageChange(currentPageCustomers + 1, setCurrentPageCustomers)}
-            disabled={currentPageCustomers === totalCustomerPages}
-          >
-            &gt;
-          </button>
-        </div>
-      </section>
+    
     </div>
   );
 };

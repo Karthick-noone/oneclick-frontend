@@ -215,7 +215,7 @@ document.head.appendChild(styleElement);
         </center>
         <h2 style={styles.title}>User Login</h2>
   
-        <form style={styles.form} onSubmit={handleSubmit}>
+        <form style={styles.form} onSubmit={handleSubmit} autoComplete="off">
           <label style={styles.label} htmlFor="name">WhatsApp Number</label>
           <input
             type="tel"

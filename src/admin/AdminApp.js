@@ -16,6 +16,8 @@ import PrinterAccessories from './pages/AddPrinterAccessories'; // Example page
 import Orders from './pages/Orders'; // Example page
 import Customers from './pages/Customers'; // Example page
 import Reports from './pages/Reports'; // Example page
+import SalesReport from './pages/SalesReport'; // Example page
+import CustomerReports from './pages/CustomerReports'; // Example page
 import ChangePassword from './pages/ChangePassword'; // Example page
 import EditHomePage from './pages/EditHomePage'; // Example page
 import EditDoubleImageAd from './pages/EditDoubleImageAd'; // Example page
@@ -86,6 +88,8 @@ function App() {
           <Route path="/Orders" element={<ProtectedRoute element={<Orders />} restrictedRoles={['Staff']} />} />
           <Route path="/Customers" element={<ProtectedRoute element={<Customers />} restrictedRoles={['Staff']} />} />
           <Route path="/Reports" element={<ProtectedRoute element={<Reports />} restrictedRoles={['Staff']} />} />
+          <Route path="/SalesReport" element={<ProtectedRoute element={<SalesReport />} restrictedRoles={['Staff']} />} />
+          <Route path="/CustomerReports" element={<ProtectedRoute element={<CustomerReports />} restrictedRoles={['Staff']} />} />
           <Route path="/ChangePassword" element={<ProtectedRoute element={<ChangePassword />} restrictedRoles={['Staff']} />} />
           <Route path="/EditHomePage" element={<ProtectedRoute element={<EditHomePage />} restrictedRoles={['Staff']} />} />
           <Route path="/EditDoubleImageAd" element={<ProtectedRoute element={<EditDoubleImageAd />} restrictedRoles={['Staff']} />} />

@@ -55,6 +55,8 @@
     max-width: 400px; /* Set a maximum width to maintain consistency */
     text-align: left; /* Align text to the left */
     position: relative;
+    height: 400px; /* Fixed height */
+    overflow-y: auto; /* Enable vertical scrollbar if content overflows */
 }
 
 /* Popup Heading */

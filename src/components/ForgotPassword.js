@@ -192,6 +192,7 @@ const styles = {
     margin: "10px 0",
     borderRadius: "5px",
     border: "1px solid #ccc",
+    width:'100%'
   },
   passwordContainer: {
     position: "relative",

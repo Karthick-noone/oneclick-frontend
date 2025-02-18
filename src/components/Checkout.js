@@ -97,85 +97,43 @@ const Checkout = () => {
   };
 
   const handleApplyCoupon = async (couponCode) => { 
-    if (!couponCode.trim()) {
-      setMessage("Please enter a coupon code.");
-      setMessageType("error");
-      return;
-    }
-    if (isCouponApplied) {
-      setMessage("Coupon has already been applied!");
-      setMessageType("warning");
-      return;
-    }
+    if (!couponCode.trim()) return setMessage("Please enter a coupon code."), setMessageType("error");
+    if (isCouponApplied) return setMessage("Coupon has already been applied!"), setMessageType("warning");
   
     try {
       console.log("Applying coupon:", couponCode, "for all products in cart");
       const productIds = cartItems.map((item) => item.prod_id);
-      console.log("Product IDs:", productIds);
+      
+      const { data } = await axios.post(`${ApiUrl}/api/apply-coupon`, { couponCode, product_ids: productIds });
+      console.log("Response from server:", data);
   
-      // Calculate the total price before applying the coupon
-      let calculatedTotalPrice = calculateTotalPrice();
-      console.log("Total price before applying coupon:", calculatedTotalPrice);
-  
-      const response = await axios.post(`${ApiUrl}/api/apply-coupon`, {
-        couponCode,
-        product_ids: productIds,
-      });
-  
-      console.log("Response from server:", response.data);
-  
-      if (response.data.success) {
-        let discount = 0;
-        let apiMinPurchaseLimit = Number(response.data.min_purchase_limit);
-  
-        // Check which discount value is provided by the API
-        if (response.data.discount1 !== undefined) {
-          discount = Number(response.data.discount1);
-          setCouponValue(discount);
-          setDiscountAmount(0);
-  
-          if (Number(calculatedTotalPrice) < apiMinPurchaseLimit) {
-            setMessage(`Minimum purchase of ₹${apiMinPurchaseLimit} required.`);
-            setMessageType("error");
-            return;
-          }
-        } else if (response.data.discount2 !== undefined) {
-          discount = Number(response.data.discount2);
-          setDiscountAmount(discount);
-          setCouponValue(0);
+      if (data.success) {
+        const discount = data.discount1 ?? data.discount2 ?? 0;
+        if (data.discount1 !== undefined && calculateTotalPrice() < data.min_purchase_limit) {
+          return setMessage(`Minimum purchase of ₹${data.min_purchase_limit} required.`), setMessageType("error");
         }
   
-        console.log("Discount received:", discount);
-  
-        let newAmount = Number(calculatedTotalPrice) - discount;
-        if (newAmount < 0) newAmount = 0;
-  
+        setDiscountAmount(data.discount2 ?? 0);
+        setCouponValue(data.discount1 ?? 0);
+        setMinPurchaseLimit(data.min_purchase_limit ?? 0);
+        
+        const newAmount = Math.max(0, calculateTotalPrice() - discount);
         setTotalAmount(newAmount);
         setNewTotalAmount(newAmount);
-        setMinPurchaseLimit(apiMinPurchaseLimit);
   
         setIsCouponApplied(true);
         setMessage("Coupon applied successfully!");
         setMessageType("success");
         setCoupon("");
   
-        setTimeout(() => {
-          setMessage("");
-          setMessageType("");
-        }, 3000);
+        setTimeout(() => setMessage(""), 3000);
       } else {
-        setMessage(response.data.message || "Failed to apply coupon.");
+        setMessage(data.message || "Failed to apply coupon.");
         setMessageType("error");
       }
     } catch (error) {
       console.error("Error applying coupon:", error);
-      
-      if (error.response && error.response.data.error === "Coupon has expired.") {
-        setMessage("This coupon has expired.");
-      } else {
-        setMessage("Invalid or expired coupon.");
-      }
-  
+      setMessage(error.response?.data?.error === "Coupon has expired." ? "This coupon has expired." : "Invalid or expired coupon.");
       setMessageType("error");
     }
   };

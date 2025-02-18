@@ -188,6 +188,13 @@ const AddressPage = () => {
     const nameRegex = /^[a-zA-Z\s]+$/;
     const phoneRegex = /^[0-9]{10}$/;
     const postalCodeRegex = /^[0-9]{6}$/; // Postal code validation (6 digits)
+    // const streetRegex = /^[a-zA-Z0-9\s,.'-]{3,}$/; // Street name validation (letters, numbers, spaces, commas, periods, and hyphens)
+
+
+       // Validate street name
+      //  if (!streetRegex.test(address.street)) {
+      //   return "Street name must contain only letters, numbers, spaces, commas, periods, or hyphens, and must be at least 3 characters long.";
+      // }
 
     // Validate name, city, state, and country
     if (!nameRegex.test(address.name)) {

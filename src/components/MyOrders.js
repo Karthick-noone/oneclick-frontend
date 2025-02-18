@@ -19,6 +19,25 @@ const MyOrders = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState(null); // State for the current order ID
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Month is 0-indexed
+  const [filteredOrders, setFilteredOrders] = useState(orders);
+
+  useEffect(() => {
+    filterOrders(selectedYear, selectedMonth);
+  }, [selectedYear, selectedMonth, orders]);
+
+  const filterOrders = (year, month) => {
+    const filtered = orders.filter((order) => {
+      const orderDate = new Date(order.order_date);
+      const orderYear = orderDate.getFullYear();
+      const orderMonth = orderDate.getMonth() + 1; // Month is 0-indexed
+
+      return orderYear === year && orderMonth === month;
+    });
+
+    setFilteredOrders(filtered);
+  };
 
   useEffect(() => {
     window.history.pushState(null, "", window.location.href);
@@ -109,8 +128,8 @@ const MyOrders = () => {
       // Fetch orders from the backend
       const fetchOrders = async () => {
         try {
-          const response = await axios.get(`${ApiUrl}/api/my-orders/${userId}`); // Replace with actual API
-          setOrders(response.data);
+          const response = await axios.get(`${ApiUrl}/my-orders/${userId}`); // Replace with actual API
+          setOrders(response.data.orders);
         } catch (error) {
           console.error("Error fetching orders:", error);
         }
@@ -185,41 +204,141 @@ const MyOrders = () => {
       });
     }
   };
+  const [selectedProduct, setSelectedProduct] = useState(
+    orders[0]?.products?.[0]?.product_id
+  );
+  const [currentOrder, setCurrentOrder] = useState(null);
+  const [, setCurrentProduct] = useState(null);
+
+  const handleProductChange = (event) => {
+    const productId = event.target.value;
+    setSelectedProduct(productId);
+  };
+
+  const handleViewOrder = (order) => {
+    const product = order.products.find(
+      (product) => product.product_id === selectedProduct
+    );
+    setCurrentOrder(order);
+    setCurrentProduct(product);
+  };
 
   return (
     <>
       <Header2 />
       <div className="my-orders">
         <h2>My Orders</h2>
+        <div className="filters">
+          <span style={{ marginTop: "30px" }}>Filter-By</span>
+          <div className="filter-item">
+            <label htmlFor="year">Year</label>
+            <select
+              id="year"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              style={{width:'25px'}}
+            >
+              {Array.from(
+                { length: 5 },
+                (_, i) => new Date().getFullYear() - i
+              ).map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-item">
+            <label htmlFor="month">Month</label>
+            <select
+              id="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              style={{width:'25px'}}
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                <option key={month} value={month}>
+                  {new Date(0, month - 1).toLocaleString("en-US", {
+                    month: "long",
+                  })}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
         <div className="order-container">
-          {orders.length === 0 ? (
+          {filteredOrders.length === 0 ? (
             <p className="no-orders">No orders found.</p>
           ) : (
-            orders.map((order) => (
+            filteredOrders.map((order) => (
               <div key={order.unique_id} className="order-card">
                 <div className="order-header">
                   <h3>Order #{order.unique_id}</h3>
                   <span
                     className={`order-status ${order.status.toLowerCase()}`}
                   >
-                    {order.status}
+                    {order.status.toLowerCase() === "pending"
+                      ? "Payment Pending"
+                      : order.status.toLowerCase() === "refund pending"
+                      ? "Refund Pending"
+                      : order.status.toLowerCase() === "refund"
+                      ? "Refund"
+                      : "Payment Paid"}
                   </span>
                 </div>
+                <div className="products-list">
+                  {order.products && order.products.length > 1 ? (
+                    <select
+                      value={selectedProduct}
+                      onChange={handleProductChange}
+                      className="product-dropdown"
+                    >
+                      {order.products.map((product) => (
+                        <option
+                          key={product.product_id}
+                          value={product.product_id}
+                        >
+                          {product.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    order.products &&
+                    order.products.length === 1 && (
+                      <span style={{ fontWeight: "bold" }}>
+                        {order.products[0].name}
+                      </span>
+                    )
+                  )}
+                </div>
+
                 <p>Order Date: {formatDate(order.order_date)}</p>
                 <p>Total Amount: ₹{order.total_amount}</p>
-                <button
-                  onClick={() => openModal(order)}
-                  className="view-details-button"
-                >
-                  View Order
-                </button>
-                <button
-                  style={{ marginLeft: "10px" }}
-                  onClick={() => openModal2(order)}
-                  className="view-details-button"
-                >
-                  Track order
-                </button>
+
+                {/* Buttons in the same row */}
+                <div className="buttons-row">
+                  <button
+                    onClick={() => openModal(order)}
+                    className="view-details-button"
+                  >
+                    View Order
+                  </button>
+                  <button
+                    onClick={() => openModal2(order)}
+                    className="view-details-button"
+                  >
+                    Track Order
+                  </button>
+
+                  {order.delivery_status === "Cancelled" && (
+                    <button className="btn btn-cancel" disabled>
+                      Cancelled
+                    </button>
+                  )}
+                </div>
+
                 <OrderTrackingModal
                   isOpen={isModalOpen2}
                   onRequestClose={closeModal2}

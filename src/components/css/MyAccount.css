@@ -1,0 +1,203 @@
+/* Banner Section */
+.ac-banner-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    margin-top: 0px;
+  }
+  
+  .ac-banner-image {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .ac-banner-text-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
+    text-align: center;
+  }
+  
+  .ac-banner-text {
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+  
+  /* Profile Section */
+  .ac-account-container {
+    padding: 20px;
+    text-align: center;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .ac-profile-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: left;
+  }
+  
+  .ac-profile-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  .ac-profile-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    margin-right: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .ac-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-right: 20px;
+  }
+  
+  .ac-profile-name {
+    font-size: 1.8rem;
+    margin: 0;
+  }
+  
+  .ac-profile-email {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .ac-address-card {
+    flex: 1;
+    text-align: left;
+    padding: 15px;
+    border-left: 2px solid #ddd;
+    margin-top: 10px;
+  }
+
+  /* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .ac-profile-header {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .ac-profile-left {
+      justify-content: center;
+      margin-right: 0;
+    }
+  
+    .ac-avatar {
+      width: 120px;
+      height: 120px;
+    }
+  
+    .ac-profile-name {
+      font-size: 1.6rem;
+    }
+  
+    .ac-address-card {
+      width: 100%;
+      margin-top: 20px;
+      border-left: none;
+      padding: 10px;
+    }
+  
+    .ac-profile-card {
+      padding: 15px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .ac-avatar {
+      width: 100px;
+      height: 100px;
+    }
+  
+    .ac-profile-name {
+      font-size: 1.4rem;
+    }
+  
+    .ac-profile-email {
+      font-size: 0.9rem;
+    }
+  
+    .ac-address-card {
+      font-size: 0.9rem;
+    }
+  }
+  
+  /* Button Styling */
+  .ac-change-btn {
+    margin-top: 12px;
+    padding: 10px 20px;
+    background: linear-gradient(to right, #007bff, #6610f2);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .ac-change-btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .ac-profile-header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  
+    .ac-avatar {
+      margin-right: 0;
+      margin-bottom: 15px;
+    }
+  
+    .ac-profile-name {
+      font-size: 1.5rem;
+    }
+  
+    .ac-address-card {
+      border-left: none;
+      border-top: 2px solid #ddd;
+      padding-top: 10px;
+    }
+  }
+
+  .ac-button {
+    margin-top: 12px;
+    padding: 10px 20px;
+    background: linear-gradient(to right, #007bff, #6610f2);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .ac-button:hover {
+    transform: translateY(-2px);
+  }
+  
+  .ac-button:active {
+    transform: translateY(0);
+  }
+  
