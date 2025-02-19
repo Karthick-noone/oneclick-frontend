@@ -128,9 +128,9 @@ const MyOrders = () => {
       // Fetch orders from the backend
       const fetchOrders = async () => {
         try {
-          const response = await axios.get(`${ApiUrl}/my-orders/${userId}`); // Replace with actual API
+          const response = await axios.get(`${ApiUrl}/api/my-orders/${userId}`); // Replace with actual API
           setOrders(response.data.orders);
-        } catch (error) {
+        } catch (error) { 
           console.error("Error fetching orders:", error);
         }
       };

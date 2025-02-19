@@ -20,30 +20,30 @@ const Reports = () => {
 
   const [itemsPerPage] = useState(10); // Number of items per page
   const userId = localStorage.getItem("user_id");
-  const [user, setUser] = useState({ username: "", email: "" });
+  // const [user, setUser] = useState({ username: "", email: "" });
 
-  useEffect(() => {
-    // Fetch user data (profile info) from localStorage or API
-    // Example: You may fetch user info via API or just use stored data
-    // Assuming you have user info in localStorage as an example
-    const storedUser = {
-      username: localStorage.getItem("username"),
-      email: localStorage.getItem("email"),
-    };
-    setUser(storedUser);
+  // useEffect(() => {
+  //   // Fetch user data (profile info) from localStorage or API
+  //   // Example: You may fetch user info via API or just use stored data
+  //   // Assuming you have user info in localStorage as an example
+  //   const storedUser = {
+  //     username: localStorage.getItem("username"),
+  //     email: localStorage.getItem("email"),
+  //   };
+  //   setUser(storedUser);
 
-    // Fetch address for the user
-    axios
-      .get(`${ApiUrl}/singleaddress/${userId}`)
-      .then((response) => {
-        const address = response.data[0];
-        console.log(address);
-        setAddress(address); // Assuming the address array is returned and we need the first entry
-      })
-      .catch((error) => {
-        console.error("Error fetching address:", error);
-      });
-  }, [userId]);
+  //   // Fetch address for the user
+  //   axios
+  //     .get(`${ApiUrl}/singleaddress/${userId}`)
+  //     .then((response) => {
+  //       const address = response.data[0];
+  //       console.log("address",address);
+  //       setAddress(address); // Assuming the address array is returned and we need the first entry
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching address:", error);
+  //     });
+  // }, [userId]);
 
   const fetchSalesReport = async () => {
     try {
@@ -71,8 +71,8 @@ const Reports = () => {
   const fetchOrdersReport = async () => {
     try {
       const response = await axios.get(`${ApiUrl}/api/ordersreport`);
-      const details = response.data
-      console.log(details)
+      const details = response.data;
+      console.log(details);
       setOrdersReport(details);
     } catch (error) {
       console.error("Error fetching orders report:", error);
@@ -101,33 +101,41 @@ const Reports = () => {
     }
   }, [navigate]);
 
-  
-
-  const [selectedYear, setSelectedYear] = useState('');
-  const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // const years = [2023, 2024, 2025]; // Example years
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
-  const statuses = ['Pending', 'Paid', 'Refund', 'Refund Pending'];
+  const statuses = ["Pending", "Paid", "Refund", "Refund Pending"];
 
   // Filter orders based on year, month, and status
-  const filteredOrders = ordersReport.filter(order => {
+  const filteredOrders = ordersReport.filter((order) => {
     const orderYear = new Date(order.order_date).getFullYear();
     const orderMonth = new Date(order.order_date).getMonth(); // 0 for January, 1 for February, etc.
-    
+
     return (
       (selectedYear ? orderYear === parseInt(selectedYear) : true) &&
       (selectedMonth ? orderMonth === months.indexOf(selectedMonth) : true) &&
       (selectedStatus ? order.status === selectedStatus : true) &&
-      (searchQuery ? 
-        order.unique_id.toLowerCase().includes(searchQuery.toLowerCase()) ||  // Filter by unique ID
-        order.username.toLowerCase().includes(searchQuery.toLowerCase()) || // Filter by username
-        (address && address.phone && address.phone.includes(searchQuery)) // Filter by phone if available
+      (searchQuery
+        ? order.unique_id.toLowerCase().includes(searchQuery.toLowerCase()) || // Filter by unique ID
+          order.username.toLowerCase().includes(searchQuery.toLowerCase()) || // Filter by username
+          (address && address.phone && address.phone.includes(searchQuery)) // Filter by phone if available
         : true)
     );
   });
@@ -135,7 +143,10 @@ const Reports = () => {
   // Pagination Logic
   const indexOfLastOrderItem = currentPageOrders * itemsPerPage;
   const indexOfFirstOrderItem = indexOfLastOrderItem - itemsPerPage;
-  const currentOrders = filteredOrders.slice(indexOfFirstOrderItem, indexOfLastOrderItem);
+  const currentOrders = filteredOrders.slice(
+    indexOfFirstOrderItem,
+    indexOfLastOrderItem
+  );
 
   // Pagination Logic for total pages
   const totalOrderPages = Math.ceil(filteredOrders.length / itemsPerPage);
@@ -221,7 +232,7 @@ const Reports = () => {
       try {
         await axios.delete(`${ApiUrl}/deleteOrder/${orderId}`);
         // setOrders(orders.filter((order) => order.unique_id !== orderId)); // Update the order state
-        
+
         Swal.fire("Deleted!", "Your order has been deleted.", "success");
         fetchOrdersReport();
       } catch (error) {
@@ -237,28 +248,25 @@ const Reports = () => {
 
   return (
     <div className="reports-container">
-     
-
       {/* Orders Report */}
       <section className="staff-main-content">
         <div className="orders-header">
           <h2 className="orders-page-title">Order Report</h2>
         </div>
         <div className="table-wrapper">
+          <div className="filters">
+            <input
+              type="text"
+              placeholder="Search by username"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
 
-        <div className="filters">
-        <input
-          type="text"
-          placeholder="Search by username"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-        />
-        
-        <select
+            <select
               id="year"
               value={selectedYear}
               onChange={(e) => setSelectedYear(Number(e.target.value))}
-              style={{width:'25px'}}
+              style={{ width: "25px" }}
             >
               {Array.from(
                 { length: 5 },
@@ -274,7 +282,7 @@ const Reports = () => {
               id="month"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(Number(e.target.value))}
-              style={{width:'25px'}}
+              style={{ width: "25px" }}
             >
               {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                 <option key={month} value={month}>
@@ -285,13 +293,18 @@ const Reports = () => {
               ))}
             </select>
 
-        <select onChange={e => setSelectedStatus(e.target.value)} value={selectedStatus}>
-          <option value="">Order Status</option>
-          {statuses.map(status => (
-            <option key={status} value={status}>{status}</option>
-          ))}
-        </select>
-      </div>
+            <select
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              value={selectedStatus}
+            >
+              <option value="">Order Status</option>
+              {statuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <table className="styled-table">
             <thead>
@@ -314,21 +327,20 @@ const Reports = () => {
                   <td>#{order.unique_id}</td>
                   <td>{formatDate(order.order_date)}</td>
                   <td>{order.username}</td>
-
-                  {address ? (
-                    <td>{address.phone}</td>
-                  ) : (
-                    <p className="ac-no-address">No number available</p>
-                  )}{" "}
+                  <td>{order.contact_number}</td>
+                  
                   <td>{order.total_amount}</td>
                   <td>{order.payment_method}</td>
                   <td>{order.status}</td>
-                  <td> <button
-                                                  className="btn btn-delete"
-                                                  onClick={() => deleteOrder(order.unique_id)}
-                                                >
-                                                  <FaTrash />
-                                                </button></td>
+                  <td>
+                    {" "}
+                    <button
+                      className="btn btn-delete"
+                      onClick={() => deleteOrder(order.unique_id)}
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -361,7 +373,6 @@ const Reports = () => {
       </section>
 
       {/* Customers Report */}
-    
     </div>
   );
 };

@@ -345,7 +345,7 @@ const filteredProducts = searchQuery
     // Set an interval to fetch the wishlist every second
     const intervalId = setInterval(() => {
       fetchWishlist();
-    }, 1000); // Update every second (1000ms)
+    }, 5000); // Update every second (1000ms)
   
     // Cleanup the interval when the component unmounts
     return () => clearInterval(intervalId);

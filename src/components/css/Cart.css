@@ -5,6 +5,11 @@
   margin: auto;
 }
 
+.discount-message{
+
+  color:green;
+}
+
 .cart-header h1 {
   margin: 0;
   font-size: 2em;
@@ -187,7 +192,6 @@
   background-color: #007bff; /* Button color */
   color: white; /* Text color */
   border: none; /* Remove default border */
-  border-radius: 5px; /* Rounded corners */
   font-size: 14px; /* Font size */
   cursor: pointer; /* Cursor pointer on hover */
   transition: background-color 0.3s; /* Smooth transition for background color */
@@ -462,7 +466,7 @@
   color: white;
   padding: 12px;
   border: none;
-  border-radius: 5px;
+  /* border-radius: 5px; */
   cursor: pointer;
   font-size: 1em;
   margin: 5px 0; /* Margin for spacing between buttons */
@@ -584,10 +588,37 @@
   background-color: #4CAF50; /* Green background */
   color: white; /* White text */
   border: none;
-  border-radius: 5px;
+  /* border-radius: 5px; */
   padding: 8px 16px;
   cursor: pointer;
   margin-left: auto; /* Push button to the right */
 }
 
 
+.Buy-later-btn {
+  background-color: #3c31da; /* Green background */
+  color: white; /* White text */
+  border: none;
+  /* border-radius: 5px; */
+  padding: 8px 16px;
+  cursor: pointer;
+  margin-left: auto; /* Push button to the right */
+}
+
+
+.Addtocart-btn {
+  background: linear-gradient(
+    145deg,
+    #ff7f50,
+    #d9534f
+  );   color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  margin-left: auto;
+  /* transition: background 0.3s ease-in-out; */
+}
+
+.Addtocart-btn:hover {
+  background: linear-gradient(145deg, #d9534f, #ff7f50);
+}

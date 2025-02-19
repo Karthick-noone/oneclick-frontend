@@ -9,6 +9,18 @@
     margin-left: 250px;
     margin-top: 70px;
   }
+  .address-box {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+  }
+  
+  .address-box p {
+    margin: 5px 0;
+  }
+  
   
   /* Page title styling */
   .page-titlee {
@@ -140,51 +152,72 @@
     overflow-y: auto; /* Enables vertical scrolling */
   }
   
+  /* Container to hold both details and image side by side */
+  .user-details-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  
+  /* User details take most of the space */
+  .user-details-info {
+    flex: 1;
+    /* margin-right: 15px; */
+  }
+  
+  /* Style for the image on the right */
+  .user-details-image img {
+    max-width: 100px; /* Adjust as needed */
+    border-radius: 8px; /* Optional styling */
+    object-fit: cover;
+    margin-right: 15px;
+
+  }
+  
+  /* Existing styles */
   .view-button {
     background-color: #3085d6;
-    color: white;
-    border: none;
-    padding: 8px 12px; /* Increased padding for better click area */
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px; /* Increased font size */
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Adding transitions */
-  }
-  
-  .view-button:hover {
-    background-color: #2673a4;
-    transform: scale(1.05); /* Slight scaling on hover for effect */
-  }
-  
-  .view-button:active {
-    transform: scale(0.95); /* Slight shrink on click for feedback */
-  }
-  
-  /* Additional styles for modal content */
-  .user-details-modal h2 {
-    margin-bottom: 15px;
-    font-size: 24px;
-    color: #333; /* Darker title color */
-  }
-  
-  .user-details-modal p {
-    margin: 5px 0; /* Spacing between paragraphs */
-    font-size: 16px; /* Consistent font size for details */
-    line-height: 1.5; /* Better readability */
-  }
-  
-  /* Add a close button style */
-  .user-details-modal button {
-    background-color: #f44336; /* Red background for close button */
     color: white;
     border: none;
     padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Smooth transition for close button */
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .view-button:hover {
+    background-color: #2673a4;
+    transform: scale(1.05);
+  }
+  
+  .view-button:active {
+    transform: scale(0.95);
+  }
+  
+  .user-details-modal h2 {
+    margin-bottom: 15px;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .user-details-modal p {
+    margin: 5px 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  .user-details-modal button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
   
   .user-details-modal button:hover {
-    background-color: #d32f2f; /* Darker red on hover */
+    background-color: #d32f2f;
   }
   

@@ -61,10 +61,9 @@ const Printers = ({ isOpen, onClose }) => {
   const [offerPrice, setOfferPrice] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
 
-
   const [isModalOpen2, setIsModalOpen2] = useState(false);
-    const [modalProductId, setModalProductId] = useState(null);
- useEffect(() => {
+  const [modalProductId, setModalProductId] = useState(null);
+  useEffect(() => {
     setTimeout(() => {
       const section = document.querySelector(".laptops-products-list");
       if (section) {
@@ -73,18 +72,17 @@ const Printers = ({ isOpen, onClose }) => {
       }
     }, 100);
   }, []);
-      // Handle opening modal and passing productId
-    
-      const openProductModal = (productId) => {
-        setModalProductId(productId);
-        setIsModalOpen2(true);
-      };
-    
-      const closeProductModal = () => {
-        setIsModalOpen2(false);
-        setModalProductId(null);
-      };
+  // Handle opening modal and passing productId
 
+  const openProductModal = (productId) => {
+    setModalProductId(productId);
+    setIsModalOpen2(true);
+  };
+
+  const closeProductModal = () => {
+    setIsModalOpen2(false);
+    setModalProductId(null);
+  };
 
   // Handle opening modal and passing productId
   const handleOpenOfferModal = (id) => {
@@ -755,9 +753,12 @@ const Printers = ({ isOpen, onClose }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         // Make the DELETE request to the backend API
-        fetch(`${ApiUrl}/deleteprinters/image/${productId}?index=${imageIndex}`, {
-          method: "DELETE",
-        })
+        fetch(
+          `${ApiUrl}/deleteprinters/image/${productId}?index=${imageIndex}`,
+          {
+            method: "DELETE",
+          }
+        )
           .then((response) => response.json())
           .then((data) => {
             if (data.message) {
@@ -1048,9 +1049,8 @@ const Printers = ({ isOpen, onClose }) => {
       coupon: product.coupon,
       category: product.category,
     });
-    setModalIsOpen(true); 
-       openProductModal(false);
-
+    setModalIsOpen(true);
+    openProductModal(false);
   };
 
   const handleUpdateProduct = async () => {
@@ -1213,10 +1213,15 @@ const Printers = ({ isOpen, onClose }) => {
     if (confirmResult.isConfirmed) {
       try {
         // Log before sending delete request
-        console.log("Sending delete request to:", `${ApiUrl}/deleteprinters/${id}`);
+        console.log(
+          "Sending delete request to:",
+          `${ApiUrl}/deleteprinters/${id}`
+        );
 
         // Perform the delete operation
-        const deleteResponse = await axios.delete(`${ApiUrl}/deleteprinters/${id}`);
+        const deleteResponse = await axios.delete(
+          `${ApiUrl}/deleteprinters/${id}`
+        );
 
         // Log response from delete request
         console.log("Delete response:", deleteResponse.data);
@@ -1577,14 +1582,13 @@ const Printers = ({ isOpen, onClose }) => {
                   </h3>
 
                   {/* "View" button to trigger modal */}
-                 
                 </div>
                 <button
-                    className="view-details-btn"
-                    onClick={() => openProductModal(product.id)} // Pass product ID to open modal
-                  >
-                    <FaEye /> View Details
-                  </button>
+                  className="view-details-btn"
+                  onClick={() => openProductModal(product.id)} // Pass product ID to open modal
+                >
+                  <FaEye /> View Details
+                </button>
                 <div className="laptops-product-actions">
                   <button
                     onClick={() => handleEditProduct(product)}
@@ -1638,7 +1642,6 @@ const Printers = ({ isOpen, onClose }) => {
                                 <span>₹{product.deliverycharge}</span>
                               </p>
                               <p>
-                         
                                 <strong>Features</strong>
                                 <span>{product.prod_features}</span>
                               </p>
@@ -1894,18 +1897,18 @@ const Printers = ({ isOpen, onClose }) => {
                                 onCouponUpdated={() => {}}
                               />
 
-                                <div
-                                                              className="frequently-buy"
-                                                              style={{ marginBottom: "10px" }}
-                                                            >
-                                                              <span className="frequently-buy-label">
-                                                                Make a copy of this product
-                                                              </span>
-                                                              <FaClone
-                                                                onClick={() => handleCopyProduct(product.id)}
-                                                                className="copy-icon"
-                                                              />
-                                                            </div>
+                              {/* <div
+                                className="frequently-buy"
+                                style={{ marginBottom: "10px" }}
+                              >
+                                <span className="frequently-buy-label">
+                                  Make a copy of this product
+                                </span>
+                                <FaClone
+                                  onClick={() => handleCopyProduct(product.id)}
+                                  className="copy-icon"
+                                />
+                              </div> */}
 
                               {/* Frequently Buy Section */}
                               <div
@@ -2038,8 +2041,6 @@ const Printers = ({ isOpen, onClose }) => {
               </div>
             ))}
         </div>
-
-
       </div>
       {/* Modal for Image Upload */}
       <Modal
@@ -2052,7 +2053,6 @@ const Printers = ({ isOpen, onClose }) => {
         <input
           type="file"
           accept="image/jpeg, image/png"
-
           onChange={handleImageUpload} // Keep this function for handling file selection
           style={inputStyle}
         />
@@ -2098,213 +2098,211 @@ const Printers = ({ isOpen, onClose }) => {
 
       {/* Modal for editing a product */}
       {/* Modal for editing a product */}
-       {editingProduct && (
-             <Modal
-               isOpen={modalIsOpen}
-               onRequestClose={() => setModalIsOpen(false)}
-               contentLabel="Edit Product"
-               className="editmodal"
-               overlayClassName="adminmodal-overlay"
-             >
-               <div className="adminmodal-header">
-                 <h2>Edit Product</h2>
-                 <button
-                   onClick={() => setModalIsOpen(false)}
-                   className="adminmodal-close-btn"
-                 >
-                   &times;
-                 </button>
-               </div>
-     
-               <div className="adminmodal-body">
-           <div className="part1">
-                   <div className="feature-item">
-                     <label className="feature-label">Name</label>
-                     <input
-                       type="text"
-                       name="name"
-                       value={editingProduct.name}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           name: e.target.value,
-                         })
-                       }
-                       placeholder="Enter product name"
-                       className="adminmodal-input"
-                     />
-                   </div>
-                   <div className="feature-item">
-                     <label className="feature-label">Subtitle</label>
-     
-                     <input
-                       type="text"
-                       name="subtitle"
-                       value={editingProduct.subtitle}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           subtitle: e.target.value,
-                         })
-                       }
-                       placeholder="Enter subtitle"
-                       className="adminmodal-input"
-                     />
-                   </div>
-     
-                   <div className="feature-item">
-                     <label className="feature-label">M.R.P Price</label>
-     
-                     <input
-                       type="text"
-                       name="actual_price"
-                       value={editingProduct.actual_price}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           actual_price: e.target.value,
-                         })
-                       }
-                       placeholder="Enter actual price"
-                       className="adminmodal-input"
-                     />
-                   </div>
-     
-                   <div className="feature-item">
-                     <label className="feature-label">Price</label>
-     
-                     <input
-                       type="text"
-                       name="price"
-                       value={editingProduct.price}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           price: e.target.value,
-                         })
-                       }
-                       placeholder="Enter product price"
-                       className="adminmodal-input"
-                     />
-                   </div>
-     
-                   <div className="feature-item">
-                     <label className="feature-label">Offer label</label>
-     
-                     <input
-                       type="text"
-                       name="label"
-                       value={editingProduct.label}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           label: e.target.value,
-                         })
-                       }
-                       placeholder="Enter label"
-                       className="adminmodal-input"
-                     />
-                   </div>
-     
-                   <div className="feature-item">
-                     <label className="feature-label">Delivery charge</label>
-                     <input
-                       type="text"
-                       name="deliverycharge"
-                       value={editingProduct.deliverycharge}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           deliverycharge: e.target.value,
-                         })
-                       }
-                       placeholder="Enter deliverycharge"
-                       className="adminmodal-input"
-                     />
-                   </div>
+      {editingProduct && (
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={() => setModalIsOpen(false)}
+          contentLabel="Edit Product"
+          className="editmodal"
+          overlayClassName="adminmodal-overlay"
+        >
+          <div className="adminmodal-header">
+            <h2>Edit Product</h2>
+            <button
+              onClick={() => setModalIsOpen(false)}
+              className="adminmodal-close-btn"
+            >
+              &times;
+            </button>
+          </div>
 
-                 </div>
-     
-                 {/* Features Section */}
-                 <div className="part2">
-                   <div className="product-features-container">
+          <div className="adminmodal-body">
+            <div className="part1">
+              <div className="feature-item">
+                <label className="feature-label">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={editingProduct.name}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      name: e.target.value,
+                    })
+                  }
+                  placeholder="Enter product name"
+                  className="adminmodal-input"
+                />
+              </div>
+              <div className="feature-item">
+                <label className="feature-label">Subtitle</label>
 
-                     {/* Others (Textarea) */}
-                     <div className="feature-item">
-                       <label className="feature-label">Features</label>
-                       <textarea
-                         name="others"
-                         value={editingProduct.features}
-                         onChange={(e) =>
-                           setEditingProduct({
-                             ...editingProduct,
-                             features: e.target.value,
-                           })
-                         }
-                         placeholder="Enter other features"
-                         className="feature-textarea"
-                         rows="4"
-                       />
-                     </div>
-     
-                     <div className="feature-item">
-                     <label className="feature-label">
-                       In Stock or Out Of Stock
-                     </label>
-     
-                     <select
-                       name="status"
-                       value={editingProduct.status}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           status: e.target.value,
-                         })
-                       }
-                       className="adminmodal-input5"
-                     >
-                 <option value="available">In Stock</option>
-                 <option value="unavailable">Out Of Stock</option>
-                     </select>
-                     </div>
-     
-                     <div className="feature-item">
-     
-             <label className="feature-label">Approve or Unapprove</label>
-     
-             <select
-                        disabled={role === 'Staff'}
-     
-                 name="productStatus"
-                 value={editingProduct.productStatus}
-                 onChange={(e) =>
-                   setEditingProduct({ ...editingProduct, productStatus: e.target.value })
-                 }
-                 className="adminmodal-input5"
-               >
-                 <option value="approved">Approve</option>
-                 <option value="unapproved">UnApprove</option>
-               </select>
-           
-           </div>
-     
-                   <button
-                     onClick={handleUpdateProduct}
-                     className="adminmodal-update-btn"
-                   >
-                     Update
-                   </button>
-                   <button
-                     onClick={() => setModalIsOpen(false)}
-                     className="adminmodal-cancel-btn"
-                   >
-                     Cancel
-                   </button>
-                   </div>
-                 </div>
-               </div>
-             </Modal>
-           )}
+                <input
+                  type="text"
+                  name="subtitle"
+                  value={editingProduct.subtitle}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      subtitle: e.target.value,
+                    })
+                  }
+                  placeholder="Enter subtitle"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">M.R.P Price</label>
+
+                <input
+                  type="text"
+                  name="actual_price"
+                  value={editingProduct.actual_price}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      actual_price: e.target.value,
+                    })
+                  }
+                  placeholder="Enter actual price"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">Price</label>
+
+                <input
+                  type="text"
+                  name="price"
+                  value={editingProduct.price}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      price: e.target.value,
+                    })
+                  }
+                  placeholder="Enter product price"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">Offer label</label>
+
+                <input
+                  type="text"
+                  name="label"
+                  value={editingProduct.label}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      label: e.target.value,
+                    })
+                  }
+                  placeholder="Enter label"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">Delivery charge</label>
+                <input
+                  type="text"
+                  name="deliverycharge"
+                  value={editingProduct.deliverycharge}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      deliverycharge: e.target.value,
+                    })
+                  }
+                  placeholder="Enter deliverycharge"
+                  className="adminmodal-input"
+                />
+              </div>
+            </div>
+
+            {/* Features Section */}
+            <div className="part2">
+              <div className="product-features-container">
+                {/* Others (Textarea) */}
+                <div className="feature-item">
+                  <label className="feature-label">Features</label>
+                  <textarea
+                    name="others"
+                    value={editingProduct.features}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        features: e.target.value,
+                      })
+                    }
+                    placeholder="Enter other features"
+                    className="feature-textarea"
+                    rows="4"
+                  />
+                </div>
+
+                <div className="feature-item">
+                  <label className="feature-label">
+                    In Stock or Out Of Stock
+                  </label>
+
+                  <select
+                    name="status"
+                    value={editingProduct.status}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        status: e.target.value,
+                      })
+                    }
+                    className="adminmodal-input5"
+                  >
+                    <option value="available">In Stock</option>
+                    <option value="unavailable">Out Of Stock</option>
+                  </select>
+                </div>
+
+                <div className="feature-item">
+                  <label className="feature-label">Approve or Unapprove</label>
+
+                  <select
+                    disabled={role === "Staff"}
+                    name="productStatus"
+                    value={editingProduct.productStatus}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        productStatus: e.target.value,
+                      })
+                    }
+                    className="adminmodal-input5"
+                  >
+                    <option value="approved">Approve</option>
+                    <option value="unapproved">UnApprove</option>
+                  </select>
+                </div>
+
+                <button
+                  onClick={handleUpdateProduct}
+                  className="adminmodal-update-btn"
+                >
+                  Update
+                </button>
+                <button
+                  onClick={() => setModalIsOpen(false)}
+                  className="adminmodal-cancel-btn"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

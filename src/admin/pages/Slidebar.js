@@ -131,7 +131,7 @@ const Slidebar = () => {
     return (
       isActive('/Admin/reports') ||
       isActive('/Admin/SalesReport') ||
-      isActive('/Admin/CustomersReport') 
+      isActive('/Admin/CustomerReports') 
       // isActive('/Admin/ProductDetailPage')
     );
   };
@@ -153,6 +153,12 @@ const Slidebar = () => {
       setIsProductsOpen(false); // Close Products submenu
       setIsEditPageOpen(false); // Close Edit Pages submenu
       setIsReportOpen(false); // Close Reports submenu
+    }
+     else if (isReportActive()) {
+      setIsOfferPageOpen(false);
+      setIsProductsOpen(false); // Close Products submenu
+      setIsEditPageOpen(false); // Close Edit Pages submenu
+      setIsReportOpen(true); // Close Reports submenu
     }
   }, []); // Run on component mount
   
@@ -247,11 +253,7 @@ const Slidebar = () => {
           </ul>
         )}
       </li>
-          <li>
-            <a href="/Admin/customers" className={isActive('/Admin/customers')}>
-              <FaUsers className="menu-icon" /> {isOpen && 'Customers'}
-            </a>
-          </li>
+          
 
           {/* <li>
             <a href="/Admin/reports" className={isActive('/Admin/reports')}>
@@ -271,6 +273,12 @@ const Slidebar = () => {
                 <li><a href="/Admin/CustomerReports" className={isActive('/Admin/CustomerReports')}>Customer Reports</a></li>
               </ul> 
             )}
+          </li>
+
+          <li>
+            <a href="/Admin/customers" className={isActive('/Admin/customers')}>
+              <FaUsers className="menu-icon" /> {isOpen && 'Customers'}
+            </a>
           </li>
           
           <li>

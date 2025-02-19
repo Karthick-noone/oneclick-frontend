@@ -47,6 +47,7 @@ const Checkout = () => {
   const [coupons, setCoupons] = useState(0);
   const [couponValue, setCouponValue] = useState(0);
   const [minPurchaseLimit, setMinPurchaseLimit] = useState(0);
+  const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
 
   const fetchCoupons = async () => {
     try {
@@ -82,7 +83,6 @@ const Checkout = () => {
     fetchCoupons();
   }, []);
 
-
   const handleCouponChange = (event) => {
     // Get the value from the input
     const inputValue = event.target.value;
@@ -96,63 +96,331 @@ const Checkout = () => {
     }
   };
 
-  const handleApplyCoupon = async (couponCode) => { 
-    if (!couponCode.trim()) return setMessage("Please enter a coupon code."), setMessageType("error");
-    if (isCouponApplied) return setMessage("Coupon has already been applied!"), setMessageType("warning");
-  
+  const handleApplyCoupon = async (couponCode) => {
+    if (!couponCode.trim()) {
+      setMessage("Please enter a coupon code.");
+      setMessageType("error");
+      setTimeout(() => setMessage(""), 3000);
+      return;
+    }
+
+    if (isCouponApplied) {
+      setMessage("Coupon has already been applied!");
+      setMessageType("warning");
+      setTimeout(() => setMessage(""), 3000);
+      return;
+    }
+
     try {
       console.log("Applying coupon:", couponCode, "for all products in cart");
       const productIds = cartItems.map((item) => item.prod_id);
-      
-      const { data } = await axios.post(`${ApiUrl}/api/apply-coupon`, { couponCode, product_ids: productIds });
+
+      const { data } = await axios.post(`${ApiUrl}/api/apply-coupon`, {
+        couponCode,
+        product_ids: productIds,
+      });
       console.log("Response from server:", data);
-  
+
       if (data.success) {
         const discount = data.discount1 ?? data.discount2 ?? 0;
-        if (data.discount1 !== undefined && calculateTotalPrice() < data.min_purchase_limit) {
-          return setMessage(`Minimum purchase of ₹${data.min_purchase_limit} required.`), setMessageType("error");
+
+        // Check if discount1 applies but the total doesn't meet the min purchase limit.
+        if (
+          data.discount1 !== undefined &&
+          calculateTotalPrice() < data.min_purchase_limit
+        ) {
+          setMessage(
+            `Minimum purchase of ₹${data.min_purchase_limit} required.`
+          );
+          setMessageType("error");
+          setTimeout(() => setMessage(""), 3000);
+          return;
         }
-  
+
+        // Save coupon details.
         setDiscountAmount(data.discount2 ?? 0);
         setCouponValue(data.discount1 ?? 0);
         setMinPurchaseLimit(data.min_purchase_limit ?? 0);
-        
+
         const newAmount = Math.max(0, calculateTotalPrice() - discount);
         setTotalAmount(newAmount);
         setNewTotalAmount(newAmount);
-  
+
         setIsCouponApplied(true);
         setMessage("Coupon applied successfully!");
         setMessageType("success");
         setCoupon("");
-  
+
         setTimeout(() => setMessage(""), 3000);
       } else {
         setMessage(data.message || "Failed to apply coupon.");
         setMessageType("error");
+        setTimeout(() => setMessage(""), 3000);
       }
     } catch (error) {
       console.error("Error applying coupon:", error);
-      setMessage(error.response?.data?.error === "Coupon has expired." ? "This coupon has expired." : "Invalid or expired coupon.");
+      setMessage(
+        error.response?.data?.error === "Coupon has expired."
+          ? "This coupon has expired."
+          : "Invalid or expired coupon."
+      );
       setMessageType("error");
+      setTimeout(() => setMessage(""), 3000);
     }
   };
-  
+
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  console.log("Selected Products State:", selectedProducts); // Log selected products
+
+  // Function to handle checkbox selection
+  const handleCheckboxChange = (id) => {
+    console.log(`Checkbox clicked for product ID: ${id}`);
+
+    setSelectedProducts((prevSelected) => {
+      const updatedSelection = prevSelected.includes(id)
+        ? prevSelected.filter((productId) => productId !== id) // Remove if already selected
+        : [...prevSelected, id]; // Add if not selected
+
+      console.log("Updated Selected Products:", updatedSelection);
+      return updatedSelection;
+    });
+  };
+
+  const handleAddToCart = async (event) => {
+    event.stopPropagation(); // Prevent event bubbling
+
+    const email = localStorage.getItem("email");
+    console.log("User Email:", email);
+
+    if (!email) {
+      console.warn("User is not logged in!");
+      Swal.fire({
+        icon: "error",
+        title: "Login Required",
+        text: "You must be logged in to add items to cart!",
+        confirmButtonText: "OK",
+      }).then(() => {
+        window.location.href = "/login";
+      });
+      return;
+    }
+
+    if (selectedProducts.length === 0) {
+      console.warn("No products selected!");
+      Swal.fire({
+        icon: "warning",
+        title: "No Items Selected",
+        text: "Please select at least one item before adding to cart.",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
+    setIsAdding(true); // Disable button while sending requests
+
+    try {
+      let allSuccess = true;
+
+      // Send each product as a separate request
+      for (const productId of selectedProducts) {
+        console.log(`Adding product: ${productId} with quantity: 1`);
+
+        const response = await axios.post(`${ApiUrl}/api/addtocart`, {
+          email,
+          productId, // Send single product ID
+          quantity: 1, // Send quantity as 1 for each product
+          buyLater: true,
+        });
+
+        console.log("Server Response:", response.data);
+
+        if (response.status !== 200) {
+          allSuccess = false;
+        }
+      }
+
+      if (allSuccess) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Selected items added to your cart successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => {
+          fetchBuyLaterItems();
+        });
+
+        setSelectedProducts([]); // Clear selection after adding to cart
+        console.log("Cleared Selected Products State.");
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "Some items could not be added to the cart.",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding items to cart:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed!",
+        text: "Something went wrong while adding items to the cart.",
+        confirmButtonText: "OK",
+      });
+    } finally {
+      setIsAdding(false); // Enable button after request
+      console.log("Request completed, isAdding set to false.");
+    }
+  };
+
+  const [buyLaterItems, setBuyLaterItems] = useState([]);
+  // This flag is set only when the user clicks the Buy Later button
+  const [buyLaterApplied, setBuyLaterApplied] = useState(false);
+
+  const userid = localStorage.getItem("user_id");
+
+  // Toggle product selection for Buy Later
+  const handleBuyLaterToggle = (id) => {
+    console.log("Toggled product id:", id);
+    setBuyLaterItems((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  // API call to store the Buy Later product IDs in the database
+  const handleBuyLaterSubmit = () => {
+    if (buyLaterItems.length === 0) {
+      // Show warning alert if no item is selected
+      Swal.fire({
+        title: "Warning!",
+        text: "Please select at least one item before clicking Buy Later.",
+        icon: "warning",
+        confirmButtonText: "OK",
+        timer: 3000,
+      });
+      return; // Stop execution
+    }
+    console.log("Sending product IDs:", buyLaterItems);
+
+    axios
+      .post(`${ApiUrl}/api/store-buy-later`, {
+        productIds: buyLaterItems,
+        userId: userid,
+      })
+      .then((response) => {
+        console.log("Buy later items saved:", response.data);
+
+        // Show success alert
+        Swal.fire({
+          title: "Success!",
+          text: "Items have been added to Buy Later.",
+          icon: "success",
+          confirmButtonText: "OK",
+          timer: 3000,
+        }).then(() => {
+          window.location.reload();
+        });
+
+        setBuyLaterApplied(true);
+      })
+      .catch((error) => {
+        console.error("Error saving buy later items:", error);
+
+        // Show error alert
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to add items to Buy Later. Please try again.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      });
+  };
+
+  // Function to remove an item from Buy Later
+  const handleRemoveBuyLater = (productId) => {
+    console.log("Removing product from Buy Later:", productId);
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to remove this item from Buy Later?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Remove",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .post(`${ApiUrl}/api/remove-buy-later`, {
+            productId,
+            userId: userid, // Ensure you have `userid` from context/state
+          })
+          .then((response) => {
+            console.log("Item removed from Buy Later:", response.data);
+
+            Swal.fire({
+              title: "Removed!",
+              text: "Item has been removed from Buy Later.",
+              icon: "success",
+              confirmButtonText: "OK",
+              timer: 3000,
+            });
+
+            // Update the local state to reflect changes
+            // setBuyLaterItems((prev) => prev.filter((id) => id !== productId));
+            fetchBuyLaterItems();
+          })
+          .catch((error) => {
+            console.error("Error removing item from Buy Later:", error);
+
+            Swal.fire({
+              title: "Error!",
+              text: "Failed to remove item. Please try again.",
+              icon: "error",
+              confirmButtonText: "OK",
+            });
+          });
+      }
+    });
+  };
+
+  const [buyLaterProducts, setBuyLaterProducts] = useState([]);
+
+  const fetchBuyLaterItems = () => {
+    axios
+      .get(`${ApiUrl}/api/get-buy-later/${userid}`)
+      .then((response) => {
+        console.log("Fetched buy later items:", response.data);
+
+        setBuyLaterProducts(response.data.buyLater);
+      })
+      .catch((error) => {
+        console.error("Error fetching buy later items:", error);
+      });
+  };
+
+  // Call this function when the page loads
+  useEffect(() => {
+    fetchBuyLaterItems();
+  }, [userid]);
+
+  // Calculate the total price; only filter out buy later items after the user clicks "Buy Later"
   const calculateTotalPrice = () => {
     // Calculate the total price of cart items
     const totalPrice = cartItems
       .reduce((total, item) => {
         const price = parseFloat(item.prod_price);
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
-  
+
         return (
           total + (isNaN(price) ? 0 : price * item.quantity) + deliveryCharge
         );
       }, 0)
       .toFixed(2);
-  
+
     let finalPrice = parseFloat(totalPrice);
-  
+
     // Check if the total price exceeds the min purchase limit
     if (finalPrice >= minPurchaseLimit) {
       // Apply coupon if total price meets the minimum limit
@@ -161,16 +429,15 @@ const Checkout = () => {
         console.log("Coupon applied. Discounted price:", finalPrice);
       }
     } else {
-      console.log("Total price is below minimum purchase limit. Coupon not applied.");
+      console.log(
+        "Total price is below minimum purchase limit. Coupon not applied."
+      );
     }
-  
+
     finalPrice = finalPrice < 0 ? 0 : finalPrice;
-  
+
     return finalPrice.toFixed(2);
   };
-  
-  
-  
 
   const calculateDeliveryCharge = () => {
     return cartItems
@@ -338,41 +605,6 @@ const Checkout = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const fetchLocalStorageData = () => {
-  //     const storedEmail = localStorage.getItem("email");
-
-  //     if (storedEmail) {
-  //       const cartKey = `${storedEmail}-cart`;
-  //       const wishlistKey = `${storedEmail}-wishlist`;
-
-  //       const storedCartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
-  //       const storedWishlistItems =
-  //         JSON.parse(localStorage.getItem(wishlistKey)) || [];
-
-  //       const updatedCartItems = storedCartItems.map((item) => ({
-  //         ...item,
-  //         quantity: item.quantity || 1,
-  //       }));
-
-  //       const updatedWishlistItems = storedWishlistItems.map((item) => ({
-  //         ...item,
-  //         quantity: item.quantity || 1,
-  //       }));
-
-  //       setCartItems(updatedCartItems);
-  //       setWishlistItems(updatedWishlistItems);
-  //     }
-  //   };
-
-  //   fetchLocalStorageData();
-  //   // Fetch data every second (if needed)
-  //   const intervalId = setInterval(fetchLocalStorageData, 2000);
-
-  //   // Cleanup interval on component unmount
-  //   return () => clearInterval(intervalId);
-  // }, []);
-
   const [isLoading, setIsLoading] = useState(true);
 
   const email = localStorage.getItem("email");
@@ -401,7 +633,7 @@ const Checkout = () => {
       fetchCartItems();
 
       // Set an interval to fetch cart items every 5 seconds
-      const intervalId = setInterval(fetchCartItems, 1000); // 5000ms = 5 seconds
+      const intervalId = setInterval(fetchCartItems, 5000); // 5000ms = 5 seconds
 
       // Clean up the interval on component unmount or when `email` changes
       return () => clearInterval(intervalId);
@@ -458,19 +690,6 @@ const Checkout = () => {
         itemId,
         quantity: newQuantity,
       });
-
-      // if (response.status === 200) {
-      //   toast.success(`Quantity updated to ${newQuantity}!`, {
-      //     position: "top-right",
-      //     autoClose: 2000,
-      //   });
-      // } else {
-      //   console.error("Failed to update item quantity");
-      //   toast.error("Failed to update item quantity", {
-      //     position: "top-right",
-      //     autoClose: 2000,
-      //   });
-      // }
     } catch (error) {
       console.error("Error updating item quantity:", error);
       toast.error("Error updating item quantity", {
@@ -834,6 +1053,7 @@ const Checkout = () => {
                       <button
                         style={{ float: "right" }}
                         className="change-btn"
+                        title="Change Delivery Address"
                         onClick={() =>
                           handleSelectAddressClick(address.address_id)
                         } // Ensure this is calling the correct function
@@ -880,11 +1100,17 @@ const Checkout = () => {
                     )}
                   </strong>
                   <br />
-                  {totalItems === 0 ? (
+                  {/* {totalItems === 0 ? ( */}
+                  {cartItems.length === 0 ? (
                     <div>
-                      <p>Your cart is empty.</p>
+                      <p style={{ marginTop: "5px" }}>Your cart is empty.</p>
                       <a href="/">
-                        <button className="change-btn">Browse Products</button>
+                        <button
+                          style={{ float: "right" }}
+                          className="change-btn"
+                        >
+                          Browse Products
+                        </button>
                       </a>
                     </div>
                   ) : (
@@ -896,16 +1122,25 @@ const Checkout = () => {
                         in cart
                       </p>
                       <button
+                        style={{ float: "right" }}
                         className="change-btn"
                         onClick={handleToggleExpand}
                       >
-                        Change
+                        View
                       </button>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="cart-list-container">
+                  <strong style={{ fontSize: "1.0rem" }}>
+                    ORDER SUMMARY{" "}
+                    {totalItems === 0 ? (
+                      <FaTimes style={{ color: "red" }} />
+                    ) : (
+                      <FaCheck style={{ color: "green" }} />
+                    )}
+                  </strong>
                   <ul className="cart-list">
                     {cartItems.map((item) => {
                       // Check if image is a stringified array and parse it
@@ -999,22 +1234,159 @@ const Checkout = () => {
                               ₹{item.actual_price}{" "}
                             </p>
                             <p>₹{item.prod_price * item.quantity}</p>
+
+                            <div>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={buyLaterItems.includes(item.id)}
+                                  onChange={() => handleBuyLaterToggle(item.id)}
+                                />{" "}
+                                {/* Buy Later */}
+                              </label>
+                            </div>
                           </div>
                         </li>
                       );
                     })}
                   </ul>
 
-                  <button
+                  {/* <button
                     style={{ float: "right" }}
                     onClick={handleToggleExpand}
                     className="change-btn"
                   >
                     Continue
-                  </button>
+                  </button> */}
+
+                  {cartItems.length > 0 && (
+                    <button
+                      style={{ float: "right", marginRight: "10px" }}
+                      onClick={handleBuyLaterSubmit}
+                      className="Buy-later-btn"
+                    >
+                      Buy Later
+                    </button>
+                  )}
                 </div>
               )}
             </div>
+            {/* <div>  */}
+            <div className="cart-product-card">
+              {/* <div className=""> */}
+              {/* <h2 >Buy Later Items</h2> */}
+              <strong style={{ fontSize: "1.0rem" }}>BUY LATER ITEMS</strong>
+              <div>
+                {buyLaterProducts.length === 0 ? (
+                  <p>No items in Buy Later.</p>
+                ) : (
+                  <div className="cart-list-container">
+                    <ul className="cart-list">
+                      {buyLaterProducts.map((product) => {
+                        // Extract first image if prod_img contains multiple images
+                        const images = Array.isArray(product.prod_img)
+                          ? product.prod_img
+                          : JSON.parse(product.prod_img || "[]"); // Handle if it's a stringified array
+
+                        const firstImage = images.length > 0 ? images[0] : null;
+
+                        return (
+                          <li
+                            key={product.prod_id}
+                            className="cart-product d-flex align-items-center"
+                          >
+                            {/* <h3>{product.prod_name}</h3> */}
+                            {/* <p>Price: ₹{product.prod_price}</p>
+                            <p>Category: {product.category}</p> */}
+                            {firstImage ? (
+                              <div
+                                key={product.id}
+                                onClick={() => handleProductClick(product.id)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <img
+                                  src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                                  alt={product.name}
+                                  loading="lazy"
+                                  className="cart-product-image"
+                                />
+                              </div>
+                            ) : (
+                              <div className="placeholder-image">
+                                No image available
+                              </div> // Placeholder for missing image
+                            )}
+                            <div
+                              style={{ cursor: "pointer" }}
+                              className="cart-product-details"
+                              key={product.id}
+                              onClick={() => handleProductClick(product.id)}
+                            >
+                              <p className="cart-product-name">
+                                {product.prod_name}
+                              </p>
+                              {/* <p className="cart-product-name">
+                                {product.prod_id}
+                              </p> */}
+                              <p className="cart-product-description">
+                                {product.prod_features}
+                              </p>
+                            </div>
+                            <div className="cart-product-price">
+                              <div className="cart-quantity-controls">
+                                <FaTrash
+                                  className="cart-remove-btn"
+                                  onClick={() =>
+                                    handleRemoveBuyLater(product.id)
+                                  }
+                                />
+                              </div>
+                              <p
+                                style={{
+                                  color: "red",
+                                  textDecoration: "line-through",
+                                  fontSize: "13px",
+                                  marginRight: "5px",
+                                }}
+                              >
+                                ₹{product.actual_price}{" "}
+                              </p>
+                              <p>₹{product.prod_price}</p>
+
+                              <div>
+                                <label>
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedProducts.includes(
+                                      product.id
+                                    )}
+                                    onChange={() =>
+                                      handleCheckboxChange(product.id)
+                                    }
+                                  />{" "}
+                                  {/* Buy Later */}
+                                </label>
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+
+                    {buyLaterProducts.length > 0 && (
+                      <button
+                        style={{ float: "right", marginRight: "10px" }}
+                        onClick={handleAddToCart} // Sends the first product
+                        className="Addtocart-btn"
+                      >
+                        Add To Cart
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* </div> */}
             {/* <div className="place-order-card">
   <div className="place-order-content">
     <button
@@ -1041,17 +1413,16 @@ const Checkout = () => {
               </span>
               <span>₹{calculateSellingPrice()}</span>
             </div>
-            <div className="summary-item">
+            {/* <div className="summary-item">
               <span>Discount</span>
-              {/* <span style={{ color: "green" }}>- ₹{discount()}</span> */}
               <span style={{ color: "green" }}>- ₹0</span>
-            </div>
+            </div> */}
             {/* <div className="summary-item">
               <span>Platform fee</span>
               <span>-</span>
             </div> */}
             <div className="summary-item">
-              <span>Delivery charge</span>
+              <span>Delivery Charge</span>
               <span>
                 {/* <span style={{ textDecoration: "line-through" }}>₹50</span>{" "}
                 <span style={{ color: "green" }}>FREE Delivery</span> */}
@@ -1066,15 +1437,16 @@ const Checkout = () => {
               </span>
             </div>
             {parseFloat(calculateTotalPrice()) >= minPurchaseLimit && (
-            <div className="summary-item">
-              <span>
-                Extra Discount on Orders Over ₹{minPurchaseLimit} <br />
-                (Apply coupon)
-              </span>
-              <span style={{ color: "green" }}>
-                - ₹{couponValue.toFixed(2)}
-              </span>
-            </div>
+              <div className="summary-item">
+                <span>
+                  (If you have coupon)
+                  <br />
+                  Extra Discount on Orders Over ₹{minPurchaseLimit}
+                </span>
+                <span style={{ color: "green" }}>
+                  - ₹{couponValue.toFixed(2)}
+                </span>
+              </div>
             )}
             <div className="summary-item">
               {/* Input for coupon code */}
@@ -1123,6 +1495,14 @@ const Checkout = () => {
               </span>
             </div>
             <hr />
+            <div>
+              {isCouponApplied && (
+                <p className="discount-message">
+                  You will save up to ₹{couponValue || discountAmount} on this
+                  order!
+                </p>
+              )}
+            </div>
             {/* <div className="summary-item">
               <span style={{ color: "green" }}>
                 You will save ₹{discount()} on this order
@@ -1298,14 +1678,15 @@ const Checkout = () => {
                   <center>
                     <div className="modal4c">
                       <button
+                      title="Set this address as current address"
                         onClick={handleConfirm}
                         className="modal4-confirm-btn"
                       >
-                        Confirm Address
+                        Set Address
                       </button>
                       <a style={{ textDecoration: "none" }} href="/Useraddress">
-                        <button className="modal4-confirm-btn">
-                          Add new address
+                        <button title="Add new address" className="modal4-confirm-btn">
+                          Add New Address
                         </button>
                       </a>
                     </div>

@@ -6,6 +6,7 @@ import { ApiUrl } from "../../components/ApiUrl";
 import Modal from "react-modal"; // Importing Modal
 import Swal from "sweetalert2";
 import { FaTrash } from "react-icons/fa";
+import userlogo from "./img/user.jpg";
 
 const Customers = () => {
   const navigate = useNavigate();
@@ -118,49 +119,49 @@ const Customers = () => {
   };
 
   const handleDeleteUser = async (id) => {
-  // Show confirmation dialog
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it!",
-  });
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
 
-  if (result.isConfirmed) {
-    try {
-      const response = await axios.delete(`${ApiUrl}/api/deleteuser/${id}`);
-      if (response.status === 200) {
-        // Show success message
-        Swal.fire({
-          title: "Deleted!",
-          text: "User entry has been deleted.",
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: true,
-        });
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.delete(`${ApiUrl}/api/deleteuser/${id}`);
+        if (response.status === 200) {
+          // Show success message
+          Swal.fire({
+            title: "Deleted!",
+            text: "User entry has been deleted.",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: true,
+          });
 
-        // Update state to remove deleted user
-        setUsers(users.filter((user) => user.id !== id)); // Filter by user_id
-      } else {
+          // Update state to remove deleted user
+          setUsers(users.filter((user) => user.id !== id)); // Filter by user_id
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: response.data.message || "Failed to delete the user entry.",
+            icon: "error",
+          });
+        }
+      } catch (error) {
+        console.error("Error deleting user entry:", error);
         Swal.fire({
           title: "Error",
-          text: response.data.message || "Failed to delete the user entry.",
+          text: "An error occurred while deleting the user entry.",
           icon: "error",
         });
       }
-    } catch (error) {
-      console.error("Error deleting user entry:", error);
-      Swal.fire({
-        title: "Error",
-        text: "An error occurred while deleting the user entry.",
-        icon: "error",
-      });
     }
-  }
-};
+  };
 
   return (
     <div className="customers-container">
@@ -254,6 +255,7 @@ const Customers = () => {
 
         {/* Modal for Viewing User Details */}
         {/* Modal for Viewing User Details */}
+
         <Modal
           isOpen={isModalOpen}
           onRequestClose={closeModal}
@@ -262,45 +264,58 @@ const Customers = () => {
           className="user-details-modal"
         >
           <h2>User Details</h2>
-          {selectedUser && (
-            <div>
-              <p>
-                <strong>Username:</strong>{" "}
-                {capitalizeFirstLetter(selectedUser.username)}
-              </p>
-              <p>
-                <strong>Email:</strong> {selectedUser.email}
-              </p>
-              <p>
-                <strong>Number:</strong> {selectedUser.contact_number}
-              </p>
-              <p>
-                <strong>Addresses:</strong>
-              </p>
-              {selectedUser.address_names &&
-                selectedUser.address_names.split(", ").map((address, i) => {
-                  const street = selectedUser.streets?.split(", ")[i] || "N/A";
-                  const city = selectedUser.cities?.split(", ")[i] || "N/A";
-                  const state = selectedUser.states?.split(", ")[i] || "N/A";
-                  const postalCode =
-                    selectedUser.postal_codes?.split(", ")[i] || "N/A";
-                  const country =
-                    selectedUser.countries?.split(", ")[i] || "N/A";
-                  const phone = selectedUser.phones?.split(", ")[i] || "N/A"; // Corresponding phone number
-
-                  return (
-                    <div key={i}>
-                      <p>
-                        {i + 1}. {address}, {street}, {city}, {state},{" "}
-                        {postalCode}, {country}
-                        <br />
-                        <strong>Phone:</strong> {phone}
-                      </p>
-                    </div>
-                  );
-                })}
+          <div className="user-details-container">
+            <div className="user-details-info">
+              {selectedUser && (
+                <>
+                  <p>
+                    <strong>Username:</strong>{" "}
+                    {capitalizeFirstLetter(selectedUser.username)}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {selectedUser.email}
+                  </p>
+                  <p>
+                    <strong>Number:</strong> {selectedUser.contact_number}
+                  </p>
+                </>
+              )}
             </div>
-          )}
+            <div className="user-details-image">
+              <img src={userlogo} alt="User Logo" />
+            </div>
+          </div>
+
+          {/* Addresses displayed below the container */}
+          <div className="user-addresses">
+            <p>
+              <strong>Addresses:</strong>
+            </p>
+            {selectedUser &&
+              selectedUser.address_names &&
+              selectedUser.address_names.split(", ").map((address, i) => {
+                const street = selectedUser.streets?.split(", ")[i] || "N/A";
+                const city = selectedUser.cities?.split(", ")[i] || "N/A";
+                const state = selectedUser.states?.split(", ")[i] || "N/A";
+                const postalCode =
+                  selectedUser.postal_codes?.split(", ")[i] || "N/A";
+                const country = selectedUser.countries?.split(", ")[i] || "N/A";
+                const phone = selectedUser.phones?.split(", ")[i] || "N/A";
+
+                return (
+                  <div key={i} className="address-box">
+                    <p>
+                      <strong>Address {i + 1}:</strong> {address}, {street},{" "}
+                      {city}, {state}, {postalCode}, {country}
+                    </p>
+                    <p>
+                      <strong>Phone:</strong> {phone}
+                    </p>
+                  </div>
+                );
+              })}
+          </div>
+
           <button onClick={closeModal}>Close</button>
         </Modal>
       </main>
