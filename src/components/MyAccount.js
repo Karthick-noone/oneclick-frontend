@@ -65,7 +65,7 @@ const MyAccount = () => {
       // Fetch orders from the backend
       const fetchOrders = async () => {
         try {
-          const response = await axios.get(`${ApiUrl}/my-orders/${userId}`); // Replace with actual API
+          const response = await axios.get(`${ApiUrl}/api/my-orders/${userId}`); // Replace with actual API
           setOrders(response.data.orders);
         } catch (error) {
           console.error("Error fetching orders:", error);
@@ -194,7 +194,7 @@ const MyAccount = () => {
       </div>
       <div style={{paddingRight:'50px', paddingLeft:'50px'}}>
       <div style={styles.infoSection}>
-          <h3>Recent Orders</h3>
+          <h3 style={{marginBottom:'10px'}}>Recent Orders</h3>
           {/* <p>No recent orders yet. Start shopping now!</p> */}
           <div className="order-container">
             {orders.length === 0 ? (

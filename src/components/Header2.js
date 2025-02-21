@@ -62,6 +62,33 @@ const Header2 = () => {
   }, []);
 
   useEffect(() => {
+      const handleScroll = () => {
+        if (isDropdownOpen4) {
+          setIsDropdownOpen4(false);
+        }
+      };
+  
+      window.addEventListener("scroll", handleScroll);
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+      };
+    }, [isDropdownOpen4]);
+
+                                 
+  useEffect(() => {
+      const handleScroll = () => {
+        if (isDropdownOpen) {
+          setIsDropdownOpen(false);
+        }
+      };
+  
+      window.addEventListener("scroll", handleScroll);
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+      };
+    }, [isDropdownOpen]);
+
+  useEffect(() => {
     // Fetch the username from local storage
     const storedUsername = localStorage.getItem("username");
 
