@@ -17,12 +17,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 // Define a fallback image URL
 // const fallbackImage = require('./img/laptop.jpg'); // Replace with a valid fallback image
 
-const Television = () => {
+const TV = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [favorites, setFavorites] = useState({});
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
 
+
+  
   // const {
   //   cartItems,
   //   addToCart,
@@ -41,69 +43,99 @@ const Television = () => {
   console.log("Search Query:", searchQuery);
 
   // Filter products based on the search query
-const filteredProducts = searchQuery
-? products.filter((product) => {
-    const nameMatches = product.prod_name
-      ? product.prod_name.toLowerCase().includes(searchQuery.toLowerCase()) // Ensure prod_name is defined
-      : false; // If prod_name is undefined, set it to false
-    const featuresMatch = product.prod_features
-      ? product.prod_features.toLowerCase().includes(searchQuery.toLowerCase()) // Ensure prod_features is defined
-      : false; // If prod_features is undefined, set it to false
-    return nameMatches || featuresMatch; // Return products that match either the name or features
-  })
-: products; // If no search query, return all products
+  const filteredProducts = searchQuery
+    ? products.filter((product) => {
+        const nameMatches = product.prod_name
+          ? product.prod_name.toLowerCase().includes(searchQuery.toLowerCase()) // Ensure prod_name is defined
+          : false; // If prod_name is undefined, set it to false
+        const featuresMatch = product.prod_features
+          ? product.prod_features
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) // Ensure prod_features is defined
+          : false; // If prod_features is undefined, set it to false
+        return nameMatches || featuresMatch; // Return products that match either the name or features
+      })
+    : products; // If no search query, return all products
 
+  const [coupons, setCoupons] = useState({}); // State to store coupons
 
-    const [coupons, setCoupons] = useState({}); // State to store coupons
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(`${ApiUrl}/fetchtv`);
+        const fetchedProducts = response.data;
 
-    useEffect(() => {
-      const fetchProducts = async () => {
-        try {
-          const response = await axios.get(`${ApiUrl}/fetchtv`);
-          const fetchedProducts = response.data;
-  
-          // Set products to state
-          setProducts(fetchedProducts);
-  
-          // Fetch coupons for each product
-          for (const product of fetchedProducts) {
-            try {
-              const couponResponse = await axios.get(`${ApiUrl}/coupons/${product.prod_id}`);
-              // Assuming couponResponse.data.coupons returns an array of coupons
-              if (couponResponse.data.coupons.length > 0) {
-                // Set the first coupon code for the product
-                setCoupons((prev) => ({
-                  ...prev,
-                  [product.prod_id]: couponResponse.data.coupons[0].coupon_code // Use coupon_code from the first coupon
-                }));
-                console.log(`Set coupon code for product ${product.prod_id}: ${couponResponse.data.coupons[0].coupon_code}`);
-              } else {
-                console.log(`No coupons found for product ${product.prod_id}`);
-              }
-            } catch (couponError) {
-              console.error(`Failed to fetch coupon for product ${product.prod_id}:`, couponError);
-            
+        // Set products to state
+        setProducts(fetchedProducts);
+
+        // Fetch coupons for each product
+        for (const product of fetchedProducts) {
+          try {
+            const couponResponse = await axios.get(
+              `${ApiUrl}/coupons/${product.prod_id}`
+            );
+            // Assuming couponResponse.data.coupons returns an array of coupons
+            if (couponResponse.data.coupons.length > 0) {
+              // Set the first coupon code for the product
+              setCoupons((prev) => ({
+                ...prev,
+                [product.prod_id]: couponResponse.data.coupons[0].coupon_code, // Use coupon_code from the first coupon
+              }));
+              console.log(
+                `Set coupon code for product ${product.prod_id}: ${couponResponse.data.coupons[0].coupon_code}`
+              );
+            } else {
+              console.log(`No coupons found for product ${product.prod_id}`);
             }
+          } catch (couponError) {
+            console.error(
+              `Failed to fetch coupon for product ${product.prod_id}:`,
+              couponError
+            );
           }
-        } catch (error) {
-          console.error("Error fetching products:", error);
-          toast.error("Failed to fetch products.", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
         }
-      };
-  
-      fetchProducts();
-    }, []);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        toast.error("Failed to fetch products.", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    };
 
+    fetchProducts();
+  }, []);
 
-    
+  const handleBuyNow = (product, event) => {
+    event.stopPropagation(); // Prevent the event from bubbling up
+
+    // Check if the user is logged in
+    const email = localStorage.getItem("email");
+    if (!email) {
+      toast.error("User is not logged in!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      window.location.href = "/login";
+      return;
+    }
+
+    // Navigate to the purchase page with product details
+    navigate("/purchase", {
+      state: { product, email }, // Pass the product details and email (if needed)
+    });
+    console.log("product", product);
+  };
 
   // useEffect(() => {
   //   const updateFavorites = () => {
@@ -135,9 +167,6 @@ const filteredProducts = searchQuery
   // const handleCardClick = (product) => {
   //   setSelectedProduct(product);
   // };
-
-
-
 
   const handleCardClick = (product) => {
     // Check if product is defined and has an id
@@ -172,37 +201,10 @@ const filteredProducts = searchQuery
     }
   };
 
-  const handleBuyNow = (product, event) => {
-    event.stopPropagation(); // Prevent the event from bubbling up
-
-    // Check if the user is logged in
-    const email = localStorage.getItem("email");
-    if (!email) {
-      toast.error("User is not logged in!", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      window.location.href = "/login";
-      return;
-    }
-
-    // Navigate to the purchase page with product details
-    navigate("/purchase", {
-      state: { product, email }, // Pass the product details and email (if needed)
-    });
-    console.log("product", product);
-  };
-
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
 
     const email = localStorage.getItem("email");
-
 
     // Check if the user is logged in
     if (!email) {
@@ -249,11 +251,11 @@ const filteredProducts = searchQuery
   };
   const handleToggleFavorite = async (product, event) => {
     event.stopPropagation();
-  
+
     // Check if the user is logged in
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
-  
+
     if (!email || !username) {
       toast.error("User is not logged in!", {
         position: "top-right",
@@ -262,36 +264,44 @@ const filteredProducts = searchQuery
       window.location.href = "/login";
       return;
     }
-  
+
     try {
       const isFavorite = favorites[`${product.id}`]; // Check if product is already in the wishlist
-  
+
       if (isFavorite) {
         // If already in wishlist, call remove API
-        console.log(`${product.prod_name} (ID: ${product.id}) is in the wishlist. Removing it.`);
-  
+        console.log(
+          `${product.prod_name} (ID: ${product.id}) is in the wishlist. Removing it.`
+        );
+
         await axios.post(`${ApiUrl}/remove-from-wishlist`, {
           email,
           productId: product.id,
         });
-  
-        console.log(`${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`);
+
+        console.log(
+          `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
+        );
         toast.info(`${product.prod_name} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
       } else {
         // If not in wishlist, call add API
-        console.log(`${product.prod_name} (ID: ${product.id}) is not in the wishlist. Adding it.`);
-  
+        console.log(
+          `${product.prod_name} (ID: ${product.id}) is not in the wishlist. Adding it.`
+        );
+
         await axios.post(`${ApiUrl}/update-user-wishlist`, {
           email,
           username,
           action: "add",
           prod_id: product.id,
         });
-  
-        console.log(`${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`);
+
+        console.log(
+          `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
+        );
         toast.success(`${product.prod_name} added to your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
@@ -305,79 +315,76 @@ const filteredProducts = searchQuery
       });
     }
   };
-  
-  
+
   useEffect(() => {
     const fetchWishlist = async () => {
       const email = localStorage.getItem("email");
       const username = localStorage.getItem("username");
-  
+
       if (!email || !username) {
         console.log("User not logged in");
         return;
       }
-  
+
       try {
         const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
           email,
           username,
         });
-  
+
         if (response.data.wishlist) {
           const wishlist = response.data.wishlist;
           const favoritesMap = {};
-  
+
           // Set the favorites map based on product IDs in the wishlist
           wishlist.forEach((item) => {
             favoritesMap[`${item}`] = true; // Mark product ID as in wishlist
           });
-  
-          setFavorites(favoritesMap);  // Update the favorites state
+
+          setFavorites(favoritesMap); // Update the favorites state
         }
       } catch (error) {
         console.error("Error fetching wishlist:", error);
       }
     };
-  
+
     // Fetch wishlist immediately
     fetchWishlist();
-  
+
     // Set an interval to fetch the wishlist every second
     const intervalId = setInterval(() => {
       fetchWishlist();
     }, 1000); // Update every second (1000ms)
-  
+
     // Cleanup the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, []);
-  
 
   const handleRemoveFromWishlist = async (productId) => {
-    const email = localStorage.getItem('email');
-  
+    const email = localStorage.getItem("email");
+
     if (!email) {
       toast.error("User is not logged in!");
       return;
     }
-  
+
     try {
       const response = await axios.post(`${ApiUrl}/remove-from-wishlist`, {
         email,
         productId,
       });
-  
+
       if (response.status === 200) {
-        toast.success('Item removed from wishlist');
+        toast.success("Item removed from wishlist");
         // Update the wishlist in the state
         // setWishlistItems((prevItems) => prevItems.filter((item) => item.id !== productId));
       }
     } catch (error) {
       console.error("Error removing item from wishlist:", error);
-      toast.error('Failed to remove item from wishlist');
+      toast.error("Failed to remove item from wishlist");
     }
   };
 
-  
   // Define the category variable
   const category = "tv";
 
@@ -397,92 +404,112 @@ const filteredProducts = searchQuery
       <div className="main-content">
         <Sidebar />
         <div className="product-list">
+          {products.length === 0 ? (
+            <div className="no-products-message">
+              <h2>No products here yet...</h2>
+              <p>
+                In the meantime, you can choose a different category to continue
+                shopping.
+              </p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            // If filteredProducts is empty, fallback to using all products
+            products.map((product) => {
+              // Parse the prod_img if it's a JSON string; assuming it's an array
+              const images = Array.isArray(product.prod_img)
+                ? product.prod_img
+                : JSON.parse(product.prod_img);
+              const firstImage = images[0]; // Get the first image
 
-        {products.length === 0 ? (
-    <div className="no-products-message">
-      <h2>No products here yet...</h2>
-      <p>
-        In the meantime, you can choose a different category to continue
-        shopping.
-      </p>
-    </div>
-  ) : (
-          filteredProducts.length === 0
-            ? // If filteredProducts is empty, fallback to using all products
-              products.map((product) => {
-                // Parse the prod_img if it's a JSON string; assuming it's an array
-                const images = Array.isArray(product.prod_img)
-                  ? product.prod_img
-                  : JSON.parse(product.prod_img);
-                const firstImage = images[0]; // Get the first image
+              return (
+                <div
+                  key={product.id}
+                  className="product-card"
+                  onClick={() => handleCardClick(product)}
+                >
+                  <div className="product-actions">
+                    <img
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
+                        firstImage
+                      }`}
+                      alt={product.prod_name}
+                      className="product-image"
+                    />
+                    <span
+                      title={
+                        favorites[`${product.id}`]
+                          ? "Remove from Wishlist"
+                          : "Add to Wishlist"
+                      }
+                      className={`favorite-icon ${
+                        favorites[`${product.id}`] ? "filled" : ""
+                      }`}
+                      onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
+                    >
+                      {favorites[`${product.id}`] ? (
+                        <FaHeart style={{ color: "red" }} /> // Filled heart
+                      ) : (
+                        <FaRegHeart /> // Empty heart
+                      )}
+                    </span>
+                  </div>
 
-                return (
-                  <div
-                    key={product.id}
-                    className="product-card"
-                    onClick={() => handleCardClick(product)}
-                  >
-       <div className="product-actions">
-  <img
-                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
-    alt={product.prod_name}
-    className="product-image"
-  />
-  <span
-    title={favorites[`${product.id}`] ? "Remove from Wishlist" : "Add to Wishlist"}
-    className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""}`}
-    onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
-  >
-    {favorites[`${product.id}`] ? (
-      <FaHeart style={{ color: "red" }} /> // Filled heart
-    ) : (
-      <FaRegHeart /> // Empty heart
-    )}
-  </span>
-</div>
+                  <h3 className="product-name">{product.prod_name}</h3>
 
-
-
-
-                    <h3 className="product-name">{product.prod_name}</h3>
-                    {/* <h3 className="product-name">{product.offer_price}</h3> */}
-                    <span className="product-subtitle2">{product.subtitle}</span>
-                    {/* <p className="product-description">
-                      {product.prod_features}
-                    </p> */}
-                   <p >
-                      <span >
-                    <span className="product-price">₹{product.prod_price}</span>
-                    <span style={{marginRight:'5px',fontSize:'15px'}}>M.R.P</span><span className="product-actual-price" style={{ textDecoration: "line-through", color:'red' }}>₹{product.actual_price}</span>
+                  {/* <h3 className="product-name">{product.offer_price}</h3> */}
+                  <span className="product-subtitle2">{product.subtitle}</span>
+                  {/* <p className="product-description">
+                            {product.prod_features}
+                          </p> */}
+                  <p>
+                    <span>
+                      <span className="product-price">
+                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
                       </span>
-                      <p style={{ color: "green", marginLeft: "10px",marginBottom: "10px" }}>
-                        (
-                        {Math.round(
-                          ((product.actual_price - product.prod_price) /
-                            product.actual_price) *
-                            100
-                        )}
-                        % OFF)
-                      </p>
-                    </p>
-                    {product.status === "unavailable" ? (
-                      <p
-                        style={{
-                          color: "red",
-                          fontWeight: "bold",
-                          fontSize: "16px",
-                          textAlign: "center",
-                          marginTop: "10px",
-                          padding: "10px",
-                          // border: "2px solid red",
-                          // borderRadius: "5px",
-                          // backgroundColor: "#fdd",
-                        }}
-                        className="out-of-stock"
+                      <span style={{ marginRight: "5px", fontSize: "15px" }}>
+                        M.R.P
+                      </span>
+                      <span
+                        className="product-actual-price"
+                        style={{ textDecoration: "line-through", color:'red' }}
                       >
-                        Out of Stock
-                      </p>
-                    ) : (
+                        ₹{product.actual_price}
+                      </span>
+                    </span>
+                    <p
+                      style={{
+                        color: "green",
+                        marginLeft: "10px",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      (
+                      {Math.round(
+                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
+                          product.actual_price) *
+                          100
+                      )}
+                      % OFF)
+                    </p>
+                  </p>
+                  {product.status === "unavailable" ? (
+                    <p
+                      style={{
+                        color: "red",
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        textAlign: "center",
+                        marginTop: "10px",
+                        padding: "10px",
+                        // border: "2px solid red",
+                        // borderRadius: "5px",
+                        // backgroundColor: "#fdd",
+                      }}
+                      className="out-of-stock"
+                    >
+                      Out of Stock
+                    </p>
+                  ) : (
                     <div className="btn-container">
                       <button
                         onClick={(event) => handleAddToCart(product, event)}
@@ -499,97 +526,121 @@ const filteredProducts = searchQuery
                         BUY NOW
                       </button>
                     </div>
-                    )}
-<><br />
-{/* {coupons[product.prod_id] && ( // Access using prod_id
-          <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
-            <span>
-              Coupon Available
-            </span>
-          </div>
-        )} */}
-        </>
+                  )}
+                  <>
+                    <br />
+                    {/* {coupons[product.prod_id] && ( // Access using prod_id
+                <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
+                  <span>
+                    Coupon Available
+                  </span>
+                </div>
+              )} */}
+                  </>
+                </div>
+              );
+            })
+          ) : (
+            // If filteredProducts has results, display them
+            filteredProducts.map((product) => {
+              const images = Array.isArray(product.prod_img)
+                ? product.prod_img
+                : JSON.parse(product.prod_img);
+              const firstImage = images[0];
+
+              return (
+                <div
+                  key={product.id}
+                  className="product-card"
+                  onClick={() => handleCardClick(product)}
+                >
+                  {product.offer_label && (
+                    <div className="product-label">{product.offer_label}</div>
+                  )}
+
+                  <div className="product-actions">
+                    <img
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
+                        images[0]
+                      }`}
+                      alt={product.prod_name}
+                      className="product-image"
+                    />
+                    <span
+                      title={
+                        favorites[`${product.id}`]
+                          ? "Remove from Wishlist"
+                          : "Add to Wishlist"
+                      }
+                      className={`favorite-icon ${
+                        favorites[`${product.id}`] ? "filled" : ""
+                      }`}
+                      onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
+                    >
+                      {favorites[`${product.id}`] ? (
+                        <FaHeart style={{ color: "red" }} /> // Filled heart
+                      ) : (
+                        <FaRegHeart /> // Empty heart
+                      )}
+                    </span>
                   </div>
-                  
-                );
-              })
-            : // If filteredProducts has results, display them
-              filteredProducts.map((product) => {
-                const images = Array.isArray(product.prod_img)
-                  ? product.prod_img
-                  : JSON.parse(product.prod_img);
-                const firstImage = images[0];
 
-                return (
-                  <div
-                    key={product.id}
-                    className="product-card"
-                    onClick={() => handleCardClick(product)}
-                  >
-                    {product.offer_label && (
-                      <div className="product-label">{product.offer_label}</div>
-                    )}
+                  <h3 className="product-name">{product.prod_name}</h3>
+                  <span className="product-subtitle2">{product.subtitle}</span>
+                  {/* <p className="product-description">
+                            {product.prod_features}
+                          </p> */}
 
-<div className="product-actions">
-  <img
-                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[0]}`}
-    alt={product.prod_name}
-    className="product-image"
-  />
-  <span
-    title={favorites[`${product.id}`] ? "Remove from Wishlist" : "Add to Wishlist"}
-    className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""}`}
-    onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
-  >
-    {favorites[`${product.id}`] ? (
-      <FaHeart style={{ color: "red" }} /> // Filled heart
-    ) : (
-      <FaRegHeart /> // Empty heart
-    )}
-  </span>
-</div>
-
-                     
-                    <h3 className="product-name">{product.prod_name}</h3>
-                    <span className="product-subtitle2">{product.subtitle}</span>
-                    {/* <p className="product-description">
-                      {product.prod_features}
-                    </p> */}
-
-                    <p >
-                      <span >
-                    <span className="product-price">₹{product.prod_price}</span>
-                    <span style={{marginRight:'5px',fontSize:'15px'}}>M.R.P</span><span className="product-actual-price" style={{ textDecoration: "line-through", color:'red' }}>₹{product.actual_price}</span>
+                  <p>
+                    <span>
+                      <span className="product-price">
+                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
                       </span>
-                      <p style={{ color: "green", marginLeft: "10px",marginBottom: "10px" }}>
-                        (
-                        {Math.round(
-                          ((product.actual_price - product.prod_price) /
-                            product.actual_price) *
-                            100
-                        )}
-                        % OFF)
-                      </p>
-                    </p>
-
-                    {product.status === "unavailable" ? (
-                      <p
-                        style={{
-                          color: "red",
-                          fontWeight: "bold",
-                          fontSize: "16px",
-                          textAlign: "center",
-                          marginTop: "10px",
-                          padding: "10px",
-                          // border: "2px solid red",
-                          // borderRadius: "5px",
-                          // backgroundColor: "#fdd",
-                        }}
-                        className="out-of-stock"
+                      <span style={{ marginRight: "5px", fontSize: "15px" }}>
+                        M.R.P
+                      </span>
+                      <span
+                        className="product-actual-price"
+                        style={{ textDecoration: "line-through", color:'red' }}
                       >
-                        Out of Stock
-                      </p>
-                    ) : (
+                        ₹{product.actual_price}
+                      </span>
+                    </span>
+                    <p
+                      style={{
+                        color: "green",
+                        marginLeft: "10px",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      (
+                      {Math.round(
+                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
+                          product.actual_price) *
+                          100
+                      )}
+                      % OFF)
+                    </p>
+                  </p>
+
+                  {product.status === "unavailable" ? (
+                    <p
+                      style={{
+                        color: "red",
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        textAlign: "center",
+                        marginTop: "10px",
+                        padding: "10px",
+                        // border: "2px solid red",
+                        // borderRadius: "5px",
+                        // backgroundColor: "#fdd",
+                      }}
+                      className="out-of-stock"
+                    >
+                      Out of Stock
+                    </p>
+                  ) : (
                     <div className="btn-container">
                       <button
                         onClick={(event) => handleAddToCart(product, event)}
@@ -606,20 +657,22 @@ const filteredProducts = searchQuery
                         BUY NOW
                       </button>
                     </div>
-                    )}
+                  )}
 
-<><br />
-{/* {coupons[product.prod_id] && ( // Access using prod_id
-          <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
-            <span>
-              Coupon Available
-            </span>
-          </div>
-        )} */}</>
-                  </div>
-                );
-              })
-            )}
+                  <>
+                    <br />
+                    {/* {coupons[product.prod_id] && ( // Access using prod_id
+                <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
+                  <span>
+                    Coupon Available
+                  </span>
+                </div>
+              )} */}
+                  </>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 
@@ -639,4 +692,4 @@ const filteredProducts = searchQuery
   );
 };
 
-export default Television;
+export default TV;

@@ -17,6 +17,20 @@ const WishlistSidebar = ({
   // const { addToCart } = useCart();
   const [wishlistItems, setWishlistItems] = useState([]);
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
+  const [product, setProduct] = useState(null);
+  const [isOfferActive, setIsOfferActive] = useState(true);
+
+
+  useEffect(() => {
+    if (product && product.offer_end_time) {
+      const now = new Date();
+      const offerEndTime = new Date(product.offer_end_time);
+
+      // Set offer active based on whether the offer end time is in the future
+      setIsOfferActive(offerEndTime > now);
+    }
+  }, [product]);
+
 
   // Fetch wishlist on component load
   useEffect(() => {
@@ -177,7 +191,7 @@ const WishlistSidebar = ({
                   </div>
                   <div className="item-actions">
                   <p className="item-price" style={{ color: 'red',textDecoration:"line-through", fontSize:'12px' }}>₹{product.actual_price}</p>
-                    <p className="item-price">₹{product.prod_price}</p>
+                    <p className="item-price">₹{isOfferActive ? product.offer_price : product.prod_price}</p>
                     {product.status === "unavailable" ? (
                       <p className="out-of-stock">Out of Stock</p>
                     ) : (

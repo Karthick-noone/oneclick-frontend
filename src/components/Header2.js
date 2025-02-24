@@ -46,6 +46,19 @@ const Header2 = () => {
   const [errorMessage, setErrorMessage] = useState(""); // State to hold error message
   const dropdownRef = useRef(null);
   const [username, setUsername] = useState("");
+  const [isOfferActive, setIsOfferActive] = useState(true);
+  const [product, setProduct] = useState(null);
+
+
+    useEffect(() => {
+      if (product && product.offer_end_time) {
+        const now = new Date();
+        const offerEndTime = new Date(product.offer_end_time);
+  
+        // Set offer active based on whether the offer end time is in the future
+        setIsOfferActive(offerEndTime > now);
+      }
+    }, [product]);
 
   useEffect(() => {
     NProgress.configure({ showSpinner: false }); // Disable spinner
@@ -62,31 +75,30 @@ const Header2 = () => {
   }, []);
 
   useEffect(() => {
-      const handleScroll = () => {
-        if (isDropdownOpen4) {
-          setIsDropdownOpen4(false);
-        }
-      };
-  
-      window.addEventListener("scroll", handleScroll);
-      return () => {
-        window.removeEventListener("scroll", handleScroll);
-      };
-    }, [isDropdownOpen4]);
+    const handleScroll = () => {
+      if (isDropdownOpen4) {
+        setIsDropdownOpen4(false);
+      }
+    };
 
-                                 
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isDropdownOpen4]);
+
   useEffect(() => {
-      const handleScroll = () => {
-        if (isDropdownOpen) {
-          setIsDropdownOpen(false);
-        }
-      };
-  
-      window.addEventListener("scroll", handleScroll);
-      return () => {
-        window.removeEventListener("scroll", handleScroll);
-      };
-    }, [isDropdownOpen]);
+    const handleScroll = () => {
+      if (isDropdownOpen) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isDropdownOpen]);
 
   useEffect(() => {
     // Fetch the username from local storage
@@ -424,7 +436,7 @@ const Header2 = () => {
 
     return cartItems
       .reduce((total, item) => {
-        const price = parseFloat(item.prod_price);
+        const price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
         return total + (isNaN(price) ? 0 : price * item.quantity);
       }, 0)
       .toFixed(0);
@@ -740,7 +752,6 @@ const Header2 = () => {
           itemId: itemId,
         });
 
-        
         // Check for successful response
         if (response.status === 200) {
           toast.success("Item removed from wishlist!", {
@@ -941,13 +952,22 @@ const Header2 = () => {
                     <FaBox style={{ color: "#333" }} className="iicon" /> My
                     Orders
                   </a>
-                  <a href="/Cart">
+                  <a href="/Cart" className="cart-link">
                     <FaShoppingBag
                       style={{ color: "#333" }}
                       className="iicon"
                     />
-                    Cart
+
+                    <div className="cart-icon-container">
+                      {getTotalItemsCount() > 0 && (
+                        <span className="cart-count2">
+                          {getTotalItemsCount()}
+                        </span>
+                      )}
+                      Cart
+                    </div>
                   </a>
+
                   <hr />
                   <a href="#" onClick={handleLogout}>
                     <FaPowerOff style={{ color: "#333" }} /> Logout
@@ -1028,7 +1048,8 @@ const Header2 = () => {
                         </p>
                         <p style={{ color: "#27ae60" }}>
                           {" "}
-                          ₹{item.prod_price * item.quantity}
+                          {/* ₹{item.prod_price * item.quantity} */}
+                          ₹{isOfferActive ? item.offer_price * item.quantity : item.prod_price * item.quantity}
                         </p>
                         <div className="quantity-controls">
                           <button

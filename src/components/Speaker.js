@@ -23,6 +23,8 @@ const Speakers = () => {
   const [favorites, setFavorites] = useState({});
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
 
+
+  
   // const {
   //   cartItems,
   //   addToCart,
@@ -109,6 +111,32 @@ const Speakers = () => {
     fetchProducts();
   }, []);
 
+  const handleBuyNow = (product, event) => {
+    event.stopPropagation(); // Prevent the event from bubbling up
+
+    // Check if the user is logged in
+    const email = localStorage.getItem("email");
+    if (!email) {
+      toast.error("User is not logged in!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      window.location.href = "/login";
+      return;
+    }
+
+    // Navigate to the purchase page with product details
+    navigate("/purchase", {
+      state: { product, email }, // Pass the product details and email (if needed)
+    });
+    console.log("product", product);
+  };
+
   // useEffect(() => {
   //   const updateFavorites = () => {
   //     const favouritesKey = "favourites";
@@ -171,32 +199,6 @@ const Speakers = () => {
       const prevIndex = (currentIndex - 1 + products.length) % products.length;
       setSelectedProduct(products[prevIndex]);
     }
-  };
-
-  const handleBuyNow = (product, event) => {
-    event.stopPropagation(); // Prevent the event from bubbling up
-
-    // Check if the user is logged in
-    const email = localStorage.getItem("email");
-    if (!email) {
-      toast.error("User is not logged in!", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      window.location.href = "/login";
-      return;
-    }
-
-    // Navigate to the purchase page with product details
-    navigate("/purchase", {
-      state: { product, email }, // Pass the product details and email (if needed)
-    });
-    console.log("product", product);
   };
 
   const handleAddToCart = async (product, event) => {
@@ -427,7 +429,9 @@ const Speakers = () => {
                 >
                   <div className="product-actions">
                     <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
+                        firstImage
+                      }`}
                       alt={product.prod_name}
                       className="product-image"
                     />
@@ -451,22 +455,23 @@ const Speakers = () => {
                   </div>
 
                   <h3 className="product-name">{product.prod_name}</h3>
+
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
                   <span className="product-subtitle2">{product.subtitle}</span>
                   {/* <p className="product-description">
-                      {product.prod_features}
-                    </p> */}
+                            {product.prod_features}
+                          </p> */}
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.prod_price}
+                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through", color: "red" }}
+                        style={{ textDecoration: "line-through", color:'red' }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -480,7 +485,7 @@ const Speakers = () => {
                     >
                       (
                       {Math.round(
-                        ((product.actual_price - product.prod_price) /
+                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
                           100
                       )}
@@ -525,12 +530,12 @@ const Speakers = () => {
                   <>
                     <br />
                     {/* {coupons[product.prod_id] && ( // Access using prod_id
-          <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
-            <span>
-              Coupon Available
-            </span>
-          </div>
-        )} */}
+                <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
+                  <span>
+                    Coupon Available
+                  </span>
+                </div>
+              )} */}
                   </>
                 </div>
               );
@@ -583,20 +588,20 @@ const Speakers = () => {
                   <h3 className="product-name">{product.prod_name}</h3>
                   <span className="product-subtitle2">{product.subtitle}</span>
                   {/* <p className="product-description">
-                      {product.prod_features}
-                    </p> */}
+                            {product.prod_features}
+                          </p> */}
 
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.prod_price}
+                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through", color: "red" }}
+                        style={{ textDecoration: "line-through", color:'red' }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -610,7 +615,7 @@ const Speakers = () => {
                     >
                       (
                       {Math.round(
-                        ((product.actual_price - product.prod_price) /
+                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
                           100
                       )}
@@ -657,12 +662,12 @@ const Speakers = () => {
                   <>
                     <br />
                     {/* {coupons[product.prod_id] && ( // Access using prod_id
-          <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
-            <span>
-              Coupon Available
-            </span>
-          </div>
-        )} */}
+                <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
+                  <span>
+                    Coupon Available
+                  </span>
+                </div>
+              )} */}
                   </>
                 </div>
               );

@@ -475,8 +475,13 @@ const ProductDetail = ({ accessoryCategory }) => {
       return;
     }
 
+    // const prod_price = isOfferActive ? product.offer_price : product.prod_price;
+
+
     // Set isAdding to true to disable the button while the request is in progress
     setIsAdding(true);
+
+    
 
     try {
       const response = await axios.post(`${ApiUrl}/add-to-cart`, {
@@ -523,9 +528,14 @@ const ProductDetail = ({ accessoryCategory }) => {
       return;
     }
   
+
+    const prod_price = isOfferActive ? product.offer_price : product.prod_price;
+
     // Navigate to the purchase page with product details
     navigate('/purchase', {
-      state: { product, email }, // Pass the product details and email (if needed)
+      // state: { product, email }, // Pass the product details and email (if needed)
+      state: { product: { ...product, prod_price }, email }, // Pass updated product details
+
     });
     console.log("product",product)
 

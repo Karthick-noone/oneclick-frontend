@@ -23,6 +23,8 @@ const Computers = () => {
   const [favorites, setFavorites] = useState({});
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
 
+
+  
   // const {
   //   cartItems,
   //   addToCart,
@@ -462,7 +464,7 @@ const Computers = () => {
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.prod_price}
+                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
@@ -483,7 +485,7 @@ const Computers = () => {
                     >
                       (
                       {Math.round(
-                        ((product.actual_price - product.prod_price) /
+                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
                           100
                       )}
@@ -592,7 +594,7 @@ const Computers = () => {
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.prod_price}
+                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
@@ -613,7 +615,7 @@ const Computers = () => {
                     >
                       (
                       {Math.round(
-                        ((product.actual_price - product.prod_price) /
+                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
                           100
                       )}

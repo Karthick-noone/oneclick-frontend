@@ -25,6 +25,20 @@ const CartPage = () => {
 
   const [addressDetails, setAddressDetails] = useState([]);
 
+    const [isOfferActive, setIsOfferActive] = useState(true);
+    const [item, setitem] = useState(null);
+  
+     useEffect(() => {
+        if (item && item.offer_end_time) {
+          const now = new Date();
+          const offerEndTime = new Date(item.offer_end_time);
+    
+          // Set offer active based on whether the offer end time is in the future
+          setIsOfferActive(offerEndTime > now);
+        }
+      }, [item]);
+      
+
   // Memoize fetchAddress function using useCallback to avoid re-creating it on each render
 const fetchAddress = useCallback(async (userId) => {
   try {
@@ -218,7 +232,7 @@ useEffect(() => {
   const calculateTotalPrice = () => {
     return cartItems
       .reduce((total, item) => {
-        const price = parseFloat(item.prod_price);
+        const price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
 
         return total + (isNaN(price) ? 0 : price * item.quantity) + deliveryCharge;
@@ -228,7 +242,7 @@ useEffect(() => {
   const calculateSellingPrice = () => {
     return cartItems
       .reduce((total, item) => {
-        const prod_price = parseFloat(item.prod_price);
+        const prod_price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
         return total + (isNaN(prod_price) ? 0 : prod_price * item.quantity);
       }, 0)
       .toFixed(2);
@@ -237,7 +251,7 @@ useEffect(() => {
     return cartItems
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
-        const price = parseFloat(item.prod_price);
+        const price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
         const discountPerItem = actual_price - price;
         return total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity);
       }, 0)
@@ -248,7 +262,7 @@ useEffect(() => {
     return cartItems
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
-        const price = parseFloat(item.prod_price);
+        const price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
         const discountPerItem = actual_price - price;
         return total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity);
       }, 0)
@@ -668,7 +682,7 @@ loading="lazy"
             >
               ₹{item.actual_price * item.quantity}
             </p>
-            <p> ₹{item.prod_price * item.quantity}</p>
+            <p> ₹{isOfferActive ? item.offer_price * item.quantity : item.prod_price * item.quantity}</p>
           </div>
         </li>
       );
@@ -763,13 +777,14 @@ loading="lazy"
                   )}
                   <div style={{ display: "flex" }}>
                     <button
+                      title="Set this address as current address"
                       onClick={handleConfirm}
                       className="modal4-confirm-btn"
                     >
-                      Confirm Address
+                      Set Address
                     </button>
                     <a style={{ textDecoration: "none" }} href="/Useraddress">
-                      <button className="modal4-confirm-btn">
+                      <button title="Add new address" className="modal4-confirm-btn">
                         Add new address
                       </button>
                     </a>
