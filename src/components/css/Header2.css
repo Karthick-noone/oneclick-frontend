@@ -363,6 +363,11 @@
     align-items: center;
     margin-top: 10px;
 }
+.btns {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
 
 .quantity-controls button {
     background: #f0f0f0;
@@ -386,6 +391,17 @@
     margin-top: 10px;
     font-size: 14px;
 }
+
+.move-btn {
+    background: #049974;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 12px;
+}
+
 
 /* Sidebar cart footer styles */
 /* .sidebarcart-footer {
@@ -508,6 +524,7 @@
     font-size: 12px;
   }
   
+
   .close-btn {
     background: none;
     border: none;

@@ -9,7 +9,7 @@ import { ApiUrl } from "./ApiUrl"; // Adjust the import path accordingly
 import "./css/ProductDetail.css"; // Ensure you create this CSS file
 import Header2 from "./Header2";
 // import Sidebar from "./Sidebar";
-import { FaHeart,FaRegHeart } from "react-icons/fa"; // Import the heart icon from react-icons
+import { FaHeart,FaRegHeart, FaShoppingBag } from "react-icons/fa"; // Import the heart icon from react-icons
 import Footer from "./footer";
 import { useNavigate } from "react-router-dom"; // Import useNavigate at the top
 import Slider from "react-slick"; // Import the slider component
@@ -1257,7 +1257,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                           className="product-detail-add-to-cart"
                         >
                           ADD TO CART{" "}
-                          <span style={{ marginLeft: "10px" }}>+</span>
+                          <span style={{ marginLeft: "10px" }}><FaShoppingBag /></span>
                         </button>
                         <button
                           title="Buy Now"

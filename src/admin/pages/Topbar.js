@@ -36,6 +36,32 @@ const Topbar = () => {
     return () => clearInterval(deleteOldNotificationsInterval);
   }, []);
 
+  useEffect(() => {
+      const handleScroll = () => {
+        if (isNotificationOpen) {
+          setIsNotificationOpen(false);
+        }
+      };
+  
+      window.addEventListener("scroll", handleScroll);
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+      };
+    }, [isNotificationOpen]);
+
+  useEffect(() => {
+      const handleScroll = () => {
+        if (isMenuOpen) {
+          setIsMenuOpen(false);
+        }
+      };
+  
+      window.addEventListener("scroll", handleScroll);
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+      };
+    }, [isMenuOpen]);
+
   const fetchNotifications = async () => {
     setLoadingNotifications(true);
     try {

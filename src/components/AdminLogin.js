@@ -258,6 +258,7 @@ const LoginPage = () => {
               placeholder="Enter your username"
               required
               className="staff-input"
+              autoFocus
             />
           </div>
           <div className="form-group">

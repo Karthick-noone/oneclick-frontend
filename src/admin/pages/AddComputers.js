@@ -16,7 +16,7 @@ import rightarrow from "./img/right.png";
 // Set up the modal root element
 Modal.setAppElement("#root");
 
-const Computers = () => {
+const Computers = ({ product }) => {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -71,15 +71,15 @@ const Computers = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [modalProductId, setModalProductId] = useState(null);
 
-   useEffect(() => {
-      setTimeout(() => {
-        const section = document.querySelector(".laptops-products-list");
-        if (section) {
-          const offset = section.offsetTop - 70; // Adjust the margin (50px in this case)
-          window.scrollTo({ top: offset, behavior: "smooth" });
-        }
-      }, 100);
-    }, []);
+  useEffect(() => {
+    setTimeout(() => {
+      const section = document.querySelector(".laptops-products-list");
+      if (section) {
+        const offset = section.offsetTop - 70; // Adjust the margin (50px in this case)
+        window.scrollTo({ top: offset, behavior: "smooth" });
+      }
+    }, 100);
+  }, []);
   // Handle opening modal and passing productId
 
   const openProductModal = (productId) => {
@@ -129,15 +129,24 @@ const Computers = () => {
     }
   };
 
-  const handleChangePrice = (e) => {
+  const handleChangePrice = (e, productPrice) => {
     const value = e.target.value;
-
-    // Regex to prevent starting with 0 (except for "0." as a decimal input), and only allow numbers and up to 2 decimal places.
-    const regex = /^[1-9][0-9]*$/; // Only digits from 1 to 9 and no leading zeros
-
-    // Allow empty string for clearing input
+  
+    // Allow only numbers (integer or decimal with up to 2 places), but no leading zero unless decimal.
+    const regex = /^(0|[1-9]\d*)(\.\d{0,2})?$/;
+  
     if (regex.test(value) || value === "") {
-      setOfferPrice(value);
+      if (parseFloat(value) <= productPrice || value === "") {
+        setOfferPrice(value);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Price",
+          text: `Offer price cannot exceed ${productPrice}`,
+          confirmButtonColor: "#d33",
+          timer: 3000,
+        });
+      }
     }
   };
 
@@ -1380,15 +1389,25 @@ const Computers = () => {
     textarea.focus();
   };
 
-  // Get today's date and format it as YYYY-MM-DD
+  
+  const getFormattedDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+  
+    return `${year}-${month}-${day}T${hours}:${minutes}`; // Format for datetime-local input
+  };
+  
   const today = new Date();
-  const minDate = today.toISOString().split("T")[0]; // Format to YYYY-MM-DD
-
-  // Calculate max date (30 days from today)
-  const maxDate = new Date(today);
-  maxDate.setDate(today.getDate() + 30);
-  const maxDateStr = maxDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
-
+  const minDate = getFormattedDate(today);
+  const maxDate = getFormattedDate(new Date(today.setDate(today.getDate() + 10)));
+  
+  
+  // console.log("Min Date:", minDate);
+  // console.log("Max Date:", maxDate);
+  
   const handleDeleteCoupon = async (couponId) => {
     const confirmation = window.confirm(
       "Are you sure you want to delete this coupon?"
@@ -1796,17 +1815,27 @@ const Computers = () => {
                   </h3>
 
                   {/* "View" button to trigger modal */}
-                 
                 </div>
                 <div>
-                  <span style={{textDecoration:"line-through", color:'red', fontSize:'14px'}}>₹{product.actual_price}</span>  <span style={{color:'green',marginLeft:'5px'}}>₹{product.prod_price}</span>
+                  <span
+                    style={{
+                      textDecoration: "line-through",
+                      color: "red",
+                      fontSize: "14px",
+                    }}
+                  >
+                    ₹{product.actual_price}
+                  </span>{" "}
+                  <span style={{ color: "green", marginLeft: "5px" }}>
+                    ₹{product.prod_price}
+                  </span>
                 </div>
                 <button
-                    className="view-details-btn"
-                    onClick={() => openProductModal(product.id)} // Pass product ID to open modal
-                  >
-                    <FaEye /> View Details
-                  </button>
+                  className="view-details-btn"
+                  onClick={() => openProductModal(product.id)} // Pass product ID to open modal
+                >
+                  <FaEye /> View Details
+                </button>
                 <div className="laptops-product-actions">
                   <button
                     onClick={() => handleEditProduct(product)}
@@ -1954,7 +1983,19 @@ const Computers = () => {
                                           setOfferEndTime(e.target.value)
                                         }
                                         required
-                                        min={minDate}
+                                        min={offerStartTime || minDate} // End date cannot be before start date
+                                        max={
+                                          offerStartTime
+                                            ? getFormattedDate(
+                                                new Date(
+                                                  new Date(
+                                                    offerStartTime
+                                                  ).getTime() +
+                                                    10 * 86400000
+                                                )
+                                              )
+                                            : maxDate
+                                        } // Max 10 days from start
                                         className="offer-input"
                                       />
                                       <label className="offer-label">
@@ -1963,7 +2004,7 @@ const Computers = () => {
                                       <input
                                         type="number"
                                         value={offerPrice}
-                                        onChange={handleChangePrice}
+                                        onChange={(e) => handleChangePrice(e, product.prod_price)} // Pass product.prod_price
                                         required
                                         className="offer-input"
                                       />
@@ -2278,7 +2319,6 @@ const Computers = () => {
         <input
           type="file"
           accept="image/jpeg, image/png"
-
           onChange={handleImageUpload} // Keep this function for handling file selection
           style={inputStyle}
         />

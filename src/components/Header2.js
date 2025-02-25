@@ -442,6 +442,7 @@ const Header2 = () => {
       .toFixed(0);
   };
 
+
   const discount = () => {
     return cartItems
       .reduce((total, item) => {
@@ -1049,8 +1050,9 @@ const Header2 = () => {
                         <p style={{ color: "#27ae60" }}>
                           {" "}
                           {/* ₹{item.prod_price * item.quantity} */}
-                          ₹{isOfferActive ? item.offer_price * item.quantity : item.prod_price * item.quantity}
+                          ₹{item.offer_price > 0 ? item.offer_price * item.quantity : item.prod_price * item.quantity}
                         </p>
+
                         <div className="quantity-controls">
                           <button
                             onClick={() =>

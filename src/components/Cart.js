@@ -682,7 +682,7 @@ loading="lazy"
             >
               ₹{item.actual_price * item.quantity}
             </p>
-            <p> ₹{isOfferActive ? item.offer_price * item.quantity : item.prod_price * item.quantity}</p>
+            <p> ₹{item.offer_price > 0 ? item.offer_price * item.quantity : item.prod_price * item.quantity}</p>
           </div>
         </li>
       );
@@ -703,11 +703,10 @@ loading="lazy"
             <span>Price ({getTotalItemsCount() === 1 ? '1 item' : `${getTotalItemsCount()} items`})</span>
               <span>₹{calculateSellingPrice()}</span>
             </div>
-            <div className="summary-item">
+            {/* <div className="summary-item">
               <span>Discount</span>
-              {/* <span style={{color:'green'}}>- ₹{discount()}</span> */}
               <span style={{color:'green'}}>- ₹0</span>
-            </div>
+            </div> */}
             <div className="summary-item">
               <span>Platform fee</span>
               <span>-</span>

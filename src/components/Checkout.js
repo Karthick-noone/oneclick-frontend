@@ -7,7 +7,7 @@ import Header2 from "./Header2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaTimes, FaTrash, FaCheck } from "react-icons/fa";
+import { FaTimes, FaTrash, FaCheck ,FaShoppingBag} from "react-icons/fa";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {
   FaMoneyBillWave,
@@ -227,6 +227,7 @@ const Checkout = () => {
         title: "No Items Selected",
         text: "Please select at least one item before adding to cart.",
         confirmButtonText: "OK",
+        timer:3000,
       });
       return;
     }
@@ -273,6 +274,7 @@ const Checkout = () => {
           title: "Error!",
           text: "Some items could not be added to the cart.",
           confirmButtonText: "OK",
+          timer: 3000,
         });
       }
     } catch (error) {
@@ -282,6 +284,8 @@ const Checkout = () => {
         title: "Failed!",
         text: "Something went wrong while adding items to the cart.",
         confirmButtonText: "OK",
+        timer: 3000,
+
       });
     } finally {
       setIsAdding(false); // Enable button after request
@@ -348,6 +352,8 @@ const Checkout = () => {
           text: "Failed to add items to Buy Later. Please try again.",
           icon: "error",
           confirmButtonText: "OK",
+          timer: 3000,
+
         });
       });
   };
@@ -393,6 +399,8 @@ const Checkout = () => {
               text: "Failed to remove item. Please try again.",
               icon: "error",
               confirmButtonText: "OK",
+          timer: 3000,
+
             });
           });
       }
@@ -1245,9 +1253,9 @@ const Checkout = () => {
                                 marginRight: "5px",
                               }}
                             >
-                              ₹{item.actual_price}{" "}
+                              ₹{item.actual_price * item.quantity}
                             </p>
-                            <p>₹{isOfferActive ? item.offer_price * item.quantity : item.prod_price * item.quantity}</p>
+                            <p>₹{item.offer_price > 0  ? item.offer_price * item.quantity : item.prod_price * item.quantity}</p>
 
                             <div>
                               <label>
@@ -1365,7 +1373,7 @@ const Checkout = () => {
                               >
                                 ₹{product.actual_price}{" "}
                               </p>
-                              <p>₹{isOfferActive ? product.offer_price : product.prod_price}</p>
+                              <p>₹{product.offer_price > 0  ? product.offer_price : product.prod_price}</p>
 
                               <div>
                                 <label>
@@ -1393,7 +1401,9 @@ const Checkout = () => {
                         onClick={handleAddToCart} // Sends the first product
                         className="Addtocart-btn"
                       >
-                        Add To Cart
+                        Move To Cart 
+                                                  <span style={{ marginLeft: "10px" }}><FaShoppingBag /></span>
+                        
                       </button>
                     )}
                   </div>

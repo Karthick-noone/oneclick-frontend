@@ -121,18 +121,27 @@ const Headphones = () => {
     }
   };
   
-  const handleChangePrice = (e) => {
+  const handleChangePrice = (e, productPrice) => {
     const value = e.target.value;
   
-    // Regex to prevent starting with 0 (except for "0." as a decimal input), and only allow numbers and up to 2 decimal places.
-    const regex = /^[1-9][0-9]*$/; // Only digits from 1 to 9 and no leading zeros
+    // Allow only numbers (integer or decimal with up to 2 places), but no leading zero unless decimal.
+    const regex = /^(0|[1-9]\d*)(\.\d{0,2})?$/;
   
-    // Allow empty string for clearing input
     if (regex.test(value) || value === "") {
-      setOfferPrice(value);
-    } 
+      if (parseFloat(value) <= productPrice || value === "") {
+        setOfferPrice(value);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Price",
+          text: `Offer price cannot exceed ${productPrice}`,
+          confirmButtonColor: "#d33",
+          timer: 3000,
+        });
+      }
+    }
   };
-  
+
   
 
   const handleSubmit = async (event) => {
@@ -1329,14 +1338,19 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     textarea.focus();
   };
 
-  // Get today's date and format it as YYYY-MM-DD
+  const getFormattedDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+  
+    return `${year}-${month}-${day}T${hours}:${minutes}`; // Format for datetime-local input
+  };
+  
   const today = new Date();
-  const minDate = today.toISOString().split("T")[0]; // Format to YYYY-MM-DD
-
-   // Calculate max date (30 days from today)
-  const maxDate = new Date(today);
-  maxDate.setDate(today.getDate() + 30);
-  const maxDateStr = maxDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
+  const minDate = getFormattedDate(today);
+  const maxDate = getFormattedDate(new Date(today.setDate(today.getDate() + 10)));
 
   const handleDeleteCoupon = async (couponId) => {
     const confirmation = window.confirm(
@@ -1685,7 +1699,19 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                           setOfferEndTime(e.target.value)
                                         }
                                         required
-                                        min={minDate}
+                                        min={offerStartTime || minDate} // End date cannot be before start date
+                                        max={
+                                          offerStartTime
+                                            ? getFormattedDate(
+                                                new Date(
+                                                  new Date(
+                                                    offerStartTime
+                                                  ).getTime() +
+                                                    10 * 86400000
+                                                )
+                                              )
+                                            : maxDate
+                                        } // Max 10 days from start
                                         className="offer-input"
                                       />
                                       <label className="offer-label">
@@ -1694,7 +1720,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                       <input
                                         type="number"
                                         value={offerPrice}
-                                        onChange={handleChangePrice}
+                                        onChange={(e) => handleChangePrice(e, product.prod_price)} // Pass product.prod_price
                                         required
                                         className="offer-input"
                                       />

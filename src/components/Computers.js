@@ -517,7 +517,7 @@ const Computers = () => {
                         title="Add To Cart"
                       >
                         ADD TO CART
-                      </button>
+                      </button> 
                       <button
                         title="Buy Now"
                         onClick={(event) => handleBuyNow(product, event)}
