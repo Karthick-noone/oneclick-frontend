@@ -32,6 +32,7 @@ const ShopByCategory = () => {
         <div className="category">
           <a href="/MobileAccessories">
             <img
+            loading="lazy"
               src={mobileAccessoriesImg}
               alt="Mobile Accessories"
               className="category-image"
@@ -51,6 +52,8 @@ const ShopByCategory = () => {
               src={tvImg}
               alt="T.V & Home Cinema"
               className="category-image"
+              loading="lazy"
+
             />
             <span>T.V & Home Cinema</span>
           </a>
@@ -61,6 +64,8 @@ const ShopByCategory = () => {
               src={watchImg}
               alt="Wearable Tech"
               className="category-image"
+              loading="lazy"
+
             />
             <span>Wearable Tech</span>
           </a>
@@ -71,6 +76,8 @@ const ShopByCategory = () => {
               src={headphonesImg}
               alt="Headphones"
               className="category-image"
+              loading="lazy"
+
             />
             <span>Headphones</span>
           </a>
@@ -87,6 +94,8 @@ const ShopByCategory = () => {
               src={computerAccessoriesImg}
               alt="Computer Accessories"
               className="category-image"
+              loading="lazy"
+
             />
             <span>Computer Accessories</span>
           </a>

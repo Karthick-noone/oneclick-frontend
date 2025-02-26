@@ -200,7 +200,7 @@ const LoginPage = () => {
         <div className="login-header">
           <a href="/">
             {" "}
-            <img src={logo} width={"200px"} alt="" />
+            <img src={logo} width={"200px"} loading="lazy" alt="" />
           </a>
           <a href="/">
             <button style={{ color: "white" }} className="close-btn">

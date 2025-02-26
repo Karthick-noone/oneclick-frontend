@@ -62,7 +62,7 @@ const ChangePasswordPage = () => {
     <div style={styles.container}>
        <center> 
         <a href="/"> 
-          <img src={logo} width={'200px'} alt="Logo" />
+          <img src={logo} width={'200px'} loading="lazy" alt="Logo" />
         </a>
       </center>
       <h2 style={styles.title}>Change Password</h2>

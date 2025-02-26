@@ -151,7 +151,7 @@ const MyAccount = () => {
     <>
     <Header2 />
     <div className="ac-banner-container">
-      <img src={fullad} alt="Banner" className="ac-banner-image" />
+      <img src={fullad} loading="lazy" alt="Banner" className="ac-banner-image" />
       <div className="ac-banner-text-container">
         <h2 className="ac-banner-text">
           Welcome, {user.username ? capitalizeFirstLetter(user.username) : "N/A"}!
@@ -163,7 +163,7 @@ const MyAccount = () => {
       <div className="ac-profile-card">
         <div className="ac-profile-header">
           <div className="ac-profile-left">
-            <img src={Logo} alt="User Avatar" className="ac-avatar" />
+            <img src={Logo} loading="lazy" alt="User Avatar" className="ac-avatar" />
             <div>
               <h2 className="ac-profile-name">
                 {user.username ? capitalizeFirstLetter(user.username) : "N/A"}
@@ -284,6 +284,8 @@ const MyAccount = () => {
                             src={`${ApiUrl}/uploads/${currentProduct.category.toLowerCase()}/${firstImage}`}
                             alt={currentProduct.prod_name}
                             className="product-image10"
+                    loading="lazy"
+
                           />
                         </center>
                       ) : (

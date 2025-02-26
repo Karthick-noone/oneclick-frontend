@@ -15,7 +15,7 @@ const About = () => {
       {/* <Header3 /> */}
       <div className="about-content">
         <div className="image-container">
-          <img src={aboutImage} alt="About Us" className="about-image" />
+          <img src={aboutImage} alt="About Us" loading='lazy' className="about-image" />
         </div>
         <div className="text-container">
           <h2 className="about-title">About Us</h2>

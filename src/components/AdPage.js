@@ -46,7 +46,7 @@ const AdPage = () => {
     <section className="ad-page">
       <div className="ad-first-page">
         <div className="ad-second-page">
-          <h2 style={{ marginBottom: '10px', textAlign: 'left', color: 'white' }}>
+          <h2 className='text-center' style={{ marginBottom: '10px', textAlign: 'left', color: 'white' }}>
             Offers For You
           </h2>
           <div className="ads-container">

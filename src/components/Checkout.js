@@ -1331,6 +1331,7 @@ const Checkout = () => {
                                   alt={product.name}
                                   loading="lazy"
                                   className="cart-product-image"
+                                  
                                 />
                               </div>
                             ) : (

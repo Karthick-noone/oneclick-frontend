@@ -178,6 +178,8 @@ const WishlistSidebar = ({
                         src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
                         alt={product.prod_name}
                         className="item-image"
+                    loading="lazy"
+
                       />
                     ) : (
                       <div className="placeholder-image">No image available</div>

@@ -505,6 +505,8 @@ const visibleProductsPrinters = groupedProducts.Printers.slice(currentIndexPrint
                     src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
                     alt={product.prod_name}
                     className="product-first-image"
+                    loading="lazy"
+
                   />
                 ) : (
                   <div>No image available</div>
@@ -603,7 +605,7 @@ const visibleProductsPrinters = groupedProducts.Printers.slice(currentIndexPrint
 ) : (
   // Only show the arrow if there are more than 5 products remaining
   groupedProducts.Mobiles.length > 5 && (
-    <img src={right} width={'30px'}  
+    <img src={right} loading="lazy" width={'30px'}  
     onClick={() => {
           loadMoreProducts('Mobiles'); // Pass 'Mobiles' as the category
           setShowSeeMoreMobiles(true); // Hide arrow and show "See More..." text for Mobiles
@@ -658,6 +660,8 @@ const visibleProductsPrinters = groupedProducts.Printers.slice(currentIndexPrint
                     src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
                     alt={product.prod_name}
                     className="product-first-image"
+                    loading="lazy"
+
                   />
                 ) : (
                   <div>No image available</div>
@@ -733,7 +737,7 @@ const visibleProductsPrinters = groupedProducts.Printers.slice(currentIndexPrint
     ) : (
       // Only show the arrow if there are more than 5 products remaining
       groupedProducts.Computers.length > 5 && (
-        <img src={right} width={'30px'}  
+        <img src={right} loading="lazy" width={'30px'}  
         onClick={() => {
               loadMoreProducts('Computers'); // Pass 'Computers' as the category
               setShowSeeMoreComputers(true); // Hide arrow and show "See More..." text for Computers
@@ -782,6 +786,7 @@ const visibleProductsPrinters = groupedProducts.Printers.slice(currentIndexPrint
                     src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
                     alt={product.prod_name}
                     className="product-first-image"
+                    loading="lazy"
                   />
                 ) : (
                   <div>No image available</div>
@@ -857,7 +862,7 @@ const visibleProductsPrinters = groupedProducts.Printers.slice(currentIndexPrint
     ) : (
       // Only show the arrow if there are more than 5 products remaining
       groupedProducts.CCTV.length > 5 && (
-        <img src={right} width={'30px'}  
+        <img src={right} loading="lazy" width={'30px'}  
           onClick={() => {
             loadMoreProducts('CCTV'); // Pass 'CCTV' as the category
             setShowSeeMoreCCTV(true); // Hide arrow and show "See More..." text for CCTV
@@ -906,6 +911,8 @@ const visibleProductsPrinters = groupedProducts.Printers.slice(currentIndexPrint
                     src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
                     alt={product.prod_name}
                     className="product-first-image"
+                    loading="lazy"
+
                   />
                 ) : (
                   <div>No image available</div>
@@ -1025,7 +1032,7 @@ const visibleProductsPrinters = groupedProducts.Printers.slice(currentIndexPrint
             <div key={index} className="product" onClick={() => handleProductClick(product.id)}>
               {product.offer_label && <div className="product-label">{product.offer_label}</div>}
               {firstImage ? (
-                <img src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`} alt={product.prod_name} className="product-first-image" />
+                <img loading="lazy" src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`} alt={product.prod_name} className="product-first-image" />
               ) : <div>No image available</div>}
               
               <span title="Add to Wishlist" className={`favorite-icon ${favorites[`${product.prod_name}-${product.id}`] ? "filled" : ""}`} onClick={(event) => handleToggleFavorite(product, event)}>
@@ -1069,7 +1076,7 @@ const visibleProductsPrinters = groupedProducts.Printers.slice(currentIndexPrint
               color="#000"
               onClick={loadMoreAccessories} // Load more products when clicked
             /> */}
-                <img src={right} width={'30px'}  
+                <img loading="lazy" src={right} width={'30px'}  
                         onClick={loadMoreAccessories} // Load more products when clicked
 
          alt="" />
@@ -1092,7 +1099,7 @@ const visibleProductsPrinters = groupedProducts.Printers.slice(currentIndexPrint
             <div key={index} className="product" onClick={() => handleProductClick(product.id)}>
               {product.offer_label && <div className="product-label">{product.offer_label}</div>}
               {firstImage ? (
-                <img src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`} alt={product.prod_name} className="product-first-image" />
+                <img loading="lazy" src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`} alt={product.prod_name} className="product-first-image" />
               ) : <div>No image available</div>}
               
               <span title="Add to Wishlist" className={`favorite-icon ${favorites[`${product.prod_name}-${product.id}`] ? "filled" : ""}`} onClick={(event) => handleToggleFavorite(product, event)}>

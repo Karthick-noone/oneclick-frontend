@@ -848,6 +848,8 @@ const Header2 = () => {
               width={"230px"}
               style={{ marginLeft: "50px" }}
               alt="Company Logo"
+              loading="lazy"
+
             />
           </a>
         </div>

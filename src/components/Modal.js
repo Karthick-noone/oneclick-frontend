@@ -301,6 +301,8 @@ const Modal = ({
           }`}
           alt={product.prod_name}
           className="modal-image"
+          loading="lazy"
+
         />
         <div className="modal-header">
           <h2 className="modal-title">{product.prod_name}</h2>

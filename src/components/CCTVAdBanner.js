@@ -59,6 +59,8 @@ const handlePageClick = (product) => {
         src={`${ApiUrl}/uploads/offerspage/${filteredBanners[0].image}`}
         alt={`Banner for ${filteredBanners[0].brand_name}`}
         className="banner-image"
+        loading="lazy"
+
         // style={{ width: '1250px', marginTop: '20px', height: 'auto' }} // Styling for the image
 
       />
@@ -79,6 +81,8 @@ const handlePageClick = (product) => {
         src={`${ApiUrl}/uploads/offerspage/${filteredBanners[1].image}`}
         alt={`Banner for ${filteredBanners[1].brand_name}`}
         className="banner-image"
+        loading="lazy"
+
         style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
 
       />
@@ -111,6 +115,8 @@ const handlePageClick = (product) => {
                       src={`${ApiUrl}/uploads/offerspage/${firstImage}`}
                       alt="Product"
                       className="offer-add"
+                    loading="lazy"
+
                     />
                   </div>
                 ) : (
@@ -139,6 +145,8 @@ const handlePageClick = (product) => {
         src={`${ApiUrl}/uploads/offerspage/${filteredBanners[2].image}`}
         alt={`Banner for ${filteredBanners[2].brand_name}`}
         className="banner-image"
+        loading="lazy"
+
         style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
 
       />
@@ -158,6 +166,8 @@ const handlePageClick = (product) => {
         src={`${ApiUrl}/uploads/offerspage/${filteredBanners[3].image}`}
         alt={`Banner for ${filteredBanners[3].brand_name}`}
         className="banner-image"
+        loading="lazy"
+
         // style={{ width: '1250px', marginTop: '20px', height: 'auto' }} // Styling for the image
 
       />
@@ -177,6 +187,8 @@ const handlePageClick = (product) => {
             src={`${ApiUrl}/uploads/offerspage/${banner.image}`}
             alt={`Banner for ${banner.brand_name}`}  
             className="potrait-image"
+            loading="lazy"
+
           />
         </div>
       ))}

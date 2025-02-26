@@ -16,14 +16,14 @@ const PaymentMethods = () => {
         <div className="payment-methods-page">
             <h2>We accept the following payment methods</h2>
             <div className="payment-images">
-                <img src={visa} alt="Visa" />
-                <img src={mastercard} alt="MasterCard" />
-                <img src={paypal} alt="PayPal" />
-                <img src={amex} alt="American Express" />
-                <img src={discover} alt="Discover" />
-                <img src={maestro} alt="Maestro" />
-                <img src={rupay} alt="RuPay" />
-                <img src={upi} alt="UPI" />
+                <img loading='lazy' src={visa} alt="Visa" />
+                <img loading='lazy' src={mastercard} alt="MasterCard" />
+                <img loading='lazy' src={paypal} alt="PayPal" />
+                <img loading='lazy' src={amex} alt="American Express" />
+                <img loading='lazy' src={discover} alt="Discover" />
+                <img loading='lazy' src={maestro} alt="Maestro" />
+                <img loading='lazy' src={rupay} alt="RuPay" />
+                <img loading='lazy' src={upi} alt="UPI" />
             </div>
             <div className="copyright">
                 <p>&copy; {new Date().getFullYear()} by One Click. All rights reserved.</p>

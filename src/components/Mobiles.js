@@ -434,6 +434,8 @@ const Mobiles = () => {
                       }`}
                       alt={product.prod_name}
                       className="product-image"
+                    loading="lazy"
+
                     />
                     <span
                       title={
@@ -561,10 +563,12 @@ const Mobiles = () => {
                   <div className="product-actions">
                     <img
                       src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                        images[0]
+                        firstImage
                       }`}
                       alt={product.prod_name}
                       className="product-image"
+                    loading="lazy"
+
                     />
                     <span
                       title={

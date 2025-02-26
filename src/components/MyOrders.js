@@ -378,6 +378,8 @@ const MyOrders = () => {
                           src={`${ApiUrl}/uploads/${currentProduct.category.toLowerCase()}/${firstImage}`}
                           alt={currentProduct.prod_name}
                           className="product-image10"
+                    loading="lazy"
+
                         />
                       </center>
                     ) : (

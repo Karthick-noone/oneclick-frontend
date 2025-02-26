@@ -881,6 +881,7 @@ const ProductDetail = ({ accessoryCategory }) => {
       setZoomStyle({
         transformOrigin: `${x}% ${y}%`,
         transform: "scale(2)", // Adjust scale for zoom level
+        cursor:'zoom-in'  
       });
     };
     
@@ -1279,9 +1280,9 @@ const ProductDetail = ({ accessoryCategory }) => {
                             onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
                           >
                             {favorites[`${product.id}`] ? (
-                              <FaHeart style={{ color: "red" }} /> // Filled heart
+                              <FaHeart title="Remove from wishlist" style={{ color: "red" }} /> // Filled heart
                             ) : (
-                              <FaRegHeart /> // Empty heart
+                              <FaRegHeart title="Add to wishlist" /> // Empty heart
                             )}
                           </span>
                         <span
@@ -1297,6 +1298,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                       </div>
                     )}
                   </div>
+              
 
                   {relatedAccessories.length > 0 && (
                     <div className="product-detail-infooo">
@@ -1336,6 +1338,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                                   src={`${ApiUrl}/uploads/${accessory.category.toLowerCase()}/${firstImage}`}
                                   alt={accessory.prod_name}
                                   className="accessory-image"
+                    loading="lazy"
+
                                   style={{
                                     width: "60px",
                                     height: "60px",
@@ -1524,6 +1528,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                           }}
                           src={leftarrow}
                           alt=""
+                    loading="lazy"
+
                         />
                       </button>
                     )}
@@ -1557,6 +1563,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                                 src={`${ApiUrl}/uploads/${relatedProduct.category.toLowerCase()}/${firstImage}`}
                                 alt={relatedProduct.prod_name}
                                 className="related-product-image"
+                    loading="lazy"
+
                               />
                               <p className="related-product-name">
                                 {relatedProduct.prod_name
@@ -1608,6 +1616,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                           }}
                           src={rightarrow}
                           alt=""
+                    loading="lazy"
+
                         />
                       </button>
                     )}
@@ -1631,6 +1641,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                       src={`${ApiUrl}/uploads/offerspage/${filteredBanners[0].image}`}
                       alt={`Banner for ${filteredBanners[0].brand_name}`}
                       className="banner-image"
+                    loading="lazy"
+
                       // style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
                     />
                   </div>
@@ -1660,6 +1672,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                         }}
                         src={leftarrow}
                         alt=""
+                    loading="lazy"
+
                       />
                     </button>
                   )}
@@ -1690,6 +1704,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                               src={`${ApiUrl}/uploads/${relatedProduct.category.toLowerCase()}/${firstImage}`}
                               alt={relatedProduct.prod_name}
                               className="related-product-image"
+                    loading="lazy"
+
                             />
                             <p className="related-product-name">
                               {relatedProduct.prod_name
@@ -1739,6 +1755,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                         }}
                         src={rightarrow}
                         alt=""
+                    loading="lazy"
+
                       />
                     </button>
                   )}
@@ -1763,6 +1781,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                       src={`${ApiUrl}/uploads/offerspage/${filteredBanners[1].image}`}
                       alt={`Banner for ${filteredBanners[1].brand_name}`}
                       className="banner-image"
+                    loading="lazy"
+
                       // style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
                     />
                   </div>

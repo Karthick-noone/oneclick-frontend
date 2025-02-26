@@ -434,6 +434,8 @@ const CCTV = () => {
                       }`}
                       alt={product.prod_name}
                       className="product-image"
+                    loading="lazy"
+
                     />
                     <span
                       title={
@@ -565,6 +567,8 @@ const CCTV = () => {
                       }`}
                       alt={product.prod_name}
                       className="product-image"
+                    loading="lazy"
+
                     />
                     <span
                       title={

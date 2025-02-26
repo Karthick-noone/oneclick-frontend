@@ -367,7 +367,7 @@ const ProductList = () => {
                   swiperRefs[categoryName]?.current?.swiper.slidePrev()
                 }
               >
-                <img width="20px" src={left} alt="" />
+                <img width="20px" loading="lazy" src={left} alt="" />
               </button>
               <button
                 className="next-btn"
@@ -387,7 +387,7 @@ const ProductList = () => {
                   swiperRefs[categoryName]?.current?.swiper.slideNext()
                 }
               >
-                <img width="20px" src={right} alt="" />
+                <img loading="lazy" width="20px" src={right} alt="" />
               </button>
             </>
           )}

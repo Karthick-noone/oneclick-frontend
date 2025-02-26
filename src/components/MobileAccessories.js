@@ -62,7 +62,7 @@ const MobileAccessories = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${ApiUrl}/fetchmobileacccessories`);
+        const response = await axios.get(`${ApiUrl}/fetchmobileaccessories`);
         const fetchedProducts = response.data;
 
         // Set products to state
@@ -386,7 +386,7 @@ const MobileAccessories = () => {
   };
 
   // Define the category variable
-  const category = "mobileacccessories";
+  const category = "mobileaccessories";
 
   // offerPercentage = ((actual_price - prod_price) / actual_price) * 100
 
@@ -399,7 +399,7 @@ const MobileAccessories = () => {
         <a style={{ textDecoration: "none", color: "black" }} href="/">
           Home{" "}
         </a>
-        &gt; Mobile Acccessories
+        &gt; Mobile Accessories
       </span>
       <div className="main-content">
         <Sidebar />

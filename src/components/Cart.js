@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import Footer from "./footer";
-import { Link, } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -25,46 +25,47 @@ const CartPage = () => {
 
   const [addressDetails, setAddressDetails] = useState([]);
 
-    const [isOfferActive, setIsOfferActive] = useState(true);
-    const [item, setitem] = useState(null);
-  
-     useEffect(() => {
-        if (item && item.offer_end_time) {
-          const now = new Date();
-          const offerEndTime = new Date(item.offer_end_time);
-    
-          // Set offer active based on whether the offer end time is in the future
-          setIsOfferActive(offerEndTime > now);
-        }
-      }, [item]);
-      
+  const [isOfferActive, setIsOfferActive] = useState(true);
+  const [item, setitem] = useState(null);
+
+  useEffect(() => {
+    if (item && item.offer_end_time) {
+      const now = new Date();
+      const offerEndTime = new Date(item.offer_end_time);
+
+      // Set offer active based on whether the offer end time is in the future
+      setIsOfferActive(offerEndTime > now);
+    }
+  }, [item]);
 
   // Memoize fetchAddress function using useCallback to avoid re-creating it on each render
-const fetchAddress = useCallback(async (userId) => {
-  try {
-    const response = await axios.get(`${ApiUrl}/singleaddress/${userId}`);
-    setAddressDetails(response.data || []); // Ensure it's an array even if response is null
-  } catch (error) {
-    console.error("Error fetching address:", error);
-  }
-}, [ApiUrl]); // Include dependencies ApiUrl
+  const fetchAddress = useCallback(
+    async (userId) => {
+      try {
+        const response = await axios.get(`${ApiUrl}/singleaddress/${userId}`);
+        setAddressDetails(response.data || []); // Ensure it's an array even if response is null
+      } catch (error) {
+        console.error("Error fetching address:", error);
+      }
+    },
+    [ApiUrl]
+  ); // Include dependencies ApiUrl
 
-useEffect(() => {
-  // Fetch the selected address from local storage
-  const storedAddressId = localStorage.getItem("selectedAddressId");
-  if (storedAddressId) {
-    setSelectedAddress(storedAddressId);
-  }
-}, []);
+  useEffect(() => {
+    // Fetch the selected address from local storage
+    const storedAddressId = localStorage.getItem("selectedAddressId");
+    if (storedAddressId) {
+      setSelectedAddress(storedAddressId);
+    }
+  }, []);
 
-useEffect(() => {
-  const storedUserId = localStorage.getItem("user_id");
-  if (storedUserId) {
-    setUserId(storedUserId);
-    fetchAddress(storedUserId); // Call fetchAddress with userId
-  }
-}, [fetchAddress]); // Add fetchAddress as a dependency
-
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+    if (storedUserId) {
+      setUserId(storedUserId);
+      fetchAddress(storedUserId); // Call fetchAddress with userId
+    }
+  }, [fetchAddress]); // Add fetchAddress as a dependency
 
   // useEffect(() => {
   //   // Fetch the selected address from local storage
@@ -99,7 +100,6 @@ useEffect(() => {
             progress: undefined,
           });
           handleCloseModal(); // Close the modal after confirming
-          
         } else {
           throw new Error("Unexpected response status");
         }
@@ -157,10 +157,9 @@ useEffect(() => {
     }
   };
 
-
   const [isLoading, setIsLoading] = useState(true);
 
-  const email = localStorage.getItem('email');
+  const email = localStorage.getItem("email");
 
   useEffect(() => {
     if (email) {
@@ -169,30 +168,29 @@ useEffect(() => {
         try {
           const response = await axios.post(`${ApiUrl}/get-cart-items`, {
             email,
-            username: localStorage.getItem('username') // Send username if needed
+            username: localStorage.getItem("username"), // Send username if needed
           });
-  
+
           if (response.data.products) {
             setCartItems(response.data.products); // Set the fetched products to state
           }
         } catch (error) {
-          console.error('Error fetching cart items:', error);
+          console.error("Error fetching cart items:", error);
         } finally {
           setIsLoading(false);
         }
       };
-  
+
       // Fetch cart items immediately
       fetchCartItems();
-  
+
       // Set an interval to fetch cart items every 5 seconds
       const intervalId = setInterval(fetchCartItems, 1000); // 5000ms = 5 seconds
-  
+
       // Clean up the interval on component unmount or when `email` changes
       return () => clearInterval(intervalId);
     }
   }, [email]); // Dependency on `email` so it will trigger fetch when email changes
-
 
   // useEffect(() => {
   //   const fetchLocalStorageData = () => {
@@ -232,17 +230,23 @@ useEffect(() => {
   const calculateTotalPrice = () => {
     return cartItems
       .reduce((total, item) => {
-        const price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
+        const price = parseFloat(
+          isOfferActive ? item.offer_price : item.prod_price
+        );
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
 
-        return total + (isNaN(price) ? 0 : price * item.quantity) + deliveryCharge;
+        return (
+          total + (isNaN(price) ? 0 : price * item.quantity) + deliveryCharge
+        );
       }, 0)
       .toFixed(2);
   };
   const calculateSellingPrice = () => {
     return cartItems
       .reduce((total, item) => {
-        const prod_price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
+        const prod_price = parseFloat(
+          isOfferActive ? item.offer_price : item.prod_price
+        );
         return total + (isNaN(prod_price) ? 0 : prod_price * item.quantity);
       }, 0)
       .toFixed(2);
@@ -251,24 +255,31 @@ useEffect(() => {
     return cartItems
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
-        const price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
+        const price = parseFloat(
+          isOfferActive ? item.offer_price : item.prod_price
+        );
         const discountPerItem = actual_price - price;
-        return total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity);
+        return (
+          total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
+        );
       }, 0)
       .toFixed(2);
   };
-  
+
   const save = () => {
     return cartItems
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
-        const price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
+        const price = parseFloat(
+          isOfferActive ? item.offer_price : item.prod_price
+        );
         const discountPerItem = actual_price - price;
-        return total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity);
+        return (
+          total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
+        );
       }, 0)
       .toFixed(0);
   };
-
 
   const calculateDeliveryCharge = () => {
     return cartItems
@@ -366,24 +377,23 @@ useEffect(() => {
   //   }
   // };
 
-
   const updateCartItemQuantity = async (itemId, newQuantity) => {
     if (newQuantity <= 0) return; // Prevent reducing quantity below 1
-  
+
     try {
       // Update the cart item in the local state immediately for responsiveness
       const updatedCartItems = cartItems.map((item) =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       );
       setCartItems(updatedCartItems);
-  
+
       // Send the updated quantity to the server
       const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
         email,
         itemId,
         quantity: newQuantity,
       });
-  
+
       // if (response.status === 200) {
       //   toast.success(`Quantity updated to ${newQuantity}!`, {
       //     position: "top-right",
@@ -404,21 +414,20 @@ useEffect(() => {
       });
     }
   };
-  
-  
+
   const removeFromCart = async (itemId, itemName, quantity) => {
     try {
       // Remove the item from the local state first
       const updatedCartItems = cartItems.filter((item) => item.id !== itemId);
       setCartItems(updatedCartItems);
-  
+
       // Send the removal request to the server
       const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
         email,
         itemId,
         quantity,
       });
-  
+
       if (response.data.success) {
         // Toast notification for successful removal
         toast.success(`${itemName} has been removed from your cart!`, {
@@ -427,23 +436,23 @@ useEffect(() => {
           closeOnClick: true,
         });
       } else {
-        console.error('Failed to remove item from cart');
-        toast.error('Failed to remove item from cart!', {
+        console.error("Failed to remove item from cart");
+        toast.error("Failed to remove item from cart!", {
           position: "top-right",
           autoClose: 2000,
           closeOnClick: true,
         });
       }
     } catch (error) {
-      console.error('Error removing item from cart:', error);
-      toast.error('Error removing item from cart!', {
+      console.error("Error removing item from cart:", error);
+      toast.error("Error removing item from cart!", {
         position: "top-right",
         autoClose: 2000,
         closeOnClick: true,
       });
     }
   };
-  
+
   // Assuming addressDetails is already available, you can set the initial address
   useEffect(() => {
     if (addressDetails.length > 0 && !defaultAddress) {
@@ -555,12 +564,11 @@ useEffect(() => {
     }
   };
 
-
   const handleProductClick = (productId) => {
     // Navigate to the product detail page
     navigate(`/product/${productId}`);
   };
-  
+
   return (
     <>
       {/* <Header1 /> */}
@@ -573,134 +581,174 @@ useEffect(() => {
         </div>
         <div className="cart-content row">
           <div className="cart-products">
-          <div className="cart-address">
-    {/* <h3>Select a Shipping Address</h3> */}
-    {addressDetails.length > 0 ? (
-      <ul>
-        {addressDetails.map((address) => (
-          <li
-            className={`addr-list ${
-              selectedAddress === address.address_id ? "selected" : ""
-            }`}
-            key={address.address_id}
-          >
-            <button
-              style={{ float: "right" }}
-              className="change-btn"
-              onClick={() => handleSelectAddressClick(address.address_id)}
-            >
-              {selectedAddress === address.address_id ? "Change" : "Change"}
-            </button>
-            <strong>Delivery to :</strong>
-            <label>
-              <span style={{ fontSize: "15px", marginTop: "5px" }}>
-                {address.name}, {address.street}, {address.city},{" "}
-                {address.state}, {address.country},{" "}
-                {address.postal_code}, {address.phone}
-              </span>
-            </label>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <div>
-        <p> Please add one address during checkout. </p>
-        <a href="/Useraddress">
-          <button className="change-btn">Add Address</button>
-        </a>
-      </div>
-    )}
-  </div>
-  <div className="cart-product-card">
-  <ul className="cart-list">
-  {cartItems.length === 0 ? (
-    <li className="empty-cart-message">
-      <p>Your cart is empty</p>
-      <a href="/">
-        <button className="change-btn">Browse products</button>
-      </a>
-    </li>
-  ) : (
-    cartItems.map((item) => {
-      // Check if image is a stringified array and parse it
-      const images = Array.isArray(item.prod_img)
-        ? item.prod_img
-        : JSON.parse(item.prod_img || '[]'); // Handle if it's a stringified array
-
-      const firstImage = images.length > 0 ? images[0] : null;// Get the first image or fallback to null
-
-      return (
-        <li key={item.id} className="cart-product d-flex align-items-center">
-          <Link style={{ textDecoration: 'none' }} to={`/product/${item.id}`}>
-            {firstImage ? (
-              <img
-                src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
-                alt={item.prod_name || "Product"}
-loading="lazy"
-              className="cart-product-image"
-              name="image"              />
-            ) : (
-              <div className="placeholder-image">No image available</div> // Fallback if no image is available
-            )}
-          </Link>
-          <div
-            style={{ cursor: 'pointer' }}
-            className="cart-product-details"
-            key={item.id}
-            onClick={() => handleProductClick(item.id)}
-          >
-            <Link style={{ textDecoration: 'none', color:'#333' }} to={`/product/${item.id}`}>
-              <p className="cart-product-name">{item.prod_name}</p>
-              {/* <p className="cart-product-description">{item.description}</p> */}
-            </Link>
-          </div>
-          <div className="cart-product-price">
-            <div className="cart-quantity-controls">
-              <button
-                onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)}
-              >
-                -
-              </button>
-              <span>{item.quantity}</span>
-              <button
-                onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)}
-              >
-                +
-              </button>
-              <FaTrash
-                className="cart-remove-btn"
-                onClick={() => removeFromCart(item.id, item.prod_name, item.quantity)}
-              />
+            <div className="cart-address">
+              {/* <h3>Select a Shipping Address</h3> */}
+              {addressDetails.length > 0 ? (
+                <ul>
+                  {addressDetails.map((address) => (
+                    <li
+                      className={`addr-list ${
+                        selectedAddress === address.address_id ? "selected" : ""
+                      }`}
+                      key={address.address_id}
+                    >
+                      <button
+                        style={{ float: "right" }}
+                        className="change-btn"
+                        onClick={() =>
+                          handleSelectAddressClick(address.address_id)
+                        }
+                      >
+                        {selectedAddress === address.address_id
+                          ? "Change"
+                          : "Change"}
+                      </button>
+                      <strong>Delivery to :</strong>
+                      <label>
+                        <span style={{ fontSize: "15px", marginTop: "5px" }}>
+                          {address.name}, {address.street}, {address.city},{" "}
+                          {address.state}, {address.country},{" "}
+                          {address.postal_code}, {address.phone}
+                        </span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div>
+                  <p> Please add one address during checkout. </p>
+                  <a href="/Useraddress">
+                    <button className="change-btn">Add Address</button>
+                  </a>
+                </div>
+              )}
             </div>
-            <p
-              style={{
-                color: 'red',
-                textDecoration: 'line-through',
-                fontSize: '13px',
-                marginRight: '5px',
-              }}
-            >
-              ₹{item.actual_price * item.quantity}
-            </p>
-            <p> ₹{item.offer_price > 0 ? item.offer_price * item.quantity : item.prod_price * item.quantity}</p>
-          </div>
-        </li>
-      );
-    })
-  )}
-</ul>
+            <div className="cart-product-card">
+              <ul className="cart-list">
+                {cartItems.length === 0 ? (
+                  <li className="empty-cart-message">
+                    <p>Your cart is empty</p>
+                    <a href="/">
+                      <button className="change-btn">Browse products</button>
+                    </a>
+                  </li>
+                ) : (
+                  cartItems.map((item) => {
+                    // Check if image is a stringified array and parse it
+                    const images = Array.isArray(item.prod_img)
+                      ? item.prod_img
+                      : JSON.parse(item.prod_img || "[]"); // Handle if it's a stringified array
 
+                    const firstImage = images.length > 0 ? images[0] : null; // Get the first image or fallback to null
 
-
-
-
-</div>
-
+                    return (
+                      <li
+                        key={item.id}
+                        className="cart-product d-flex align-items-center"
+                      >
+                        <Link
+                          style={{ textDecoration: "none" }}
+                          to={`/product/${item.id}`}
+                        >
+                          {firstImage ? (
+                            <img
+                              src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
+                              alt={item.prod_name || "Product"}
+                              loading="lazy"
+                              className="cart-product-image"
+                              name="image"
+                            />
+                          ) : (
+                            <div className="placeholder-image">
+                              No image available
+                            </div> // Fallback if no image is available
+                          )}
+                        </Link>
+                        <div
+                          style={{ cursor: "pointer" }}
+                          className="cart-product-details"
+                          key={item.id}
+                          onClick={() => handleProductClick(item.id)}
+                        >
+                          <Link
+                            style={{ textDecoration: "none", color: "#333" }}
+                            to={`/product/${item.id}`}
+                          >
+                            <p className="cart-product-name">
+                              {item.prod_name}
+                            </p>
+                            {/* <p className="cart-product-description">{item.description}</p> */}
+                          </Link>
+                        </div>
+                        <div className="cart-product-price">
+                          <div className="cart-quantity-controls">
+                            <button
+                              onClick={() =>
+                                updateCartItemQuantity(
+                                  item.id,
+                                  item.quantity - 1
+                                )
+                              }
+                            >
+                              -
+                            </button>
+                            <span>{item.quantity}</span>
+                            <button
+                              onClick={() =>
+                                updateCartItemQuantity(
+                                  item.id,
+                                  item.quantity + 1
+                                )
+                              }
+                            >
+                              +
+                            </button>
+                            <FaTrash
+                              className="cart-remove-btn"
+                              onClick={() =>
+                                removeFromCart(
+                                  item.id,
+                                  item.prod_name,
+                                  item.quantity
+                                )
+                              }
+                            />
+                          </div>
+                          <p
+                            style={{
+                              color: "red",
+                              textDecoration: "line-through",
+                              fontSize: "13px",
+                              marginRight: "5px",
+                            }}
+                          >
+                            ₹{item.actual_price * item.quantity}
+                          </p>
+                          <p>
+                            {" "}
+                            ₹
+                            {item.offer_price > 0
+                              ? item.offer_price * item.quantity
+                              : item.prod_price * item.quantity}
+                          </p>
+                        </div>
+                      </li>
+                    );
+                  })
+                )}
+              </ul>
+            </div>
           </div>
 
           <div className="cart-summary">
             <div className="summary-item">
-            <span>Price ({getTotalItemsCount() === 1 ? '1 item' : `${getTotalItemsCount()} items`})</span>
+              <span>
+                Price (
+                {getTotalItemsCount() === 1
+                  ? "1 item"
+                  : `${getTotalItemsCount()} items`}
+                )
+              </span>
               <span>₹{calculateSellingPrice()}</span>
             </div>
             {/* <div className="summary-item">
@@ -715,21 +763,25 @@ loading="lazy"
               <span>Delivery charge</span>
               <span>
                 {/* <span style={{ textDecoration: "line-through" }}>₹40</span> <span style={{color:'green'}}>FREE Delivery</span> */}
-               <span>₹{calculateDeliveryCharge()}</span>
+                <span>₹{calculateDeliveryCharge()}</span>
               </span>
             </div>
             {/* <div className="summary-item">
               <span>You will save on this order</span>
               <span>₹10000</span>
-            </div> */} <hr />
+            </div> */}{" "}
+            <hr />
             <div className="summary-item">
               <strong>Total Amount</strong>
-              <span style={{fontWeight:'bold'}}>₹{calculateTotalPrice()}</span>
+              <span style={{ fontWeight: "bold" }}>
+                ₹{calculateTotalPrice()}
+              </span>
             </div>
             <hr />
-
             <div className="summary-item">
-              <span style={{color:'green'}}>You will save ₹{save()} on this order</span>
+              <span style={{ color: "green" }}>
+                You will save ₹{save()} on this order
+              </span>
               {/* <span>₹10000</span> */}
             </div>
             <button
@@ -739,7 +791,6 @@ loading="lazy"
             >
               Checkout
             </button>
-
             {isModalOpen && (
               <div className="modal4-overlay">
                 <div className="modal4-content">
@@ -783,7 +834,10 @@ loading="lazy"
                       Set Address
                     </button>
                     <a style={{ textDecoration: "none" }} href="/Useraddress">
-                      <button title="Add new address" className="modal4-confirm-btn">
+                      <button
+                        title="Add new address"
+                        className="modal4-confirm-btn"
+                      >
                         Add new address
                       </button>
                     </a>
