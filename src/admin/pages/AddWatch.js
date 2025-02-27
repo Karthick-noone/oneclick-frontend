@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes,FaImages } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -20,7 +20,7 @@ const Watch = () => {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: "",
-    image: [],
+    images: [],
     features: "",
     price: "",
     label: "",
@@ -32,6 +32,8 @@ const Watch = () => {
     actual_price: "", // Add actual price field
     effectiveprice: "", // Add actual price field
   });
+  const fileInputRef = useRef(null);
+  const [imageCount, setImageCount] = useState(0);
   const [editingProduct, setEditingProduct] = useState(null); // To handle the product being edited
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal open/close state
   const navigate = useNavigate();
@@ -264,76 +266,81 @@ const Watch = () => {
   const handleCouponUpdated = () => {
     console.log("Coupon updated successfully!");
   };
+ const MAX_FILES = 5; // Set your file limit
+
   const handleFileChange = (productId, event) => {
-    const files = Array.from(event.target.files); // Convert FileList to array
+    const files = Array.from(event.target.files);
+  
+    // Get the existing files for this product (or an empty array)
+    const existingFiles = newImages[productId] || [];
+    const existingFileNames = existingFiles.map((file) => file.name);
+  
+    // Check if adding new files exceeds the limit
+    if (existingFiles.length + files.length > MAX_FILES) {
+      Swal.fire({
+        icon: "warning",
+        title: "File Limit Exceeded",
+        text: `You can only upload up to ${MAX_FILES} images.`,
+      }).then(() => {
+        event.target.value = ""; // Clear the file input field
+      });
+      return;
+    }
+  
+    // Filter out duplicate files based on name
+    const uniqueFiles = files.filter(
+      (file) => !existingFileNames.includes(file.name)
+    );
+  
+    if (uniqueFiles.length === 0) return; // No new images
+  
     const resizedFiles = [];
-
-    files.forEach((file) => {
-      console.log(`Selected file for product ID ${productId}:`, file);
-
+  
+    uniqueFiles.forEach((file) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         const img = new Image();
         img.src = e.target.result;
         img.onload = () => {
-          console.log("Original image dimensions:", img.width, img.height);
-
           const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Define max width
+          const MAX_WIDTH = 500; // Maximum width for the image
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
-
+  
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          console.log("Resizing image to:", canvas.width, canvas.height);
-
+  
           // Compress and convert to blob
           canvas.toBlob(
             (blob) => {
-              console.log(
-                "Resized image size (in KB):",
-                (blob.size / 1024).toFixed(2)
-              );
-
+              const processBlob = (finalBlob) => {
+                const processedFile = new File([finalBlob], file.name, {
+                  type: "image/jpeg",
+                });
+                resizedFiles.push(processedFile);
+  
+                if (resizedFiles.length === uniqueFiles.length) {
+                  setNewImages((prev) => ({
+                    ...prev,
+                    [productId]: [...(prev[productId] || []), ...resizedFiles],
+                  }));
+                }
+              };
+  
               if (blob.size / 1024 < 50) {
-                console.log("Image is under 50 KB, ready for upload.");
-                resizedFiles.push(blob); // Add resized image to array
+                processBlob(blob);
               } else {
-                console.log(
-                  "Image still above 50 KB, applying further compression."
-                );
                 canvas.toBlob(
                   (compressedBlob) => {
-                    console.log(
-                      "Compressed image size (in KB):",
-                      (compressedBlob.size / 1024).toFixed(2)
-                    );
-                    resizedFiles.push(compressedBlob);
-
-                    // Update state after all files processed
-                    if (resizedFiles.length === files.length) {
-                      setNewImages((prev) => ({
-                        ...prev,
-                        [productId]: resizedFiles,
-                      }));
-                    }
+                    processBlob(compressedBlob);
                   },
                   "image/jpeg",
                   0.7
                 );
-              }
-
-              // Update state after all files processed
-              if (resizedFiles.length === files.length) {
-                setNewImages((prev) => ({
-                  ...prev,
-                  [productId]: resizedFiles,
-                }));
               }
             },
             "image/jpeg",
@@ -640,74 +647,79 @@ const Watch = () => {
   //   });
   // };
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files); // Convert FileList to an array
-    const resizedFiles = [];
-
-    files.forEach((file) => {
-      console.log("Selected image for upload:", file);
-
+    const handleImageChange = async (e) => {
+    const files = Array.from(e.target.files);
+  
+    // If more than 5 images are selected, show an alert and prevent upload
+    if (files.length > 5) {
+      Swal.fire({
+        icon: "warning",
+        title: "Image Upload Limit",
+        text: "You can upload a maximum of 5 images at a time.",
+        confirmButtonText: "OK",
+      });
+      e.target.value = ""; // Reset input to allow re-selection
+      return;
+    }
+  
+    // Resize images before adding them
+    const resizedImages = await Promise.all(files.map((file) => resizeImage(file)));
+  
+    setNewProduct((prevProduct) => {
+      // Convert existing images to a comparable format
+      const existingImages = prevProduct.images.map((img) => img.name || img);
+  
+      // Filter out duplicates
+      const newUniqueImages = resizedImages.filter(
+        (newImg) => !existingImages.includes(newImg.name || newImg)
+      );
+  
+      return {
+        ...prevProduct,
+        images: [...prevProduct.images, ...newUniqueImages], // Append only unique images
+      };
+    });
+  
+    setImageCount(resizedImages.length);
+  
+    // Reset file input to allow selecting new files again
+    e.target.value = "";
+  };
+  
+  const resizeImage = (file) => {
+    return new Promise((resolve) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (event) => {
         const img = new Image();
         img.src = event.target.result;
         img.onload = () => {
-          console.log("Original image dimensions:", img.width, img.height);
-
           const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Define max width
+          const MAX_WIDTH = 500;
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
-
+  
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          console.log("Resizing image to:", canvas.width, canvas.height);
-
+  
           canvas.toBlob(
             (blob) => {
-              console.log(
-                "Resized image size (in KB):",
-                (blob.size / 1024).toFixed(2)
-              );
               if (blob.size / 1024 < 50) {
-                console.log("Image is under 50 KB, ready for upload.");
-                resizedFiles.push(blob); // Add resized image to the array
+                resolve(new File([blob], file.name, { type: "image/jpeg" }));
               } else {
-                console.log(
-                  "Image still above 50 KB, applying further compression."
-                );
-                // Further compress if above 50 KB
                 canvas.toBlob(
-                  (compressedBlob) => {
-                    console.log(
-                      "Compressed image size (in KB):",
-                      (compressedBlob.size / 1024).toFixed(2)
-                    );
-                    resizedFiles.push(compressedBlob);
-                    // Update state after processing all files
-                    if (resizedFiles.length === files.length) {
-                      setNewProduct((prevProduct) => ({
-                        ...prevProduct,
-                        images: resizedFiles,
-                      }));
-                    }
-                  },
+                  (compressedBlob) =>
+                    resolve(
+                      new File([compressedBlob], file.name, {
+                        type: "image/jpeg",
+                      })
+                    ),
                   "image/jpeg",
                   0.7
                 );
-              }
-
-              // Update state after processing all files
-              if (resizedFiles.length === files.length) {
-                setNewProduct((prevProduct) => ({
-                  ...prevProduct,
-                  images: resizedFiles,
-                }));
               }
             },
             "image/jpeg",
@@ -719,7 +731,7 @@ const Watch = () => {
   };
 
   const handleAddProduct = async () => {
-    if (newProduct.label && newProduct.label.length > 15) {
+    if (newProduct.label && newProduct.label.replace(/\s/g, "").length > 15) {
       Swal.fire({
         icon: "warning",
         title: "Validation Error",
@@ -883,8 +895,12 @@ const Watch = () => {
     formData.append("category", newProduct.category); // Add category here
 
     // Append each image file to the FormData
-    newProduct.images.forEach((image) => {
-      formData.append("images", image); // Use 'images' for multiple file upload
+    newProduct.images.forEach((image, index) => {
+      if (image instanceof File) {
+        formData.append("images", image);
+      } else {
+        formData.append(`images${index}`, image);
+      }
     });
 
     try {
@@ -916,8 +932,8 @@ const Watch = () => {
         // coupon: "",
         effectiveprice: "",
         category: "", // Clear the category here
-      });
-
+});
+      setImageCount(0);
       document.querySelector('input[type="file"]').value = ""; // Reset file input
     } catch (error) {
       console.error("Error adding product:", error);
@@ -1520,12 +1536,23 @@ const Watch = () => {
             <label className="laptops-label">Product Image</label>
             <input
               accept="image/jpeg, image/png"
+              ref={fileInputRef}
               multiple
               onChange={handleImageChange}
+              style={{ display: "none" }}
               type="file"
               className="laptops-file-input"
             />
-
+            <button
+              type="button"
+              onClick={() => fileInputRef.current.click()}
+              className="custom-file-input-button"
+            >
+              <FaImages className="file-icon" />
+              {imageCount > 0
+                ? `Selected Images: ${imageCount}`
+                : "Choose Images"}
+            </button>
             <label className="laptops-label">Features</label>
             <textarea
               name="features"
@@ -1554,9 +1581,11 @@ const Watch = () => {
                 <div className="laptops-product-image">
                   <div className="slider-container">
                     <Slider
-                      {...{
+                        {...{
                         ...settings,
                         arrows: product.prod_img.length > 1,
+                        draggable: product.prod_img.length > 1, // Disable dragging if only one image exists
+                        swipe: product.prod_img.length > 1, // Disable swipe gestures on touch devices for one image
                       }}
                     >
                       {product.prod_img.map((img, imgIndex) => (

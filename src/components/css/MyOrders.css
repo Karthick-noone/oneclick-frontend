@@ -1,3 +1,90 @@
+.order-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.order-info {
+  flex: 1;
+}
+
+.filters-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #fff;
+  padding: 12px 18px;
+  border-radius: 5px;
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+  margin-left: auto; /* Aligns to the right */
+  max-width: fit-content;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.filter-dropdown {
+  padding: 6px 10px;
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  width: 90px;
+  background: #f9f9f9;
+  font-size: 14px;  
+}
+
+.filters-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #222;
+  margin-right: 10px;
+}
+
+
+/* Seal Style */
+.cancelled-seal {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: bold;
+  /* color: red; */
+  background: transparent;
+  /* border: 3px solid red; */
+  /* border-radius: 50%; */
+  /* padding: 15px 25px; */
+  text-transform: uppercase;
+  margin-right: 15px;
+  /* transform: rotate(20deg); */
+  /* box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); */
+}
+
+.product-name {
+  display: -webkit-box;              /* Required for WebKit-based browsers */
+  /* display: box;                        */
+  -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
+  box-orient: vertical;              /* Fallback for other browsers */
+  overflow: hidden;                   /* Hide overflow content */
+  -webkit-line-clamp: 1;             /* Limit to 2 lines in WebKit-based browsers */
+  line-clamp: 1;                     /* Future proofing for standard implementation */
+  text-overflow: ellipsis;           /* Show ellipsis when text overflows */
+}
+
+
+/* New style for cancelled order card */
+.cancelled-order-card {
+  background: #ffe7e7 !important; /* light red/pink background */
+  border-color: #ffabab;
+}
 .my-orders {
     padding: 20px;
     background-color: #f0f2f5;

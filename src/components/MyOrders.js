@@ -9,6 +9,9 @@ import { FaTimes, FaCheck } from "react-icons/fa";
 import OrderTrackingModal from "./TrackingModal";
 import Swal from "sweetalert2";
 
+import stamp from "./img/cancelled.jpg";
+import stamp2 from "./img/cancelled-stamp.png";
+
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null); // For modal
@@ -130,7 +133,10 @@ const MyOrders = () => {
         try {
           const response = await axios.get(`${ApiUrl}/api/my-orders/${userId}`); // Replace with actual API
           setOrders(response.data.orders);
-        } catch (error) { 
+
+          console.log("response",response.data.orders)
+         
+        } catch (error) {
           console.error("Error fetching orders:", error);
         }
       };
@@ -228,52 +234,57 @@ const MyOrders = () => {
       <Header2 />
       <div className="my-orders">
         <h2>My Orders</h2>
-        <div className="filters">
-          <span style={{ marginTop: "30px" }}>Filter-By</span>
-          <div className="filter-item">
-            <label htmlFor="year">Year</label>
-            <select
-              id="year"
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(Number(e.target.value))}
-              style={{width:'25px'}}
-            >
-              {Array.from(
-                { length: 5 },
-                (_, i) => new Date().getFullYear() - i
-              ).map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="filters-container">
+  <span className="filters-title">Filter By</span>
+  
+  <div className="filter-group">
+    <label htmlFor="year" className="filter-label">Year</label>
+    <select
+      className="filter-dropdown"
+      id="year"
+      value={selectedYear}
+      onChange={(e) => setSelectedYear(Number(e.target.value))}
+    >
+      {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+        <option key={year} value={year}>
+          {year}
+        </option>
+      ))}
+    </select>
+  </div>
 
-          <div className="filter-item">
-            <label htmlFor="month">Month</label>
-            <select
-              id="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(Number(e.target.value))}
-              style={{width:'25px'}}
-            >
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                <option key={month} value={month}>
-                  {new Date(0, month - 1).toLocaleString("en-US", {
-                    month: "long",
-                  })}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+  <div className="filter-group">
+    <label htmlFor="month" className="filter-label">Month</label>
+    <select
+      className="filter-dropdown"
+      id="month"
+      value={selectedMonth}
+      onChange={(e) => setSelectedMonth(Number(e.target.value))}
+    >
+      {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+        <option key={month} value={month}>
+          {new Date(0, month - 1).toLocaleString("en-US", { month: "long" })}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+
 
         <div className="order-container">
           {filteredOrders.length === 0 ? (
             <p className="no-orders">No orders found.</p>
           ) : (
             filteredOrders.map((order) => (
-              <div key={order.unique_id} className="order-card">
+              <div
+                key={order.unique_id}
+                className={`order-card ${
+                  order.delivery_status === "Cancelled"
+                    ? "cancelled-order-card"
+                    : ""
+                }`}
+              >
+                {" "}
                 <div className="order-header">
                   <h3>Order #{order.unique_id}</h3>
                   <span
@@ -283,41 +294,58 @@ const MyOrders = () => {
                       ? "Payment Pending"
                       : order.status.toLowerCase() === "refund pending"
                       ? "Refund Pending"
-                      : order.status.toLowerCase() === "refund"
-                      ? "Refund"
+                      : order.status.toLowerCase() === "refunded"
+                      ? "Refunded"
                       : "Payment Paid"}
                   </span>
                 </div>
-                <div className="products-list">
-                  {order.products && order.products.length > 1 ? (
-                    <select
-                      value={selectedProduct}
-                      onChange={handleProductChange}
-                      className="product-dropdown"
-                    >
-                      {order.products.map((product) => (
-                        <option
-                          key={product.product_id}
-                          value={product.product_id}
+                {/* Row Layout: Left Side (Details) & Right Side (Cancelled Seal) */}
+                <div className="order-details">
+                  {/* Left Side: Order Information */}
+                  <div className="order-info">
+                    <div className="products-list">
+                      {order.products && order.products.length > 1 ? (
+                        <select
+                          value={selectedProduct}
+                          onChange={handleProductChange}
+                          className="product-dropdown"
                         >
-                          {product.name}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    order.products &&
-                    order.products.length === 1 && (
-                      <span style={{ fontWeight: "bold" }}>
-                        {order.products[0].name}
-                      </span>
-                    )
+                          {order.products.map((product) => (
+                            <option
+                            className="product-name"
+                              key={product.product_id}
+                              value={product.product_id}
+                            >
+                              {product.name}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        order.products &&
+                        order.products.length === 1 && (
+                          <span className="product-name" style={{ fontWeight: "bold" }}>
+                            {order.products[0].name}
+                          </span>
+                        )
+                      )}
+                    </div>{" "}
+                    <p>
+                      <strong>Order Date:</strong>{" "}
+                      {formatDate(order.order_date)}
+                    </p>
+                    <p>
+                      <strong>Total Amount:</strong> ₹{order.total_amount}
+                    </p>
+                  </div>
+
+                  {/* Right Side: Cancelled Seal */}
+                  {order.delivery_status === "Cancelled" && (
+                    <div className="cancelled-seal">
+                      <img src={stamp2} loading="lazy" width={"85px"} alt="" />
+                    </div>
                   )}
                 </div>
-
-                <p>Order Date: {formatDate(order.order_date)}</p>
-                <p>Total Amount: ₹{order.total_amount}</p>
-
-                {/* Buttons in the same row */}
+                {/* Buttons */}
                 <div className="buttons-row">
                   <button
                     onClick={() => openModal(order)}
@@ -331,14 +359,7 @@ const MyOrders = () => {
                   >
                     Track Order
                   </button>
-
-                  {order.delivery_status === "Cancelled" && (
-                    <button className="btn btn-cancel" disabled>
-                      Cancelled
-                    </button>
-                  )}
                 </div>
-
                 <OrderTrackingModal
                   isOpen={isModalOpen2}
                   onRequestClose={closeModal2}
@@ -378,8 +399,7 @@ const MyOrders = () => {
                           src={`${ApiUrl}/uploads/${currentProduct.category.toLowerCase()}/${firstImage}`}
                           alt={currentProduct.prod_name}
                           className="product-image10"
-                    loading="lazy"
-
+                          loading="lazy"
                         />
                       </center>
                     ) : (

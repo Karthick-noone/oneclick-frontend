@@ -7,6 +7,43 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 } */
 
+
+.custom-file-input-wrapper {
+  display: inline-block;
+}
+
+.custom-file-input-button {
+  /* display: inline-flex; */
+  align-items: center;
+  background-color: white;
+  color: #333;
+  border: 1px solid #cacaca;
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+
+.custom-file-input-button:focus
+ {
+  border-color: #007bff; /* Change border color on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a glowing effect */
+}
+
+.custom-file-input-button:hover
+ {
+  border-color: #0056b3; 
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); 
+}
+
+
+
+
+.file-icon {
+  margin-right: 8px;
+}
 .laptops-modal-title {
   font-size: 24px;
   margin-bottom: 20px;
@@ -24,7 +61,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1001;
+  z-index: 1002;
 }
 
 /* Modal Content */

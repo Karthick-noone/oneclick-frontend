@@ -529,7 +529,7 @@ const ProductDetail = ({ accessoryCategory }) => {
     }
   
 
-    const prod_price = isOfferActive ? product.offer_price : product.prod_price;
+    const prod_price = product.offer_price > 0 ? product.offer_price : product.prod_price;
 
     // Navigate to the purchase page with product details
     navigate('/purchase', {
@@ -1427,13 +1427,13 @@ const ProductDetail = ({ accessoryCategory }) => {
                       {product.memory && (
                         <li style={listItemStyle}>
                           <span style={labelStyle}><FaHdd style={iconStyle}/> RAM</span>
-                          <span style={valueStyle}>{product.memory} GB</span>
+                          <span style={valueStyle}>{product.memory}</span>
                         </li>
                       )}
                       {product.storage && (
                         <li style={listItemStyle}>
                           <span style={labelStyle}><FaMemory style={iconStyle} /> ROM</span>
-                          <span style={valueStyle}>{product.storage} GB</span>
+                          <span style={valueStyle}>{product.storage}</span>
                         </li>
                       )}
                       {product.camera && (

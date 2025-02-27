@@ -1,16 +1,33 @@
-
-/* Container for filters */
 .filters {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 20px;
-  flex-wrap: wrap;
 }
 
-/* Filter elements (input, select) */
-.filters input,
-.filters select {
+/* Default styling for filter inputs/selects */
+
+.order_year_filter,
+.order_month_filter {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 70px;
+  min-width: 100px;
+}
+.order_status_filter {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 70px;
+  min-width: 150px;
+}
+
+
+.filters input
+ {
   padding: 8px 12px;
   font-size: 14px;
   border: 1px solid #ccc;
@@ -19,11 +36,46 @@
   min-width: 150px;
 }
 
-/* Add some space between the filters */
-.filters select {
-  cursor: pointer;
-  width: 50px;
+/* Override any inline widths for year and month selects */
+
+
+/* Responsive: Use a grid layout to show 2 filters per row */
+@media (max-width: 768px) {
+  .filters {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  /* Make inputs/selects take full column width */
+  .filters input,
+  .filters select {
+    width: 80%;
+  font-size: 12px;
+
+  }
+
+  .order_year_filter,
+.order_month_filter {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 150px;
 }
+
+  .order_status_filter{
+    padding: 10px;
+    width: 50px;
+  }
+  .order_status_option{
+    padding: 10px;
+    width: 30px;
+    font-size: 10px;
+  }
+}
+
+
 
 /* Placeholder for search input */
 .filters input::placeholder {

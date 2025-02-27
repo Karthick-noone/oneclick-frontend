@@ -432,7 +432,7 @@ const Checkout = () => {
     // Calculate the total price of cart items
     const totalPrice = cartItems
       .reduce((total, item) => {
-        const price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
+        const price = parseFloat(item.offer_price > 0? item.offer_price : item.prod_price);
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
 
         return (
@@ -674,7 +674,7 @@ const Checkout = () => {
   const calculateSellingPrice = () => {
     return cartItems
       .reduce((total, item) => {
-        const prod_price = parseFloat(isOfferActive ? item.offer_price : item.prod_price);
+        const prod_price = parseFloat(item.offer_price > 0 ? item.offer_price : item.prod_price);
         return total + (isNaN(prod_price) ? 0 : prod_price * item.quantity);
       }, 0)
       .toFixed(2);
@@ -683,7 +683,7 @@ const Checkout = () => {
     return cartItems
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
-        const price = parseFloat(isOfferActive ? item.offer_price : item.prod_price);
+        const price = parseFloat(item.offer_price > 0 ? item.offer_price : item.prod_price);
         const discountPerItem = actual_price - price;
         return (
           total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
@@ -793,7 +793,7 @@ const Checkout = () => {
     }
     if (cartItems.length === 0) {
       Swal.fire({
-        icon: "error",
+        icon: "warning",
         title: "Cart is Empty",
         text: "Please add items to your cart before proceeding with payment.",
         timer: 5000,
@@ -870,7 +870,7 @@ const Checkout = () => {
 
     if (cartItems.length === 0) {
       Swal.fire({
-        icon: "error",
+        icon: "warning",
         title: "Cart is Empty",
         text: "Please add items to your cart before proceeding with payment.",
         timer: 5000,
@@ -915,7 +915,7 @@ const Checkout = () => {
     const enrichedCartItems = cartItems.map((item) => ({
       id: item.id,
       quantity: item.quantity, // Map 'prod_quantity' to 'quantity'
-      prod_price: isOfferActive? item.offer_price :  item.prod_price, // Map 'prod_price' to 'prod_price'
+      prod_price: item.offer_price > 0 ? item.offer_price :  item.prod_price, // Map 'prod_price' to 'prod_price'
       prod_name: item.prod_name, // Map 'prod_name' to 'prod_name'
       prod_img: item.image, // Map 'prod_image' to 'image'
       prod_description: item.prod_description, // Map 'prod_description' to 'prod_description'
@@ -1249,7 +1249,7 @@ const Checkout = () => {
                               style={{
                                 color: "red",
                                 textDecoration: "line-through",
-                                fontSize: "13px",
+                                fontSize: "14px",
                                 marginRight: "5px",
                               }}
                             >
@@ -1260,6 +1260,7 @@ const Checkout = () => {
                             <div>
                               <label>
                                 <input
+                                style={{marginLeft:'10px'}}
                                   type="checkbox"
                                   checked={buyLaterItems.includes(item.id)}
                                   onChange={() => handleBuyLaterToggle(item.id)}

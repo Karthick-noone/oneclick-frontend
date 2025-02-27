@@ -184,6 +184,7 @@
     gap: 10px; /* Add space between filter items */
     margin-bottom: 15px;
     flex-wrap: wrap; /* Ensure wrapping if items overflow */
+    margin-top: 5px;
   }
 
   /* Row 2: Month and Year */
@@ -533,7 +534,7 @@
   padding: 10px;
   border-radius: 8px;
   max-width: 550px;
-  margin: auto;
+  /* margin: auto; */
   position: relative;
   margin-top: 100px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -541,7 +542,7 @@
   flex-direction: column;
   gap: 20px;
   zoom: 0.9;
-  z-index: 9999;
+  /* z-index: 9999; */
 }
 
 

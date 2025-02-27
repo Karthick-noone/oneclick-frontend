@@ -121,7 +121,7 @@ const Reports = () => {
     "November",
     "December",
   ];
-  const statuses = ["Pending", "Paid", "Refund", "Refund Pending"];
+  const statuses = ["Pending", "Paid", "Refund Pending", "Refunded"];
 
   // Filter orders based on year, month, and status
   const filteredOrders = ordersReport.filter((order) => {
@@ -253,59 +253,65 @@ const Reports = () => {
         <div className="orders-header">
           <h2 className="orders-page-title">Order Report</h2>
         </div>
+
+        <div className="filters">
+          <input
+            type="text"
+            placeholder="Search by username"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+
+          <select
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            value={selectedStatus}
+            className="order_status_filter"
+          >
+            <option  value="">Order Status</option>
+            {statuses.map((status) => (
+              <option key={status} value={status}>
+            <span className="order_status_option">{status}</span>
+                
+              </option>
+            ))}
+          </select>
+
+          <select
+            id="year"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            style={{ width: "25px" }}
+            className="order_month_filter"
+
+          >
+            {Array.from(
+              { length: 5 },
+              (_, i) => new Date().getFullYear() - i
+            ).map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+
+          <select
+            id="month"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            style={{ width: "25px" }}
+            className="order_year_filter"
+
+          >
+            {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+              <option key={month} value={month}>
+                {new Date(0, month - 1).toLocaleString("en-US", {
+                  month: "long",
+                })}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="table-wrapper">
-          <div className="filters">
-            <input
-              type="text"
-              placeholder="Search by username"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-
-            <select
-              id="year"
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(Number(e.target.value))}
-              style={{ width: "25px" }}
-            >
-              {Array.from(
-                { length: 5 },
-                (_, i) => new Date().getFullYear() - i
-              ).map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-
-            <select
-              id="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(Number(e.target.value))}
-              style={{ width: "25px" }}
-            >
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                <option key={month} value={month}>
-                  {new Date(0, month - 1).toLocaleString("en-US", {
-                    month: "long",
-                  })}
-                </option>
-              ))}
-            </select>
-
-            <select
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              value={selectedStatus}
-            >
-              <option value="">Order Status</option>
-              {statuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </div>
-
           <table className="styled-table">
             <thead>
               <tr>
@@ -321,14 +327,16 @@ const Reports = () => {
               </tr>
             </thead>
             <tbody>
-              {currentOrders.map((order, index) => (
+            {currentOrders.length > 0 ? (
+
+              currentOrders.map((order, index) => (
                 <tr key={index}>
                   <td>{indexOfFirstOrderItem + index + 1}</td>
                   <td>#{order.unique_id}</td>
                   <td>{formatDate(order.order_date)}</td>
                   <td>{order.username}</td>
                   <td>{order.contact_number}</td>
-                  
+
                   <td>{order.total_amount}</td>
                   <td>{order.payment_method}</td>
                   <td>{order.status}</td>
@@ -342,7 +350,19 @@ const Reports = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
+                   ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="11"
+                        style={{ textAlign: "center", padding: "20px" }}
+                      >
+                        No orders found
+                      </td>
+                    </tr>
+                  )}
+
+
             </tbody>
           </table>
         </div>

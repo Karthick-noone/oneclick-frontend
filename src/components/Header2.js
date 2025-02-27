@@ -436,7 +436,7 @@ const Header2 = () => {
 
     return cartItems
       .reduce((total, item) => {
-        const price = parseFloat(isOfferActive? item.offer_price : item.prod_price);
+        const price = parseFloat(item.offer_price > 0 ? item.offer_price : item.prod_price);
         return total + (isNaN(price) ? 0 : price * item.quantity);
       }, 0)
       .toFixed(0);
@@ -828,7 +828,7 @@ const Header2 = () => {
       fetchCartItems();
 
       // Set an interval to fetch cart items every 5 seconds
-      const intervalId = setInterval(fetchCartItems, 100); // 5000ms = 5 seconds
+      const intervalId = setInterval(fetchCartItems, 5000); // 5000ms = 5 seconds
 
       // Clean up the interval on component unmount or when `email` changes
       return () => clearInterval(intervalId);

@@ -278,9 +278,9 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
         (filterDeliveryStatus === "Refund Pending" &&
           order.status &&
           order.status === "Refund Pending") ||
-        (filterDeliveryStatus === "Refund" &&
+        (filterDeliveryStatus === "Refunded" &&
           order.status &&
-          order.status === "Refund"))
+          order.status === "Refunded"))
       // Filter by selected delivery status
     );
   });
@@ -593,11 +593,11 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
         <input
           type="radio"
           name="deliveryStatus"
-          value="Refund"
-          checked={filterDeliveryStatus === "Refund"}
-          onChange={() => setFilterDeliveryStatus("Refund")}
+          value="Refunded"
+          checked={filterDeliveryStatus === "Refunded"}
+          onChange={() => setFilterDeliveryStatus("Refunded")}
         />
-        Refund
+        Refunded
       </label>
     </div>
   </div>
@@ -723,9 +723,9 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                                   <option value="Pending">Pending</option>
                                   <option value="Paid">Paid</option>
                                   <option value="Refund Pending">
-                                    Refund Pendng
+                                    Refund Pending
                                   </option>
-                                  <option value="Refund">Refund</option>
+                                  <option value="Refunded">Refunded</option>
                                 </select>
                                 <FaCheck
                                   className="tick-icon"
@@ -755,10 +755,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                                 <FaEdit
                                   className="edit-icon"
                                   onClick={() => {
-                                    if (order.delivery_status !== "Cancelled") {
-                                      setEditingRow(order.unique_id);
-                                      setSelectedStatus(order.status);
-                                    }
+                                    setEditingRow(order.unique_id);
+                                    setSelectedStatus(order.status);
                                   }}
                                   style={{
                                     cursor:

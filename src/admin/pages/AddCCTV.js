@@ -1,8 +1,16 @@
-import React, { useState, useEffect, useref } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes, FaClone } from "react-icons/fa"; // Import icons
+import {
+  FaEdit,
+  FaTrash,
+  FaEye,
+  FaTimes,
+  FaClone,
+  FaFile,
+  FaImages,
+} from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +29,7 @@ const CCTV = ({ isOpen, onClose }) => {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: "",
-    image: [],
+    images: [],
     features: "",
     price: "",
     label: "",
@@ -32,6 +40,8 @@ const CCTV = ({ isOpen, onClose }) => {
     // coupon_expiry_date: "",
     actual_price: "", // Add actual price field
   });
+  const fileInputRef = useRef(null);
+  const [imageCount, setImageCount] = useState(0);
   const [editingProduct, setEditingProduct] = useState(null); // To handle the product being edited
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal open/close state
   const navigate = useNavigate();
@@ -70,24 +80,21 @@ const CCTV = ({ isOpen, onClose }) => {
       }
     }, 100);
   }, []);
-  
-
 
   const [isModalOpen2, setIsModalOpen2] = useState(false);
-    const [modalProductId, setModalProductId] = useState(null);
-    
-      // Handle opening modal and passing productId
-    
-      const openProductModal = (productId) => {
-        setModalProductId(productId);
-        setIsModalOpen2(true);
-      };
-    
-      const closeProductModal = () => {
-        setIsModalOpen2(false);
-        setModalProductId(null);
-      };
+  const [modalProductId, setModalProductId] = useState(null);
 
+  // Handle opening modal and passing productId
+
+  const openProductModal = (productId) => {
+    setModalProductId(productId);
+    setIsModalOpen2(true);
+  };
+
+  const closeProductModal = () => {
+    setIsModalOpen2(false);
+    setModalProductId(null);
+  };
 
   // Handle opening modal and passing productId
   const handleOpenOfferModal = (id) => {
@@ -128,26 +135,25 @@ const CCTV = ({ isOpen, onClose }) => {
   };
 
   const handleChangePrice = (e, productPrice) => {
-     const value = e.target.value;
-   
-     // Allow only numbers (integer or decimal with up to 2 places), but no leading zero unless decimal.
-     const regex = /^(0|[1-9]\d*)(\.\d{0,2})?$/;
-   
-     if (regex.test(value) || value === "") {
-       if (parseFloat(value) <= productPrice || value === "") {
-         setOfferPrice(value);
-       } else {
-         Swal.fire({
-           icon: "warning",
-           title: "Invalid Price",
-           text: `Offer price cannot exceed ${productPrice}`,
-           confirmButtonColor: "#d33",
-           timer: 3000,
-         });
-       }
-     }
-   };
- 
+    const value = e.target.value;
+
+    // Allow only numbers (integer or decimal with up to 2 places), but no leading zero unless decimal.
+    const regex = /^(0|[1-9]\d*)(\.\d{0,2})?$/;
+
+    if (regex.test(value) || value === "") {
+      if (parseFloat(value) <= productPrice || value === "") {
+        setOfferPrice(value);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Price",
+          text: `Offer price cannot exceed ${productPrice}`,
+          confirmButtonColor: "#d33",
+          timer: 3000,
+        });
+      }
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -425,76 +431,81 @@ const CCTV = ({ isOpen, onClose }) => {
   const handleCouponUpdated = () => {
     console.log("Coupon updated successfully!");
   };
+ const MAX_FILES = 5; // Set your file limit
+
   const handleFileChange = (productId, event) => {
-    const files = Array.from(event.target.files); // Convert FileList to array
+    const files = Array.from(event.target.files);
+  
+    // Get the existing files for this product (or an empty array)
+    const existingFiles = newImages[productId] || [];
+    const existingFileNames = existingFiles.map((file) => file.name);
+  
+    // Check if adding new files exceeds the limit
+    if (existingFiles.length + files.length > MAX_FILES) {
+      Swal.fire({
+        icon: "warning",
+        title: "File Limit Exceeded",
+        text: `You can only upload up to ${MAX_FILES} images.`,
+      }).then(() => {
+        event.target.value = ""; // Clear the file input field
+      });
+      return;
+    }
+  
+    // Filter out duplicate files based on name
+    const uniqueFiles = files.filter(
+      (file) => !existingFileNames.includes(file.name)
+    );
+  
+    if (uniqueFiles.length === 0) return; // No new images
+  
     const resizedFiles = [];
-
-    files.forEach((file) => {
-      console.log(`Selected file for product ID ${productId}:`, file);
-
+  
+    uniqueFiles.forEach((file) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         const img = new Image();
         img.src = e.target.result;
         img.onload = () => {
-          console.log("Original image dimensions:", img.width, img.height);
-
           const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Define max width
+          const MAX_WIDTH = 500; // Maximum width for the image
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
-
+  
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          console.log("Resizing image to:", canvas.width, canvas.height);
-
+  
           // Compress and convert to blob
           canvas.toBlob(
             (blob) => {
-              console.log(
-                "Resized image size (in KB):",
-                (blob.size / 1024).toFixed(2)
-              );
-
+              const processBlob = (finalBlob) => {
+                const processedFile = new File([finalBlob], file.name, {
+                  type: "image/jpeg",
+                });
+                resizedFiles.push(processedFile);
+  
+                if (resizedFiles.length === uniqueFiles.length) {
+                  setNewImages((prev) => ({
+                    ...prev,
+                    [productId]: [...(prev[productId] || []), ...resizedFiles],
+                  }));
+                }
+              };
+  
               if (blob.size / 1024 < 50) {
-                console.log("Image is under 50 KB, ready for upload.");
-                resizedFiles.push(blob); // Add resized image to array
+                processBlob(blob);
               } else {
-                console.log(
-                  "Image still above 50 KB, applying further compression."
-                );
                 canvas.toBlob(
                   (compressedBlob) => {
-                    console.log(
-                      "Compressed image size (in KB):",
-                      (compressedBlob.size / 1024).toFixed(2)
-                    );
-                    resizedFiles.push(compressedBlob);
-
-                    // Update state after all files processed
-                    if (resizedFiles.length === files.length) {
-                      setNewImages((prev) => ({
-                        ...prev,
-                        [productId]: resizedFiles,
-                      }));
-                    }
+                    processBlob(compressedBlob);
                   },
                   "image/jpeg",
                   0.7
                 );
-              }
-
-              // Update state after all files processed
-              if (resizedFiles.length === files.length) {
-                setNewImages((prev) => ({
-                  ...prev,
-                  [productId]: resizedFiles,
-                }));
               }
             },
             "image/jpeg",
@@ -801,74 +812,79 @@ const CCTV = ({ isOpen, onClose }) => {
   //   });
   // };
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files); // Convert FileList to an array
-    const resizedFiles = [];
-
-    files.forEach((file) => {
-      console.log("Selected image for upload:", file);
-
+    const handleImageChange = async (e) => {
+    const files = Array.from(e.target.files);
+  
+    // If more than 5 images are selected, show an alert and prevent upload
+    if (files.length > 5) {
+      Swal.fire({
+        icon: "warning",
+        title: "Image Upload Limit",
+        text: "You can upload a maximum of 5 images at a time.",
+        confirmButtonText: "OK",
+      });
+      e.target.value = ""; // Reset input to allow re-selection
+      return;
+    }
+  
+    // Resize images before adding them
+    const resizedImages = await Promise.all(files.map((file) => resizeImage(file)));
+  
+    setNewProduct((prevProduct) => {
+      // Convert existing images to a comparable format
+      const existingImages = prevProduct.images.map((img) => img.name || img);
+  
+      // Filter out duplicates
+      const newUniqueImages = resizedImages.filter(
+        (newImg) => !existingImages.includes(newImg.name || newImg)
+      );
+  
+      return {
+        ...prevProduct,
+        images: [...prevProduct.images, ...newUniqueImages], // Append only unique images
+      };
+    });
+  
+    setImageCount(resizedImages.length);
+  
+    // Reset file input to allow selecting new files again
+    e.target.value = "";
+  };
+  
+  const resizeImage = (file) => {
+    return new Promise((resolve) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (event) => {
         const img = new Image();
         img.src = event.target.result;
         img.onload = () => {
-          console.log("Original image dimensions:", img.width, img.height);
-
           const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Define max width
+          const MAX_WIDTH = 500;
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
-
+  
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          console.log("Resizing image to:", canvas.width, canvas.height);
-
+  
           canvas.toBlob(
             (blob) => {
-              console.log(
-                "Resized image size (in KB):",
-                (blob.size / 1024).toFixed(2)
-              );
               if (blob.size / 1024 < 50) {
-                console.log("Image is under 50 KB, ready for upload.");
-                resizedFiles.push(blob); // Add resized image to the array
+                resolve(new File([blob], file.name, { type: "image/jpeg" }));
               } else {
-                console.log(
-                  "Image still above 50 KB, applying further compression."
-                );
-                // Further compress if above 50 KB
                 canvas.toBlob(
-                  (compressedBlob) => {
-                    console.log(
-                      "Compressed image size (in KB):",
-                      (compressedBlob.size / 1024).toFixed(2)
-                    );
-                    resizedFiles.push(compressedBlob);
-                    // Update state after processing all files
-                    if (resizedFiles.length === files.length) {
-                      setNewProduct((prevProduct) => ({
-                        ...prevProduct,
-                        images: resizedFiles,
-                      }));
-                    }
-                  },
+                  (compressedBlob) =>
+                    resolve(
+                      new File([compressedBlob], file.name, {
+                        type: "image/jpeg",
+                      })
+                    ),
                   "image/jpeg",
                   0.7
                 );
-              }
-
-              // Update state after processing all files
-              if (resizedFiles.length === files.length) {
-                setNewProduct((prevProduct) => ({
-                  ...prevProduct,
-                  images: resizedFiles,
-                }));
               }
             },
             "image/jpeg",
@@ -880,7 +896,7 @@ const CCTV = ({ isOpen, onClose }) => {
   };
 
   const handleAddProduct = async () => {
-    if (newProduct.label && newProduct.label.length > 15) {
+    if (newProduct.label && newProduct.label.replace(/\s/g, "").length > 15) {
       Swal.fire({
         icon: "warning",
         title: "Validation Error",
@@ -988,9 +1004,14 @@ const CCTV = ({ isOpen, onClose }) => {
     formData.append("productStatus", productStatus); // Add product status to the formData
 
     // Append each image file to the FormData
-    newProduct.images.forEach((image) => {
-      formData.append("images", image); // Use 'images' for multiple file upload
+    newProduct.images.forEach((image, index) => {
+      if (image instanceof File) {
+        formData.append("images", image);
+      } else {
+        formData.append(`images${index}`, image);
+      }
     });
+
 
     try {
       await axios.post(`${ApiUrl}/cctv`, formData, {
@@ -1021,7 +1042,7 @@ const CCTV = ({ isOpen, onClose }) => {
         coupon: "",
         category: "", // Clear the category here
       });
-
+      setImageCount(0);
       document.querySelector('input[type="file"]').value = ""; // Reset file input
     } catch (error) {
       console.error("Error adding product:", error);
@@ -1061,9 +1082,8 @@ const CCTV = ({ isOpen, onClose }) => {
       coupon: product.coupon,
       category: product.category,
     });
-    setModalIsOpen(true); 
-       openProductModal(false);
-
+    setModalIsOpen(true);
+    openProductModal(false);
   };
 
   const handleUpdateProduct = async () => {
@@ -1376,13 +1396,15 @@ const CCTV = ({ isOpen, onClose }) => {
     const day = String(date.getDate()).padStart(2, "0");
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-  
+
     return `${year}-${month}-${day}T${hours}:${minutes}`; // Format for datetime-local input
   };
-  
+
   const today = new Date();
   const minDate = getFormattedDate(today);
-  const maxDate = getFormattedDate(new Date(today.setDate(today.getDate() + 10)));
+  const maxDate = getFormattedDate(
+    new Date(today.setDate(today.getDate() + 10))
+  );
 
   const handleDeleteCoupon = async (couponId) => {
     const confirmation = window.confirm(
@@ -1516,11 +1538,23 @@ const CCTV = ({ isOpen, onClose }) => {
             <label className="laptops-label">Product Image</label>
             <input
               accept="image/jpeg, image/png"
+              ref={fileInputRef}
               multiple
               onChange={handleImageChange}
+              style={{ display: "none" }}
               type="file"
               className="laptops-file-input"
             />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current.click()}
+              className="custom-file-input-button"
+            >
+              <FaImages className="file-icon" />
+              {imageCount > 0
+                ? `Selected Images: ${imageCount}`
+                : "Choose Images"}
+            </button>
 
             <label className="laptops-label">Features</label>
             <textarea
@@ -1550,9 +1584,11 @@ const CCTV = ({ isOpen, onClose }) => {
                 <div className="laptops-product-image">
                   <div className="slider-container">
                     <Slider
-                      {...{
+                        {...{
                         ...settings,
                         arrows: product.prod_img.length > 1,
+                        draggable: product.prod_img.length > 1, // Disable dragging if only one image exists
+                        swipe: product.prod_img.length > 1, // Disable swipe gestures on touch devices for one image
                       }}
                     >
                       {product.prod_img.map((img, imgIndex) => (
@@ -1595,18 +1631,28 @@ const CCTV = ({ isOpen, onClose }) => {
                   </h3>
 
                   {/* "View" button to trigger modal */}
-                 
                 </div>
 
                 <div>
-                  <span style={{textDecoration:"line-through", color:'red', fontSize:'14px'}}>₹{product.actual_price}</span>  <span style={{color:'green',marginLeft:'5px'}}>₹{product.prod_price}</span>
+                  <span
+                    style={{
+                      textDecoration: "line-through",
+                      color: "red",
+                      fontSize: "14px",
+                    }}
+                  >
+                    ₹{product.actual_price}
+                  </span>{" "}
+                  <span style={{ color: "green", marginLeft: "5px" }}>
+                    ₹{product.prod_price}
+                  </span>
                 </div>
                 <button
-                    className="view-details-btn"
-                    onClick={() => openProductModal(product.id)} // Pass product ID to open modal
-                  >
-                    <FaEye /> View Details
-                  </button>
+                  className="view-details-btn"
+                  onClick={() => openProductModal(product.id)} // Pass product ID to open modal
+                >
+                  <FaEye /> View Details
+                </button>
                 <div className="laptops-product-actions">
                   <button
                     onClick={() => handleEditProduct(product)}
@@ -1660,7 +1706,6 @@ const CCTV = ({ isOpen, onClose }) => {
                                 <span>₹{product.deliverycharge}</span>
                               </p>
                               <p>
-                         
                                 <strong>Features</strong>
                                 <span>{product.prod_features}</span>
                               </p>
@@ -1756,7 +1801,12 @@ const CCTV = ({ isOpen, onClose }) => {
                                       <input
                                         type="number"
                                         value={offerPrice}
-                                        onChange={(e) => handleChangePrice(e, product.prod_price)} // Pass product.prod_price
+                                        onChange={(e) =>
+                                          handleChangePrice(
+                                            e,
+                                            product.prod_price
+                                          )
+                                        } // Pass product.prod_price
                                         required
                                         className="offer-input"
                                       />
@@ -1790,6 +1840,7 @@ const CCTV = ({ isOpen, onClose }) => {
                                   className="file-input"
                                   multiple
                                   type="file"
+                                  accept="image/jpeg, image/png"
                                   onChange={(e) =>
                                     handleFileChange(product.id, e)
                                   }
@@ -2059,8 +2110,6 @@ const CCTV = ({ isOpen, onClose }) => {
               </div>
             ))}
         </div>
-
-
       </div>
       {/* Modal for Image Upload */}
       <Modal
@@ -2073,7 +2122,6 @@ const CCTV = ({ isOpen, onClose }) => {
         <input
           type="file"
           accept="image/jpeg, image/png"
-
           onChange={handleImageUpload} // Keep this function for handling file selection
           style={inputStyle}
         />
@@ -2119,213 +2167,211 @@ const CCTV = ({ isOpen, onClose }) => {
 
       {/* Modal for editing a product */}
       {/* Modal for editing a product */}
-       {editingProduct && (
-             <Modal
-               isOpen={modalIsOpen}
-               onRequestClose={() => setModalIsOpen(false)}
-               contentLabel="Edit Product"
-               className="editmodal"
-               overlayClassName="adminmodal-overlay"
-             >
-               <div className="adminmodal-header">
-                 <h2>Edit Product</h2>
-                 <button
-                   onClick={() => setModalIsOpen(false)}
-                   className="adminmodal-close-btn"
-                 >
-                   &times;
-                 </button>
-               </div>
-     
-               <div className="adminmodal-body">
-           <div className="part1">
-                   <div className="feature-item">
-                     <label className="feature-label">Name</label>
-                     <input
-                       type="text"
-                       name="name"
-                       value={editingProduct.name}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           name: e.target.value,
-                         })
-                       }
-                       placeholder="Enter product name"
-                       className="adminmodal-input"
-                     />
-                   </div>
-                   <div className="feature-item">
-                     <label className="feature-label">Subtitle</label>
-     
-                     <input
-                       type="text"
-                       name="subtitle"
-                       value={editingProduct.subtitle}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           subtitle: e.target.value,
-                         })
-                       }
-                       placeholder="Enter subtitle"
-                       className="adminmodal-input"
-                     />
-                   </div>
-     
-                   <div className="feature-item">
-                     <label className="feature-label">M.R.P Price</label>
-     
-                     <input
-                       type="text"
-                       name="actual_price"
-                       value={editingProduct.actual_price}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           actual_price: e.target.value,
-                         })
-                       }
-                       placeholder="Enter actual price"
-                       className="adminmodal-input"
-                     />
-                   </div>
-     
-                   <div className="feature-item">
-                     <label className="feature-label">Price</label>
-     
-                     <input
-                       type="text"
-                       name="price"
-                       value={editingProduct.price}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           price: e.target.value,
-                         })
-                       }
-                       placeholder="Enter product price"
-                       className="adminmodal-input"
-                     />
-                   </div>
-     
-                   <div className="feature-item">
-                     <label className="feature-label">Offer label</label>
-     
-                     <input
-                       type="text"
-                       name="label"
-                       value={editingProduct.label}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           label: e.target.value,
-                         })
-                       }
-                       placeholder="Enter label"
-                       className="adminmodal-input"
-                     />
-                   </div>
-     
-                   <div className="feature-item">
-                     <label className="feature-label">Delivery charge</label>
-                     <input
-                       type="text"
-                       name="deliverycharge"
-                       value={editingProduct.deliverycharge}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           deliverycharge: e.target.value,
-                         })
-                       }
-                       placeholder="Enter deliverycharge"
-                       className="adminmodal-input"
-                     />
-                   </div>
+      {editingProduct && (
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={() => setModalIsOpen(false)}
+          contentLabel="Edit Product"
+          className="editmodal"
+          overlayClassName="adminmodal-overlay"
+        >
+          <div className="adminmodal-header">
+            <h2>Edit Product</h2>
+            <button
+              onClick={() => setModalIsOpen(false)}
+              className="adminmodal-close-btn"
+            >
+              &times;
+            </button>
+          </div>
 
-                 </div>
-     
-                 {/* Features Section */}
-                 <div className="part2">
-                   <div className="product-features-container">
+          <div className="adminmodal-body">
+            <div className="part1">
+              <div className="feature-item">
+                <label className="feature-label">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={editingProduct.name}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      name: e.target.value,
+                    })
+                  }
+                  placeholder="Enter product name"
+                  className="adminmodal-input"
+                />
+              </div>
+              <div className="feature-item">
+                <label className="feature-label">Subtitle</label>
 
-                     {/* Others (Textarea) */}
-                     <div className="feature-item">
-                       <label className="feature-label">Features</label>
-                       <textarea
-                         name="others"
-                         value={editingProduct.features}
-                         onChange={(e) =>
-                           setEditingProduct({
-                             ...editingProduct,
-                             features: e.target.value,
-                           })
-                         }
-                         placeholder="Enter other features"
-                         className="feature-textarea"
-                         rows="4"
-                       />
-                     </div>
-     
-                     <div className="feature-item">
-                     <label className="feature-label">
-                       In Stock or Out Of Stock
-                     </label>
-     
-                     <select
-                       name="status"
-                       value={editingProduct.status}
-                       onChange={(e) =>
-                         setEditingProduct({
-                           ...editingProduct,
-                           status: e.target.value,
-                         })
-                       }
-                       className="adminmodal-input5"
-                     >
-                 <option value="available">In Stock</option>
-                 <option value="unavailable">Out Of Stock</option>
-                     </select>
-                     </div>
-     
-                     <div className="feature-item">
-     
-             <label className="feature-label">Approve or Unapprove</label>
-     
-             <select
-                        disabled={role === 'Staff'}
-     
-                 name="productStatus"
-                 value={editingProduct.productStatus}
-                 onChange={(e) =>
-                   setEditingProduct({ ...editingProduct, productStatus: e.target.value })
-                 }
-                 className="adminmodal-input5"
-               >
-                 <option value="approved">Approve</option>
-                 <option value="unapproved">UnApprove</option>
-               </select>
-           
-           </div>
-     
-                   <button
-                     onClick={handleUpdateProduct}
-                     className="adminmodal-update-btn"
-                   >
-                     Update
-                   </button>
-                   <button
-                     onClick={() => setModalIsOpen(false)}
-                     className="adminmodal-cancel-btn"
-                   >
-                     Cancel
-                   </button>
-                   </div>
-                 </div>
-               </div>
-             </Modal>
-           )}
+                <input
+                  type="text"
+                  name="subtitle"
+                  value={editingProduct.subtitle}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      subtitle: e.target.value,
+                    })
+                  }
+                  placeholder="Enter subtitle"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">M.R.P Price</label>
+
+                <input
+                  type="text"
+                  name="actual_price"
+                  value={editingProduct.actual_price}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      actual_price: e.target.value,
+                    })
+                  }
+                  placeholder="Enter actual price"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">Price</label>
+
+                <input
+                  type="text"
+                  name="price"
+                  value={editingProduct.price}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      price: e.target.value,
+                    })
+                  }
+                  placeholder="Enter product price"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">Offer label</label>
+
+                <input
+                  type="text"
+                  name="label"
+                  value={editingProduct.label}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      label: e.target.value,
+                    })
+                  }
+                  placeholder="Enter label"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">Delivery charge</label>
+                <input
+                  type="text"
+                  name="deliverycharge"
+                  value={editingProduct.deliverycharge}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      deliverycharge: e.target.value,
+                    })
+                  }
+                  placeholder="Enter deliverycharge"
+                  className="adminmodal-input"
+                />
+              </div>
+            </div>
+
+            {/* Features Section */}
+            <div className="part2">
+              <div className="product-features-container">
+                {/* Others (Textarea) */}
+                <div className="feature-item">
+                  <label className="feature-label">Features</label>
+                  <textarea
+                    name="others"
+                    value={editingProduct.features}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        features: e.target.value,
+                      })
+                    }
+                    placeholder="Enter other features"
+                    className="feature-textarea"
+                    rows="4"
+                  />
+                </div>
+
+                <div className="feature-item">
+                  <label className="feature-label">
+                    In Stock or Out Of Stock
+                  </label>
+
+                  <select
+                    name="status"
+                    value={editingProduct.status}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        status: e.target.value,
+                      })
+                    }
+                    className="adminmodal-input5"
+                  >
+                    <option value="available">In Stock</option>
+                    <option value="unavailable">Out Of Stock</option>
+                  </select>
+                </div>
+
+                <div className="feature-item">
+                  <label className="feature-label">Approve or Unapprove</label>
+
+                  <select
+                    disabled={role === "Staff"}
+                    name="productStatus"
+                    value={editingProduct.productStatus}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        productStatus: e.target.value,
+                      })
+                    }
+                    className="adminmodal-input5"
+                  >
+                    <option value="approved">Approve</option>
+                    <option value="unapproved">UnApprove</option>
+                  </select>
+                </div>
+
+                <button
+                  onClick={handleUpdateProduct}
+                  className="adminmodal-update-btn"
+                >
+                  Update
+                </button>
+                <button
+                  onClick={() => setModalIsOpen(false)}
+                  className="adminmodal-cancel-btn"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

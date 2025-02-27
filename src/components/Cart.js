@@ -231,7 +231,7 @@ const CartPage = () => {
     return cartItems
       .reduce((total, item) => {
         const price = parseFloat(
-          isOfferActive ? item.offer_price : item.prod_price
+          item.offer_price > 0 ? item.offer_price : item.prod_price
         );
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
 
@@ -245,7 +245,7 @@ const CartPage = () => {
     return cartItems
       .reduce((total, item) => {
         const prod_price = parseFloat(
-          isOfferActive ? item.offer_price : item.prod_price
+          item.offer_price > 0 ? item.offer_price : item.prod_price
         );
         return total + (isNaN(prod_price) ? 0 : prod_price * item.quantity);
       }, 0)
@@ -256,7 +256,7 @@ const CartPage = () => {
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
         const price = parseFloat(
-          isOfferActive ? item.offer_price : item.prod_price
+          item.offer_price > 0 ? item.offer_price : item.prod_price
         );
         const discountPerItem = actual_price - price;
         return (
@@ -271,7 +271,7 @@ const CartPage = () => {
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
         const price = parseFloat(
-          isOfferActive ? item.offer_price : item.prod_price
+          item.offer_price > 0 ? item.offer_price : item.prod_price
         );
         const discountPerItem = actual_price - price;
         return (
