@@ -496,7 +496,7 @@ const ProductList = () => {
                         >
                           ₹{product.actual_price}
                         </span>
-                      </span>
+                      </span> 
                       <br />
                       <span
                         className="discount"

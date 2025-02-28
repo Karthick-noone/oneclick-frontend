@@ -104,9 +104,9 @@ const App = () => {
         <Route path="/Purchase" element={<BuyNow />} />
         <Route path="/MyAccount" element={<MyAccount />} />
         <Route path="/MyOrders" element={<MyOrders />} />
-        <Route path="/ComputerAdBanner" element={<ComputerAdBanner />} />
-        <Route path="/CCTVAdBanner" element={<CCTVAdBanner />} />
-        <Route path="/MobileAdBanner" element={<MobileAdBanner />} />
+        <Route path="/ComputerAd" element={<ComputerAdBanner />} />
+        <Route path="/CCTVAd" element={<CCTVAdBanner />} />
+        <Route path="/MobileAd" element={<MobileAdBanner />} />
         <Route path="/FilterBar" element={<FilterBar />} />
         <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
         <Route path="/Admin/*" element={<AdminMain />} />{" "}

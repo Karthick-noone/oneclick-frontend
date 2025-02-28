@@ -121,13 +121,11 @@ const Header2 = () => {
   };
   const navigate = useNavigate();
 
-  useEffect(() => {
+useEffect(() => {
     const fetchSuggestions = async () => {
       try {
         const response = await fetch(
-          `${ApiUrl}/api/suggestions?query=${encodeURIComponent(
-            searchQuery.trim()
-          )}`
+          `${ApiUrl}/api/suggestions?query=${encodeURIComponent(searchQuery.trim())}`
         );
         if (response.ok) {
           const data = await response.json();
@@ -153,7 +151,7 @@ const Header2 = () => {
     } else {
       setSuggestions([]);
       setIsDropdownOpen3(false);
-      setErrorMessage(""); // Clear error message if input is empty
+      setErrorMessage("");
     }
   }, [searchQuery]);
 
@@ -161,6 +159,7 @@ const Header2 = () => {
     setSearchQuery(e.target.value);
   };
 
+  // Define your category and keyword mappings
   const keywordMapping = [
     {
       term: "Computers",
@@ -184,8 +183,9 @@ const Header2 = () => {
         "phones",
         "phone",
         "android",
+        "oneplus", // add the normalized product name here
       ],
-    }, // Added xiomi and redmi here
+    },
     { term: "CCTV", keywords: ["cctv", "security camera", "surveillance"] },
     {
       term: "Printers",
@@ -247,99 +247,98 @@ const Header2 = () => {
     },
   ];
 
+  // Synonym mapping to normalize variations; note how "one plus" maps to "oneplus"
   const synonymMapping = {
     xiaomi: "redmi",
-    redmi: "redmi", // This can help in consistency for checks
+    redmi: "redmi",
+    "one plus": "oneplus",
+    oneplus: "oneplus",
   };
 
   const handleSearch = async () => {
-    let searchTerm = searchQuery.trim().toLowerCase(); // Convert input to lowercase for comparison
-    console.log("Search term:", searchTerm); // Log the search term
+    // Lowercase and trim the query
+    let searchTerm = searchQuery.trim().toLowerCase();
+    console.log("Original search term:", searchTerm);
 
-    // Map the search term if it's a synonym
+    // Clean the search term by removing all whitespace
+    const cleanedSearchTerm = searchTerm.replace(/\s+/g, "");
+    console.log("Cleaned search term:", cleanedSearchTerm);
+
+    // Map the search term if there's a synonym match
     if (synonymMapping[searchTerm]) {
-      searchTerm = synonymMapping[searchTerm]; // Replace the term with its synonym
-      console.log("Mapped search term:", searchTerm); // Log the mapped term
+      searchTerm = synonymMapping[searchTerm];
+      console.log("Mapped search term:", searchTerm);
+    } else if (synonymMapping[cleanedSearchTerm]) {
+      searchTerm = synonymMapping[cleanedSearchTerm];
+      console.log("Mapped search term after cleaning:", searchTerm);
+    } else {
+      // Otherwise, use the cleaned term for matching
+      searchTerm = cleanedSearchTerm;
+      console.log("Using cleaned search term for matching:", searchTerm);
     }
 
     if (searchTerm) {
-      // 1. First, check locally using priority categories
-      const foundCategory = keywordMapping.find(
-        (mapping) =>
-          mapping.term !== "ComputerAccessories" &&
-          mapping.term !== "MobileAccessories" &&
-          mapping.keywords.some(
-            (keyword) => searchTerm === keyword.toLowerCase()
-          ) // Use exact match
+      // 1. Check local keyword mapping for priority categories (excluding accessories)
+      const foundCategory = keywordMapping.find((mapping) =>
+        mapping.term !== "ComputerAccessories" &&
+        mapping.term !== "MobileAccessories" &&
+        mapping.keywords.some(
+          (keyword) =>
+            searchTerm === keyword.toLowerCase().replace(/\s+/g, "")
+        )
       );
 
-      console.log("Found category in priority categories:", foundCategory); // Log found category
+      console.log("Found category in priority categories:", foundCategory);
 
       if (foundCategory) {
-        // If a priority category match is found, navigate to that category
-        console.log(`Navigating to category: ${foundCategory.term}`); // Log navigation
+        console.log(`Navigating to category: ${foundCategory.term}`);
         navigate(
-          `/${encodeURIComponent(
-            foundCategory.term
-          )}?search=${encodeURIComponent(searchTerm)}`
+          `/${encodeURIComponent(foundCategory.term)}?search=${encodeURIComponent(searchTerm)}`
         );
       } else {
-        // 2. If no priority category found, check for accessories
-        const accessoryFound = keywordMapping.find(
-          (mapping) =>
-            (mapping.term === "ComputerAccessories" ||
-              mapping.term === "MobileAccessories") &&
-            mapping.keywords.some(
-              (keyword) => searchTerm === keyword.toLowerCase()
-            ) // Use exact match
+        // 2. Check accessory categories if no match was found in priority
+        const accessoryFound = keywordMapping.find((mapping) =>
+          (mapping.term === "ComputerAccessories" ||
+            mapping.term === "MobileAccessories") &&
+          mapping.keywords.some(
+            (keyword) =>
+              searchTerm === keyword.toLowerCase().replace(/\s+/g, "")
+          )
         );
 
-        console.log("Found category in accessories:", accessoryFound); // Log found accessory
+        console.log("Found category in accessories:", accessoryFound);
 
         if (accessoryFound) {
-          console.log(
-            `Navigating to accessory category: ${accessoryFound.term}`
-          ); // Log navigation to accessory
+          console.log(`Navigating to accessory category: ${accessoryFound.term}`);
           navigate(
-            `/${encodeURIComponent(
-              accessoryFound.term
-            )}?search=${encodeURIComponent(searchTerm)}`
+            `/${encodeURIComponent(accessoryFound.term)}?search=${encodeURIComponent(searchTerm)}`
           );
         } else {
           // 3. If no local match, call the backend API for suggestions
-          console.log(
-            "No local match found, calling backend API for suggestions."
-          );
+          console.log("No local match found, calling backend API for suggestions.");
           try {
             const response = await fetch(
-              `${ApiUrl}/api/suggestions?query=${encodeURIComponent(
-                searchQuery.trim()
-              )}`
+              `${ApiUrl}/api/suggestions?query=${encodeURIComponent(searchQuery.trim())}`
             );
 
             if (response.ok) {
               const data = await response.json();
-              console.log("API response data:", data); // Log API response
+              console.log("API response data:", data);
 
               if (data.category) {
                 let category = data.category;
-
-                // Explicitly handle backend response for "tv"
+                // Handle special cases for API responses
                 if (category.toLowerCase() === "tv") {
                   category = "TeleVision";
                 } else if (searchQuery.trim().toLowerCase() === "cctv") {
                   category = "CCTV";
                 }
-
-                console.log(`Navigating to category from API: ${category}`); // Log navigation from API
+                console.log(`Navigating to category from API: ${category}`);
                 navigate(
-                  `/${encodeURIComponent(category)}?search=${encodeURIComponent(
-                    searchTerm
-                  )}`
+                  `/${encodeURIComponent(category)}?search=${encodeURIComponent(searchTerm)}`
                 );
               } else {
-                // If the backend doesn't return a category, show "Product not found"
-                console.warn("No category returned from API."); // Log warning
+                console.warn("No category returned from API.");
                 Swal.fire({
                   title: "Product not found",
                   text: "We could not find any products matching your search.",
@@ -348,7 +347,7 @@ const Header2 = () => {
                 });
               }
             } else {
-              console.error("Failed to fetch suggestions from API."); // Log error
+              console.error("Failed to fetch suggestions from API.");
               Swal.fire({
                 title: "Product not found",
                 text: "We could not find any products matching your search.",
@@ -357,7 +356,7 @@ const Header2 = () => {
               });
             }
           } catch (error) {
-            console.error("Error during search:", error); // Log error
+            console.error("Error during search:", error);
             Swal.fire({
               title: "Error",
               text: "An error occurred while searching.",
@@ -368,16 +367,17 @@ const Header2 = () => {
         }
       }
     } else {
-      console.warn("Search term is empty."); // Log warning for empty search term
+      console.warn("Search term is empty.");
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      console.log("Enter key pressed, initiating search."); // Log enter key press
+      console.log("Enter key pressed, initiating search.");
       handleSearch();
     }
   };
+
 
   // const handleSuggestionClick = (suggestion) => {
   //   setSearchQuery(suggestion);

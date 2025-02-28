@@ -402,7 +402,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
       const productResponse = await axios.get(
         `${ApiUrl}/getProductByOrderId/${orderId}`
       );
-      console.log("Product Response Data:", productResponse.data);
+      // console.log("Product Response Data:", productResponse.data);
 
       // Check if any product details are present
       if (!productResponse.data || productResponse.data.length === 0) {

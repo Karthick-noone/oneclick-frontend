@@ -1,6 +1,6 @@
 import React from "react";
 import logo from "./img/logo3.png"; // Ensure the path is correct
-import { HiScissors } from 'react-icons/hi';
+import { HiScissors } from "react-icons/hi";
 
 const Invoice = ({ order, productDetails }) => {
   // Ensure the products array exists and is not empty
@@ -12,7 +12,10 @@ const Invoice = ({ order, productDetails }) => {
     0
   );
   const grandTotal = products.reduce(
-    (acc, product) => acc + (product.prod_price || 0) * (product.quantity || 0),
+    (acc, product) =>
+      acc +
+      (product.prod_price || 0) +
+      (product.delivey_charge || 0) * (product.quantity || 0),
     0
   );
 
@@ -117,11 +120,11 @@ const Invoice = ({ order, productDetails }) => {
           <div>
             <p>Order By: {order.payment_method}</p>
             <p>
-            <strong>Total Products: </strong> {totalQuantity}
-          </p>
-          <p>
-            <strong>Grand Total: </strong> ₹{grandTotal}
-          </p>
+              <strong>Total Products: </strong> {totalQuantity}
+            </p>
+            <p>
+              <strong>Grand Total: </strong> ₹{order.total_amount}
+            </p>
             {/* Removed individual product total calculations here */}
           </div>
         </div>
@@ -133,71 +136,72 @@ const Invoice = ({ order, productDetails }) => {
       </div>
 
       <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: "10px",
+        }}
+      >
+        <hr
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: "10px",
+            flex: "1",
+            borderTop: "1px dotted #333",
+            // margin: "0 10px",
           }}
-        >
-          <hr
-            style={{
-              flex: "1",
-              borderTop: "1px dotted #333",
-              // margin: "0 10px",
-            }}
-          />
-          <HiScissors style={{ fontSize: "20px", color: "#333" }} />
-          <hr
-            style={{
-              flex: "1",
-              borderTop: "1px dotted #333",
-              // margin: "0 10px",
-            }}
-          />
-        </div>
+        />
+        <HiScissors style={{ fontSize: "20px", color: "#333" }} />
+        <hr
+          style={{
+            flex: "1",
+            borderTop: "1px dotted #333",
+            // margin: "0 10px",
+          }}
+        />
+      </div>
 
       {/* Products Table Container */}
       <div
-         style={{
+        style={{
           paddingTop: "20px",
           fontFamily: "Arial, sans-serif",
           border: "1px solid black",
           marginBottom: "30px",
         }}
       >
-         <div
-  style={{
-    paddingLeft: "10px",
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "10px",
-  }}
->
-  <div style={{ flex: "1", paddingRight: "10px" }}>
-    <p>Order By: {order.payment_method}</p>
-    <p>Order ID: #{order.unique_id}</p>
-  </div>
+        <div
+          style={{
+            paddingLeft: "10px",
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "10px",
+          }}
+        >
+          <div style={{ flex: "1", paddingRight: "10px" }}>
+            <p>Order By: {order.payment_method}</p>
+            <p>Order ID: #{order.unique_id}</p>
+          </div>
 
-  <div style={{ flex: "1" }}>
-    <p>Order Date: {new Date(order.order_date).toLocaleDateString()}</p>
-    <p>Invoice Date: {new Date().toLocaleDateString()}</p>
-  </div>
-</div>
+          <div style={{ flex: "1" }}>
+            <p>Order Date: {new Date(order.order_date).toLocaleDateString()}</p>
+            <p>Invoice Date: {new Date().toLocaleDateString()}</p>
+          </div>
+        </div>
 
-        
         <table
           style={{
             width: "98%",
             borderCollapse: "collapse",
             marginBottom: "20px",
-            marginLeft:'5px',
-            marginRight:'5px',
+            marginLeft: "5px",
+            marginRight: "5px",
           }}
         >
           <thead>
             <tr>
-              <th style={{ border: "1px solid #000", padding: "5px" }}>Product</th>
+              <th style={{ border: "1px solid #000", padding: "5px" }}>
+                Product
+              </th>
               <th style={{ border: "1px solid #000", padding: "5px" }}>Qty</th>
               <th style={{ border: "1px solid #000", padding: "5px" }}>Tax</th>
               <th style={{ border: "1px solid #000", padding: "5px" }}>
@@ -219,7 +223,9 @@ const Invoice = ({ order, productDetails }) => {
                   {product.tax || "-"}
                 </td>
                 <td style={{ border: "1px solid #000", padding: "5px" }}>
-                  ₹{product.prod_price * (product.quantity || 1) || "0"}
+                  ₹
+                  {product.prod_price +
+                    product.deliverycharge * (product.quantity || 1) || "0"}
                 </td>
               </tr>
             ))}
@@ -227,26 +233,26 @@ const Invoice = ({ order, productDetails }) => {
         </table>
 
         {/* Total Quantity and Grand Total */}
-        <div   style={{
+        <div
+          style={{
             padding: "10px",
             display: "flex",
             justifyContent: "space-between",
             marginBottom: "20px",
-          }}>
+          }}
+        >
           <p>
             <strong>Total Products: </strong> {totalQuantity}
           </p>
           <p>
-            <strong>Grand Total: </strong> ₹{grandTotal}
+            <strong>Grand Total: </strong> ₹{order.total_amount}
           </p>
         </div>
         <hr />
-      <p style={{ fontSize: "12px", fontFamily: "dancing, cursive" }}>
-        This is a computer generated invoice, no signature required.
-      </p>
+        <p style={{ fontSize: "12px", fontFamily: "dancing, cursive" }}>
+          This is a computer generated invoice, no signature required.
+        </p>
       </div>
-
-     
     </div>
   );
 };

@@ -134,10 +134,10 @@ const Header3 = () => {
           {isOpen ? "Home" : ""}
         </NavLink>
         <NavLink
-          to="/ComputerAdBanner"
+          to="/ComputerAd"
           className={`nav-link ${
             location.pathname.startsWith("/computers") ||
-            location.pathname.startsWith("/ComputerAdBanner")
+            location.pathname.startsWith("/ComputerAd")
               ? "active"
               : ""
           }`}
@@ -145,7 +145,7 @@ const Header3 = () => {
           <FaLaptop
             className={`fa-icons ${
               location.pathname.startsWith("/computers") ||
-              location.pathname.startsWith("/ComputerAdBanner")
+              location.pathname.startsWith("/ComputerAd")
                 ? "active"
                 : ""
             }`}
@@ -154,10 +154,10 @@ const Header3 = () => {
         </NavLink>
 
         <NavLink
-          to="/MobileAdBanner"
+          to="/MobileAd"
           className={`nav-link ${
             location.pathname.startsWith("/mobiles") ||
-            location.pathname.startsWith("/MobileAdBanner")
+            location.pathname.startsWith("/MobileAd")
               ? "active"
               : ""
           }`}
@@ -165,7 +165,7 @@ const Header3 = () => {
           <FaMobileAlt
             className={`fa-icons ${
               location.pathname.startsWith("/mobiles") ||
-              location.pathname.startsWith("/MobileAdBanner")
+              location.pathname.startsWith("/MobileAd")
                 ? "active"
                 : ""
             }`}
@@ -174,10 +174,10 @@ const Header3 = () => {
         </NavLink>
 
         <NavLink
-          to="/CCTVAdBanner"
+          to="/CCTVAd"
           className={`nav-link ${
             location.pathname.startsWith("/cctv") ||
-            location.pathname.startsWith("/CCTVAdBanner")
+            location.pathname.startsWith("/CCTVAd")
               ? "active"
               : ""
           }`}
@@ -185,7 +185,7 @@ const Header3 = () => {
           <FaVideo
             className={`fa-icons ${
               location.pathname.startsWith("/cctv") ||
-              location.pathname.startsWith("/CCTVAdBanner")
+              location.pathname.startsWith("/CCTVAd")
                 ? "active"
                 : ""
             }`}

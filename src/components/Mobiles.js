@@ -22,6 +22,7 @@ const Mobiles = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [favorites, setFavorites] = useState({});
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
+  const [loading, setLoading] = useState(true);
 
 
   
@@ -39,28 +40,46 @@ const Mobiles = () => {
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get("search");
 
-  // Use searchQuery in your component
+  // Log the raw search query
   console.log("Search Query:", searchQuery);
 
-  // Filter products based on the search query
+  // Normalize a string by trimming, lowercasing, and removing all spaces
+  const normalizeString = (str) =>
+    str.trim().toLowerCase().replace(/\s+/g, "");
+
+  // Normalize the search query (if it exists)
+  const normalizedSearchQuery = searchQuery
+    ? normalizeString(searchQuery)
+    : "";
+
+  // Filter products based on the normalized, concatenated prod_name and prod_features
   const filteredProducts = searchQuery
-    ? products.filter((product) => {
-        const nameMatches = product.prod_name
-          ? product.prod_name.toLowerCase().includes(searchQuery.toLowerCase()) // Ensure prod_name is defined
-          : false; // If prod_name is undefined, set it to false
-        const featuresMatch = product.prod_features
-          ? product.prod_features
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()) // Ensure prod_features is defined
-          : false; // If prod_features is undefined, set it to false
-        return nameMatches || featuresMatch; // Return products that match either the name or features
-      })
-    : products; // If no search query, return all products
+  ? products.filter((product) => {
+      // Get product details, or an empty string if undefined
+      const prodName = product.prod_name || "";
+      const prodFeatures = product.prod_features || "";
+      const prodSubtitle = product.subtitle || "";
+
+      // Concatenate and normalize the strings
+      const combinedString = normalizeString(
+        prodName + " " + prodFeatures + " " + prodSubtitle
+      );
+
+      // Log the combined string for debugging
+      console.log(
+        `Combined string for product "${prodName}": ${combinedString}`
+      );
+
+      // Check if the combined string contains the normalized search query
+      return combinedString.includes(normalizedSearchQuery);
+    })
+  : products;
 
   const [coupons, setCoupons] = useState({}); // State to store coupons
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(`${ApiUrl}/fetchmobiles`);
         const fetchedProducts = response.data;
@@ -105,12 +124,16 @@ const Mobiles = () => {
           draggable: true,
           progress: undefined,
         });
+      }finally {
+        setLoading(false); // Stop loading regardless of success or failure
       }
     };
 
     fetchProducts();
   }, []);
 
+
+  
   const handleBuyNow = (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
 
@@ -169,13 +192,45 @@ const Mobiles = () => {
   // };
 
   const handleCardClick = (product) => {
-    // Check if product is defined and has an id
     if (product && product.id) {
-      navigate(`/product/${product.id}`); // Navigate to the product details page
+      // Retrieve existing recently viewed products
+      let storedProductIds = localStorage.getItem("Recently-viewed");
+  
+      if (storedProductIds) {
+        try {
+          storedProductIds = JSON.parse(storedProductIds);
+          
+          // Ensure it's an array
+          if (!Array.isArray(storedProductIds)) {
+            storedProductIds = [storedProductIds]; 
+          }
+        } catch (error) {
+          console.error("Error parsing Recently Viewed data:", error);
+          storedProductIds = [];
+        }
+      } else {
+        storedProductIds = [];
+      }
+  
+      // Remove the product ID if it already exists (to avoid duplicates)
+      storedProductIds = storedProductIds.filter((id) => id !== product.id);
+  
+      // Add the new product ID to the beginning of the list
+      storedProductIds.unshift(product.id);
+  
+      // Keep only the last 10 recently viewed products
+      storedProductIds = storedProductIds.slice(0, 10);
+  
+      // Save back to localStorage
+      localStorage.setItem("Recently-viewed", JSON.stringify(storedProductIds));
+  
+      // Navigate to product details page
+      navigate(`/product/${product.id}`);
     } else {
       console.error("Product is undefined or missing ID:", product);
     }
   };
+  
 
   const handleCloseModal = () => {
     setSelectedProduct(null);
@@ -390,6 +445,14 @@ const Mobiles = () => {
 
   // offerPercentage = ((actual_price - prod_price) / actual_price) * 100
 
+  // if (loading) {
+  //   return (
+  //     <div className="loading-message">
+  //       <h2>Loading products...</h2>
+  //     </div>
+  //   );
+  // }
+
   return (
     <div className="computers-page">
       {/* <Header1 /> */}
@@ -404,7 +467,12 @@ const Mobiles = () => {
       <div className="main-content">
         <Sidebar />
         <div className="product-list">
-          {products.length === 0 ? (
+          {loading ? (
+        // 1. Loading state
+        <div className="loading-message">
+          <h2>Loading products...</h2>
+        </div>
+      ) : products.length === 0 ? (
             <div className="no-products-message">
               <h2>No products here yet...</h2>
               <p>
@@ -456,7 +524,7 @@ const Mobiles = () => {
                     </span>
                   </div>
 
-                  <h3 className="product-name">{product.prod_name}</h3>
+                  <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
 
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
                   <span className="product-subtitle2">{product.subtitle}</span>
@@ -589,7 +657,7 @@ const Mobiles = () => {
                     </span>
                   </div>
 
-                  <h3 className="product-name">{product.prod_name}</h3>
+                  <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
                   <span className="product-subtitle2">{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}

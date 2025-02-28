@@ -12,6 +12,7 @@ import './styles.css';
 import FullAdPage from './components/FullAdPage';
 import BrandsPage from './components/BrandsPage';
 import ProductCategories from './components/ProductCategories';
+import RecentlyViewed from './components/RecentlyViewed';
 
 const Main = () => {
     return (
@@ -22,6 +23,8 @@ const Main = () => {
             <Homepage />
 
             <FeaturesCard />
+            <RecentlyViewed />
+
             <AdPage />
             <ShopByCategory />
 
@@ -30,6 +33,7 @@ const Main = () => {
 
             {/* <ProductList /> */}
             <BrandsPage />
+
             
             <Footer />
         </div>

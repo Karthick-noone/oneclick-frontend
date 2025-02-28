@@ -48,7 +48,7 @@ const ProductDetailPage = () => {
   const fetchProducts = async () => {
     console.log("Starting to fetch products...");
     try {
-      const response = await axios.get(`${ApiUrl}/fetchmobileofferspage`);
+      const response = await axios.get(`${ApiUrl}/fetchproductdetailsofferspage`);
       console.log("Fetched products:", response.data);
       setProducts(response.data);
 
@@ -284,7 +284,7 @@ const ProductDetailPage = () => {
     });
   
     try {
-      await axios.post(`${ApiUrl}/mobileofferspage`, formData, {
+      await axios.post(`${ApiUrl}/add-productdetails-offerspage-banner`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -295,7 +295,7 @@ const ProductDetailPage = () => {
         title: "Product Added",
         text: "The product has been added successfully!",
       }).then(() => {
-        return axios.get(`${ApiUrl}/fetchmobileofferspage`);
+        return axios.get(`${ApiUrl}/fetchproductdetailsofferspage`);
       }).then((productsResponse) => {
         setProducts(productsResponse.data);
         setNewProduct({
@@ -387,7 +387,7 @@ const ProductDetailPage = () => {
         icon: "success",
         title: "Product Updated",
         text: "The product has been updated successfully!",
-      }).then(() => axios.get(`${ApiUrl}/fetchmobileofferspage`))
+      }).then(() => axios.get(`${ApiUrl}/fetchproductdetailsofferspage`))
         .then((fetchResponse) => {
           console.log("Updated product list:", fetchResponse.data);
           setProducts(fetchResponse.data);

@@ -1,0 +1,156 @@
+/* Container */
+.recently-viewed-container {
+  max-width: 1200px;
+  margin: 10px auto;
+  padding: 10px;
+  /* background: #f8f9fa; */
+  border-radius: 8px;
+  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+}
+.recent-product-name {
+  display: -webkit-box; /* Required for WebKit-based browsers */
+  /* display: box;                        */
+  -webkit-box-orient: vertical; /* Required for WebKit-based browsers */
+  box-orient: vertical; /* Fallback for other browsers */
+  overflow: hidden; /* Hide overflow content */
+  -webkit-line-clamp: 1; /* Limit to 2 lines in WebKit-based browsers */
+  line-clamp: 1; /* Future proofing for standard implementation */
+  text-overflow: ellipsis; /* Show ellipsis when text overflows */
+}
+
+.recent-product-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 5px;
+}
+
+.custom-arrow {
+    width: 60px;
+    height: 60px;
+    padding: 5px;
+
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 10;
+    background: #f8f9fa;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .custom-arrow.prev {
+    left: -30px;
+  }
+  
+  .custom-arrow.next {
+    right: -30px;
+  }
+  
+.recent-product-subtitle {
+  display: -webkit-box; /* Required for WebKit-based browsers */
+  /* display: box;                        */
+  -webkit-box-orient: vertical; /* Required for WebKit-based browsers */
+  box-orient: vertical; /* Fallback for other browsers */
+  overflow: hidden; /* Hide overflow content */
+  -webkit-line-clamp: 1; /* Limit to 2 lines in WebKit-based browsers */
+  line-clamp: 1; /* Future proofing for standard implementation */
+  text-overflow: ellipsis; /* Show ellipsis when text overflows */
+}
+.recent-product-subtitle {
+  font-size: 12px;
+  color: grey;
+}
+
+/* Title */
+.recently-viewed-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  /* text-transform: uppercase; */
+  letter-spacing: 1px;
+}
+
+/* Grid Layout */
+.recently-viewed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Product Card */
+.recently-viewed-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  width: 100%; /* Ensure full width of the swiper slide */
+  padding: 10px;
+  box-sizing: border-box;
+  box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  min-height: 300px; /* Ensure all cards have the same minimum height */
+  height: auto; /* Adjust height dynamically */
+  cursor: pointer;
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+.recently-viewed-slider .slick-slide {
+    padding: 0 10px; /* Adds space between cards */
+  }
+/* 
+.recently-viewed-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+} */
+
+/* Product Image */
+.recently-viewed-image {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Product Name */
+.recently-viewed-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  padding: 10px;
+}
+
+/* Product Price */
+.recently-viewed-price {
+  font-size: 16px;
+  font-weight: bold;
+  color: #e63946;
+  text-align: center;
+  padding-bottom: 10px;
+}
+
+/* No Products Message */
+.no-recent-products {
+  text-align: center;
+  font-size: 18px;
+  color: #666;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+
+.recently-viewed-container {
+    width: 80%;
+    margin: 10px auto;
+    padding: 10px;
+    /* background: #f8f9fa; */
+    border-radius: 8px;
+    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+  }
+  /* Product Card */
+
+}

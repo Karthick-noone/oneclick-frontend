@@ -1119,7 +1119,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                         <span>
                           <span className="product-detail-price">
                             ₹
-                            {isOfferActive && product.offer_price
+                            {product.offer_price > 0 && product.offer_price
                               ? product.offer_price
                               : product.prod_price}{" "}
                           </span>{" "}
@@ -1142,7 +1142,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                             <span>
                               {Math.round(
                                 ((product.actual_price -
-                                  (isOfferActive && product.offer_price
+                                  (product.offer_price > 0 && product.offer_price
                                     ? product.offer_price
                                     : product.prod_price)) /
                                   product.actual_price) *
@@ -1156,13 +1156,13 @@ const ProductDetail = ({ accessoryCategory }) => {
                         <p className="offerr-tag">
                           Save upto ₹
                           {product.actual_price -
-                            (isOfferActive && product.offer_price
+                            (product.offer_price >0 && product.offer_price
                               ? product.offer_price
                               : product.prod_price)}
                         </p>
 
                         {/* Timer display */}
-                        {isOfferActive &&
+                        {product.offer_price>0 &&
                           product.offer_price &&
                           remainingTime && (
                             <div className="offer-timer">

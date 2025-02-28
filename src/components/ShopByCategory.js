@@ -18,15 +18,15 @@ const ShopByCategory = () => {
       <h2>Shop by Category</h2>
       <div className="categories">
         <div className="category">
-          <a href="/ComputerAdBanner">
+          <a href="/ComputerAd">
             <img loading="lazy" src={computerImg} alt="Computers" className="category-image" />
-            <span>Computers</span>
+            <span className="category-text">Computers</span>
           </a>
         </div>
         <div className="category">
-          <a href="/MobileAdBanner">
+          <a href="/MobileAd">
             <img loading="lazy" src={mobileImg} alt="Mobile" className="category-image" />
-            <span>Mobile</span>
+            <span className="category-text">Mobile</span>
           </a>
         </div>
         <div className="category">
@@ -37,13 +37,13 @@ const ShopByCategory = () => {
               alt="Mobile Accessories"
               className="category-image"
             />
-            <span>Mobile Accessories</span>
+            <span className="category-text">Mobile Accessories</span>
           </a>
         </div>
         <div className="category">
-          <a href="/CCTVAdBanner">
+          <a href="/CCTVAd">
             <img loading="lazy" src={cctvImg} alt="CCTV" className="category-image" />
-            <span>CCTV</span>
+            <span className="category-text">CCTV</span>
           </a>
         </div>
         <div className="category">
@@ -55,7 +55,7 @@ const ShopByCategory = () => {
               loading="lazy"
 
             />
-            <span>T.V & Home Cinema</span>
+            <span className="category-text">T.V & Home Cinema</span>
           </a>
         </div>
         <div className="category">
@@ -67,7 +67,7 @@ const ShopByCategory = () => {
               loading="lazy"
 
             />
-            <span>Wearable Tech</span>
+            <span className="category-text">Wearable Tech</span>
           </a>
         </div>
         <div className="category">
@@ -79,13 +79,13 @@ const ShopByCategory = () => {
               loading="lazy"
 
             />
-            <span>Headphones</span>
+            <span className="category-text">Headphones</span>
           </a>
         </div>
         <div className="category">
           <a href="/Printers">
             <img loading="lazy" src={printerImg} alt="Printers" className="category-image" />
-            <span>Printers</span>
+            <span className="category-text">Printers</span>
           </a>
         </div>
         <div className="category">
@@ -97,13 +97,13 @@ const ShopByCategory = () => {
               loading="lazy"
 
             />
-            <span>Computer Accessories</span>
+            <span className="category-text">Computer Accessories</span>
           </a>
         </div>
         <div className="category">
           <a href="/Speaker">
             <img loading="lazy" src={speakersImg} alt="Speakers" className="category-image" />
-            <span>Speakers</span>
+            <span className="category-text">Speakers</span>
           </a>
         </div>
       </div>

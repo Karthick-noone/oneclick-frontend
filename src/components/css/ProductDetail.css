@@ -622,7 +622,7 @@
 }
 
 .product-detail-add-to-cart2 {
-  padding: 8px 5px;
+  padding: 7px 5px;
   background-color: #4aa36f;
   color: #fff;
   font-size: 0.8em;
@@ -640,7 +640,7 @@
 }
 
 .product-detail-add-to-cart {
-  padding: 10px 24px; /* Increased padding for a larger button */
+  padding: 10px 20px; /* Increased padding for a larger button */
   background: linear-gradient(
     145deg,
     #ff7f50,

@@ -46,9 +46,21 @@ const AdPage = () => {
     <section className="ad-page">
       <div className="ad-first-page">
         <div className="ad-second-page">
-          <h2 className='text-center' style={{ marginBottom: '10px', textAlign: 'left', color: 'white' }}>
-            Offers For You
-          </h2>
+        <h2
+  className="text-center offer-heading"
+  style={{
+    marginBottom: "10px",
+    textAlign: "left",
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: "24px",
+    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
+  }}
+>
+  Exclusive Offers For You!
+</h2>
+
+
           <div className="ads-container">
             {loading ? (
               <div className="spinner-container">
