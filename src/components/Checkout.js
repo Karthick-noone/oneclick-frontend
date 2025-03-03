@@ -1470,7 +1470,7 @@ const Checkout = () => {
                   Extra Discount on Orders Over ₹{minPurchaseLimit}
                 </span>
                 <span style={{ color: "green" }}>
-                  - ₹{couponValue.toFixed(2)}
+                  - ₹{couponValue}
                 </span>
               </div>
             )}

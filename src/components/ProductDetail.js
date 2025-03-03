@@ -1197,12 +1197,13 @@ const ProductDetail = ({ accessoryCategory }) => {
                             className="price-cell"
                             style={{ backgroundColor: "white" }}
                           >
-                            <span className="price-label">Actual Price</span>
+                            <span className="price-label">M.R.P Rate</span>
                             <span className="actual-priceee">
-                              M.R.P. ₹
-                              {coupons[product?.prod_id]
+                             ₹
+                              {/* {coupons[product?.prod_id]
                                 ? product?.offer_price || product?.prod_price
-                                : product?.actual_price}
+                                : product?.actual_price} */}
+                                {product?.actual_price}
                             </span>
                           </div>
 
@@ -1212,7 +1213,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                             style={{ backgroundColor: "white" }}
                           >
                             <span className="price-label">Discount</span>
-                            <span className="discounted-priceee">
+                            {/* <span className="discounted-priceee">
                               {coupons[product?.prod_id]
                                 ? // If a coupon exists, calculate and round discount percentage
                                   `${Math.round(
@@ -1228,7 +1229,15 @@ const ProductDetail = ({ accessoryCategory }) => {
                                       product?.actual_price) *
                                       100
                                   )}%`}
-                            </span>
+                            </span> */}
+                            <span className="discounted-priceee">
+  {`${Math.round(
+    ((product?.actual_price - (product?.offer_price || product?.prod_price)) /
+      product?.actual_price) *
+      100
+  )}%`}
+</span>
+
                           </div>
 
                           {/* Effective Price */}
