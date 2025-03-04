@@ -194,7 +194,7 @@ const AddressPage = () => {
        // Validate street name
       //  if (!streetRegex.test(address.street)) {
       //   return "Street name must contain only letters, numbers, spaces, commas, periods, or hyphens, and must be at least 3 characters long.";
-      // }
+      // }                     
 
     // Validate name, city, state, and country
     if (!nameRegex.test(address.name)) {

@@ -1,150 +1,127 @@
-import React, { useEffect, useState, useRef } from 'react';
-import './css/AdPage.css'; // Adjust path as needed
+import React, { useEffect, useState, useRef, useMemo } from 'react';
+import './css/AdPage.css';
 import { ApiUrl } from './ApiUrl';
-import axios from 'axios'; // Ensure axios is installed
-import { Swiper, SwiperSlide } from 'swiper/react'; // Import Swiper components
-import 'swiper/css'; // Import Swiper styles
-import 'swiper/css/navigation'; // Import Navigation styles
+import axios from 'axios';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
 const AdPage = () => {
   const [ads, setAds] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
-  const [isMobile, setIsMobile] = useState(false); // To check if it's a mobile view
-  const swiperRef = useRef(null); // Ref to control Swiper
+  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const swiperRef = useRef(null);
 
   useEffect(() => {
-    // Fetch data from the API
-    axios
-      .get(`${ApiUrl}/fetchdoubleadpage`)
-      .then((response) => {
-        setAds(response.data); // Assuming the response data is an array of ads
-        setLoading(false); // Set loading to false once data is fetched
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        setLoading(false); // Ensure loading is false on error
-      });
+    const fetchAds = async () => {
+      try {
+        const response = await axios.get(`${ApiUrl}/fetchdoubleadpage`);
+        setAds(response.data || []);
+      } catch (error) {
+        console.error('Error fetching ads:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Check if the window width is mobile size
-    const checkMobileView = () => {
+    fetchAds();
+
+    const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
 
-    // Add event listener for window resize
-    window.addEventListener('resize', checkMobileView);
-
-    // Run the check initially
-    checkMobileView();
-
-    // Clean up the event listener on unmount
-    return () => {
-      window.removeEventListener('resize', checkMobileView);
+    const debounceResize = () => {
+      clearTimeout(window.resizeTimer);
+      window.resizeTimer = setTimeout(handleResize, 200);
     };
+
+    window.addEventListener('resize', debounceResize);
+    return () => window.removeEventListener('resize', debounceResize);
   }, []);
+
+  // Preprocess images to avoid repeated operations
+  const processedAds = useMemo(() => {
+    return ads.map((ad) => ({
+      ...ad,
+      images: ad.image ? ad.image.split(',') : [],
+    }));
+  }, [ads]);
+
+  if (loading) {
+    return (
+      <div className="spinner-container">
+        <div className="spinner">
+          {[...Array(12)].map((_, index) => (
+            <div key={index} className="spinner-blade"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (ads.length === 0) {
+    return <p>No ads available</p>;
+  }
 
   return (
     <section className="ad-page">
       <div className="ad-first-page">
         <div className="ad-second-page">
-        <h2
-  className="text-center offer-heading"
-  style={{
-    marginBottom: "10px",
-    textAlign: "left",
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: "24px",
-    textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
-  }}
->
-  Exclusive Offers For You!
-</h2>
-
+          <h2 className="text-center offer-heading">Exclusive Offers For You!</h2>
 
           <div className="ads-container">
-            {loading ? (
-              <div className="spinner-container">
-                <div className="spinner">
-                  {[...Array(12)].map((_, index) => (
-                    <div key={index} className="spinner-blade"></div>
-                  ))}
-                </div>
-              </div>
-            ) : ads.length > 0 ? (
-              isMobile ? (
-                // Use Swiper on mobile view with navigation enabled
-                <Swiper
-                  spaceBetween={10}
-                  slidesPerView={isMobile ? 1 : 3} // Adjust per view based on screen size
-                  ref={swiperRef} // Attach the swiper ref
-                  className="ads-slider"
-                >
-                  {ads.map((ad, index) => (
-                    <SwiperSlide key={ad.id || index}>
-                      <div className="ad">
-                        <div className="ad-image-card">
-                          {ad.image &&
-                            ad.image.split(',').map((img, imgIndex) => (
-                              <a
-                                style={{ textDecoration: 'none', color: 'white' }}
-                                href={`/${ad.category}`}
-                                key={imgIndex}
-                              >
-                                <img
-                                  src={`${ApiUrl}/uploads/doubleadpage/${img}`}
-                                  alt={`Ad ${imgIndex + 1}`}
-                                  className="add-image"
-                                  loading="lazy"
-                                />
-                              </a>
-                            ))}
-                        </div>
-                      </div>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              ) : (
-                // Display images statically for larger screens
-                ads.map((ad, index) => (
-                  <div key={ad.id || index} className="ad">
-                    <div className="ad-image-card">
-                      {ad.image &&
-                        ad.image.split(',').map((img, imgIndex) => (
-                          <a
-                            style={{ textDecoration: 'none', color: 'white' }}
-                            href={`/${ad.category}`}
-                            key={imgIndex}
-                          >
+            {isMobile ? (
+              <Swiper
+                spaceBetween={10}
+                slidesPerView={1}
+                onSwiper={(swiper) => (swiperRef.current = swiper)}
+                className="ads-slider"
+              >
+                {processedAds.map((ad, index) => (
+                  <SwiperSlide key={ad.id || index}>
+                    <div className="ad">
+                      <div className="ad-image-card">
+                        {ad.images.map((img, imgIndex) => (
+                          <a href={`/${ad.category}`} key={imgIndex}>
                             <img
-                              src={`${ApiUrl}/uploads/doubleadpage/${img}`} // Adjust path as needed
+                              src={`${ApiUrl}/uploads/doubleadpage/${img}`}
                               alt={`Ad ${imgIndex + 1}`}
                               className="add-image"
                               loading="lazy"
                             />
                           </a>
                         ))}
+                      </div>
                     </div>
-                  </div>
-                ))
-              )
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             ) : (
-              <p>No ads available</p>
+              processedAds.map((ad, index) => (
+                <div key={ad.id || index} className="ad">
+                  <div className="ad-image-card">
+                    {ad.images.map((img, imgIndex) => (
+                      <a href={`/${ad.category}`} key={imgIndex}>
+                        <img
+                          src={`${ApiUrl}/uploads/doubleadpage/${img}`}
+                          alt={`Ad ${imgIndex + 1}`}
+                          className="add-image"
+                          loading="lazy"
+                        />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ))
             )}
 
-            {/* Custom navigation arrows for mobile */}
-            {isMobile && (
+            {isMobile && swiperRef.current && (
               <div className="swiper-arrows">
-                <button
-                  className="swiper-arrow prev"
-                  onClick={() => swiperRef.current.swiper.slidePrev()}
-                >
-                  &#8249; {/* Left Arrow */}
+                <button className="swiper-arrow prev" onClick={() => swiperRef.current.slidePrev()}>
+                  &#8249;
                 </button>
-                <button
-                  className="swiper-arrow next"
-                  onClick={() => swiperRef.current.swiper.slideNext()}
-                >
-                  &#8250; {/* Right Arrow */}
+                <button className="swiper-arrow next" onClick={() => swiperRef.current.slideNext()}>
+                  &#8250;
                 </button>
               </div>
             )}

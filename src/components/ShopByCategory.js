@@ -1,111 +1,40 @@
 import React from "react";
-// import { Link } from 'react-router-dom'; // Import Link if you're using React Router for navigation
-import computerImg from "./img/computer.jpg";
-import mobileImg from "./img/mbl.jpg";
-import mobileAccessoriesImg from "./img/cmp.jpg";
-import cctvImg from "./img/cctv.jpg";
-import tvImg from "./img/tv.jpg";
-import watchImg from "./img/watch.jpg";
-import headphonesImg from "./img/headphones.jpg";
-import printerImg from "./img/printer.jpg";
-import computerAccessoriesImg from "./img/cmp.jpg";
-import speakersImg from "./img/speaker.jpg";
 import "./css/ShopByCategory.css"; // Adjust path as needed
+
+const categories = [
+  { name: "Computers", img: "computer.jpg", link: "/ComputerAd" },
+  { name: "Mobiles", img: "mbl.jpg", link: "/MobileAd" },
+  { name: "CCTV", img: "cctv.jpg", link: "/CCTVAd" },
+  { name: "Headphones", img: "headphones.jpg", link: "/Headphones" },
+  { name: "Speakers", img: "speaker.jpg", link: "/Speaker" },
+  { name: "T.V & Home Cinema", img: "tv.jpg", link: "/TeleVision" },
+  { name: "Wearable Tech", img: "watch.jpg", link: "/Watch" },
+  { name: "Printers", img: "printer.jpg", link: "/Printers" },
+  { name: "Computer Accessories", img: "cmp.jpg", link: "/ComputerAccessories" },
+  { name: "Mobile Accessories", img: "cmp.jpg", link: "/MobileAccessories" },
+];
+
+// Dynamic import of images
+const images = require.context("./img", false, /\.(jpg|jpeg|png|webp)$/);
 
 const ShopByCategory = () => {
   return (
     <section className="shop-by-category">
       <h2>Shop by Category</h2>
       <div className="categories">
-        <div className="category">
-          <a href="/ComputerAd">
-            <img loading="lazy" src={computerImg} alt="Computers" className="category-image" />
-            <span className="category-text">Computers</span>
-          </a>
-        </div>
-        <div className="category">
-          <a href="/MobileAd">
-            <img loading="lazy" src={mobileImg} alt="Mobile" className="category-image" />
-            <span className="category-text">Mobile</span>
-          </a>
-        </div>
-        <div className="category">
-          <a href="/MobileAccessories">
-            <img
-            loading="lazy"
-              src={mobileAccessoriesImg}
-              alt="Mobile Accessories"
-              className="category-image"
-            />
-            <span className="category-text">Mobile Accessories</span>
-          </a>
-        </div>
-        <div className="category">
-          <a href="/CCTVAd">
-            <img loading="lazy" src={cctvImg} alt="CCTV" className="category-image" />
-            <span className="category-text">CCTV</span>
-          </a>
-        </div>
-        <div className="category">
-          <a href="/TeleVision">
-            <img
-              src={tvImg}
-              alt="T.V & Home Cinema"
-              className="category-image"
-              loading="lazy"
-
-            />
-            <span className="category-text">T.V & Home Cinema</span>
-          </a>
-        </div>
-        <div className="category">
-          <a href="/Watch">
-            <img
-              src={watchImg}
-              alt="Wearable Tech"
-              className="category-image"
-              loading="lazy"
-
-            />
-            <span className="category-text">Wearable Tech</span>
-          </a>
-        </div>
-        <div className="category">
-          <a href="/Headphones">
-            <img
-              src={headphonesImg}
-              alt="Headphones"
-              className="category-image"
-              loading="lazy"
-
-            />
-            <span className="category-text">Headphones</span>
-          </a>
-        </div>
-        <div className="category">
-          <a href="/Printers">
-            <img loading="lazy" src={printerImg} alt="Printers" className="category-image" />
-            <span className="category-text">Printers</span>
-          </a>
-        </div>
-        <div className="category">
-          <a href="/ComputerAccessories">
-            <img
-              src={computerAccessoriesImg}
-              alt="Computer Accessories"
-              className="category-image"
-              loading="lazy"
-
-            />
-            <span className="category-text">Computer Accessories</span>
-          </a>
-        </div>
-        <div className="category">
-          <a href="/Speaker">
-            <img loading="lazy" src={speakersImg} alt="Speakers" className="category-image" />
-            <span className="category-text">Speakers</span>
-          </a>
-        </div>
+        {categories.map((category, index) => (
+          <div className="category" key={index}>
+            <a href={category.link}>
+              <img
+                loading="lazy"
+                src={images(`./${category.img}`)}
+                alt={category.name}
+                className="category-image"
+              />
+              <span className="category-text">{category.name}</span>
+            </a>
+          </div>
+        ))}
       </div>
     </section>
   );
