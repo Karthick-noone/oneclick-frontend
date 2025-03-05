@@ -112,7 +112,16 @@ const LoginPage = () => {
             });
           },
         }).then(() => {
-          navigate("/Admin/Dashboard"); // Redirect to admin dashboard
+          if (role === "Staff" && result.staff) {
+            // Store staff's name in localStorage
+            localStorage.setItem("staffname", result.staff.staffname);
+          navigate("/Admin/Computers"); // Redirect to admin dashboard
+
+          }
+          else{
+            navigate("/Admin/Dashboard")
+          }
+
         });
       } else {
         // Handle login failures

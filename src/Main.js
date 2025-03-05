@@ -2,7 +2,7 @@ import React from 'react';
 // import Header1 from './components/Header1';
 import Header2 from './components/Header2';
 // import Header3 from './components/Header3';
-import ProductList from './components/productlist';
+// import ProductList from './components/productlist';
 import Footer from './components/footer';
 import Homepage from './components/Homepage';
 import FeaturesCard from './components/FeaturesCard';

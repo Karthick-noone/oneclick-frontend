@@ -1585,8 +1585,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                   {relatedProduct.prod_features}
                 </p> */}
                               <p className="product-actual-price">
-                                <span
-                                  style={{ textDecoration: "line-through" }}
+                                M.R.P <span
+                                  style={{ textDecoration: "line-through", color:'red' }}
                                 >
                                   ₹{relatedProduct.actual_price}{" "}
                                 </span>
@@ -1633,7 +1633,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                   </div>
                 </div>
               )}
-            <div className="bannerr-container4">
+            <div className="bannerr-container4" style={{marginTop:'20px'}}>
               {filteredBanners.length > 0 ? (
                 <div>
                   <div
@@ -1726,7 +1726,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                   {relatedProduct.prod_features}
                 </p> */}
                             <p className="product-actual-price">
-                              <span style={{ textDecoration: "line-through" }}>
+                            M.R.P <span style={{ textDecoration: "line-through", color:'red' }}>
                                 ₹{relatedProduct.actual_price}{" "}
                               </span>
                               <span

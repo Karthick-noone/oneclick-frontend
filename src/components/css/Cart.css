@@ -9,6 +9,9 @@
 
   color:green;
 }
+.browse-btn{
+  float: right !important;
+}
 
 .cart-header h1 {
   margin: 0;
@@ -502,6 +505,17 @@
   font-size: 0.7em;
 }
 
+.cart-product-cardd {
+  display: flex;
+  flex-direction: column; /* Arrange the heading and products vertically */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  padding: 15px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .cart-product-card {
   display: flex;
   flex-direction: column; /* Arrange the heading and products vertically */
@@ -514,11 +528,14 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .cart-product-description {
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* Limits to 2 lines */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box;              /* Required for WebKit-based browsers */
+    /* display: box;                        */
+    -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
+    box-orient: vertical;              /* Fallback for other browsers */
+    overflow: hidden;                   /* Hide overflow content */
+    -webkit-line-clamp: 2;             /* Limit to 2 lines in WebKit-based browsers */
+    line-clamp: 2;                     /* Future proofing for standard implementation */
+    text-overflow: ellipsis;           /* Show ellipsis when text overflows */
 }
 
 

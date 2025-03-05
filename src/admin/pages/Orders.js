@@ -646,14 +646,14 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
     onChange={handleSearch}
     className="search-box2"
   />
-  {searchQuery && (
+  {/* {searchQuery && (
     <span
       className="clear-button"
       onClick={() => setSearchQuery("")}
     >
       X
     </span>
-  )}
+  )} */}
 </div>
 
         

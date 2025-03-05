@@ -7,7 +7,7 @@ import Header2 from "./Header2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaShoppingBag } from "react-icons/fa";
 import Swal from "sweetalert2";
 import Footer from "./footer";
 import { Link } from "react-router-dom";
@@ -24,9 +24,142 @@ const CartPage = () => {
   const [isAddressSelected, setIsAddressSelected] = useState(false);
 
   const [addressDetails, setAddressDetails] = useState([]);
+  const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
 
   const [isOfferActive, setIsOfferActive] = useState(true);
   const [item, setitem] = useState(null);
+
+  const [buyLaterProducts, setBuyLaterProducts] = useState([]);
+  const [buyLaterItems, setBuyLaterItems] = useState([]);
+  // This flag is set only when the user clicks the Buy Later button
+  const [buyLaterApplied, setBuyLaterApplied] = useState(false);
+
+  const userid = localStorage.getItem("user_id");
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  // Toggle product selection for Buy Later
+  const handleBuyLaterToggle = (id) => {
+    console.log("Toggled product id:", id);
+    setBuyLaterItems((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  // API call to store the Buy Later product IDs in the database
+  const handleBuyLaterSubmit = () => {
+    if (buyLaterItems.length === 0) {
+      // Show warning alert if no item is selected
+      Swal.fire({
+        title: "Warning!",
+        text: "Please select at least one item before clicking Buy Later.",
+        icon: "warning",
+        confirmButtonText: "OK",
+        timer: 3000,
+      });
+      return; // Stop execution
+    }
+    console.log("Sending product IDs:", buyLaterItems);
+
+    axios
+      .post(`${ApiUrl}/api/store-buy-later`, {
+        productIds: buyLaterItems,
+        userId: userid,
+      })
+      .then((response) => {
+        console.log("Buy later items saved:", response.data);
+
+        // Show success alert
+        Swal.fire({
+          title: "Success!",
+          text: "Items have been added to Buy Later.",
+          icon: "success",
+          confirmButtonText: "OK",
+          timer: 3000,
+        }).then(() => {
+          window.location.reload();
+        });
+
+        setBuyLaterApplied(true);
+      })
+      .catch((error) => {
+        console.error("Error saving buy later items:", error);
+
+        // Show error alert
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to add items to Buy Later. Please try again.",
+          icon: "error",
+          confirmButtonText: "OK",
+          timer: 3000,
+        });
+      });
+  };
+
+  // Function to remove an item from Buy Later
+  const handleRemoveBuyLater = (productId) => {
+    console.log("Removing product from Buy Later:", productId);
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to remove this item from Buy Later?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Remove",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .post(`${ApiUrl}/api/remove-buy-later`, {
+            productId,
+            userId: userid, // Ensure you have `userid` from context/state
+          })
+          .then((response) => {
+            console.log("Item removed from Buy Later:", response.data);
+
+            Swal.fire({
+              title: "Removed!",
+              text: "Item has been removed from Buy Later.",
+              icon: "success",
+              confirmButtonText: "OK",
+              timer: 3000,
+            });
+
+            // Update the local state to reflect changes
+            // setBuyLaterItems((prev) => prev.filter((id) => id !== productId));
+            fetchBuyLaterItems();
+          })
+          .catch((error) => {
+            console.error("Error removing item from Buy Later:", error);
+
+            Swal.fire({
+              title: "Error!",
+              text: "Failed to remove item. Please try again.",
+              icon: "error",
+              confirmButtonText: "OK",
+              timer: 3000,
+            });
+          });
+      }
+    });
+  };
+
+  const fetchBuyLaterItems = () => {
+    axios
+      .get(`${ApiUrl}/api/get-buy-later/${userid}`)
+      .then((response) => {
+        console.log("Fetched buy later items:", response.data);
+
+        setBuyLaterProducts(response.data.buyLater);
+      })
+      .catch((error) => {
+        console.error("Error fetching buy later items:", error);
+      });
+  };
+
+  // Call this function when the page loads
+  useEffect(() => {
+    fetchBuyLaterItems();
+  }, [userid]);
 
   useEffect(() => {
     if (item && item.offer_end_time) {
@@ -460,6 +593,111 @@ const CartPage = () => {
     }
   }, [addressDetails]);
 
+  // Function to handle checkbox selection
+  const handleCheckboxChange = (id) => {
+    console.log(`Checkbox clicked for product ID: ${id}`);
+
+    setSelectedProducts((prevSelected) => {
+      const updatedSelection = prevSelected.includes(id)
+        ? prevSelected.filter((productId) => productId !== id) // Remove if already selected
+        : [...prevSelected, id]; // Add if not selected
+
+      console.log("Updated Selected Products:", updatedSelection);
+      return updatedSelection;
+    });
+  };
+
+  const handleAddToCart = async (event) => {
+    event.stopPropagation(); // Prevent event bubbling
+
+    const email = localStorage.getItem("email");
+    console.log("User Email:", email);
+
+    if (!email) {
+      console.warn("User is not logged in!");
+      Swal.fire({
+        icon: "error",
+        title: "Login Required",
+        text: "You must be logged in to add items to cart!",
+        confirmButtonText: "OK",
+      }).then(() => {
+        window.location.href = "/login";
+      });
+      return;
+    }
+
+    if (selectedProducts.length === 0) {
+      console.warn("No products selected!");
+      Swal.fire({
+        icon: "warning",
+        title: "No Items Selected",
+        text: "Please select at least one item before adding to cart.",
+        confirmButtonText: "OK",
+        timer: 3000,
+      });
+      return;
+    }
+
+    setIsAdding(true); // Disable button while sending requests
+
+    try {
+      let allSuccess = true;
+
+      // Send each product as a separate request
+      for (const productId of selectedProducts) {
+        console.log(`Adding product: ${productId} with quantity: 1`);
+
+        const response = await axios.post(`${ApiUrl}/api/addtocart`, {
+          email,
+          productId, // Send single product ID
+          quantity: 1, // Send quantity as 1 for each product
+          buyLater: true,
+        });
+
+        console.log("Server Response:", response.data);
+
+        if (response.status !== 200) {
+          allSuccess = false;
+        }
+      }
+
+      if (allSuccess) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Selected items added to your cart successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => {
+          fetchBuyLaterItems();
+        });
+
+        setSelectedProducts([]); // Clear selection after adding to cart
+        console.log("Cleared Selected Products State.");
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "Some items could not be added to the cart.",
+          confirmButtonText: "OK",
+          timer: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error adding items to cart:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed!",
+        text: "Something went wrong while adding items to the cart.",
+        confirmButtonText: "OK",
+        timer: 3000,
+      });
+    } finally {
+      setIsAdding(false); // Enable button after request
+      console.log("Request completed, isAdding set to false.");
+    }
+  };
+
   const handlePlaceOrder = async () => {
     console.log("handlePlaceOrder function called");
 
@@ -623,15 +861,15 @@ const CartPage = () => {
                 </div>
               )}
             </div>
-            <div className="cart-product-card">
+            <div className="cart-product-cardd">
               <ul className="cart-list">
                 {cartItems.length === 0 ? (
-                  <li className="empty-cart-message">
-                    <p>Your cart is empty</p>
-                    <a href="/">
-                      <button className="change-btn">Browse products</button>
-                    </a>
-                  </li>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <p style={{ marginTop: "5px" }}>Your cart is empty.</p>
+                <a href="/">
+                  <button className="change-btn browse-btn">Browse Products</button>
+                </a>
+              </div>
                 ) : (
                   cartItems.map((item) => {
                     // Check if image is a stringified array and parse it
@@ -731,16 +969,144 @@ const CartPage = () => {
                               ? item.offer_price * item.quantity
                               : item.prod_price * item.quantity}
                           </p>
+                          <div>
+                            <label>
+                              <input
+                                style={{ marginLeft: "10px" }}
+                                type="checkbox"
+                                checked={buyLaterItems.includes(item.id)}
+                                onChange={() => handleBuyLaterToggle(item.id)}
+                              />{" "}
+                              {/* Buy Later */}
+                            </label>
+                          </div>
                         </div>
                       </li>
                     );
                   })
                 )}
+                {cartItems.length > 0 && (
+                  <button
+                    style={{ float: "right", marginRight: "10px" }}
+                    onClick={handleBuyLaterSubmit}
+                    className="Buy-later-btn"
+                  >
+                    Buy Later
+                  </button>
+                )}
               </ul>
             </div>
+            {buyLaterProducts.length > 0 && (
+              <div className="cart-product-card">
+                <strong style={{ fontSize: "1.0rem" }}>BUY LATER ITEMS</strong>
+                <div className="cart-list-container">
+                  <ul className="cart-list">
+                    {buyLaterProducts.map((product) => {
+                      const images = Array.isArray(product.prod_img)
+                        ? product.prod_img
+                        : JSON.parse(product.prod_img || "[]");
+                      const firstImage = images.length > 0 ? images[0] : null;
+
+                      return (
+                        <li
+                          key={product.prod_id}
+                          className="cart-product d-flex align-items-center"
+                        >
+                          {firstImage ? (
+                            <div
+                              key={product.id}
+                              onClick={() => handleProductClick(product.id)}
+                              style={{ cursor: "pointer" }}
+                            >
+                              <img
+                                src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                                alt={product.name}
+                                loading="lazy"
+                                className="cart-product-image"
+                              />
+                            </div>
+                          ) : (
+                            <div className="placeholder-image">
+                              No image available
+                            </div>
+                          )}
+
+                          <div
+                            style={{ cursor: "pointer" }}
+                            className="cart-product-details"
+                            key={product.id}
+                            onClick={() => handleProductClick(product.id)}
+                          >
+                            <p className="cart-product-name">
+                              {product.prod_name}
+                            </p>
+                            <p className="cart-product-description">
+                              {product.prod_features}
+                            </p>
+                          </div>
+
+                          <div className="cart-product-price">
+                            <div className="cart-quantity-controls">
+                              <FaTrash
+                                className="cart-remove-btn"
+                                onClick={() => handleRemoveBuyLater(product.id)}
+                              />
+                            </div>
+                            <p
+                              style={{
+                                color: "red",
+                                textDecoration: "line-through",
+                                fontSize: "13px",
+                                marginRight: "5px",
+                              }}
+                            >
+                              ₹{product.actual_price}
+                            </p>
+                            <p>
+                              ₹
+                              {product.offer_price > 0
+                                ? product.offer_price
+                                : product.prod_price}
+                            </p>
+
+                            <div>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={selectedProducts.includes(
+                                    product.id
+                                  )}
+                                  onChange={() =>
+                                    handleCheckboxChange(product.id)
+                                  }
+                                />{" "}
+                              </label>
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+
+                  <button
+                    style={{ float: "right", marginRight: "10px" }}
+                    onClick={handleAddToCart}
+                    className="Addtocart-btn"
+                  >
+                    Move To Cart{" "}
+                    <span style={{ marginLeft: "10px" }}>
+                      <FaShoppingBag />
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="cart-summary">
+          <h4 style={{ marginTop: "10px", marginBottom: "5px" }}>
+              Price Summary:
+            </h4>
             <div className="summary-item">
               <span>
                 Price (

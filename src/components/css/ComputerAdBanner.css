@@ -10,7 +10,7 @@ border-radius: 5px;
   width: 1250px; /* Full width */
   height: 300px; /* Maintain aspect ratio */
   max-width: 1255px; /* Limit max width */
-  margin-top: 20px; /* Space at the top */
+  /* margin-top: 20px;  */
   cursor: pointer;
   border-radius: 5px;
   transition: transform 0.3s ease; /* Smooth transition for scaling */
@@ -86,6 +86,7 @@ border-radius: 5px;
 .offer-ad-container4 {
   display: grid; /* Grid layout for the single ads */
   grid-template-columns: repeat(3, 1fr); /* 3 columns for single ads */
+  gap: 10px;
 }
 
 .single-ad-container4 {
@@ -379,3 +380,4 @@ border-radius: 5px;
     max-height: 150px;
   }
 }
+

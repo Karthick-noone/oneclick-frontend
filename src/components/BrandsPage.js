@@ -1,47 +1,28 @@
-import React from 'react';
-import './css/BrandsPage.css'; // Import the CSS file for styles
+import React, { memo } from "react";
+import "./css/BrandsPage.css";
 
-// Importing images
-import brandA from './img/brands/dell.png';
-import brandB from './img/brands/lenovo.png';
-import brandC from './img/brands/vivo.png';
-import brandD from './img/brands/samsung.png';
-import brandk from './img/brands/hp.png';
-import brandF from './img/brands/epson.png';
-import brandG from './img/brands/oppo.png';
-import brandH from './img/brands/fireboltt.png';
-import brandI from './img/brands/hikvision.png';
-import brandj from './img/brands/boat.svg';
-import brandl from './img/brands/R.png';
-import brandE from './img/brands/OnePlus.png';
-import brandm from './img/brands/apple.png';
-import brandn from './img/brands/Dahua.jpg';
+// Dynamically import all images from 'img/brands' folder
+const importAll = (context) =>
+  context.keys().map((key) => ({
+    logo: context(key),
+    name: key.replace("./", "").split(".")[0], // Extract filename as brand name
+  }));
 
-const brands = [
-  { logo: brandA },
-  { logo: brandB },
-  { logo: brandC },
-  { logo: brandD },
-  { logo: brandE },
-  { logo: brandF },
-  { logo: brandG },
-  { logo: brandH },
-  { logo: brandI },
-  { logo: brandj },
-  { logo: brandk },
-  { logo: brandl },
-  { logo: brandm },
-  { logo: brandn },
-];
+const brands = importAll(require.context("./img/brands", false, /\.(png|jpe?g|svg)$/));
 
 const BrandsPage = () => {
   return (
     <div className="brands-page">
       <h1>Brands</h1>
       <div className="brands-container">
-        {brands.map((brand, index) => (
-          <div className="brand-item" key={index}>
-            <img loading="lazy" src={brand.logo} alt={`Brand ${index}`} className="brand-logo" />
+        {brands.map((brand) => (
+          <div className="brand-item" key={brand.name}>
+            <img 
+              loading="lazy" 
+              src={brand.logo} 
+              alt={brand.name} 
+              className="brand-logo"
+            />
           </div>
         ))}
       </div>
@@ -49,4 +30,4 @@ const BrandsPage = () => {
   );
 };
 
-export default BrandsPage;
+export default memo(BrandsPage);

@@ -59,7 +59,7 @@ function App() {
   const ProtectedRoute = ({ element, restrictedRoles }) => {
     // If the user role is restricted, redirect to the dashboard or home
     if (restrictedRoles.includes(userRole)) {
-      return <Navigate to="/Admin/Dashboard" />; // You can change the redirect route as needed
+      return <Navigate to="/Admin/Computers" />; // You can change the redirect route as needed
     }
     return element; // Return the original element if not restricted
   };
@@ -81,10 +81,11 @@ function App() {
           <Route path="/MobileAccessories" element={<MobileAccessories />} />
           <Route path="/PrinterAccessories" element={<PrinterAccessories />} />
           <Route path="/CCTVAccessories" element={<CCTVAccessories />} />
-          <Route path="/Dashboard" element={<Dashboard />} />
+          {/* <Route path="/Dashboard" element={<Dashboard />} /> */}
           <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
           <Route path="/NewProduct" element={<NewProduct />} />
 
+          <Route path="/Dashboard" element={<ProtectedRoute element={<Dashboard />} restrictedRoles={['Staff']} />} />
           <Route path="/Orders" element={<ProtectedRoute element={<Orders />} restrictedRoles={['Staff']} />} />
           <Route path="/Customers" element={<ProtectedRoute element={<Customers />} restrictedRoles={['Staff']} />} />
           <Route path="/Reports" element={<ProtectedRoute element={<Reports />} restrictedRoles={['Staff']} />} />

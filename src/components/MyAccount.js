@@ -227,6 +227,8 @@ const MyAccount = () => {
                     >
                       {order.products.map((product) => (
                         <option
+                        className="product-name"
+
                           key={product.product_id}
                           value={product.product_id}
                         >
@@ -237,14 +239,14 @@ const MyAccount = () => {
                   ) : (
                     order.products &&
                     order.products.length === 1 && (
-                      <span style={{ fontWeight: "bold" }}>
+                      <span  className="product-name"  style={{ fontWeight: "bold" }}>
                         {order.products[0].name}
                       </span>
                     )
                   )}
                 </div>
-                  <p>Date: {formatDate(order.order_date)}</p>
-                  <p>Total: ₹{order.total_amount}</p>
+                  <p>Order Date: {formatDate(order.order_date)}</p>
+                  <p>Total Amount: ₹{order.total_amount}</p>
                   <button
                     onClick={() => openModal(order)}
                     className="view-details-button"
@@ -306,12 +308,12 @@ const MyAccount = () => {
                           ₹{currentProduct.prod_price}
                         </span>
                       </p>
-                      <p className="info-row">
+                      {/* <p className="info-row">
                         <span className="info-label">Description</span>
                         <span className="info-value product-descriptionn">
                           {currentProduct.prod_features}
                         </span>
-                      </p>
+                      </p> */}
                     </>
                   )}
                 </div>

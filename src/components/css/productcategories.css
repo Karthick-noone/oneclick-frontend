@@ -14,14 +14,14 @@
 .custom-slider-product {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
     text-align: center;
     width: 100%; /* Ensure full width of the swiper slide */
     padding: 10px;
     box-sizing: border-box;
     box-shadow: 2px 4px 6px  rgba(0, 0, 0, 0.1);
     border: 1px solid #ddd;
-     min-height: 400px; /* Ensure all cards have the same minimum height */
+     min-height: 370px; /* Ensure all cards have the same minimum height */
     height: auto; /* Adjust height dynamically */
     cursor: pointer;
     margin-bottom: 5px;
@@ -151,6 +151,17 @@
     text-transform: capitalize;
 }
 
+
+.custom-slider-subtitle{
+    display: -webkit-box; /* Required for WebKit-based browsers */
+    /* display: box;                      */
+    -webkit-box-orient: vertical; /* Required for WebKit-based browsers */
+    box-orient: vertical; /* Fallback for other browsers */
+    overflow: hidden; /* Hide overflow content */
+    -webkit-line-clamp: 1; /* Limit to 2 lines in WebKit-based browsers */
+    line-clamp: 1; /* Future proofing for standard implementation */
+    text-overflow: ellipsis; /* Show ellipsis when text overflows */
+}
 
 .custom-slider-name {
     display: -webkit-box; /* Required for WebKit-based browsers */
