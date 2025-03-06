@@ -5,13 +5,15 @@ import Header2 from "./Header2";
 import Footer from "./footer";
 import { ApiUrl } from "./ApiUrl";
 import Modal from "react-modal"; // Install if needed using `npm install react-modal`
-import { FaTimes, FaCheck } from "react-icons/fa";
+import { FaTimes, FaCheck, FaPrint } from "react-icons/fa";
 import OrderTrackingModal from "./TrackingModal";
 import Swal from "sweetalert2";
 
 import stamp from "./img/cancelled.jpg";
 import stamp2 from "./img/cancelled-stamp.png";
 
+import ReactDOMServer from "react-dom/server"; // Add this import at the top
+import Invoice from "../admin/pages/Invoice";
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null); // For modal
@@ -134,8 +136,7 @@ const MyOrders = () => {
           const response = await axios.get(`${ApiUrl}/api/my-orders/${userId}`); // Replace with actual API
           setOrders(response.data.orders);
 
-          console.log("response",response.data.orders)
-         
+          console.log("response", response.data.orders);
         } catch (error) {
           console.error("Error fetching orders:", error);
         }
@@ -229,47 +230,124 @@ const MyOrders = () => {
     setCurrentProduct(product);
   };
 
+  // Fetch product details function
+  const fetchProductDetails = async (orderId) => {
+    if (!orderId) return; // Prevent fetching if no orderId is provided
+    try {
+      console.log("Fetching product details for Order ID:", orderId);
+
+      // Fetch product IDs using order_id
+      const productResponse = await axios.get(
+        `${ApiUrl}/getProductByOrderId/${orderId}`
+      );
+      // console.log("Product Response Data:", productResponse.data);
+
+      // Check if any product details are present
+      if (!productResponse.data || productResponse.data.length === 0) {
+        console.error("No products found for Order ID:", orderId);
+        return []; // Return empty array if no products found
+      }
+
+      // Return product details from the response
+      return productResponse.data;
+    } catch (error) {
+      console.error("Error fetching product details:", error);
+      return []; // Return empty array in case of error
+    }
+  };
+
+  // Fetch product details when the selected order changes
+  useEffect(() => {
+    if (selectedOrder) {
+      fetchProductDetails(selectedOrder.unique_id); // Call function with selected order's unique ID
+    }
+  }, [selectedOrder]); // Run effect when selectedOrder changes
+
+  const printInvoice = async (order) => {
+    console.log("Preparing to print invoice for order:", order);
+
+    // Fetch product details before printing
+    const details = await fetchProductDetails(order.unique_id); // Get product details
+
+    // Log the product details to be printed
+    console.log("Product details to print:", details);
+
+    if (!details || details.length === 0) {
+      console.error("No product details available to print. Aborting print.");
+      return; // Exit if no product details
+    }
+
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Invoice</title>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid black; padding: 8px; text-align: left; }
+          </style>
+        </head>
+        <body>
+          ${ReactDOMServer.renderToStaticMarkup(
+            <Invoice order={order} productDetails={details} />
+          )}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
   return (
     <>
       <Header2 />
       <div className="my-orders">
         <h2>My Orders</h2>
         <div className="filters-container">
-  <span className="filters-title">Filter By</span>
-  
-  <div className="filter-group">
-    <label htmlFor="year" className="filter-label">Year</label>
-    <select
-      className="filter-dropdown"
-      id="year"
-      value={selectedYear}
-      onChange={(e) => setSelectedYear(Number(e.target.value))}
-    >
-      {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((year) => (
-        <option key={year} value={year}>
-          {year}
-        </option>
-      ))}
-    </select>
-  </div>
+          <span className="filters-title">Filter By</span>
 
-  <div className="filter-group">
-    <label htmlFor="month" className="filter-label">Month</label>
-    <select
-      className="filter-dropdown"
-      id="month"
-      value={selectedMonth}
-      onChange={(e) => setSelectedMonth(Number(e.target.value))}
-    >
-      {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-        <option key={month} value={month}>
-          {new Date(0, month - 1).toLocaleString("en-US", { month: "long" })}
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
+          <div className="filter-group">
+            <label htmlFor="year" className="filter-label">
+              Year
+            </label>
+            <select
+              className="filter-dropdown"
+              id="year"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+            >
+              {Array.from(
+                { length: 5 },
+                (_, i) => new Date().getFullYear() - i
+              ).map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
 
+          <div className="filter-group">
+            <label htmlFor="month" className="filter-label">
+              Month
+            </label>
+            <select
+              className="filter-dropdown"
+              id="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                <option key={month} value={month}>
+                  {new Date(0, month - 1).toLocaleString("en-US", {
+                    month: "long",
+                  })}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         <div className="order-container">
           {filteredOrders.length === 0 ? (
@@ -312,19 +390,25 @@ const MyOrders = () => {
                         >
                           {order.products.map((product) => (
                             <option
-                            className="product-name"
+                              // className="product-name"
                               key={product.product_id}
                               value={product.product_id}
                             >
-                              {product.name}
+                              {product.name.split(" ").slice(0, 4).join(" ")}
                             </option>
                           ))}
                         </select>
                       ) : (
                         order.products &&
                         order.products.length === 1 && (
-                          <span className="product-name" style={{ fontWeight: "bold" }}>
-                            {order.products[0].name}
+                          <span
+                            className="product-name"
+                            style={{ fontWeight: "bold" }}
+                          >
+                            {order.products[0].name
+                              .split(" ")
+                              .slice(0, 4)
+                              .join(" ")}
                           </span>
                         )
                       )}
@@ -359,6 +443,16 @@ const MyOrders = () => {
                   >
                     Track Order
                   </button>
+                  {order.delivery_status !== "Cancelled" && (
+                  <button
+                  title="Print Invoice"
+                    className="btn btn-print"
+                    onClick={() => printInvoice(order, productDetails)}
+                  >
+                    <FaPrint style={{ fontSize: "16px" }} />
+                  </button>
+                  )}
+
                 </div>
                 <OrderTrackingModal
                   isOpen={isModalOpen2}

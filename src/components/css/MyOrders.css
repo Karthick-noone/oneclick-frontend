@@ -173,7 +173,6 @@
   }
  
   
-  
   .order-container {
     display: flex;
     flex-wrap: wrap;
@@ -181,23 +180,24 @@
     justify-content: center;
   }
   
+  /* Order Card Styling */
   .order-card {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
+    background-color: #ffffff;
+    border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s, transform 0.3s;
     width: 100%;
     max-width: 350px;
-    
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    border-left: 6px solid #287bff; /* Adds a color accent to each card */
   }
   
   .order-card:hover {
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-6px);
   }
   
+  /* Order Header */
   .order-header {
     display: flex;
     justify-content: space-between;
@@ -205,90 +205,173 @@
     margin-bottom: 15px;
   }
   
-  .order-status {
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 14px;
-    text-transform: capitalize;
+  .order-header h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
   }
   
-  .order-status.completed {
-    background-color: #d4edda;
-    color: #155724;
+  /* Order Status Styling */
+  .order-status {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    font-size: 12px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .order-status:hover {
+    transform: scale(1.05);
+  }
+  
+  .order-status.paid {
+    background-color: #28a745;
   }
   
   .order-status.pending {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: #ffc107;
+    color: #212529;
   }
   
   .order-status.cancelled {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: #dc3545;
+  }
+  
+  .order-status.refunded {
+    background-color: #17a2b8;
+  }
+  
+  /* Product Name Styling */
+  .product-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #444;
+    /* background: linear-gradient(45deg, #f8f9fa, #e9ecef); */
+    padding: 6px 10px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-bottom: 10px;
+    text-transform: capitalize;
+  }
+  
+  /* Product Dropdown */
+  .product-dropdown {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    background-color: #fff;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .product-dropdown:focus {
+    border-color: #287bff;
+    box-shadow: 0 0 5px rgba(40, 123, 255, 0.5);
+  }
+  
+  /* Order Details */
+  .order-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+  }
+  
+  .order-info {
+    flex: 1;
+  }
+  
+  .order-info p {
+    font-size: 14px;
+    color: #555;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    font-weight: bold
+  }
+  
+  /* Icons and Labels for Date & Amount */
+  .order-info p strong {
+    font-size: 14px;
+    color: #222;
+    /* background: #f1f1f1; */
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-right: 5px;
+  }
+  
+  .order-container p {
+    font-size: 14px;
+    color: #555;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    font-weight: bold
+  }
+  
+  /* Icons and Labels for Date & Amount */
+  .order-container p strong {
+    font-size: 14px;
+    color: #222;
+    /* background: #f1f1f1; */
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-right: 5px;
+  }
+  
+  /* Cancelled Seal */
+  .cancelled-seal {
+    text-align: right;
+  }
+  
+  /* Buttons */
+  .buttons-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
   }
   
   .view-details-button {
     background-color: #287bff;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     padding: 10px 15px;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.3s;
-
+    transition: background-color 0.3s ease, transform 0.3s ease;
   }
   
   .view-details-button:hover {
     background-color: #0056b3;
+    transform: scale(1.05);
+  }
+  
+  .btn-print {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-print:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+    color: white;
   }
   
   .no-orders {
     text-align: center;
     font-size: 18px;
-    color: #555;
-  }
-
-  .order-status {
-    padding: 6px 15px; /* Increased padding for a more prominent look */
-    border-radius: 8px; /* More rounded corners for a modern feel */
-    font-weight: bold; /* Keep bold text */
-    color: white; /* White text for better contrast */
-    background-color: #28a745; /* Green background for successful status */
-    display: inline-block; /* Make the status label inline-block */
-    text-align: center; /* Center the text */
-    font-size: 12px; /* Slightly increased font size */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
-    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transitions */
+    color: #666;
+    margin-top: 20px;
   }
   
-  .order-status:hover {
-    background-color: #218838; /* Darker green on hover */
-    transform: scale(1.05); /* Slight zoom effect on hover */
-  }
-  
-  .order-status.shipped {
-    background-color: #ffc107; /* Yellow background for 'Shipped' status */
-    color: #212529; /* Dark text for better contrast on yellow */
-  }
-  
-  .order-status.out-for-delivery {
-    background-color: #17a2b8; /* Blue background for 'Out for Delivery' status */
-  }
-  
-  .order-status.delivered {
-    background-color: #007bff; /* Blue background for 'Delivered' status */
-  }
-  
-  .order-status.pending {
-    background-color: #dc3545; /* Red background for 'Pending' or error status */
-    color: white;
-  }
-  
-  /* Additional styles for no orders message */
-  .no-orders {
-    text-align: center;
-    font-size: 1.2em;
-    color: #555; /* Slightly darker text for contrast */
-  }
   

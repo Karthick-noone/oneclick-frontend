@@ -183,6 +183,7 @@ useEffect(() => {
         "phones",
         "phone",
         "android",
+        "iphone",
         "oneplus", // add the normalized product name here
       ],
     },

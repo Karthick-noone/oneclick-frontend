@@ -212,8 +212,8 @@ const MyAccount = () => {
                       ? "Payment Pending"
                       : order.status.toLowerCase() === "refund pending"
                       ? "Refund Pending"
-                      : order.status.toLowerCase() === "refund"
-                      ? "Refund"
+                      : order.status.toLowerCase() === "refunded"
+                      ? "Refunded"
                       : "Payment Paid"}
                   </span>
                   </div>
@@ -227,12 +227,12 @@ const MyAccount = () => {
                     >
                       {order.products.map((product) => (
                         <option
-                        className="product-name"
+                        // className="product-name"
 
                           key={product.product_id}
                           value={product.product_id}
                         >
-                          {product.name}
+                         {product.name.split(" ").slice(0, 4).join(" ")}
                         </option>
                       ))}
                     </select>
@@ -240,7 +240,7 @@ const MyAccount = () => {
                     order.products &&
                     order.products.length === 1 && (
                       <span  className="product-name"  style={{ fontWeight: "bold" }}>
-                        {order.products[0].name}
+                        {order.products[0].name.split(" ").slice(0, 4).join(" ")}
                       </span>
                     )
                   )}

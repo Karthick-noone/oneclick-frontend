@@ -214,7 +214,7 @@ const Invoice = ({ order, productDetails }) => {
               <tr key={product.prod_id}>
                 <td style={{ border: "1px solid #000", padding: "5px" }}>
                   {product.prod_name || "-"} <br />
-                  (#{product.prod_id})
+                  {/* (#{product.prod_id}) */}
                 </td>
                 <td style={{ border: "1px solid #000", padding: "5px" }}>
                   {product.quantity || "-"}

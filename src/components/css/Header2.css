@@ -603,7 +603,7 @@
   padding: 10px 15px; /* Padding for items */
   cursor: pointer; /* Pointer cursor on hover */
   list-style: none; /* Remove default list style */
-  font-size: 0.875rem; /* Font size for suggestions */
+  font-size: 0.875rem; /* Font size for suggestions */  
   transition: background-color 0.3s; /* Smooth background color transition */
 }
 
