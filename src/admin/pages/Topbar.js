@@ -185,7 +185,7 @@ const Topbar = () => {
 
   const username = localStorage.getItem("staffname")
   const role = localStorage.getItem("userRole")
-  const UserName = username.charAt(0).toUpperCase()+username.slice(1)
+  // const UserName = username+username.slice(1)
 
   return (
     <div className="topbar">
@@ -250,7 +250,7 @@ const Topbar = () => {
         <div className="topbar-menu" ref={menuRef}>
           <div className="profile-section">
             <img src={user} alt="Profile" className="profile-imagee" />
-            <h3 style={{ color: "black" }} className="profile-username">{role === 'Staff' ? UserName : role}</h3>
+            <h3 style={{ color: "black" }} className="profile-username">{role === 'Staff' ? username : role}</h3>
           </div>
           <hr />
           {role !== 'Staff' && (

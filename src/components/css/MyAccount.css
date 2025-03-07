@@ -12,29 +12,7 @@
     height: 100%;
   }
 
-  .product-name {
-    display: -webkit-box;              /* Required for WebKit-based browsers */
-    /* display: box;                        */
-    -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
-    box-orient: vertical;              /* Fallback for other browsers */
-    overflow: hidden;                   /* Hide overflow content */
-    -webkit-line-clamp: 1;             /* Limit to 2 lines in WebKit-based browsers */
-    line-clamp: 1;                     /* Future proofing for standard implementation */
-    text-overflow: ellipsis;           /* Show ellipsis when text overflows */
-  }
-  
 
-  .product-namee {
-    display: -webkit-box;              /* Required for WebKit-based browsers */
-    /* display: box;                        */
-    -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
-    box-orient: vertical;              /* Fallback for other browsers */
-    overflow: hidden;                   /* Hide overflow content */
-    -webkit-line-clamp: 3;             /* Limit to 2 lines in WebKit-based browsers */
-    line-clamp: 3;                     /* Future proofing for standard implementation */
-    text-overflow: ellipsis;           /* Show ellipsis when text overflows */
-  }
-  
 
   .product-descriptionn {
     display: -webkit-box;              /* Required for WebKit-based browsers */

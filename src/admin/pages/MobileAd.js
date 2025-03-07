@@ -124,95 +124,69 @@ const MobileAd = () => {
 
   const handleImageChange = (e, isBanner = false) => {
     const files = Array.from(e.target.files);
-    const validFiles = [];
-
+    const validExtensions = ["jpg", "jpeg", "png", "jfif"];
+    let processedFiles = [];
+  
     files.forEach((file) => {
       const fileName = file.name;
       const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]+/g, "_");
       const sanitizedFile = new File([file], sanitizedFileName, {
         type: file.type,
       });
-
-      const validExtensions = ["jpg", "jpeg", "png", "jfif"];
+  
       const fileExtension = sanitizedFile.name.split(".").pop().toLowerCase();
-
-      if (validExtensions.includes(fileExtension)) {
-        const reader = new FileReader();
-        reader.readAsDataURL(sanitizedFile);
-        reader.onload = (event) => {
-          const img = new Image();
-          img.src = event.target.result;
-          img.onload = () => {
-            const canvas = document.createElement("canvas");
-            const MAX_WIDTH = 800; // Maintain width
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
-
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            // Compression function
-            const compressImage = (minQuality, maxQuality) => {
-              return new Promise((resolve) => {
-                const tryCompression = (quality) => {
-                  canvas.toBlob(
-                    (blob) => {
-                      if (blob) {
-                        const sizeInKB = blob.size / 1024;
-                        console.log(
-                          `Compressed image at quality ${quality} has size: ${sizeInKB.toFixed(
-                            2
-                          )} KB`
-                        );
-
-                        if (sizeInKB > 500 && quality > minQuality) {
-                          tryCompression(quality - 0.05);
-                        } else if (sizeInKB < 500 && quality < maxQuality) {
-                          tryCompression(quality + 0.02);
-                        } else {
-                          resolve(blob);
-                        }
-                      }
-                    },
-                    "image/jpeg",
-                    quality
-                  );
-                };
-
-                // Start compression attempt only if size is above 500 KB
-                if (sanitizedFile.size / 1024 > 500) {
-                  tryCompression(maxQuality);
-                } else {
-                  resolve(sanitizedFile);
-                }
-              });
-            };
-
-            // Compressing with quality range between 0.5 and 0.95
-            compressImage(0.5, 0.95).then((compressedBlob) => {
-              const finalFileName = isBanner
-                ? `banner_${sanitizedFileName}`
-                : sanitizedFileName;
-              const finalFile = new File([compressedBlob], finalFileName, {
-                type: sanitizedFile.type,
-              });
-              validFiles.push(finalFile);
-              setNewProduct((prev) => ({
-                ...prev,
-                images: [...prev.images, ...validFiles],
-              }));
+  
+      if (!validExtensions.includes(fileExtension)) {
+        console.error(`${sanitizedFileName} is not a valid image format.`);
+        return;
+      }
+  
+      const reader = new FileReader();
+      reader.readAsDataURL(sanitizedFile);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 800;
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+          const compressImage = (minQuality, maxQuality) => {
+            return new Promise((resolve) => {
+              canvas.toBlob(
+                (blob) => resolve(blob || sanitizedFile),
+                "image/jpeg",
+                0.8
+              );
             });
           };
+  
+          compressImage(0.5, 0.95).then((compressedBlob) => {
+            const finalFileName = isBanner
+              ? `banner_${sanitizedFileName}`
+              : sanitizedFileName;
+            const finalFile = new File([compressedBlob], finalFileName, {
+              type: sanitizedFile.type,
+            });
+  
+            processedFiles.push(finalFile);
+  
+            if (processedFiles.length === files.length) {
+              setNewProduct((prev) => ({
+                ...prev,
+                images: [...prev.images, ...processedFiles],
+                title: isBanner ? "banner" : prev.title, // ✅ Set title if it's a banner
+              }));
+            }
+          });
         };
-      } else {
-        console.error(
-          `${sanitizedFileName} is not a valid image format (jpg, jpeg, png, jfif)`
-        );
-      }
+      };
     });
   };
-
   const handleImageChange2 = (e, isPortrait = false) => {
     const files = Array.from(e.target.files);
     const validFiles = [];
@@ -305,7 +279,6 @@ const MobileAd = () => {
   };
 
   const handleAddProduct = async () => {
-    // Check for missing fields
     if (!newProduct.brand_name) {
       Swal.fire({
         icon: "warning",
@@ -314,7 +287,7 @@ const MobileAd = () => {
       });
       return;
     }
-
+  
     if (newProduct.images.length === 0) {
       Swal.fire({
         icon: "warning",
@@ -323,74 +296,38 @@ const MobileAd = () => {
       });
       return;
     }
-
+  
     const formData = new FormData();
-    formData.append("title", newProduct.title);
+    formData.append("title", newProduct.title || "banner"); // ✅ Default to 'banner' if not set
     formData.append("description", newProduct.description);
     formData.append("offer", newProduct.offer);
     formData.append("brand_name", newProduct.brand_name);
-
-    // Add banner image with prefix if it exists
-    if (bannerImage) {
-      const bannerImageName = `banner_${bannerImage.name}`; // Prefix the banner image
-      const renamedBannerImage = new File([bannerImage], bannerImageName, {
-        type: bannerImage.type,
-      });
-      formData.append("images", renamedBannerImage);
-    } else if (potraitImage) {
-      const potraitImageName = `portrait_${potraitImage.name}`; // Prefix the potrait image
-      const renamedpotraitImage = new File([potraitImage], potraitImageName, {
-        type: potraitImage.type,
-      });
-      formData.append("images", renamedpotraitImage);
-    }
-
-    // Append other images without prefix
+  
     newProduct.images.forEach((image) => {
-      const originalImageName = image.name; // Keep the original name
-      const imageToUpload = new File([image], originalImageName, {
-        type: image.type,
-      });
-      formData.append("images", imageToUpload);
+      formData.append("images", image);
     });
-
+  
     try {
       await axios.post(`${ApiUrl}/mobileofferspage`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
-
+  
       Swal.fire({
         icon: "success",
         title: "Product Added",
         text: "The product has been added successfully!",
-      })
-        .then(() => {
-          return axios.get(`${ApiUrl}/fetchmobileofferspage`);
-        })
+      }).then(() => axios.get(`${ApiUrl}/fetchmobileofferspage`))
         .then((productsResponse) => {
           setProducts(productsResponse.data);
           setNewProduct({
-            title: "",
+            title: "", // ✅ Reset title
             description: "",
             brand_name: "",
             images: [],
           });
         });
-
-      // Reset file input
+  
       document.querySelector('input[type="file"]').value = "";
-
-      const fileInput = document.querySelector(".filee-input"); // Select the input by its class
-      if (fileInput) {
-        fileInput.value = ""; // Clear the file input
-      }
-
-      const fileInput2 = document.querySelector(".filee-inputt"); // Select the input by its class
-      if (fileInput2) {
-        fileInput2.value = ""; // Clear the file input
-      }
     } catch (error) {
       console.error("Error adding product:", error);
       Swal.fire({
@@ -400,6 +337,8 @@ const MobileAd = () => {
       });
     }
   };
+  
+  
 
  const handleUpdateProduct = async () => {
   console.log("Updating product:", editingProduct); // Log the current state of the editing product

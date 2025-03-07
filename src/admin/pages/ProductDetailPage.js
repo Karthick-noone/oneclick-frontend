@@ -120,80 +120,67 @@ const ProductDetailPage = () => {
   
   const handleImageChange = (e, isBanner = false) => {
     const files = Array.from(e.target.files);
-    const validFiles = [];
+    const validExtensions = ["jpg", "jpeg", "png", "jfif"];
+    let processedFiles = [];
   
     files.forEach((file) => {
       const fileName = file.name;
-      const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]+/g, '_');
-      const sanitizedFile = new File([file], sanitizedFileName, { type: file.type });
+      const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]+/g, "_");
+      const sanitizedFile = new File([file], sanitizedFileName, {
+        type: file.type,
+      });
   
-      const validExtensions = ['jpg', 'jpeg', 'png', 'jfif'];
-      const fileExtension = sanitizedFile.name.split('.').pop().toLowerCase();
+      const fileExtension = sanitizedFile.name.split(".").pop().toLowerCase();
   
-      if (validExtensions.includes(fileExtension)) {
-        const reader = new FileReader();
-        reader.readAsDataURL(sanitizedFile);
-        reader.onload = (event) => {
-          const img = new Image();
-          img.src = event.target.result;
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 800; // Maintain width
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
+      if (!validExtensions.includes(fileExtension)) {
+        console.error(`${sanitizedFileName} is not a valid image format.`);
+        return;
+      }
   
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const reader = new FileReader();
+      reader.readAsDataURL(sanitizedFile);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 800;
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   
-            // Compression function
-            const compressImage = (minQuality, maxQuality) => {
-              return new Promise((resolve) => {
-                const tryCompression = (quality) => {
-                  canvas.toBlob(
-                    (blob) => {
-                      if (blob) {
-                        const sizeInKB = blob.size / 1024;
-                        console.log(`Compressed image at quality ${quality} has size: ${sizeInKB.toFixed(2)} KB`);
-  
-                        if (sizeInKB > 500 && quality > minQuality) {
-                          tryCompression(quality - 0.05);
-                        } else if (sizeInKB < 500 && quality < maxQuality) {
-                          tryCompression(quality + 0.02);
-                        } else {
-                          resolve(blob);
-                        }
-                      }
-                    },
-                    'image/jpeg',
-                    quality
-                  );
-                };
-  
-                // Start compression attempt only if size is above 500 KB
-                if (sanitizedFile.size / 1024 > 500) {
-                  tryCompression(maxQuality);
-                } else {
-                  resolve(sanitizedFile);
-                }
-              });
-            };
-  
-            // Compressing with quality range between 0.5 and 0.95
-            compressImage(0.5, 0.95).then((compressedBlob) => {
-              const finalFileName = isBanner ? `product_banner_${sanitizedFileName}` : sanitizedFileName;
-              const finalFile = new File([compressedBlob], finalFileName, { type: sanitizedFile.type });
-              validFiles.push(finalFile);
-              setNewProduct((prev) => ({
-                ...prev,
-                images: [...prev.images, ...validFiles],
-              }));
+          const compressImage = (minQuality, maxQuality) => {
+            return new Promise((resolve) => {
+              canvas.toBlob(
+                (blob) => resolve(blob || sanitizedFile),
+                "image/jpeg",
+                0.8
+              );
             });
           };
+  
+          compressImage(0.5, 0.95).then((compressedBlob) => {
+            const finalFileName = isBanner
+              ? `product_banner_${sanitizedFileName}`
+              : sanitizedFileName;
+            const finalFile = new File([compressedBlob], finalFileName, {
+              type: sanitizedFile.type,
+            });
+  
+            processedFiles.push(finalFile);
+  
+            if (processedFiles.length === files.length) {
+              setNewProduct((prev) => ({
+                ...prev,
+                images: [...prev.images, ...processedFiles],
+                title: isBanner ? "product_banner" : prev.title, // ✅ Set title if it's a banner
+              }));
+            }
+          });
         };
-      } else {
-        console.error(`${sanitizedFileName} is not a valid image format (jpg, jpeg, png, jfif)`);
-      }
+      };
     });
   };
   

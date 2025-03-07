@@ -68,16 +68,6 @@
   /* box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); */
 }
 
-.product-name {
-  display: -webkit-box;              /* Required for WebKit-based browsers */
-  /* display: box;                        */
-  -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
-  box-orient: vertical;              /* Fallback for other browsers */
-  overflow: hidden;                   /* Hide overflow content */
-  -webkit-line-clamp: 1;             /* Limit to 2 lines in WebKit-based browsers */
-  line-clamp: 1;                     /* Future proofing for standard implementation */
-  text-overflow: ellipsis;           /* Show ellipsis when text overflows */
-}
 
 
 /* New style for cancelled order card */

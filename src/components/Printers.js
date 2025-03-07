@@ -509,6 +509,8 @@ const Printers = () => {
                     </span>
                   </div>
 
+        
+
                   <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
 
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
