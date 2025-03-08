@@ -5,11 +5,10 @@ import Header2 from "./Header2";
 import Footer from "./footer";
 import { ApiUrl } from "./ApiUrl";
 import Modal from "react-modal"; // Install if needed using `npm install react-modal`
-import { FaTimes, FaCheck, FaPrint } from "react-icons/fa";
+import { FaTimes, FaPrint } from "react-icons/fa";
 import OrderTrackingModal from "./TrackingModal";
 import Swal from "sweetalert2";
 
-import stamp from "./img/cancelled.jpg";
 import stamp2 from "./img/cancelled-stamp.png";
 
 import ReactDOMServer from "react-dom/server"; // Add this import at the top
@@ -19,9 +18,8 @@ const MyOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null); // For modal
   const [productDetails, setProductDetails] = useState(null); // To store fetched product details
   const [modalIsOpen, setModalIsOpen] = useState(false); // To open and close modal
-  const [deliveryStatus, setDeliveryStatus] = useState("");
+  const [deliveryStatus, ] = useState("");
   const statuses = ["Order Placed", "Shipped", "Out for Delivery", "Delivered"]; // Define the statuses
-  const [selectedStatus, setSelectedStatus] = useState("");
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState(null); // State for the current order ID
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -161,7 +159,7 @@ const MyOrders = () => {
     return `${day} ${month} ${year}`;
   };
 
-  const currentIndex = statuses.indexOf(deliveryStatus);
+  // const currentIndex = statuses.indexOf(deliveryStatus);
   const cancelOrder = async (orderId) => {
     try {
       const confirmation = await Swal.fire({
@@ -214,7 +212,7 @@ const MyOrders = () => {
   const [selectedProduct, setSelectedProduct] = useState(
     orders[0]?.products?.[0]?.product_id
   );
-  const [currentOrder, setCurrentOrder] = useState(null);
+  const [, setCurrentOrder] = useState(null);
   const [, setCurrentProduct] = useState(null);
 
   const handleProductChange = (event) => {
@@ -222,13 +220,13 @@ const MyOrders = () => {
     setSelectedProduct(productId);
   };
 
-  const handleViewOrder = (order) => {
-    const product = order.products.find(
-      (product) => product.product_id === selectedProduct
-    );
-    setCurrentOrder(order);
-    setCurrentProduct(product);
-  };
+  // const handleViewOrder = (order) => {
+  //   const product = order.products.find(
+  //     (product) => product.product_id === selectedProduct
+  //   );
+  //   setCurrentOrder(order);
+  //   setCurrentProduct(product);
+  // };
 
   // Fetch product details function
   const fetchProductDetails = async (orderId) => {
@@ -407,7 +405,7 @@ const MyOrders = () => {
                           >
                             {order.products[0].name
                               .split(" ")
-                              .slice(0, 4)
+                              .slice(0, 3)
                               .join(" ")}
                           </span>
                         )
@@ -554,7 +552,7 @@ const MyOrders = () => {
                   </span>
                 </p>
 
-                {selectedOrder.delivery_status != "Delivered" && (
+                {selectedOrder.delivery_status !== "Delivered" && (
                   <p>
                     <button
                       className="btn btn-cancel"

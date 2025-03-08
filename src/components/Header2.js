@@ -232,7 +232,7 @@ useEffect(() => {
       ],
     },
     {
-      term: "Speaker",
+      term: "Speakers",
       keywords: [
         "speaker",
         "speakers",
@@ -241,7 +241,7 @@ useEffect(() => {
         "home theatre",
       ],
     },
-    { term: "Television", keywords: ["television", "tv", "tele"] },
+    { term: "TV", keywords: ["television", "tv", "tele"] },
     {
       term: "Watch",
       keywords: ["watch", "smart watch", "time", "clock", "wall clock"],

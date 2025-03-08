@@ -32,10 +32,10 @@ const CCTVAd = () => {
   const [bannerKeyword, setBannerKeyword] = useState(""); // Define state for bannerKeyword
   const [isBannerEdit, setIsBannerEdit] = useState(false); // Track if the edit is for the banner
 
-  const [potraitImage, setPotraitImage] = useState(null);
-  const [potraitImageName, setPotraitImageName] = useState(null);
-  const [potraitKeyword, setPotraitKeyword] = useState(""); // Define state for potraitKeyword
-  const [isPotraitEdit, setIsPotraitEdit] = useState(false); // Track if the edit is for the banner
+  const [portraitImage, setportraitImage] = useState(null);
+  const [portraitImageName, setportraitImageName] = useState(null);
+  const [portraitKeyword, setportraitKeyword] = useState(""); // Define state for portraitKeyword
+  const [isportraitEdit, setIsportraitEdit] = useState(false); // Track if the edit is for the banner
 
   const navigate = useNavigate();
 
@@ -53,16 +53,16 @@ const CCTVAd = () => {
           (product) => product.image && product.image.startsWith("banner") // Adjust property name if needed
         );
         // Extract the banner image name from the fetched products
-        const potraitImage = response.data.find(
+        const portraitImage = response.data.find(
           (product) => product.image && product.image.startsWith("portrait") // Adjust property name if needed
         );
 
         if (bannerImage) {
           console.log("Banner image found:", bannerImage.image);
           setBannerImageName(bannerImage.image);
-        } else if (potraitImage) {
-          console.log("potrait image found:", potraitImage.image);
-          setPotraitImageName(potraitImage.image);
+        } else if (portraitImage) {
+          console.log("portrait image found:", portraitImage.image);
+          setportraitImageName(portraitImage.image);
         } else {
           console.log("No images found");
         }
@@ -190,94 +190,69 @@ const CCTVAd = () => {
     });
   };
 
-  const handleImageChange2 = (e, isPortrait = false) => {
+  const handleImageChange2 = (e, isportrait = false) => {
     const files = Array.from(e.target.files);
-    const validFiles = [];
-
+    const validExtensions = ["jpg", "jpeg", "png", "jfif"];
+    let processedFiles = [];
+  
     files.forEach((file) => {
       const fileName = file.name;
       const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]+/g, "_");
       const sanitizedFile = new File([file], sanitizedFileName, {
         type: file.type,
       });
-
-      const validExtensions = ["jpg", "jpeg", "png", "jfif"];
+  
       const fileExtension = sanitizedFile.name.split(".").pop().toLowerCase();
-
-      if (validExtensions.includes(fileExtension)) {
-        const reader = new FileReader();
-        reader.readAsDataURL(sanitizedFile);
-        reader.onload = (event) => {
-          const img = new Image();
-          img.src = event.target.result;
-          img.onload = () => {
-            const canvas = document.createElement("canvas");
-            const MAX_WIDTH = 800; // Maintain width
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
-
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            // Compression function
-            const compressImage = (minQuality, maxQuality) => {
-              return new Promise((resolve) => {
-                const tryCompression = (quality) => {
-                  canvas.toBlob(
-                    (blob) => {
-                      if (blob) {
-                        const sizeInKB = blob.size / 1024;
-                        console.log(
-                          `Compressed image at quality ${quality} has size: ${sizeInKB.toFixed(
-                            2
-                          )} KB`
-                        );
-
-                        if (sizeInKB > 500 && quality > minQuality) {
-                          tryCompression(quality - 0.05);
-                        } else if (sizeInKB < 500 && quality < maxQuality) {
-                          tryCompression(quality + 0.02);
-                        } else {
-                          resolve(blob);
-                        }
-                      }
-                    },
-                    "image/jpeg",
-                    quality
-                  );
-                };
-
-                // Start compression attempt only if size is above 500 KB
-                if (sanitizedFile.size / 1024 > 500) {
-                  tryCompression(maxQuality);
-                } else {
-                  resolve(sanitizedFile);
-                }
-              });
-            };
-
-            // Compressing with quality range between 0.5 and 0.95
-            compressImage(0.5, 0.95).then((compressedBlob) => {
-              const finalFileName = isPortrait
-                ? `portrait_${sanitizedFileName}`
-                : sanitizedFileName;
-              const finalFile = new File([compressedBlob], finalFileName, {
-                type: sanitizedFile.type,
-              });
-              validFiles.push(finalFile);
-              setNewProduct((prev) => ({
-                ...prev,
-                images: [...prev.images, ...validFiles],
-              }));
+  
+      if (!validExtensions.includes(fileExtension)) {
+        console.error(`${sanitizedFileName} is not a valid image format.`);
+        return;
+      }
+  
+      const reader = new FileReader();
+      reader.readAsDataURL(sanitizedFile);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 800;
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+          const compressImage = (minQuality, maxQuality) => {
+            return new Promise((resolve) => {
+              canvas.toBlob(
+                (blob) => resolve(blob || sanitizedFile),
+                "image/jpeg",
+                0.8
+              );
             });
           };
+  
+          compressImage(0.5, 0.95).then((compressedBlob) => {
+            const finalFileName = isportrait
+              ? `portrait_${sanitizedFileName}`
+              : sanitizedFileName;
+            const finalFile = new File([compressedBlob], finalFileName, {
+              type: sanitizedFile.type,
+            });
+  
+            processedFiles.push(finalFile);
+  
+            if (processedFiles.length === files.length) {
+              setNewProduct((prev) => ({
+                ...prev,
+                images: [...prev.images, ...processedFiles],
+                title: isportrait ? "portrait" : prev.title, // ✅ Set title if it's a banner
+              }));
+            }
+          });
         };
-      } else {
-        console.error(
-          `${sanitizedFileName} is not a valid image format (jpg, jpeg, png, jfif)`
-        );
-      }
+      };
     });
   };
 
@@ -287,6 +262,7 @@ const CCTVAd = () => {
         icon: "warning",
         title: "Missing Fields",
         text: "Please fill in all required fields.",
+        timer:3000,
       });
       return;
     }
@@ -296,6 +272,7 @@ const CCTVAd = () => {
         icon: "warning",
         title: "No Images",
         text: "Please select at least one image.",
+        timer:3000,
       });
       return;
     }
@@ -319,6 +296,7 @@ const CCTVAd = () => {
         icon: "success",
         title: "Product Added",
         text: "The product has been added successfully!",
+        timer:3000,
       }).then(() => axios.get(`${ApiUrl}/fetchcctvofferspage`))
         .then((productsResponse) => {
           setProducts(productsResponse.data);
@@ -328,6 +306,7 @@ const CCTVAd = () => {
             brand_name: "",
             images: [],
           });
+          window.location.reload()
         });
   
       document.querySelector('input[type="file"]').value = "";
@@ -337,6 +316,7 @@ const CCTVAd = () => {
         icon: "error",
         title: "Error",
         text: "There was an error adding the product. Please try again.",
+        timer:3000,
       });
     }
   };
@@ -356,6 +336,7 @@ const CCTVAd = () => {
       icon: "warning",
       title: "Missing Fields",
       text: "Please fill in all required fields.",
+      timer:3000,
     });
     return;
   }
@@ -376,7 +357,7 @@ const CCTVAd = () => {
       // Check if it's a normal, banner, or portrait image
       if (isBannerEdit) {
         imageNamePrefix = `banner_${selectedFiles.name}`; // Prefix for banner images
-      } else if (isPotraitEdit) {
+      } else if (isportraitEdit) {
         imageNamePrefix = `portrait_${selectedFiles.name}`; // Prefix for portrait images
       } else {
         imageNamePrefix = selectedFiles.name; // No prefix for normal images
@@ -414,6 +395,7 @@ const CCTVAd = () => {
       icon: "success",
       title: "Product and Image Updated",
       text: "The product and image have been updated successfully!",
+      timer:3000,
     })
       .then(() => {
         return axios.get(`${ApiUrl}/fetchcctvofferspage`);
@@ -430,6 +412,7 @@ const CCTVAd = () => {
       icon: "error",
       title: "Update Failed",
       text: "There was an error updating the product and/or image. Please try again.",
+      timer:3000,
     });
   }
 };
@@ -439,7 +422,7 @@ const CCTVAd = () => {
   
   
 
-  const handleEditProduct = (product, isBanner = false, isPotrait = false) => {
+  const handleEditProduct = (product, isBanner = false, isportrait = false) => {
     console.log("Editing product:", product); // Log the product being edited
   
     setEditingProduct({
@@ -450,7 +433,7 @@ const CCTVAd = () => {
   
     // Set the flags based on whether it's a banner or portrait image
     setIsBannerEdit(isBanner);
-    setIsPotraitEdit(isPotrait); // Set the flag for portrait image
+    setIsportraitEdit(isportrait); // Set the flag for portrait image
   
     setModalIsOpen(true);
   };
@@ -564,6 +547,7 @@ const CCTVAd = () => {
           icon: "success",
           title: "Image Deleted",
           text: "The image has been deleted successfully!",
+          timer:3000,
         });
 
         // Update the state to reflect the change
@@ -591,6 +575,7 @@ const CCTVAd = () => {
         icon: "error",
         title: "No File Selected",
         text: "Please select an image to update.",
+        timer:3000,
       });
       return;
     }
@@ -616,6 +601,7 @@ const CCTVAd = () => {
         icon: "success",
         title: "Image Updated",
         text: "The image has been updated successfully!",
+        timer:3000,
       });
 
       // Update the product images after a successful update
@@ -637,6 +623,7 @@ const CCTVAd = () => {
         icon: "error",
         title: "Update Failed",
         text: "There was an error updating the image. Please try again.",
+        timer:3000,
       });
     }
   };
@@ -711,7 +698,7 @@ const CCTVAd = () => {
 
         {products && products.length > 0 ? (
   products.map((product, index) => {
-    // Check if the first image name starts with 'banner' or 'potrait'
+    // Check if the first image name starts with 'banner' or 'portrait'
     const firstImage = product.image
       ? product.image.split(",")[0]
       : "";
@@ -834,9 +821,9 @@ const CCTVAd = () => {
 
 
 
-          <div className="potrait-container">
+          <div className="portrait-container">
             <>
-              <h4 className="banner-title">Potrait image (4000 x 6000)</h4>
+              <h4 className="banner-title">portrait image (4000 x 6000)</h4>
               <div className="input-grouppp">
                 {/* Display input fields when there are no images */}
                 {/* <p className="banner-title">banner</p> */}
@@ -896,7 +883,7 @@ const CCTVAd = () => {
         >
           <div style={{ textAlign: "center", marginTop: "10px" }}>
             <span style={{ fontWeight: "bold" }}>
-              Potrait Image {index + 1}
+              portrait Image {index + 1}
             </span>
           </div>
           <p style={{ marginTop: "30px" }} className="pc-product-brand">
@@ -905,8 +892,8 @@ const CCTVAd = () => {
 
           <img
             src={`${ApiUrl}/uploads/offerspage/${product.image}`} // Construct the image URL for the product
-            alt={`Potrait for ${product.brand_name}`} // Alt text for accessibility
-            className="potrait-imagee" // Class for styling
+            alt={`portrait for ${product.brand_name}`} // Alt text for accessibility
+            className="portrait-imagee" // Class for styling
           />
 
           <button

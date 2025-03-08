@@ -220,14 +220,14 @@ const Header3 = () => {
                 Headphones
               </NavLink>
               <NavLink
-                to="/Speaker"
+                to="/Speakers"
                 className={`nav-link ${
-                  location.pathname === "/Speaker" ? "active" : ""
+                  location.pathname === "/Speakers" ? "active" : ""
                 }`}
               >
                 <FaVolumeUp
                   className={`fa-icons ${
-                    location.pathname === "/Speaker" ? "active" : ""
+                    location.pathname === "/Speakers" ? "active" : ""
                   }`}
                 />{" "}
                 Speakers
@@ -236,14 +236,14 @@ const Header3 = () => {
           )}
         </div>
         <NavLink
-          to="/Television"
+          to="/TV"
           className={`nav-link ${
-            location.pathname === "/Television" ? "active" : ""
+            location.pathname === "/TV" ? "active" : ""
           }`}
         >
           <FaTv
             className={`fa-icons ${
-              location.pathname === "/Television" ? "active" : ""
+              location.pathname === "/TV" ? "active" : ""
             }`}
           />{" "}
           T.V & Home Cinema

@@ -172,7 +172,7 @@
   margin-top: 10px;
   height: 275px;
 }
-.potrait-imagee{
+.portrait-imagee{
   width: 230px;
   height: 300px;
   margin-top: 10px;
@@ -249,12 +249,12 @@
   text-align: center; /* Center align the title */
 }
 
-.potrait-container {
-  width: 300px; /* Width of the potrait */
-  height: 350px; /* Height of the potrait */
+.portrait-container {
+  width: 300px; /* Width of the portrait */
+  height: 350px; /* Height of the portrait */
   background-size: 10px 10px; /* Adjust size for spacing of slashes */
   border: none; /* Remove regular border */
-  margin-top: 20px; /* Add space between products and potrait */
+  margin-top: 20px; /* Add space between products and portrait */
   display: flex; /* Center the image inside the container */
   justify-content: center; /* Center the content horizontally */
   align-items: center; /* Center the content vertically */
@@ -264,7 +264,7 @@
 }
 
 /* Optional: You can add a pseudo-element for added styling if needed */
-.potrait-container::before {
+.portrait-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -275,7 +275,7 @@
   pointer-events: none; /* Allows clicks to pass through */
 }
 /* Title styling */
-.potrait-title {
+.portrait-title {
   margin-bottom: 30px; /* Space below the title */
   font-size: 20px; /* Font size for the title */
   font-weight: bold; /* Bold font weight */

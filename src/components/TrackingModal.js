@@ -4,13 +4,15 @@ import axios from "axios";
 import { ApiUrl } from "./ApiUrl";
 import Swal from "sweetalert2";
 import {
-  FaClipboard,
+  FaBox,
   FaShippingFast,
   FaTruck,
   FaCheckCircle,
-  FaTimes
+  FaTimes,
 } from "react-icons/fa";
 import "./css/TrackingModal.css";
+import Lottie from "lottie-react";
+import truckAnimation from "./css/truck2.json"; // Import your Lottie animation
 
 const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   const [deliveryStatus, setDeliveryStatus] = useState("");
@@ -18,25 +20,30 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   const [loading, setLoading] = useState(false);
 
   // Define statuses for regular and cancelled orders
-  const regularStatuses = ["Order Placed", "Shipped", "Out of Delivery", "Delivered"];
+  const regularStatuses = [
+    "Order Placed",
+    "Shipped",
+    "Out of Delivery",
+    "Delivered",
+  ];
   const cancelledStatuses = ["Order Placed", "Cancelled"];
   const isCancelled = deliveryStatus === "Cancelled";
   const statuses = isCancelled ? cancelledStatuses : regularStatuses;
 
   // Map statuses to icons
   const statusIcons = {
-    "Order Placed": FaClipboard,
-    "Shipped": FaShippingFast,
+    "Order Placed": FaBox,
+    Shipped: FaShippingFast,
     "Out of Delivery": FaTruck,
-    "Delivered": FaCheckCircle,
-    "Cancelled": FaTimes
+    Delivered: FaCheckCircle,
+    Cancelled: FaTimes,
   };
 
   const fetchDeliveryStatus = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${ApiUrl}/api/get-order-status`, {
-        params: { orderId: order_id }
+        params: { orderId: order_id },
       });
       const { delivery_status, delivery_date } = response.data;
       const dateObj = new Date(delivery_date);
@@ -52,7 +59,7 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
         icon: "error",
         title: "Error Fetching Status",
         text: "Could not fetch delivery status.",
-        confirmButtonText: "OK"
+        confirmButtonText: "OK",
       });
     } finally {
       setLoading(false);
@@ -106,25 +113,41 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
 
       <div className="trackorder-progress-wrapper">
         <div className="trackorder-progress-bar">
-          {/* The progress fill is now exactly between current and next icon */}
-          <div className="trackorder-progress-fill" style={{ width: `${fillPercentage}%` }}></div>
-          {/* Truck positioned at the same fill percentage */}
-          <FaTruck className="trackorder-truck" style={{ left: `${fillPercentage}%` }} />
+          <div
+            className="trackorder-progress-fill"
+            style={{ width: `${fillPercentage}%` }}
+          ></div>
         </div>
+        {deliveryStatus !== "Cancelled" && deliveryStatus !== "Delivered" && (
+          <div
+            className="trackorder-truck"
+            style={{ left: `${fillPercentage}%` }}
+          >
+            <Lottie
+              animationData={truckAnimation}
+              style={{ width: 50, height: 50 }}
+            />
+          </div>
+        )}
+
         <div className="trackorder-statuses">
           {statuses.map((status, index) => {
             const IconComponent = statusIcons[status];
             const isActive = index < currentIndex;
             // Blink only for the current status (unless delivered)
-            const isCurrent = index === currentIndex && deliveryStatus !== "Delivered" && deliveryStatus !== "Cancelled";
+            const isCurrent =
+              index === currentIndex &&
+              deliveryStatus !== "Delivered" &&
+              deliveryStatus !== "Cancelled";
             return (
               <div key={index} className="trackorder-status-item">
                 <IconComponent
+                style={{color:'red'}}
                   className={`trackorder-status-icon ${
                     isActive || index === currentIndex ? "active" : ""
                   } ${isCurrent ? "current" : ""}`}
                 />
-                <span className="trackorder-status-label">{status}</span>
+                <span  className="trackorder-status-label">{status}</span>
               </div>
             );
           })}
@@ -133,7 +156,9 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
 
       {deliveryDate && (
         <p className="trackorder-delivery-date">
-          {deliveryStatus === "Delivered" ? "Delivered on: " : "Expected Delivery: "}
+          {deliveryStatus === "Delivered"
+            ? "Delivered on: "
+            : "Expected Delivery: "}
           {formatDeliveryDate(deliveryDate)}
         </p>
       )}

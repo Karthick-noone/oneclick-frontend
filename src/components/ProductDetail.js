@@ -1083,7 +1083,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                         style={{ textDecoration: "none", color: "grey" }}
                         href={`/${
                           product.category === "TV"
-                            ? "TeleVision"
+                            ? "TV"
                             : product.category
                         }`} // Conditional URL
                       >

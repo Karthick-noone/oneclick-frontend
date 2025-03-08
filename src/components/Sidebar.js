@@ -84,18 +84,18 @@ const Sidebar = () => {
                         </li>
                         <li>
                             <a
-                                href="/Speaker"
-                                onClick={() => handleLinkClick('speaker')}
-                                className={activeLink === 'speaker' ? 'active' : ''}
+                                href="/Speakers"
+                                onClick={() => handleLinkClick('speakers')}
+                                className={activeLink === 'speakers' ? 'active' : ''}
                             >
                                 <FaVolumeUp /> Speakers
                             </a>
                         </li>
                         <li>
                             <a
-                                href="/TeleVision"
-                                onClick={() => handleLinkClick('television')}
-                                className={activeLink === 'television' ? 'active' : ''}
+                                href="/TV"
+                                onClick={() => handleLinkClick('TV')}
+                                className={activeLink === 'TV' ? 'active' : ''}
                             >
                                 <FaTv /> TV & Home Cinema
                             </a>

@@ -26,7 +26,7 @@ const FullAdPage = () => {
   }, []);
 
   const categoryMap = {
-    TV: "Television",
+    TV: "TV",
     Speakers: "Speaker",
     // Add other mappings as needed
   };

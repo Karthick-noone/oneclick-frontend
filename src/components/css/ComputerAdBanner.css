@@ -1,8 +1,8 @@
 .box{
-  padding: 10px;
+  padding: 5px;
   background-color: white;
   box-shadow: 5px  4px 8px rgba(0, 0, 0, 0.1);
-margin-top: 10px;
+/* margin-top: 10px; */
 border-radius: 5px;
 }
 
@@ -21,33 +21,33 @@ border-radius: 5px;
 /* .banner-image:hover {  
   transform: scale(1.02); 
 } */
-.potrait-container2 {
+.portrait-container2 {
   display: grid; /* Use grid layout */
   grid-template-columns: repeat(5, 1fr); /* Five columns */
   gap: 10px; /* Space between grid items */
   margin-top: 20px; /* Space at the top of the container */
-  margin-bottom: 20px; /* Space at the bottom of the container */
+  margin-bottom: 5px; /* Space at the bottom of the container */
 }
 
-.potrait-image {
+.portrait-image {
   width: 100%; /* Full width of the grid item */
   height: 350px; /* Fixed height */
   cursor: pointer;
   transition: transform 0.3s ease; /* Smooth transition for scaling */
 
 }
-.potrait-image:hover {
+.portrait-image:hover {
   transform: scale(1.05); /* Slightly zoom in on hover */
 }
 /* Media Queries for Responsive Design */
 @media (max-width: 1024px) {
-  .potrait-container2 {
+  .portrait-container2 {
     grid-template-columns: repeat(2, 1fr); /* Two images in a row */
   }
 }
 
 @media (max-width: 768px) {
-  .potrait-container2 {
+  .portrait-container2 {
     grid-template-columns: repeat(2, 1fr); /* Two images in a row */
   }
   .banner-image {
@@ -62,7 +62,7 @@ border-radius: 5px;
 }
 
 @media (max-width: 480px) {
-  .potrait-container2 {
+  .portrait-container2 {
     grid-template-columns: repeat(1, 1fr); /* One image in a row */
   }
 }

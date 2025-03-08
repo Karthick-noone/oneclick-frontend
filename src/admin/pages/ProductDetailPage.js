@@ -34,10 +34,10 @@ const ProductDetailPage = () => {
   const [isBannerEdit, setIsBannerEdit] = useState(false); // Track if the edit is for the banner
 
 
-  const [potraitImage, setPotraitImage] = useState(null);
-  const [potraitImageName, setPotraitImageName] = useState(null);
-  const [potraitKeyword, setPotraitKeyword] = useState(''); // Define state for potraitKeyword
-  const [ispotraitEdit, setIsPotraitEdit] = useState(false); // Track if the edit is for the banner
+  const [portraitImage, setportraitImage] = useState(null);
+  const [portraitImageName, setportraitImageName] = useState(null);
+  const [portraitKeyword, setportraitKeyword] = useState(''); // Define state for portraitKeyword
+  const [isportraitEdit, setIsportraitEdit] = useState(false); // Track if the edit is for the banner
 
 
   
@@ -184,7 +184,7 @@ const ProductDetailPage = () => {
     });
   };
   
-  const handleImageChange2 = (e, isPotrait = false) => {
+  const handleImageChange2 = (e, isportrait = false) => {
     const files = Array.from(e.target.files);
     const validFiles = [];
   
@@ -203,10 +203,10 @@ const ProductDetailPage = () => {
   
       if (validExtensions.includes(fileExtension)) {
         // If the current input is the banner input, prefix the file name
-        if (isPotrait) {
-          const potraitFileName = `potrait_${sanitizedFileName}`;
-          const potraitFile = new File([sanitizedFile], potraitFileName, { type: sanitizedFile.type });
-          validFiles.push(potraitFile); // Push the renamed potrait file
+        if (isportrait) {
+          const portraitFileName = `portrait_${sanitizedFileName}`;
+          const portraitFile = new File([sanitizedFile], portraitFileName, { type: sanitizedFile.type });
+          validFiles.push(portraitFile); // Push the renamed portrait file
         } else {
           validFiles.push(sanitizedFile); // Push the normal file
         }
@@ -257,10 +257,10 @@ const ProductDetailPage = () => {
       formData.append("images", renamedBannerImage);
     }
   
-   else if (potraitImage) {
-      const potraitImageName = `potrait_${potraitImage.name}`; // Prefix the potrait image
-      const renamedpotraitImage = new File([potraitImage], potraitImageName, { type: potraitImage.type });
-      formData.append("images", renamedpotraitImage);
+   else if (portraitImage) {
+      const portraitImageName = `portrait_${portraitImage.name}`; // Prefix the portrait image
+      const renamedportraitImage = new File([portraitImage], portraitImageName, { type: portraitImage.type });
+      formData.append("images", renamedportraitImage);
     }
   
     // Append other images without prefix

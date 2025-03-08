@@ -19,6 +19,7 @@ const WishlistSidebar = ({
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [product, setProduct] = useState(null);
   const [isOfferActive, setIsOfferActive] = useState(true);
+  const [wishlistLoaded, setWishlistLoaded] = useState(false);
 
 
   useEffect(() => {
@@ -52,24 +53,17 @@ const WishlistSidebar = ({
           username,
         });
 
-        if (response.data.products) {
-          setWishlistItems(response.data.products);
-        } else {
-          setWishlistItems([]);
-        }
+        setWishlistItems(response.data.products || []);
+        setWishlistLoaded(true); // ✅ Prevents unnecessary re-fetching
       } catch (error) {
         console.error("Error fetching wishlist:", error);
-        // toast.error("Failed to load wishlist.", {
-        //   position: "top-right",
-        //   autoClose: 2000,
-        // });
       }
     };
 
-    if (isOpen) {
+    if (isOpen && !wishlistLoaded) {
       fetchWishlist();
     }
-  }, [isOpen]);
+  }, [isOpen, wishlistLoaded]);
 
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
@@ -193,7 +187,7 @@ const WishlistSidebar = ({
                   </div>
                   <div className="item-actions">
                   <p className="item-price" style={{ color: 'red',textDecoration:"line-through", fontSize:'12px' }}>₹{product.actual_price}</p>
-                    <p className="item-price">₹{isOfferActive ? product.offer_price : product.prod_price}</p>
+                    <p className="item-price">₹{product.offer_price > 0 ? product.offer_price : product.prod_price}</p>
                     {product.status === "unavailable" ? (
                       <p className="out-of-stock">Out of Stock</p>
                     ) : (

@@ -75,8 +75,8 @@ const App = () => {
         <Route path="/CCTVAccessories" element={<CCTVAccessories />} />
         <Route path="/CCTV" element={<CCTV />} />
         <Route path="/Headphones" element={<Headphones />} />
-        <Route path="/TeleVision" element={<TV />} />
-        <Route path="/Speaker" element={<Speaker />} />
+        <Route path="/TV" element={<TV />} />
+        <Route path="/Speakers" element={<Speaker />} />
         <Route path="/Watch" element={<Watch />} />
         <Route path="/Printers" element={<Printers />} />
         <Route path="/Sidebar" element={<Sidebar />} />

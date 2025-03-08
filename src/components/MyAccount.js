@@ -232,7 +232,7 @@ const MyAccount = () => {
                           key={product.product_id}
                           value={product.product_id}
                         >
-                         {product.name.split(" ").slice(0, 4).join(" ")}
+                         {product.name.split(" ").slice(0, 3).join(" ")}
                         </option>
                       ))}
                     </select>
