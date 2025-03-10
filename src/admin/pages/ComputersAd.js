@@ -320,7 +320,7 @@ const ComputersAd = () => {
       });
     }
   };
-  
+      
   
  const handleUpdateProduct = async () => {
   console.log("Updating product:", editingProduct); // Log the current state of the editing product

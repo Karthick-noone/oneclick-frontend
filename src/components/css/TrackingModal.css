@@ -16,7 +16,7 @@
 
 /* Modal Content */
 .trackorder-modal {
-  background: #fff;
+  background: #fff; 
   width: 600px;
   padding: 25px;
   border-radius: 12px;
@@ -24,7 +24,11 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   position: relative;
   animation: fadeIn 0.3s ease-in-out;
+  height: 500px; /* Set a fixed height */
+  max-height: 56vh; /* Prevent excessive height */
+  overflow-y: auto; /* Allow scrolling if needed */
 }
+
 
 /* Close Button */
 .trackorder-close-button {
@@ -46,7 +50,7 @@
 .trackorder-title {
   font-size: 22px;
   font-weight: bold;
-  margin-bottom: 55px;
+  margin-bottom: 180px;
 }
 
 /* Progress Wrapper */
@@ -60,7 +64,7 @@
 /* Progress Bar Container */
 .trackorder-progress-bar {
   width: 100%;
-  height: 10px;
+  height: 6px;
   background: #c5c5c5;
   border-radius: 4px;
   margin-bottom: 60px; /* space for status icons or extra spacing */
@@ -167,5 +171,13 @@
   }
   .trackorder-status-icon {
     font-size: 20px;
+  }
+
+  .trackorder-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #c5c5c5;
+    border-radius: 4px;
+    margin-bottom: 80px; /* space for status icons or extra spacing */
   }
 }

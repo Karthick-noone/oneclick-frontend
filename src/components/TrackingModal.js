@@ -14,6 +14,8 @@ import "./css/TrackingModal.css";
 import Lottie from "lottie-react";
 import truckAnimation from "./css/truck2.json"; // Import your Lottie animation
 
+import citybg from "./img/city.jpg"
+
 const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   const [deliveryStatus, setDeliveryStatus] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -105,11 +107,26 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
       className="trackorder-modal"
       overlayClassName="trackorder-overlay"
       ariaHideApp={false}
-    >
+      style={{
+        content: {
+          backgroundImage: `url(${citybg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          // color: 'white' // Adjust text color for contrast
+          // backgoundRepeat:'no-repeat'
+          // marginBottom:'50px'
+        }
+      }}  
+    > 
+
+
+      
       <button onClick={handleModalClose} className="trackorder-close-button">
         <FaTimes />
       </button>
-      <h2 className="trackorder-title">Order Tracking</h2>
+      <h2 className="trackorder-title">Track Order</h2>
+
+      {/* <img src={citybg} width={'100%'} /> */}
 
       <div className="trackorder-progress-wrapper">
         <div className="trackorder-progress-bar">
@@ -142,7 +159,7 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
             return (
               <div key={index} className="trackorder-status-item">
                 <IconComponent
-                style={{color:'red'}}
+                // style={{color:'red'}}
                   className={`trackorder-status-icon ${
                     isActive || index === currentIndex ? "active" : ""
                   } ${isCurrent ? "current" : ""}`}
