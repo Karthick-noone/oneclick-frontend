@@ -154,3 +154,15 @@
   /* Product Card */
 
 }
+
+.recently-viewed-slider .slick-prev,
+.recently-viewed-slider .slick-next {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.recently-viewed-container:hover .slick-prev,
+.recently-viewed-container:hover .slick-next {
+  opacity: 1;
+
+}

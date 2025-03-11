@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import axios from "axios"; 
-import Slider from "react-slick"; 
-import "slick-carousel/slick/slick.css"; 
+import axios from "axios";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import "./css/RecentlyViewed.css"; 
+import "./css/RecentlyViewed.css";
 import { ApiUrl } from "./ApiUrl";
 import leftarrow from "./img/left.png";
 import rightarrow from "./img/right.png";
@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 const CustomArrow = ({ src, onClick, className }) => (
   <img
     src={src}
-    style={{ width: "35px", height: "35px" }}
     alt="Arrow"
     className={`custom-arrow ${className}`}
     onClick={onClick}
@@ -22,6 +21,7 @@ const CustomArrow = ({ src, onClick, className }) => (
 
 const RecentlyViewed = () => {
   const [recentProducts, setRecentProducts] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,6 +40,12 @@ const RecentlyViewed = () => {
     };
 
     fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   if (!recentProducts.length) return null;
@@ -61,7 +67,11 @@ const RecentlyViewed = () => {
     const firstImage = productImages.length ? productImages[0] : "";
 
     return (
-      <div key={product.prod_id} className="recently-viewed-card" onClick={() => navigate(`/product/${product.prod_id}`)}>
+      <div
+        key={product.id}
+        className="recently-viewed-card"
+        onClick={() => navigate(`/product/${product.id}`)}
+      >
         <img
           src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
           alt={product.prod_name}
@@ -83,37 +93,36 @@ const RecentlyViewed = () => {
     );
   };
 
-  // Slider settings with custom arrows
+  // Slider settings
   const sliderSettings = {
     dots: false,
     infinite: false,
     speed: 500,
-    slidesToShow: 5,
+    slidesToShow: isMobile ? 1 : 5, // Show 1 on mobile, 5 on desktop
     slidesToScroll: 1,
     prevArrow: <CustomArrow src={leftarrow} className="prev" />,
     nextArrow: <CustomArrow src={rightarrow} className="next" />,
-    responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 3 } },
-      { breakpoint: 768, settings: { slidesToShow: 2 } },
-      { breakpoint: 480, settings: { slidesToShow: 1 } },
-    ],
   };
 
   return (
     <div className="recently-viewed-container">
       <h2 className="recently-viewed-title">Recently Viewed Products</h2>
-      {recentProducts.length > 5 ? (
-        <Slider {...sliderSettings} className="recently-viewed-slider">
-          {recentProducts.map((product) => (
-            <ProductCard key={product.prod_id} product={product} />
-          ))}
-        </Slider>
-      ) : (
+      
+
+      {/* Normal Grid View if products <= 5 (Desktop), otherwise enable slider */}
+      {!isMobile && recentProducts.length <= 5 ? (
         <div className="recently-viewed-grid">
           {recentProducts.map((product) => (
-            <ProductCard key={product.prod_id} product={product} />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
+      ) : (
+        // Slider View for Mobile or if products > 5
+        <Slider {...sliderSettings} className="recently-viewed-slider">
+          {recentProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </Slider>
       )}
     </div>
   );
