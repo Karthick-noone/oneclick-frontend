@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./css/Cart.css";
 import { ApiUrl } from "./ApiUrl";
 // import Header1 from './Header1';
@@ -26,7 +26,7 @@ const CartPage = () => {
   const [addressDetails, setAddressDetails] = useState([]);
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
 
-  const [isOfferActive, setIsOfferActive] = useState(true);
+  // const [isOfferActive, setIsOfferActive] = useState(true);
   const [item, setitem] = useState(null);
 
   const [buyLaterProducts, setBuyLaterProducts] = useState([]);
@@ -36,6 +36,15 @@ const CartPage = () => {
 
   const userid = localStorage.getItem("user_id");
   const [selectedProducts, setSelectedProducts] = useState([]);
+
+  const location = useLocation();
+  const { isOfferActive, product } = location.state || {}; // Ensure it doesn't break if undefined
+
+  console.log("Received in Cart:", { isOfferActive, product });
+
+  const handleViewCheckout = () => {
+    navigate("/Checkout", { state: { isOfferActive, product } });
+  };
 
   // Toggle product selection for Buy Later
   const handleBuyLaterToggle = (id) => {
@@ -161,15 +170,15 @@ const CartPage = () => {
     fetchBuyLaterItems();
   }, [userid]);
 
-  useEffect(() => {
-    if (item && item.offer_end_time) {
-      const now = new Date();
-      const offerEndTime = new Date(item.offer_end_time);
+  // useEffect(() => {
+  //   if (item && item.offer_end_time) {
+  //     const now = new Date();
+  //     const offerEndTime = new Date(item.offer_end_time);
 
-      // Set offer active based on whether the offer end time is in the future
-      setIsOfferActive(offerEndTime > now);
-    }
-  }, [item]);
+  //     // Set offer active based on whether the offer end time is in the future
+  //     setIsOfferActive(offerEndTime > now);
+  //   }
+  // }, [item]);
 
   // Memoize fetchAddress function using useCallback to avoid re-creating it on each render
   const fetchAddress = useCallback(
@@ -364,7 +373,7 @@ const CartPage = () => {
     return cartItems
       .reduce((total, item) => {
         const price = parseFloat(
-          item.offer_price > 0 ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
         );
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
 
@@ -378,7 +387,7 @@ const CartPage = () => {
     return cartItems
       .reduce((total, item) => {
         const prod_price = parseFloat(
-          item.offer_price > 0 ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
         );
         return total + (isNaN(prod_price) ? 0 : prod_price * item.quantity);
       }, 0)
@@ -389,7 +398,7 @@ const CartPage = () => {
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
         const price = parseFloat(
-          item.offer_price > 0 ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
         );
         const discountPerItem = actual_price - price;
         return (
@@ -404,7 +413,7 @@ const CartPage = () => {
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
         const price = parseFloat(
-          item.offer_price > 0 ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
         );
         const discountPerItem = actual_price - price;
         return (
@@ -965,7 +974,7 @@ const CartPage = () => {
                           <p>
                             {" "}
                             ₹
-                            {item.offer_price > 0
+                            {item.offer_price > 0 && isOfferActive 
                               ? item.offer_price * item.quantity
                               : item.prod_price * item.quantity}
                           </p>
@@ -1064,7 +1073,7 @@ const CartPage = () => {
                             </p>
                             <p>
                               ₹
-                              {product.offer_price > 0
+                              {product.offer_price > 0 && isOfferActive 
                                 ? product.offer_price
                                 : product.prod_price}
                             </p>
@@ -1152,7 +1161,7 @@ const CartPage = () => {
             </div>
             <button
               className="summary-place-order-btn"
-              onClick={() => navigate("/Checkout")}
+              onClick={handleViewCheckout}
               // onClick={handlePlaceOrder}
             >
               Checkout

@@ -28,6 +28,7 @@ import Header3 from "./Header3";
 import Swal from "sweetalert2";
 import "nprogress/nprogress.css";
 import NProgress from "nprogress";
+// import isOfferActive from './ProductDetail'
 
 const Header2 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -48,17 +49,39 @@ const Header2 = () => {
   const [username, setUsername] = useState("");
   const [isOfferActive, setIsOfferActive] = useState(true);
   const [product, setProduct] = useState(null);
+  const [cartLoaded, setCartLoaded] = useState(false);
 
-
-    useEffect(() => {
-      if (product && product.offer_end_time) {
-        const now = new Date();
-        const offerEndTime = new Date(product.offer_end_time);
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      console.log("Cart is empty, no offer status to check.");
+      setProduct(null);
+      return;
+    }
   
-        // Set offer active based on whether the offer end time is in the future
-        setIsOfferActive(offerEndTime > now);
+    let activeOffer = false;
+    let bestProduct = null;
+  
+    cartItems.forEach((item) => {
+      if (item.offer_end_time) {
+        const now = new Date();
+        const offerEndTime = new Date(item.offer_end_time);
+  
+        console.log(`Checking offer for ${item.prod_name}:`, offerEndTime.toLocaleString());
+  
+        if (offerEndTime > now) {
+          activeOffer = true;
+          bestProduct = item; // Assign the first item with an active offer
+        }
       }
-    }, [product]);
+    });
+  
+    setIsOfferActive(activeOffer);
+    setProduct(bestProduct); // Assign the product with the active offer (or null if none)
+  
+    console.log(`Final Offer Status: ${activeOffer ? "Yes" : "No"}`);
+    console.log("Assigned product for offer tracking:", bestProduct);
+  }, [cartItems]);
+  
 
   useEffect(() => {
     NProgress.configure({ showSpinner: false }); // Disable spinner
@@ -356,7 +379,7 @@ useEffect(() => {
 
     return cartItems
       .reduce((total, item) => {
-        const price = parseFloat(item.offer_price > 0 ? item.offer_price : item.prod_price);
+        const price = parseFloat(item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price);
         return total + (isNaN(price) ? 0 : price * item.quantity);
       }, 0)
       .toFixed(0);
@@ -726,34 +749,35 @@ useEffect(() => {
 
   useEffect(() => {
     if (email) {
-      // Function to fetch the cart items
       const fetchCartItems = async () => {
         try {
           const response = await axios.post(`${ApiUrl}/get-cart-items`, {
             email,
-            username: localStorage.getItem("username"), // Send username if needed
+            username: localStorage.getItem("username"),
           });
-
-          if (response.data.products) {
-            setCartItems(response.data.products); // Set the fetched products to state
-          }
+  
+          const fetchedCart = response.data.products || [];
+          setCartItems(fetchedCart);
+          setCartLoaded(true);
+  
+          console.log("Fetched cart items:", fetchedCart);
         } catch (error) {
           console.error("Error fetching cart items:", error);
         } finally {
           setIsLoading(false);
         }
       };
-
-      // Fetch cart items immediately
+  
       fetchCartItems();
-
-      // Set an interval to fetch cart items every 5 seconds
-      const intervalId = setInterval(fetchCartItems, 5000); // 5000ms = 5 seconds
-
-      // Clean up the interval on component unmount or when `email` changes
+      const intervalId = setInterval(fetchCartItems, 5000);
+  
       return () => clearInterval(intervalId);
     }
-  }, [email]); // Dependency on `email` so it will trigger fetch when email changes
+  }, [email]);// Dependency on `email` so it will trigger fetch when email changes
+
+  const handleViewCart = () => {
+    navigate("/Cart", { state: { isOfferActive, product } });
+  };
 
   return (
     <>
@@ -972,7 +996,7 @@ useEffect(() => {
                         <p style={{ color: "#27ae60" }}>
                           {" "}
                           {/* ₹{item.prod_price * item.quantity} */}
-                          ₹{item.offer_price > 0 ? item.offer_price * item.quantity : item.prod_price * item.quantity}
+                          ₹{item.offer_price > 0 && isOfferActive ? item.offer_price * item.quantity : item.prod_price * item.quantity}
                         </p>
 
                         <div className="quantity-controls">
@@ -1017,8 +1041,8 @@ useEffect(() => {
                   style={{ textDecoration: "none", color: "black" }}
                   href="/Cart"
                 >
-                  <button className="change-btn">
-                    View Cart <FaShoppingCart />
+                  <button className="change-btn" onClick={handleViewCart}>
+                    View Cart <FaShoppingCart  />
                   </button>
                 </a>
               </div>

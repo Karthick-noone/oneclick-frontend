@@ -23,22 +23,60 @@ const WishlistSidebar = ({
 
 
   useEffect(() => {
-    if (product && product.offer_end_time) {
-      const now = new Date();
-      const offerEndTime = new Date(product.offer_end_time);
-
-      // Set offer active based on whether the offer end time is in the future
-      setIsOfferActive(offerEndTime > now);
+    console.log("useEffect triggered. Product:", product);
+  
+    if (!product) {
+      console.log("Product is null or undefined.");
+      return;
     }
+  
+    if (!product.offer_end_time) {
+      console.log("Product has no offer_end_time.");
+      return;
+    }
+  
+    const now = new Date();
+    const offerEndTime = new Date(product.offer_end_time);
+  
+    console.log("Current Time:", now.toLocaleString());
+    console.log("Offer End Time:", offerEndTime.toLocaleString());
+  
+    const isActive = offerEndTime > now;
+    setIsOfferActive(isActive);
+  
+    console.log(`Is Offer Active: ${isActive ? "Yes" : "No"}`);
   }, [product]);
-
-
-  // Fetch wishlist on component load
+  
+  useEffect(() => {
+    if (wishlistItems.length === 0) {
+      console.log("Wishlist is empty, no offer status to check.");
+      return;
+    }
+  
+    let activeOffer = false;
+  
+    wishlistItems.forEach((item) => {
+      if (item.offer_end_time) {
+        const now = new Date();
+        const offerEndTime = new Date(item.offer_end_time);
+  
+        console.log(`Checking offer for ${item.prod_name}:`, offerEndTime.toLocaleString());
+  
+        if (offerEndTime > now) {
+          activeOffer = true; // If at least one product has an active offer, set true
+        }
+      }
+    });
+  
+    setIsOfferActive(activeOffer);
+    console.log(`Final Offer Status: ${activeOffer ? "Yes" : "No"}`);
+  }, [wishlistItems]);
+  
   useEffect(() => {
     const fetchWishlist = async () => {
       const email = localStorage.getItem("email");
       const username = localStorage.getItem("username");
-
+  
       if (!email || !username) {
         toast.error("User is not logged in!", {
           position: "top-right",
@@ -46,24 +84,28 @@ const WishlistSidebar = ({
         });
         return;
       }
-
+  
       try {
         const response = await axios.post(`${ApiUrl}/fetch-wishlist`, {
           email,
           username,
         });
-
-        setWishlistItems(response.data.products || []);
-        setWishlistLoaded(true); // ✅ Prevents unnecessary re-fetching
+  
+        const fetchedWishlist = response.data.products || [];
+        setWishlistItems(fetchedWishlist);
+        setWishlistLoaded(true);
+  
+        console.log("Fetched wishlist items:", fetchedWishlist);
       } catch (error) {
         console.error("Error fetching wishlist:", error);
       }
     };
-
+  
     if (isOpen && !wishlistLoaded) {
       fetchWishlist();
     }
   }, [isOpen, wishlistLoaded]);
+  
 
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
@@ -187,7 +229,7 @@ const WishlistSidebar = ({
                   </div>
                   <div className="item-actions">
                   <p className="item-price" style={{ color: 'red',textDecoration:"line-through", fontSize:'12px' }}>₹{product.actual_price}</p>
-                    <p className="item-price">₹{product.offer_price > 0 ? product.offer_price : product.prod_price}</p>
+                    <p className="item-price">₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}</p>
                     {product.status === "unavailable" ? (
                       <p className="out-of-stock">Out of Stock</p>
                     ) : (

@@ -25,7 +25,7 @@ import tag from "./img/percent.png";
 import offertag from "./img/sale.png";
 import couponimg from "./img/couponcode.png";
 import FullAdPage from "./FullAdPage";
-
+// import Header2 from './Header2'
 const ProductDetail = ({ accessoryCategory }) => {
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -378,7 +378,7 @@ const ProductDetail = ({ accessoryCategory }) => {
   //       const cartKey = `${email}-cart`;
   //       const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
   //       const currentPrice =
-  //         isOfferActive && product.offer_price > 0
+  //         isOfferActive && product.offer_price > 0 && isOfferActive
   //           ? product.offer_price // Use offer_price if offer is active
   //           : product.prod_price;
   //       // Find existing item by id and category
@@ -529,7 +529,7 @@ const ProductDetail = ({ accessoryCategory }) => {
     }
   
 
-    const prod_price = product.offer_price > 0 ? product.offer_price : product.prod_price;
+    const prod_price = product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price;
 
     // Navigate to the purchase page with product details
     navigate('/purchase', {
@@ -1010,7 +1010,7 @@ const ProductDetail = ({ accessoryCategory }) => {
   
   return (
     <>
-      <Header2 />
+      <Header2  />
       <div className="main-container">
         {/* <Sidebar /> */}
 
@@ -1119,7 +1119,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                         <span>
                           <span className="product-detail-price">
                             ₹
-                            {product.offer_price > 0 && product.offer_price
+                            {product.offer_price > 0 && isOfferActive && product.offer_price
                               ? product.offer_price
                               : product.prod_price}{" "}
                           </span>{" "}
@@ -1142,7 +1142,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                             <span>
                               {Math.round(
                                 ((product.actual_price -
-                                  (product.offer_price > 0 && product.offer_price
+                                  (product.offer_price > 0 && isOfferActive && product.offer_price
                                     ? product.offer_price
                                     : product.prod_price)) /
                                   product.actual_price) *
@@ -1156,13 +1156,13 @@ const ProductDetail = ({ accessoryCategory }) => {
                         <p className="offerr-tag">
                           Save upto ₹
                           {product.actual_price -
-                            (product.offer_price >0 && product.offer_price
+                            (product.offer_price > 0 && isOfferActive && product.offer_price
                               ? product.offer_price
                               : product.prod_price)}
                         </p>
 
                         {/* Timer display */}
-                        {product.offer_price>0 &&
+                        {product.offer_price> 0 && isOfferActive &&
                           product.offer_price &&
                           remainingTime && (
                             <div className="offer-timer">
@@ -1232,7 +1232,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                             </span> */}
                             <span className="discounted-priceee">
   {`${Math.round(
-    ((product?.actual_price - (product?.offer_price || product?.prod_price)) /
+    ((product?.actual_price - (product?.offer_price && isOfferActive || product?.prod_price)) /
       product?.actual_price) *
       100
   )}%`}
@@ -1244,12 +1244,11 @@ const ProductDetail = ({ accessoryCategory }) => {
                           <div className="price-cell">
                             <span className="price-label">Effective Price</span>
                             <span className="total-priceee">
-                              ₹
-                              {coupons[product?.prod_id]
-                                ? (product?.offer_price ||
-                                    product?.prod_price) - couponNumber
-                                : product?.offer_price || product?.prod_price}
-                            </span>
+    ₹
+    {isOfferActive && product?.offer_price > 0
+      ? product?.offer_price
+      : product?.prod_price}
+  </span>
                           </div>
                         </div>
                       </div>
