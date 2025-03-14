@@ -23,6 +23,8 @@ const Computers = () => {
   const [favorites, setFavorites] = useState({});
    const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [loading, setLoading] = useState(true);
+  const [isOfferActive, setIsOfferActive] = useState(true);
+  const [product, setProduct] = useState(null);
 
 
   
@@ -61,9 +63,9 @@ const Computers = () => {
         const combinedString = normalizeString(prodName + " " + prodFeatures);
 
         // Log the combined string for debugging
-        console.log(
-          `Combined string for product: ${prodName} => ${combinedString}`
-        );
+        // console.log(
+        //   `Combined string for product: ${prodName} => ${combinedString}`
+        // );
 
         // Check if the combined string contains the normalized search query
         return combinedString.includes(normalizedSearchQuery);
@@ -126,6 +128,41 @@ const Computers = () => {
 
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    const now = new Date();
+    // console.log("Current Time:", now.toLocaleString());
+  
+    const activeProduct = products.find((item) => {
+      if (!item.offer_start_time || !item.offer_end_time) {
+        // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
+        return false;
+      }
+  
+      const offerStartTime = new Date(item.offer_start_time);
+      const offerEndTime = new Date(item.offer_end_time);
+  
+      // console.log(
+      //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
+      // );
+  
+      return offerStartTime <= now && offerEndTime > now;
+    });
+  
+    if (activeProduct) {
+      // console.log("Active Product Found:", activeProduct);
+    } else {
+      // console.log("No active product with a valid offer.");
+    }
+  
+    setProduct(activeProduct || null);
+    setIsOfferActive(!!activeProduct);
+  
+    // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
+  }, [products]);
+  
+  
+
 
   const handleBuyNow = (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
@@ -519,7 +556,7 @@ const Computers = () => {
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
+                        ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
@@ -540,7 +577,7 @@ const Computers = () => {
                     >
                       (
                       {Math.round(
-                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
+                        ((product.actual_price - (product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
                           100
                       )}
@@ -583,7 +620,7 @@ const Computers = () => {
                     </div>
                   )}
                   <>
-                    <br />
+                    {/* <br /> */}
                     {/* {coupons[product.prod_id] && ( // Access using prod_id
                 <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
                   <span>
@@ -651,7 +688,7 @@ const Computers = () => {
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
+                        ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
@@ -672,7 +709,7 @@ const Computers = () => {
                     >
                       (
                       {Math.round(
-                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
+                        ((product.actual_price - (product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
                           100
                       )}
@@ -717,7 +754,7 @@ const Computers = () => {
                   )}
 
                   <>
-                    <br />
+                    {/* <br /> */}
                     {/* {coupons[product.prod_id] && ( // Access using prod_id
                 <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
                   <span>

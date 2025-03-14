@@ -7,7 +7,7 @@ import Header2 from "./Header2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaTimes, FaTrash, FaCheck, FaShoppingBag } from "react-icons/fa";
+import { FaTimes, FaTrash, FaCheck, FaShoppingBag, FaStore } from "react-icons/fa";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {
   FaMoneyBillWave,
@@ -1600,7 +1600,7 @@ const Checkout = () => {
                   selectedPaymentMethod === "pickup" ? "selected" : ""
                 }`}
               >
-                <FaMoneyBillWave className="payment-icon" />
+                <FaStore className="payment-icon" />
                 <span className="methods">Pick Up From Store</span>
                 <span>
                   <input

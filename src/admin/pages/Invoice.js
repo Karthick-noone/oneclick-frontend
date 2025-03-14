@@ -3,19 +3,13 @@ import logo from "./img/logo3.png"; // Ensure the path is correct
 import { HiScissors } from "react-icons/hi";
 
 const Invoice = ({ order, productDetails }) => {
-  // Ensure the products array exists and is not empty
   const products = productDetails || []; // Use productDetails passed as prop
 
-  // Calculate total quantity and total amount
+  console.log("product", products);
+
+  // Calculate total quantity
   const totalQuantity = products.reduce(
     (acc, product) => acc + (product.quantity || 0),
-    0
-  );
-  const grandTotal = products.reduce(
-    (acc, product) =>
-      acc +
-      (product.prod_price || 0) +
-      (product.delivey_charge || 0) * (product.quantity || 0),
     0
   );
 
@@ -23,6 +17,21 @@ const Invoice = ({ order, productDetails }) => {
 
   return (
     <div>
+      <style type="text/css" media="print">
+        {`
+          /* Force display of the logo image during printing */
+          .invoice-logo {
+            display: block !important;
+            max-width: 100%; /* Ensure it fits within the page */
+            height: auto; /* Maintain aspect ratio */
+          }
+          /* Additional styles to ensure visibility */
+          body {
+            -webkit-print-color-adjust: exact; /* Ensure colors are printed */
+            print-color-adjust: exact;
+          }
+        `}
+      </style>
       {/* Main Container */}
       <div
         style={{
@@ -44,7 +53,12 @@ const Invoice = ({ order, productDetails }) => {
         >
           {/* Left: Logo */}
           <div style={{ flex: "1", textAlign: "left" }}>
-            <img src={logo} alt="Company Logo" style={{ width: "150px" }} />
+            <img
+              className="invoice-logo"
+              src={logo}
+              alt="Company Logo"
+              style={{ width: "150px" }}
+            />
           </div>
 
           {/* Center: Contact Info */}
@@ -125,7 +139,6 @@ const Invoice = ({ order, productDetails }) => {
             <p>
               <strong>Grand Total: </strong> ₹{order.total_amount}
             </p>
-            {/* Removed individual product total calculations here */}
           </div>
         </div>
 
@@ -147,7 +160,6 @@ const Invoice = ({ order, productDetails }) => {
           style={{
             flex: "1",
             borderTop: "1px dotted #333",
-            // margin: "0 10px",
           }}
         />
         <HiScissors style={{ fontSize: "20px", color: "#333" }} />
@@ -155,7 +167,6 @@ const Invoice = ({ order, productDetails }) => {
           style={{
             flex: "1",
             borderTop: "1px dotted #333",
-            // margin: "0 10px",
           }}
         />
       </div>
@@ -214,7 +225,6 @@ const Invoice = ({ order, productDetails }) => {
               <tr key={product.prod_id}>
                 <td style={{ border: "1px solid #000", padding: "5px" }}>
                   {product.prod_name || "-"} <br />
-                  {/* (#{product.prod_id}) */}
                 </td>
                 <td style={{ border: "1px solid #000", padding: "5px" }}>
                   {product.quantity || "-"}
@@ -223,9 +233,7 @@ const Invoice = ({ order, productDetails }) => {
                   {product.tax || "-"}
                 </td>
                 <td style={{ border: "1px solid #000", padding: "5px" }}>
-                  ₹
-                  {product.prod_price +
-                    product.deliverycharge * (product.quantity || 1) || "0"}
+                  ₹{product.prod_price * (product.quantity || 1) || "0"}
                 </td>
               </tr>
             ))}
@@ -238,16 +246,31 @@ const Invoice = ({ order, productDetails }) => {
             padding: "10px",
             display: "flex",
             justifyContent: "space-between",
+            alignItems: "center",
             marginBottom: "20px",
           }}
         >
+          {/* Left Side - Total Products */}
           <p>
             <strong>Total Products: </strong> {totalQuantity}
           </p>
-          <p>
-            <strong>Grand Total: </strong> ₹{order.total_amount}
-          </p>
+
+          {/* Right Side - Delivery Charge & Grand Total */}
+          <div style={{ textAlign: "right" }}>
+            <p>
+              <strong>Delivery Charge: </strong> ₹
+              {products.reduce(
+                (acc, product) =>
+                  acc + (parseInt(product.deliverycharge, 10) || 0),
+                0
+              )}
+            </p>
+            <p>
+              <strong>Grand Total: </strong> ₹{order.total_amount}
+            </p>
+          </div>
         </div>
+
         <hr />
         <p style={{ fontSize: "12px", fontFamily: "dancing, cursive" }}>
           This is a computer generated invoice, no signature required.

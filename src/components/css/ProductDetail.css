@@ -1,3 +1,84 @@
+/* Your original styles remain unchanged */
+
+.check {
+  cursor: pointer;
+  position: relative;
+  margin: auto;
+  width: 18px;
+  height: 18px;
+  -webkit-tap-highlight-color: transparent;
+  transform: translate3d(0, 0, 0);
+}
+
+.check:before {
+  content: "";
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(34, 50, 84, 0.03);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.check svg {
+  position: relative;
+  z-index: 1;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke: #333; 
+  stroke-width: 1.5;
+  transform: translate3d(0, 0, 0);
+  transition: all 0.2s ease;
+}
+
+.check svg path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 0;
+}
+
+.check svg polyline {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 66;
+}
+
+.check:hover:before {
+  opacity: 1;
+}
+
+.check:hover svg {
+  stroke: var(--accent-color, #007BFF); /* Accent color for hover */
+}
+
+.custom-checkbox:checked + .check svg {
+  stroke: var(--accent-color, #007BFF); /* Accent color when checked */
+}
+
+.custom-checkbox:checked + .check svg path {
+  stroke-dashoffset: 60;
+  transition: all 0.3s linear;
+}
+
+.custom-checkbox:checked + .check svg polyline {
+  stroke-dashoffset: 42;
+  transition: all 0.2s linear;
+  transition-delay: 0.15s;
+}
+
+/* New rule: Hide the plus icon when the checkbox is checked */
+.custom-checkbox:checked + .check .plus {
+  display: none;
+}
+
+.check:hover .plus line {
+  stroke: var(--accent-color, #007BFF) !important;
+}
+
+
+
 .side-row {
   max-height: 400px;
   overflow-y: auto;
@@ -1054,11 +1135,37 @@
   animation: shine 2s infinite linear; /* Add a shine animation */
 }
 
-.carousel-container {
+/* .carousel-container {
   position: relative;
   width: 100%;
   text-align: center;
+} */
+
+
+.product-features {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+  font-weight: 500;
+  text-align: justify;
+  transition: all 0.3s ease-in-out;
 }
+
+.product-features:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+}
+
+.product-features::before {
+  content: "✔  ";
+  font-weight: bold;
+  color: #007bff;
+}
+
 
 .product-detail-carousel-image {
   width: 490px; /* Set your desired fixed width */

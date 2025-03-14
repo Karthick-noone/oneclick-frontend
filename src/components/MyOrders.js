@@ -400,8 +400,8 @@ const MyOrders = () => {
                         order.products &&
                         order.products.length === 1 && (
                           <span
-                            className="product-name"
-                            style={{ fontWeight: "bold" }}
+                            className="product-namee"
+                            style={{ fontWeight: "bold", marginLeft:'10px' }}
                           >
                             {order.products[0].name
                               .split(" ")

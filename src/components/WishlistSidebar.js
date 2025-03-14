@@ -23,10 +23,8 @@ const WishlistSidebar = ({
 
 
   useEffect(() => {
-    console.log("useEffect triggered. Product:", product);
   
     if (!product) {
-      console.log("Product is null or undefined.");
       return;
     }
   
@@ -38,13 +36,10 @@ const WishlistSidebar = ({
     const now = new Date();
     const offerEndTime = new Date(product.offer_end_time);
   
-    console.log("Current Time:", now.toLocaleString());
-    console.log("Offer End Time:", offerEndTime.toLocaleString());
   
     const isActive = offerEndTime > now;
     setIsOfferActive(isActive);
   
-    console.log(`Is Offer Active: ${isActive ? "Yes" : "No"}`);
   }, [product]);
   
   useEffect(() => {

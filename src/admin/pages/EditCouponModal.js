@@ -23,14 +23,14 @@ const EditCouponModal = ({ isOpen, onClose, coupon, onCouponUpdated, productPric
   const handleUpdateCoupon = async () => {
     try {
       // Convert coupon code to uppercase
-      const upperCouponCode = couponCode.toUpperCase();
+      // const upperCouponCode = couponCode.toUpperCase();
   
       // Validate coupon code and extract numeric part
       // const couponValueMatch = upperCouponCode.match(/\d+/); // Use couponCode from state (in uppercase)
       // const couponValue = couponValueMatch ? Number(couponValueMatch[0]) : 0; // Get the number or default to 0 if not found
   
       // Check if either coupon code or expiry date is provided
-      if (!upperCouponCode || !expiryDate || !couponValue) {
+      if (!couponCode || !expiryDate || !couponValue) {
         Swal.fire({
           icon: "warning",
           title: "Validation Error",
@@ -39,7 +39,7 @@ const EditCouponModal = ({ isOpen, onClose, coupon, onCouponUpdated, productPric
         return;
       }
   
-      // if (!upperCouponCode && !expiryDate) {
+      // if (!couponCode && !expiryDate) {
       //   Swal.fire({
       //     icon: "warning",
       //     title: "Validation Error",
@@ -49,7 +49,7 @@ const EditCouponModal = ({ isOpen, onClose, coupon, onCouponUpdated, productPric
       // }
   
       // Check if coupon code is provided and not just spaces
-      if (upperCouponCode && !upperCouponCode.trim()) {
+      if (couponCode && !couponCode.trim()) {
         Swal.fire({
           icon: "warning",
           title: "Validation Error",
@@ -69,8 +69,8 @@ const EditCouponModal = ({ isOpen, onClose, coupon, onCouponUpdated, productPric
       }
   
       // Check if the coupon code contains at least one letter and one digit
-      // const hasDigit = /\d/.test(upperCouponCode);
-      // const hasLetter = /[a-zA-Z]/.test(upperCouponCode);
+      // const hasDigit = /\d/.test(couponCode);
+      // const hasLetter = /[a-zA-Z]/.test(couponCode);
   
       // if (!hasDigit || !hasLetter) {
       //   Swal.fire({
@@ -83,7 +83,7 @@ const EditCouponModal = ({ isOpen, onClose, coupon, onCouponUpdated, productPric
   
       // Prepare the updated coupon data
       const updatedCouponData = {
-        coupon_code: upperCouponCode, // Store coupon code in uppercase
+        coupon_code: couponCode, // Store coupon code in uppercase
         couponValue: couponValue, // Store coupon code in uppercase
         expiry_date: expiryDate,  // Use updated expiryDate from state
       };

@@ -17,10 +17,10 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
 
   const handleAddCoupon = async () => {
     // Convert coupon code to uppercase
-    const upperCouponCode = couponCode.toUpperCase();
+    // const upperCouponCode = couponCode.toUpperCase();
 
     // Validation checks
-    if (!upperCouponCode || !expiryDate || !couponValue) {
+    if (!couponCode || !expiryDate || !couponValue) {
       Swal.fire({
         icon: "warning",
         title: "Validation Error",
@@ -29,7 +29,16 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
       return;
     }
 
-    if (!upperCouponCode && !expiryDate) {
+    if (couponValue >= prodPrice) {
+      Swal.fire({
+        icon: "warning",
+        title: "Validation Error",
+        text: `Coupon value must be less than the price ${prodPrice}`,
+      });
+      return;
+    }
+
+    if (!couponCode && !expiryDate) {
       Swal.fire({
         icon: "warning",
         title: "Validation Error",
@@ -51,7 +60,7 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
     try {
       const coupon = {
         product_id: productId,
-        coupon_code: upperCouponCode,
+        coupon_code: couponCode,
         discount_value: Number(couponValue), // Convert string to number
         expiry_date: expiryDate,
       };

@@ -29,7 +29,7 @@ const CouponManager = () => {
     e.preventDefault();
     try {
 
-        const upperCaseName = couponName.toUpperCase(); // Convert name to uppercase
+        const upperCaseName = couponName; // Convert name to uppercase
 
       if (editingId) {
         await axios.put(`${ApiUrl}/api/editcoupons/${editingId}`, {
@@ -106,7 +106,6 @@ const CouponManager = () => {
       setCouponValue(value);
     }
   };
-  
 
   return (
     <div style={styles.container}>

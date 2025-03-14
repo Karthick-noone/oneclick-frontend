@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom"; // Import useParams to get the product ID from the URL
 import axios from "axios";
 // import { toast } from "react-toastify";
@@ -9,13 +9,22 @@ import { ApiUrl } from "./ApiUrl"; // Adjust the import path accordingly
 import "./css/ProductDetail.css"; // Ensure you create this CSS file
 import Header2 from "./Header2";
 // import Sidebar from "./Sidebar";
-import { FaHeart,FaRegHeart, FaShoppingBag } from "react-icons/fa"; // Import the heart icon from react-icons
+import { FaHeart, FaRegHeart, FaShoppingBag } from "react-icons/fa"; // Import the heart icon from react-icons
 import Footer from "./footer";
 import { useNavigate } from "react-router-dom"; // Import useNavigate at the top
 import Slider from "react-slick"; // Import the slider component
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { FaMemory, FaHdd, FaCamera, FaMicrochip, FaTv, FaBatteryFull, FaWifi, FaApple } from 'react-icons/fa';  // Import necessary icons
+import {
+  FaMemory,
+  FaHdd,
+  FaCamera,
+  FaMicrochip,
+  FaTv,
+  FaBatteryFull,
+  FaWifi,
+  FaApple,
+} from "react-icons/fa"; // Import necessary icons
 
 import { useCart } from "../components/CartContext";
 import leftarrow from "./img/left.png";
@@ -57,8 +66,6 @@ const ProductDetail = ({ accessoryCategory }) => {
 
   const [zoomStyle, setZoomStyle] = useState({});
   const zoomRef = useRef(null);
-  
- 
 
   useEffect(() => {
     if (product && product.offer_end_time) {
@@ -279,7 +286,6 @@ const ProductDetail = ({ accessoryCategory }) => {
       setIsFavorite(productIsFavorite);
     }
   }, [product]); // Dependency on product
-  
 
   const handleAddToCart2 = async (selectedAccessories, event) => {
     if (!event) return;
@@ -300,7 +306,9 @@ const ProductDetail = ({ accessoryCategory }) => {
 
     try {
       for (const accessoryId of selectedAccessories) {
-        const accessory = relatedAccessories.find((acc) => acc.id === accessoryId);
+        const accessory = relatedAccessories.find(
+          (acc) => acc.id === accessoryId
+        );
         if (accessory) {
           await axios.post(`${ApiUrl}/add-to-cart`, {
             email,
@@ -323,8 +331,7 @@ const ProductDetail = ({ accessoryCategory }) => {
     } finally {
       setIsAdding(false); // Enable button after completion
     }
-};
-
+  };
 
   const handleAddToCartWithAccessories = async (selectedAccessories, event) => {
     // Check if at least one accessory is selected
@@ -459,7 +466,6 @@ const ProductDetail = ({ accessoryCategory }) => {
 
     const email = localStorage.getItem("email");
 
-
     // Check if the user is logged in
     if (!email) {
       toast.error("User is not logged in!", {
@@ -477,11 +483,8 @@ const ProductDetail = ({ accessoryCategory }) => {
 
     // const prod_price = isOfferActive ? product.offer_price : product.prod_price;
 
-
     // Set isAdding to true to disable the button while the request is in progress
     setIsAdding(true);
-
-    
 
     try {
       const response = await axios.post(`${ApiUrl}/add-to-cart`, {
@@ -511,7 +514,7 @@ const ProductDetail = ({ accessoryCategory }) => {
 
   const handleBuyNow = (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
-  
+
     // Check if the user is logged in
     const email = localStorage.getItem("email");
     if (!email) {
@@ -527,27 +530,27 @@ const ProductDetail = ({ accessoryCategory }) => {
       window.location.href = "/login";
       return;
     }
-  
 
-    const prod_price = product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price;
+    const prod_price =
+      product.offer_price > 0 && isOfferActive
+        ? product.offer_price
+        : product.prod_price;
 
     // Navigate to the purchase page with product details
-    navigate('/purchase', {
+    navigate("/purchase", {
       // state: { product, email }, // Pass the product details and email (if needed)
       state: { product: { ...product, prod_price }, email }, // Pass updated product details
-
     });
-    console.log("product",product)
-
+    console.log("product", product);
   };
 
   const handleToggleFavorite = async (product, event) => {
     event.stopPropagation();
-  
+
     // Check if the user is logged in
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
-  
+
     if (!email || !username) {
       toast.error("User is not logged in!", {
         position: "top-right",
@@ -556,50 +559,52 @@ const ProductDetail = ({ accessoryCategory }) => {
       window.location.href = "/login";
       return;
     }
-  
+
+    // Optimistically update the UI
+    setFavorites((prev) => ({
+      ...prev,
+      [product.id]: !prev[product.id],
+    }));
+
     try {
-      const isFavorite = favorites[`${product.id}`]; // Check if product is already in the wishlist
-  
+      const isFavorite = favorites[product.id];
+
       if (isFavorite) {
-        // If already in wishlist, call remove API
-        console.log(`${product.prod_name} (ID: ${product.id}) is in the wishlist. Removing it.`);
-  
+        // Call remove API
         await axios.post(`${ApiUrl}/remove-from-wishlist`, {
           email,
           productId: product.id,
         });
-  
-        console.log(`${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`);
         toast.info(`${product.prod_name} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
       } else {
-        // If not in wishlist, call add API
-        console.log(`${product.prod_name} (ID: ${product.id}) is not in the wishlist. Adding it.`);
-  
+        // Call add API
         await axios.post(`${ApiUrl}/update-user-wishlist`, {
           email,
           username,
           action: "add",
           prod_id: product.id,
         });
-  
-        console.log(`${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`);
         toast.success(`${product.prod_name} added to your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
       }
     } catch (error) {
-      console.error("Error updating wishlist:", error);
+      // Revert the UI change if the API call fails
+      setFavorites((prev) => ({
+        ...prev,
+        [product.id]: favorites[product.id],
+      }));
       toast.error("An error occurred while updating wishlist.", {
         position: "top-right",
         autoClose: 2000,
       });
     }
   };
-  
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -809,46 +814,40 @@ const ProductDetail = ({ accessoryCategory }) => {
     const fetchWishlist = async () => {
       const email = localStorage.getItem("email");
       const username = localStorage.getItem("username");
-  
+
       if (!email || !username) {
         console.log("User not logged in");
         return;
       }
-  
+
       try {
         const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
           email,
           username,
         });
-  
+
         if (response.data.wishlist) {
           const wishlist = response.data.wishlist;
           const favoritesMap = {};
-  
-          // Set the favorites map based on product IDs in the wishlist
+
           wishlist.forEach((item) => {
-            favoritesMap[`${item}`] = true; // Mark product ID as in wishlist
+            favoritesMap[item] = true;
           });
-  
-          setFavorites(favoritesMap);  // Update the favorites state
+
+          setFavorites(favoritesMap);
         }
       } catch (error) {
         console.error("Error fetching wishlist:", error);
       }
     };
-  
-    // Fetch wishlist immediately
+
+    // Fetch wishlist on component mount
     fetchWishlist();
-  
-    // Set an interval to fetch the wishlist every second
-    const intervalId = setInterval(() => {
-      fetchWishlist();
-    }, 100); // Update every second (1000ms)
-  
-    // Cleanup the interval when the component unmounts
-    return () => clearInterval(intervalId);
+
+    // Optionally, use a longer polling interval if you need periodic updates
+    // const intervalId = setInterval(fetchWishlist, 30000); // every 30 seconds
+    // return () => clearInterval(intervalId);
   }, []);
-  
 
   if (isLoading) {
     return (
@@ -870,23 +869,22 @@ const ProductDetail = ({ accessoryCategory }) => {
     ? product.prod_img
     : JSON.parse(product.prod_img || "[]");
 
-    const handleMouseMove = (e) => {
-      const image = zoomRef.current;
-      if (!image) return;
-    
-      const { left, top, width, height } = image.getBoundingClientRect();
-      const x = ((e.clientX - left) / width) * 100;
-      const y = ((e.clientY - top) / height) * 100;
-    
-      setZoomStyle({
-        transformOrigin: `${x}% ${y}%`,
-        transform: "scale(2)", // Adjust scale for zoom level
-        cursor:'zoom-in'  
-      });
-    };
-    
-    const hasMultipleImages = images.length > 1;
-  
+  const handleMouseMove = (e) => {
+    const image = zoomRef.current;
+    if (!image) return;
+
+    const { left, top, width, height } = image.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+
+    setZoomStyle({
+      transformOrigin: `${x}% ${y}%`,
+      transform: "scale(2)", // Adjust scale for zoom level
+      cursor: "zoom-in",
+    });
+  };
+
+  const hasMultipleImages = images.length > 1;
 
   // const firstImage = images.length > 0 ? images[0] : null; // Get the first image or null if not available
 
@@ -1006,11 +1004,9 @@ const ProductDetail = ({ accessoryCategory }) => {
     ],
   };
 
-
-  
   return (
     <>
-      <Header2  />
+      <Header2 />
       <div className="main-container">
         {/* <Sidebar /> */}
 
@@ -1038,30 +1034,34 @@ const ProductDetail = ({ accessoryCategory }) => {
               </div>
 
               <div className="product-detail-image-container">
-    <div className="carousel-container">
-      {product.offer_label && <div className="product-label2">{product.offer_label}</div>}
+                <div className="carousel-container">
+                  {product.offer_label && (
+                    <div className="product-label2">{product.offer_label}</div>
+                  )}
 
-      <Slider {...settings}>
-        {images.length > 0 ? (
-          images.map((image, index) => (
-            <div key={index} className="zoom-container">
-              <img
-                ref={zoomRef}
-                src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${image}`}
-                alt={product.prod_name}
-                className="product-detail-image"
-                onMouseMove={!hasMultipleImages ? handleMouseMove : null} // Apply zoom only if 1 image
-                onMouseLeave={() => setZoomStyle({})} // Reset zoom when mouse leaves
-                style={zoomStyle}
-              />
-            </div>
-          ))
-        ) : (
-          <div>No image available</div>
-        )}
-      </Slider>
-    </div>
-  </div>
+                  <Slider {...settings}>
+                    {images.length > 0 ? (
+                      images.map((image, index) => (
+                        <div key={index} className="zoom-container">
+                          <img
+                            ref={zoomRef}
+                            src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${image}`}
+                            alt={product.prod_name}
+                            className="product-detail-image"
+                            onMouseMove={
+                              !hasMultipleImages ? handleMouseMove : null
+                            } // Apply zoom only if 1 image
+                            onMouseLeave={() => setZoomStyle({})} // Reset zoom when mouse leaves
+                            style={zoomStyle}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div>No image available</div>
+                    )}
+                  </Slider>
+                </div>
+              </div>
 
               <div className="side-row">
                 <div className="product-main-row">
@@ -1082,9 +1082,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                       <a
                         style={{ textDecoration: "none", color: "grey" }}
                         href={`/${
-                          product.category === "TV"
-                            ? "TV"
-                            : product.category
+                          product.category === "TV" ? "TV" : product.category
                         }`} // Conditional URL
                       >
                         {" "}
@@ -1119,7 +1117,9 @@ const ProductDetail = ({ accessoryCategory }) => {
                         <span>
                           <span className="product-detail-price">
                             ₹
-                            {product.offer_price > 0 && isOfferActive && product.offer_price
+                            {product.offer_price > 0 &&
+                            isOfferActive &&
+                            product.offer_price
                               ? product.offer_price
                               : product.prod_price}{" "}
                           </span>{" "}
@@ -1142,7 +1142,9 @@ const ProductDetail = ({ accessoryCategory }) => {
                             <span>
                               {Math.round(
                                 ((product.actual_price -
-                                  (product.offer_price > 0 && isOfferActive && product.offer_price
+                                  (product.offer_price > 0 &&
+                                  isOfferActive &&
+                                  product.offer_price
                                     ? product.offer_price
                                     : product.prod_price)) /
                                   product.actual_price) *
@@ -1156,13 +1158,16 @@ const ProductDetail = ({ accessoryCategory }) => {
                         <p className="offerr-tag">
                           Save upto ₹
                           {product.actual_price -
-                            (product.offer_price > 0 && isOfferActive && product.offer_price
+                            (product.offer_price > 0 &&
+                            isOfferActive &&
+                            product.offer_price
                               ? product.offer_price
                               : product.prod_price)}
                         </p>
 
                         {/* Timer display */}
-                        {product.offer_price> 0 && isOfferActive &&
+                        {product.offer_price > 0 &&
+                          isOfferActive &&
                           product.offer_price &&
                           remainingTime && (
                             <div className="offer-timer">
@@ -1199,11 +1204,11 @@ const ProductDetail = ({ accessoryCategory }) => {
                           >
                             <span className="price-label">M.R.P Rate</span>
                             <span className="actual-priceee">
-                             ₹
+                              ₹
                               {/* {coupons[product?.prod_id]
                                 ? product?.offer_price || product?.prod_price
                                 : product?.actual_price} */}
-                                {product?.actual_price}
+                              {product?.actual_price}
                             </span>
                           </div>
 
@@ -1231,24 +1236,25 @@ const ProductDetail = ({ accessoryCategory }) => {
                                   )}%`}
                             </span> */}
                             <span className="discounted-priceee">
-  {`${Math.round(
-    ((product?.actual_price - (product?.offer_price && isOfferActive || product?.prod_price)) /
-      product?.actual_price) *
-      100
-  )}%`}
-</span>
-
+                              {`${Math.round(
+                                ((product?.actual_price -
+                                  ((product?.offer_price && isOfferActive) ||
+                                    product?.prod_price)) /
+                                  product?.actual_price) *
+                                  100
+                              )}%`}
+                            </span>
                           </div>
 
                           {/* Effective Price */}
                           <div className="price-cell">
                             <span className="price-label">Effective Price</span>
                             <span className="total-priceee">
-    ₹
-    {isOfferActive && product?.offer_price > 0
-      ? product?.offer_price
-      : product?.prod_price}
-  </span>
+                              ₹
+                              {isOfferActive && product?.offer_price > 0
+                                ? product?.offer_price
+                                : product?.prod_price}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -1266,7 +1272,9 @@ const ProductDetail = ({ accessoryCategory }) => {
                           className="product-detail-add-to-cart"
                         >
                           ADD TO CART{" "}
-                          <span style={{ marginLeft: "10px" }}><FaShoppingBag /></span>
+                          <span style={{ marginLeft: "10px" }}>
+                            <FaShoppingBag />
+                          </span>
                         </button>
                         <button
                           title="Buy Now"
@@ -1282,17 +1290,28 @@ const ProductDetail = ({ accessoryCategory }) => {
                           onClick={(event) => toggleFavorite(product, event)}
                         /> */}
 
-                         <span
-                            title={favorites[`${product.id}`] ? "Remove from Wishlist" : "Add to Wishlist"}
-                            className={`heart-icon ${favorites[`${product.id}`] ? "filled" : ""}`}
-                            onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
-                          >
-                            {favorites[`${product.id}`] ? (
-                              <FaHeart title="Remove from wishlist" style={{ color: "red" }} /> // Filled heart
-                            ) : (
-                              <FaRegHeart title="Add to wishlist" /> // Empty heart
-                            )}
-                          </span>
+                        <span
+                          title={
+                            favorites[`${product.id}`]
+                              ? "Remove from Wishlist"
+                              : "Add to Wishlist"
+                          }
+                          className={`heart-icon ${
+                            favorites[`${product.id}`] ? "filled" : ""
+                          }`}
+                          onClick={(event) =>
+                            handleToggleFavorite(product, event)
+                          } // Unified handler
+                        >
+                          {favorites[`${product.id}`] ? (
+                            <FaHeart
+                              title="Remove from wishlist"
+                              style={{ color: "red" }}
+                            /> // Filled heart
+                          ) : (
+                            <FaRegHeart title="Add to wishlist" /> // Empty heart
+                          )}
+                        </span>
                         <span
                           style={{
                             color: "green",
@@ -1306,7 +1325,6 @@ const ProductDetail = ({ accessoryCategory }) => {
                       </div>
                     )}
                   </div>
-              
 
                   {relatedAccessories.length > 0 && (
                     <div className="product-detail-infooo">
@@ -1333,21 +1351,51 @@ const ProductDetail = ({ accessoryCategory }) => {
                                   marginTop: "15px",
                                 }}
                               >
-                                <input
+                                {/* <input
                                   type="checkbox"
                                   id={`accessory-${accessory.id}`}
                                   onChange={(event) =>
                                     handleCheckboxChange(event, accessory.id)
                                   }
                                   style={{ marginRight: "10px" }}
-                                />
+                                /> */}
+
+<div className="container">
+  <input
+    type="checkbox"
+    id={`accessory-${accessory.id}`}
+    className="custom-checkbox" // Use the custom class for our CSS
+    onChange={(event) => handleCheckboxChange(event, accessory.id)}
+    style={{ display: "none" }} // Hide the native checkbox
+  />
+  <label 
+    htmlFor={`accessory-${accessory.id}`} 
+    className="check" 
+    style={{ marginRight: "10px" }}
+  >
+    <svg width="18px" height="18px" viewBox="0 0 18 18">
+      {/* The circle outline remains the same */}
+      <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+      {/* Plus icon group (visible when unchecked) */}
+      <g className="plus">
+        <line x1="9" y1="4" x2="9" y2="14" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="4" y1="9" x2="14" y2="9" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+      </g>
+      {/* Check mark for the animated state */}
+      <polyline points="1 9 7 14 15 4"></polyline>
+    </svg>
+  </label>
+</div>
+
+
+
+
                                 {/* <span>{accessory.prod_name}</span> */}
                                 <img
                                   src={`${ApiUrl}/uploads/${accessory.category.toLowerCase()}/${firstImage}`}
                                   alt={accessory.prod_name}
                                   className="accessory-image"
-                    loading="lazy"
-
+                                  loading="lazy"
                                   style={{
                                     width: "60px",
                                     height: "60px",
@@ -1365,7 +1413,11 @@ const ProductDetail = ({ accessoryCategory }) => {
                                     {accessory.prod_name
                                       .charAt(0)
                                       .toUpperCase() +
-                                      accessory.prod_name.slice(1)}
+                                      accessory.prod_name
+                                        .slice(1)
+                                        .split(" ")
+                                        .slice(0, 3)
+                                        .join(" ")}
                                   </h5>
                                   <p
                                     style={{
@@ -1412,7 +1464,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                     </div>
                   )}
                 </div>
-   
+
                 <div className="product-features-row">
                   {/* <span>{product.category}</span> */}
                   <h3 className="product-features-title">
@@ -1434,50 +1486,66 @@ const ProductDetail = ({ accessoryCategory }) => {
                     <ul style={{ listStyleType: "none", padding: 0 }}>
                       {product.memory && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}><FaHdd style={iconStyle}/> RAM</span>
+                          <span style={labelStyle}>
+                            <FaHdd style={iconStyle} /> RAM
+                          </span>
                           <span style={valueStyle}>{product.memory}</span>
                         </li>
                       )}
                       {product.storage && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}><FaMemory style={iconStyle} /> ROM</span>
+                          <span style={labelStyle}>
+                            <FaMemory style={iconStyle} /> ROM
+                          </span>
                           <span style={valueStyle}>{product.storage}</span>
                         </li>
                       )}
                       {product.camera && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}><FaCamera  style={iconStyle}/> Camera</span>
+                          <span style={labelStyle}>
+                            <FaCamera style={iconStyle} /> Camera
+                          </span>
                           <span style={valueStyle}>{product.camera}</span>
                         </li>
                       )}
 
                       {product.processor && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}><FaMicrochip  style={iconStyle}/> Processor</span>
+                          <span style={labelStyle}>
+                            <FaMicrochip style={iconStyle} /> Processor
+                          </span>
                           <span style={valueStyle}>{product.processor}</span>
                         </li>
                       )}
                       {product.display && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}><FaTv  style={iconStyle}/> Display</span>
+                          <span style={labelStyle}>
+                            <FaTv style={iconStyle} /> Display
+                          </span>
                           <span style={valueStyle}>{product.display}</span>
                         </li>
                       )}
                       {product.os && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}><FaApple  style={iconStyle}/> OS</span>
+                          <span style={labelStyle}>
+                            <FaApple style={iconStyle} /> OS
+                          </span>
                           <span style={valueStyle}>{product.os}</span>
                         </li>
                       )}
                       {product.network && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}><FaWifi  style={iconStyle}/> Network</span>
+                          <span style={labelStyle}>
+                            <FaWifi style={iconStyle} /> Network
+                          </span>
                           <span style={valueStyle}>{product.network}</span>
                         </li>
                       )}
                       {product.battery && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}><FaBatteryFull  style={iconStyle}/> Battery</span>
+                          <span style={labelStyle}>
+                            <FaBatteryFull style={iconStyle} /> Battery
+                          </span>
                           <span style={valueStyle}>{product.battery}</span>
                         </li>
                       )}
@@ -1494,10 +1562,10 @@ const ProductDetail = ({ accessoryCategory }) => {
                     product.category === "Headphones" ||
                     product.category === "Speaker" ? (
                     // Product Features for CCTV, Watch, TV, Headphones, and Speaker
-                    <p style={descriptionStyle}>{product.prod_features}</p>
+                    <p className="product-features">{product.prod_features}</p>
                   ) : (
                     // For other categories
-                    <p style={descriptionStyle}>{product.prod_features}</p>
+                    <p className="product-features">{product.prod_features}</p>
                   )}
                 </div>
               </div>
@@ -1536,8 +1604,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                           }}
                           src={leftarrow}
                           alt=""
-                    loading="lazy"
-
+                          loading="lazy"
                         />
                       </button>
                     )}
@@ -1571,8 +1638,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                                 src={`${ApiUrl}/uploads/${relatedProduct.category.toLowerCase()}/${firstImage}`}
                                 alt={relatedProduct.prod_name}
                                 className="related-product-image"
-                    loading="lazy"
-
+                                loading="lazy"
                               />
                               <p className="related-product-name">
                                 {relatedProduct.prod_name
@@ -1584,8 +1650,12 @@ const ProductDetail = ({ accessoryCategory }) => {
                   {relatedProduct.prod_features}
                 </p> */}
                               <p className="product-actual-price">
-                                M.R.P <span
-                                  style={{ textDecoration: "line-through", color:'red' }}
+                                M.R.P{" "}
+                                <span
+                                  style={{
+                                    textDecoration: "line-through",
+                                    color: "red",
+                                  }}
                                 >
                                   ₹{relatedProduct.actual_price}{" "}
                                 </span>
@@ -1624,15 +1694,14 @@ const ProductDetail = ({ accessoryCategory }) => {
                           }}
                           src={rightarrow}
                           alt=""
-                    loading="lazy"
-
+                          loading="lazy"
                         />
                       </button>
                     )}
                   </div>
                 </div>
               )}
-            <div className="bannerr-container4" style={{marginTop:'20px'}}>
+            <div className="bannerr-container4" style={{ marginTop: "20px" }}>
               {filteredBanners.length > 0 ? (
                 <div>
                   <div
@@ -1649,7 +1718,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                       src={`${ApiUrl}/uploads/offerspage/${filteredBanners[0].image}`}
                       alt={`Banner for ${filteredBanners[0].brand_name}`}
                       className="banner-image"
-                    loading="lazy"
+                      loading="lazy"
 
                       // style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
                     />
@@ -1680,8 +1749,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                         }}
                         src={leftarrow}
                         alt=""
-                    loading="lazy"
-
+                        loading="lazy"
                       />
                     </button>
                   )}
@@ -1712,8 +1780,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                               src={`${ApiUrl}/uploads/${relatedProduct.category.toLowerCase()}/${firstImage}`}
                               alt={relatedProduct.prod_name}
                               className="related-product-image"
-                    loading="lazy"
-
+                              loading="lazy"
                             />
                             <p className="related-product-name">
                               {relatedProduct.prod_name
@@ -1725,7 +1792,13 @@ const ProductDetail = ({ accessoryCategory }) => {
                   {relatedProduct.prod_features}
                 </p> */}
                             <p className="product-actual-price">
-                            M.R.P <span style={{ textDecoration: "line-through", color:'red' }}>
+                              M.R.P{" "}
+                              <span
+                                style={{
+                                  textDecoration: "line-through",
+                                  color: "red",
+                                }}
+                              >
                                 ₹{relatedProduct.actual_price}{" "}
                               </span>
                               <span
@@ -1763,8 +1836,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                         }}
                         src={rightarrow}
                         alt=""
-                    loading="lazy"
-
+                        loading="lazy"
                       />
                     </button>
                   )}
@@ -1789,7 +1861,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                       src={`${ApiUrl}/uploads/offerspage/${filteredBanners[1].image}`}
                       alt={`Banner for ${filteredBanners[1].brand_name}`}
                       className="banner-image"
-                    loading="lazy"
+                      loading="lazy"
 
                       // style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
                     />
@@ -1816,12 +1888,12 @@ const ProductDetail = ({ accessoryCategory }) => {
   /* Styling for the list items */
 }
 const listItemStyle = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: '10px',
-  padding: '8px 12px',
-  borderRadius: '8px',
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "10px",
+  padding: "8px 12px",
+  borderRadius: "8px",
   // backgroundColor: '#f9f9f9',
   // border: '1px solid #ddd',
 };
@@ -1836,8 +1908,8 @@ const labelStyle = {
   width: "30%", // Increased width for label
   marginRight: "15px", // More space between label and value
   fontSize: "16px", // Slightly larger font for readability
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
 };
 
 const valueStyle = {
@@ -1851,9 +1923,9 @@ const valueStyle = {
 };
 
 const iconStyle = {
-  marginRight: '8px',
-  fontSize: '18px',
-  color: '#007bff',
+  marginRight: "8px",
+  fontSize: "18px",
+  color: "#007bff",
 };
 
 // Additional styles for description and text

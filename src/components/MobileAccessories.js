@@ -127,6 +127,41 @@ const MobileAccessories = () => {
     fetchProducts();
   }, []);
 
+    const [isOfferActive, setIsOfferActive] = useState(true);
+      const [product, setProduct] = useState(null);
+  
+       useEffect(() => {
+          const now = new Date();
+          // console.log("Current Time:", now.toLocaleString());
+        
+          const activeProduct = products.find((item) => {
+            if (!item.offer_start_time || !item.offer_end_time) {
+              // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
+              return false;
+            }
+        
+            const offerStartTime = new Date(item.offer_start_time);
+            const offerEndTime = new Date(item.offer_end_time);
+        
+            // console.log(
+            //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
+            // );
+        
+            return offerStartTime <= now && offerEndTime > now;
+          });
+        
+          if (activeProduct) {
+            // console.log("Active Product Found:", activeProduct);
+          } else {
+            // console.log("No active product with a valid offer.");
+          }
+        
+          setProduct(activeProduct || null);
+          setIsOfferActive(!!activeProduct);
+        
+          // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
+        }, [products]);
+
   const handleBuyNow = (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
 
