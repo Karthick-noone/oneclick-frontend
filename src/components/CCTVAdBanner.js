@@ -8,6 +8,7 @@ import Footer from "./footer";
 
 const AdBanner = () => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,6 +19,8 @@ const AdBanner = () => {
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProducts();
@@ -37,70 +40,75 @@ const AdBanner = () => {
       <Header2 />
       <div className="ad-section-container4">
         {/* ✅ Section 1: Banner Images */}
-        {bannerProducts.length > 0 && (
-          <div className="box">
-            <div className="bannerr-container4">
-              {bannerProducts.map((banner, index) => (
-                <div className="banner-image-display" key={index}>
-                  <img
-                    onClick={() => handleAdClick(banner)}
-                    src={`${ApiUrl}/uploads/offerspage/${banner.image}`}
-                    alt={`Banner for ${banner.brand_name}`}
-                    className="banner-image"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
-            </div>
+        <div className="box">
+          <div className="bannerr-container4">
+            {loading
+              ? [...Array(2)].map((_, index) => (
+                  <div className="skeleton-banner" key={index}></div>
+                ))
+              : bannerProducts.map((banner, index) => (
+                  <div className="banner-image-display" key={index}>
+                    <img
+                      onClick={() => handleAdClick(banner)}
+                      src={`${ApiUrl}/uploads/offerspage/${banner.image}`}
+                      alt={`Banner for ${banner.brand_name}`}
+                      className="banner-image"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
           </div>
-        )}
+        </div>
 
         {/* ✅ Section 2: Products with Empty Title */}
-        {noTitleProducts.length > 0 && (
-          <div className="box">
-            <div className="offer-ad-container4">
-              {noTitleProducts.map((product) => (
-                <div key={product.id} className="single-ad-container4" onClick={() => handleAdClick(product)}>
-                  <div className="image-wrapper">
-                    {product.image ? (
-                      <>
-                        {/* <p className="brand-namee">{product.brand_name}</p> */}
-                        <img
-                          src={`${ApiUrl}/uploads/offerspage/${product.image}`}
-                          alt="Product"
-                          className="offer-add"
-                          loading="lazy"
-                        />
-                      </>
-                    ) : (
-                      <p>No images available</p>
-                    )}
+        <div className="box">
+          <div className="offer-ad-container4">
+            {loading
+              ? [...Array(3)].map((_, index) => (
+                  <div className="skeleton-product" key={index}></div>
+                ))
+              : noTitleProducts.map((product) => (
+                  <div key={product.id} className="single-ad-container4" onClick={() => handleAdClick(product)}>
+                    <div className="image-wrapper">
+                      {product.image ? (
+                        <>
+                          <p className="brand-namee">{product.brand_name}</p>
+                          <img
+                            src={`${ApiUrl}/uploads/offerspage/${product.image}`}
+                            alt="Product"
+                            className="offer-add"
+                            loading="lazy"
+                          />
+                        </>
+                      ) : (
+                        <p>No images available</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
           </div>
-        )}
+        </div>
 
         {/* ✅ Section 3: Portrait Images */}
-        {portraitProducts.length > 0 && (
-          <div className="box">
-            <div className="portrait-container2">
-              {portraitProducts.map((portrait, index) => (
-                <div key={index}>
-                <p className="brand-namee">{portrait.brand_name}</p>
-                  <img
-                    onClick={() => handleAdClick(portrait)}
-                    src={`${ApiUrl}/uploads/offerspage/${portrait.image}`}
-                    alt={`Portrait for ${portrait.brand_name}`}
-                    className="portrait-image"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
-            </div>
+        <div className="box">
+          <div className="portrait-container2">
+            {loading
+              ? [...Array(2)].map((_, index) => (
+                  <div className="skeleton-portrait" key={index}></div>
+                ))
+              : portraitProducts.map((portrait, index) => (
+                  <div key={index}>
+                    <img
+                      onClick={() => handleAdClick(portrait)}
+                      src={`${ApiUrl}/uploads/offerspage/${portrait.image}`}
+                      alt={`Portrait for ${portrait.brand_name}`}
+                      className="portrait-image"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
           </div>
-        )}
+        </div>
       </div>
       <Footer />
     </>

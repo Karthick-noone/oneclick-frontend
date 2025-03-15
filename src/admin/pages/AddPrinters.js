@@ -2053,8 +2053,10 @@ const Printers = ({ isOpen, onClose }) => {
                                                   </div>
                                                   <div className="freq-item-details">
                                                     <span className="freq-item-name">
-                                                      {accessory.prod_name}
-                                                    </span>
+                                                    {accessory.prod_name
+                                                        .split(" ")
+                                                        .slice(0, 4)
+                                                        .join(" ")}                                                    </span>
                                                     <span className="freq-item-price">
                                                       ₹{accessory.prod_price}
                                                     </span>

@@ -489,9 +489,15 @@ const TV = () => {
         <div className="product-list">
           {loading ? (
         // 1. Loading state
-        <div className="loading-message">
-          <h2>Loading products...</h2>
-        </div>
+         [...Array(8)].map((_, index) => (
+          <div key={index} className="skeleton-product-card">
+            <div className="skeleton-image"></div>
+            <div className="skeleton-text"></div>
+            <div className="skeleton-text short"></div>
+            <div className="skeleton-price"></div>
+            <div className="skeleton-buttons"></div>
+          </div>
+        ))
       ) : products.length === 0 ? (
             <div className="no-products-message">
               <h2>No products here yet...</h2>

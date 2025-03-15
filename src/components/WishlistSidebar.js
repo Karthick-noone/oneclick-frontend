@@ -42,6 +42,8 @@ const WishlistSidebar = ({
   
   }, [product]);
   
+
+  
   useEffect(() => {
     if (wishlistItems.length === 0) {
       console.log("Wishlist is empty, no offer status to check.");

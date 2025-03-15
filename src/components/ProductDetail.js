@@ -55,6 +55,7 @@ const ProductDetail = ({ accessoryCategory }) => {
   const [products, setProducts] = useState([]);
   const [coupons, setCoupons] = useState({}); // State to hold coupon codes for products
   const [favorites, setFavorites] = useState({});
+  const [, setImages] = useState([]);
 
   // State for storing related items
   const [relatedItems, setRelatedItems] = useState([]);
@@ -76,6 +77,7 @@ const ProductDetail = ({ accessoryCategory }) => {
       setIsOfferActive(offerEndTime > now);
     }
   }, [product]);
+
   useEffect(() => {
     const getSimilarProducts = async () => {
       try {
@@ -231,10 +233,11 @@ const ProductDetail = ({ accessoryCategory }) => {
         setProduct(productData);
 
         // Set the initial selected image
-        const images = Array.isArray(productData.prod_img)
+        const prodImages = Array.isArray(productData.prod_img)
           ? productData.prod_img
           : JSON.parse(productData.prod_img || "[]");
-        setSelectedImage(images[0]); // Set the first image as the default selected image
+        setImages(prodImages);
+        setSelectedImage(0); // Set the first image as the default selected image
 
         // Fetch coupon using product ID after the product is set
         const couponResponse = await axios.get(
@@ -886,6 +889,12 @@ const ProductDetail = ({ accessoryCategory }) => {
 
   const hasMultipleImages = images.length > 1;
 
+  // useEffect(() => {
+  //   if (images && images.length > 0) {
+  //     setSelectedImage(images[0]);
+  //   }
+  // }, [images]);
+
   // const firstImage = images.length > 0 ? images[0] : null; // Get the first image or null if not available
 
   const couponCode = coupons[product?.prod_id]; // Use coupons object instead of product
@@ -1004,6 +1013,80 @@ const ProductDetail = ({ accessoryCategory }) => {
     ],
   };
 
+  const NextArrow = (props) => {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          display: "block",
+          right: 0,
+          background: "rgba(0, 0, 0, 0.5)",
+          borderRadius: "50%",
+          width: "30px",
+          height: "30px",
+          lineHeight: "30px",
+          textAlign: "center",
+          color: "#fff",
+          zIndex: 2,
+        }}
+        onClick={onClick}
+      >
+        &#8594;
+      </div>
+    );
+  };
+
+  const PrevArrow = (props) => {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          display: "block",
+          left: 0,
+          background: "rgba(0, 0, 0, 0.5)",
+          borderRadius: "50%",
+          width: "30px",
+          height: "30px",
+          lineHeight: "30px",
+          textAlign: "center",
+          color: "#fff",
+          zIndex: 2,
+        }}
+        onClick={onClick}
+      >
+        &#8592;
+      </div>
+    );
+  };
+
+  const thumbnailSliderSettings = {
+    slidesToShow: 5,
+    slidesToScroll: 1,
+    arrows: images.length > 5, // Enable arrows only if more than 5 images
+    infinite: false,
+    draggable: true,
+    swipeToSlide: true,
+    touchMove: true,
+    nextArrow: images.length > 5 ? <NextArrow /> : null,
+    prevArrow: images.length > 5 ? <PrevArrow /> : null,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: { slidesToShow: 4, arrows: images.length > 4 },
+      },
+      {
+        breakpoint: 480,
+        settings: { slidesToShow: 3, arrows: images.length > 3 },
+      },
+    ],
+  };
+
+  // const useSlider = images && images.length > 1;
+
   return (
     <>
       <Header2 />
@@ -1032,35 +1115,57 @@ const ProductDetail = ({ accessoryCategory }) => {
                   {product.category}{" "}
                 </a>
               </div>
-
               <div className="product-detail-image-container">
                 <div className="carousel-container">
                   {product.offer_label && (
                     <div className="product-label2">{product.offer_label}</div>
                   )}
 
-                  <Slider {...settings}>
-                    {images.length > 0 ? (
-                      images.map((image, index) => (
-                        <div key={index} className="zoom-container">
-                          <img
-                            ref={zoomRef}
-                            src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${image}`}
-                            alt={product.prod_name}
-                            className="product-detail-image"
-                            onMouseMove={
-                              !hasMultipleImages ? handleMouseMove : null
-                            } // Apply zoom only if 1 image
-                            onMouseLeave={() => setZoomStyle({})} // Reset zoom when mouse leaves
-                            style={zoomStyle}
-                          />
-                        </div>
-                      ))
+                  <div className="big-image-container">
+                    {images && images.length > 0 ? (
+                      <div
+                        className="zoom-container"
+                        onMouseMove={handleMouseMove} // Apply zoom for all images
+                        onMouseLeave={() => setZoomStyle({})}
+                      >
+                        <img
+                          ref={zoomRef}
+                          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
+                            images[selectedImage]
+                          }`}
+                          alt={product.prod_name}
+                          className="product-detail-image"
+                          style={zoomStyle}
+                        />
+                      </div>
                     ) : (
                       <div>No image available</div>
                     )}
-                  </Slider>
+                  </div>
                 </div>
+
+                {/* Display Thumbnails only if more than one image exists */}
+                {images && images.length > 1 && (
+                  <div className="thumbnails-wrapper">
+                    <div className="thumbnails-container">
+                      <Slider {...thumbnailSliderSettings}>
+                        {images.map((image, index) => (
+                          <div key={index}>
+                            <img
+                              src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${image}`}
+                              alt={product.prod_name}
+                              className={`thumbnail ${
+                                selectedImage === index ? "active" : ""
+                              }`}
+                              onClick={() => setSelectedImage(index)}
+                              onMouseEnter={() => setSelectedImage(index)} // Update on hover
+                            />
+                          </div>
+                        ))}
+                      </Slider>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="side-row">
@@ -1141,13 +1246,11 @@ const ProductDetail = ({ accessoryCategory }) => {
                           >
                             <span>
                               {Math.round(
-                                ((product.actual_price -
-                                  (product.offer_price > 0 &&
-                                  isOfferActive &&
-                                  product.offer_price
-                                    ? product.offer_price
-                                    : product.prod_price)) /
-                                  product.actual_price) *
+                                ((product?.actual_price -
+                                  (product?.offer_price > 0 && isOfferActive
+                                    ? product?.offer_price
+                                    : product?.prod_price)) /
+                                  product?.actual_price) *
                                   100
                               )}
                               % OFF
@@ -1180,12 +1283,10 @@ const ProductDetail = ({ accessoryCategory }) => {
                                 <p>
                                   Deals end in{" "}
                                   <span className="timer-tag">
-                                    {" "}
                                     {remainingTime.hours}h :{" "}
                                     {remainingTime.minutes}m :{" "}
-                                    {remainingTime.seconds}s{" "}
-                                  </span>{" "}
-                                  {/* Hurry up! */}
+                                    {remainingTime.seconds}s
+                                  </span>
                                 </p>
                               )}
                             </div>
@@ -1237,10 +1338,11 @@ const ProductDetail = ({ accessoryCategory }) => {
                             </span> */}
                             <span className="discounted-priceee">
                               {`${Math.round(
-                                ((product?.actual_price -
-                                  ((product?.offer_price && isOfferActive) ||
-                                    product?.prod_price)) /
-                                  product?.actual_price) *
+                                ((product.actual_price -
+                                  (product.offer_price > 0 && isOfferActive
+                                    ? product.offer_price
+                                    : product.prod_price)) /
+                                  product.actual_price) *
                                   100
                               )}%`}
                             </span>
@@ -1273,7 +1375,18 @@ const ProductDetail = ({ accessoryCategory }) => {
                         >
                           ADD TO CART{" "}
                           <span style={{ marginLeft: "10px" }}>
-                            <FaShoppingBag />
+                            {/* <FaShoppingBag /> */}
+                            <button class="icon-button">
+                              <svg
+                                class="svg-icon"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                              </svg>
+                            </button>
                           </span>
                         </button>
                         <button
@@ -1360,35 +1473,54 @@ const ProductDetail = ({ accessoryCategory }) => {
                                   style={{ marginRight: "10px" }}
                                 /> */}
 
-<div className="container">
-  <input
-    type="checkbox"
-    id={`accessory-${accessory.id}`}
-    className="custom-checkbox" // Use the custom class for our CSS
-    onChange={(event) => handleCheckboxChange(event, accessory.id)}
-    style={{ display: "none" }} // Hide the native checkbox
-  />
-  <label 
-    htmlFor={`accessory-${accessory.id}`} 
-    className="check" 
-    style={{ marginRight: "10px" }}
-  >
-    <svg width="18px" height="18px" viewBox="0 0 18 18">
-      {/* The circle outline remains the same */}
-      <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
-      {/* Plus icon group (visible when unchecked) */}
-      <g className="plus">
-        <line x1="9" y1="4" x2="9" y2="14" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="4" y1="9" x2="14" y2="9" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
-      </g>
-      {/* Check mark for the animated state */}
-      <polyline points="1 9 7 14 15 4"></polyline>
-    </svg>
-  </label>
-</div>
-
-
-
+                                <div className="container">
+                                  <input
+                                    type="checkbox"
+                                    id={`accessory-${accessory.id}`}
+                                    className="custom-checkbox" // Use the custom class for our CSS
+                                    onChange={(event) =>
+                                      handleCheckboxChange(event, accessory.id)
+                                    }
+                                    style={{ display: "none" }} // Hide the native checkbox
+                                  />
+                                  <label
+                                    htmlFor={`accessory-${accessory.id}`}
+                                    className="check"
+                                    style={{ marginRight: "10px" }}
+                                  >
+                                    <svg
+                                      width="18px"
+                                      height="18px"
+                                      viewBox="0 0 18 18"
+                                    >
+                                      {/* The circle outline remains the same */}
+                                      <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+                                      {/* Plus icon group (visible when unchecked) */}
+                                      <g className="plus">
+                                        <line
+                                          x1="9"
+                                          y1="4"
+                                          x2="9"
+                                          y2="14"
+                                          stroke="#333"
+                                          strokeWidth="1.5"
+                                          strokeLinecap="round"
+                                        />
+                                        <line
+                                          x1="4"
+                                          y1="9"
+                                          x2="14"
+                                          y2="9"
+                                          stroke="#333"
+                                          strokeWidth="1.5"
+                                          strokeLinecap="round"
+                                        />
+                                      </g>
+                                      {/* Check mark for the animated state */}
+                                      <polyline points="1 9 7 14 15 4"></polyline>
+                                    </svg>
+                                  </label>
+                                </div>
 
                                 {/* <span>{accessory.prod_name}</span> */}
                                 <img
@@ -1439,8 +1571,17 @@ const ProductDetail = ({ accessoryCategory }) => {
                                   >
                                     ₹{accessory.prod_price}
                                   </p>
-                                  <p style={{ marginLeft: "10px", margin: 0 }}>
-                                    ₹{accessory.effectiveprice}
+                                  <p
+                                    style={{
+                                      marginLeft: "10px",
+                                      margin: 0,
+                                      color: "green",
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    {accessory.effectiveprice > 0
+                                      ? `₹${accessory.effectiveprice}`
+                                      : "Free"}
                                   </p>
                                 </div>
                               </div>

@@ -1646,6 +1646,10 @@ const CCTV = ({ isOpen, onClose }) => {
                   <span style={{ color: "green", marginLeft: "5px" }}>
                     ₹{product.prod_price}
                   </span>
+                  {product.offer_price && 
+                  <span style={{ color: "green", marginLeft: "5px" }}>
+                    ₹{product.offer_price}
+                  </span>}
                 </div>
                 <button
                   className="view-details-btn"
@@ -2065,8 +2069,10 @@ const CCTV = ({ isOpen, onClose }) => {
                                                   </div>
                                                   <div className="freq-item-details">
                                                     <span className="freq-item-name">
-                                                      {accessory.prod_name}
-                                                    </span>
+                                                    {accessory.prod_name
+                                                        .split(" ")
+                                                        .slice(0, 4)
+                                                        .join(" ")}                                                    </span>
                                                     <span className="freq-item-price">
                                                       ₹{accessory.prod_price}
                                                     </span>

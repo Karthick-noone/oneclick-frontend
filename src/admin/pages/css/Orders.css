@@ -508,7 +508,7 @@
 .product-image10 {
   width: 150px;
   height: 150px; /* Maintain aspect ratio */
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .modal-close-button10 {

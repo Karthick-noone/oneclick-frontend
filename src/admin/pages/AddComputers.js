@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes,FaImages } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes, FaImages } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -133,10 +133,10 @@ const Computers = ({ product }) => {
 
   const handleChangePrice = (e, productPrice) => {
     const value = e.target.value;
-  
+
     // Allow only numbers (integer or decimal with up to 2 places), but no leading zero unless decimal.
     const regex = /^(0|[1-9]\d*)(\.\d{0,2})?$/;
-  
+
     if (regex.test(value) || value === "") {
       if (parseFloat(value) <= productPrice || value === "") {
         setOfferPrice(value);
@@ -275,15 +275,15 @@ const Computers = ({ product }) => {
   const handleCouponUpdated = () => {
     console.log("Coupon updated successfully!");
   };
- const MAX_FILES = 5; // Set your file limit
+  const MAX_FILES = 5; // Set your file limit
 
   const handleFileChange = (productId, event) => {
     const files = Array.from(event.target.files);
-  
+
     // Get the existing files for this product (or an empty array)
     const existingFiles = newImages[productId] || [];
     const existingFileNames = existingFiles.map((file) => file.name);
-  
+
     // Check if adding new files exceeds the limit
     if (existingFiles.length + files.length > MAX_FILES) {
       Swal.fire({
@@ -295,16 +295,16 @@ const Computers = ({ product }) => {
       });
       return;
     }
-  
+
     // Filter out duplicate files based on name
     const uniqueFiles = files.filter(
       (file) => !existingFileNames.includes(file.name)
     );
-  
+
     if (uniqueFiles.length === 0) return; // No new images
-  
+
     const resizedFiles = [];
-  
+
     uniqueFiles.forEach((file) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -317,12 +317,12 @@ const Computers = ({ product }) => {
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
-  
+
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
+
           // Compress and convert to blob
           canvas.toBlob(
             (blob) => {
@@ -331,7 +331,7 @@ const Computers = ({ product }) => {
                   type: "image/jpeg",
                 });
                 resizedFiles.push(processedFile);
-  
+
                 if (resizedFiles.length === uniqueFiles.length) {
                   setNewImages((prev) => ({
                     ...prev,
@@ -339,7 +339,7 @@ const Computers = ({ product }) => {
                   }));
                 }
               };
-  
+
               if (blob.size / 1024 < 50) {
                 processBlob(blob);
               } else {
@@ -661,9 +661,9 @@ const Computers = ({ product }) => {
   //   });
   // };
 
-    const handleImageChange = async (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
-  
+
     // If more than 5 images are selected, show an alert and prevent upload
     if (files.length > 5) {
       Swal.fire({
@@ -675,31 +675,33 @@ const Computers = ({ product }) => {
       e.target.value = ""; // Reset input to allow re-selection
       return;
     }
-  
+
     // Resize images before adding them
-    const resizedImages = await Promise.all(files.map((file) => resizeImage(file)));
-  
+    const resizedImages = await Promise.all(
+      files.map((file) => resizeImage(file))
+    );
+
     setNewProduct((prevProduct) => {
       // Convert existing images to a comparable format
       const existingImages = prevProduct.images.map((img) => img.name || img);
-  
+
       // Filter out duplicates
       const newUniqueImages = resizedImages.filter(
         (newImg) => !existingImages.includes(newImg.name || newImg)
       );
-  
+
       return {
         ...prevProduct,
         images: [...prevProduct.images, ...newUniqueImages], // Append only unique images
       };
     });
-  
+
     setImageCount(resizedImages.length);
-  
+
     // Reset file input to allow selecting new files again
     e.target.value = "";
   };
-  
+
   const resizeImage = (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -713,12 +715,12 @@ const Computers = ({ product }) => {
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
-  
+
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
+
           canvas.toBlob(
             (blob) => {
               if (blob.size / 1024 < 50) {
@@ -963,7 +965,7 @@ const Computers = ({ product }) => {
         os: "",
         // network: "",
         others: "",
-});
+      });
       setImageCount(0);
       document.querySelector('input[type="file"]').value = ""; // Reset file input
     } catch (error) {
@@ -1405,25 +1407,25 @@ const Computers = ({ product }) => {
     textarea.focus();
   };
 
-  
   const getFormattedDate = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-  
+
     return `${year}-${month}-${day}T${hours}:${minutes}`; // Format for datetime-local input
   };
-  
+
   const today = new Date();
   const minDate = getFormattedDate(today);
-  const maxDate = getFormattedDate(new Date(today.setDate(today.getDate() + 10)));
-  
-  
+  const maxDate = getFormattedDate(
+    new Date(today.setDate(today.getDate() + 10))
+  );
+
   // console.log("Min Date:", minDate);
   // console.log("Max Date:", maxDate);
-  
+
   const handleDeleteCoupon = async (couponId) => {
     const confirmation = window.confirm(
       "Are you sure you want to delete this coupon?"
@@ -1654,7 +1656,6 @@ const Computers = ({ product }) => {
               onChange={handleChange}
               className="laptops-input"
             />
-
             <label className="laptops-label">M.R.P Price</label>
             <input
               type="text"
@@ -1663,7 +1664,6 @@ const Computers = ({ product }) => {
               onChange={handleChange}
               className="laptops-input"
             />
-
             <label className="laptops-label">Selling Price</label>
             <input
               type="text"
@@ -1672,7 +1672,6 @@ const Computers = ({ product }) => {
               onChange={handleChange}
               className="laptops-input"
             />
-
             <label className="laptops-label">Label</label>
             <input
               type="text"
@@ -1681,7 +1680,6 @@ const Computers = ({ product }) => {
               onChange={handleChange}
               className="laptops-input"
             />
-
             <label className="laptops-label">Subtitle</label>
             <input
               type="text"
@@ -1690,7 +1688,6 @@ const Computers = ({ product }) => {
               onChange={handleChange}
               className="laptops-input"
             />
-
             <label className="laptops-label">Delivery Charge</label>
             <input
               type="text"
@@ -1699,7 +1696,6 @@ const Computers = ({ product }) => {
               onChange={handleChange}
               className="laptops-input"
             />
-
             <label className="laptops-label">Product Image</label>
             <input
               accept="image/jpeg, image/png"
@@ -1719,7 +1715,8 @@ const Computers = ({ product }) => {
               {imageCount > 0
                 ? `Selected Images: ${imageCount}`
                 : "Choose Images"}
-            </button>          </div>
+            </button>{" "}
+          </div>
 
           {/* Right Section */}
           <div className="laptops-right-section">
@@ -1797,7 +1794,7 @@ const Computers = ({ product }) => {
                 <div className="laptops-product-image">
                   <div className="slider-container">
                     <Slider
-                        {...{
+                      {...{
                         ...settings,
                         arrows: product.prod_img.length > 1,
                         draggable: product.prod_img.length > 1, // Disable dragging if only one image exists
@@ -1846,6 +1843,7 @@ const Computers = ({ product }) => {
                   {/* "View" button to trigger modal */}
                 </div>
                 <div>
+                  M.R.P{" "}
                   <span
                     style={{
                       textDecoration: "line-through",
@@ -1856,9 +1854,18 @@ const Computers = ({ product }) => {
                     ₹{product.actual_price}
                   </span>{" "}
                   <span style={{ color: "green", marginLeft: "5px" }}>
-                    ₹{product.prod_price}
+                    ₹
+                    {product.offer_price > 0
+                      ? product.offer_price
+                      : product.prod_price}
                   </span>
                 </div>
+                {/* {product.offer_price > 0 && (
+                  <div>Limited Time Offer
+                    <span style={{ color: "blue", marginLeft: "5px" }}>
+                      ₹{product.offer_price}
+                    </span></div>
+                  )} */}
                 <button
                   className="view-details-btn"
                   onClick={() => openProductModal(product.id)} // Pass product ID to open modal
@@ -2033,7 +2040,12 @@ const Computers = ({ product }) => {
                                       <input
                                         type="number"
                                         value={offerPrice}
-                                        onChange={(e) => handleChangePrice(e, product.prod_price)} // Pass product.prod_price
+                                        onChange={(e) =>
+                                          handleChangePrice(
+                                            e,
+                                            product.prod_price
+                                          )
+                                        } // Pass product.prod_price
                                         required
                                         className="offer-input"
                                       />
@@ -2291,7 +2303,10 @@ const Computers = ({ product }) => {
                                                   </div>
                                                   <div className="freq-item-details">
                                                     <span className="freq-item-name">
-                                                      {accessory.prod_name}
+                                                      {accessory.prod_name
+                                                        .split(" ")
+                                                        .slice(0, 4)
+                                                        .join(" ")}
                                                     </span>
                                                     <span className="freq-item-price">
                                                       ₹{accessory.prod_price}

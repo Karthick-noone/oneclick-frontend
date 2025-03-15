@@ -410,7 +410,18 @@ const ProductList = () => {
             }}
             onInit={(swiper) => console.log("Swiper initialized:", swiper)}
           >
-            {combinedProducts.map((product, idx) => {
+            {loading
+              ? [...Array(5)].map((_, index) => (
+                  <SwiperSlide key={index}>
+                    <div className="skeleton-product-card">
+                      <div className="skeleton-image"></div>
+                      <div className="skeleton-text"></div>
+                      <div className="skeleton-text short"></div>
+                      <div className="skeleton-price"></div>
+                    </div>
+                  </SwiperSlide>
+                ))
+              : combinedProducts.map((product, idx) => {
               const images = Array.isArray(product.prod_img)
                 ? product.prod_img
                 : JSON.parse(product.prod_img || "[]");

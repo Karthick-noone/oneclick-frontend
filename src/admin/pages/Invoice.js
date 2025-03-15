@@ -13,7 +13,7 @@ const Invoice = ({ order, productDetails }) => {
     0
   );
 
-  const uniqueInvoiceNumber = `INV${order.unique_id}-${Date.now()}`;
+  // const uniqueInvoiceNumber = `INV${order.unique_id}-${Date.now()}`;
 
   return (
     <div>
@@ -76,7 +76,7 @@ const Invoice = ({ order, productDetails }) => {
               border: "1px dashed #333",
             }}
           >
-            Tax Invoice: <p> #{uniqueInvoiceNumber}</p>
+            Tax Invoice: <p> #{order.invoice}</p>
           </div>
         </div>
 
@@ -113,10 +113,9 @@ const Invoice = ({ order, productDetails }) => {
             <p>
               {order.shipping_address
                 ? order.shipping_address.split(",").map((line, index) => (
-                    <span key={index}>
+                    <div key={index} style={{ marginBottom: "5px" }}>
                       {line.trim()}
-                      <br />
-                    </span>
+                    </div>
                   ))
                 : "N/A"}
             </p>
@@ -214,7 +213,11 @@ const Invoice = ({ order, productDetails }) => {
                 Product
               </th>
               <th style={{ border: "1px solid #000", padding: "5px" }}>Qty</th>
+              <th style={{ border: "1px solid #000", padding: "5px" }}>
+                Price
+              </th>
               <th style={{ border: "1px solid #000", padding: "5px" }}>Tax</th>
+
               <th style={{ border: "1px solid #000", padding: "5px" }}>
                 Total Price
               </th>
@@ -230,8 +233,12 @@ const Invoice = ({ order, productDetails }) => {
                   {product.quantity || "-"}
                 </td>
                 <td style={{ border: "1px solid #000", padding: "5px" }}>
+                  ₹{product.prod_price || "-"}
+                </td>
+                <td style={{ border: "1px solid #000", padding: "5px" }}>
                   {product.tax || "-"}
                 </td>
+
                 <td style={{ border: "1px solid #000", padding: "5px" }}>
                   ₹{product.prod_price * (product.quantity || 1) || "0"}
                 </td>
@@ -257,14 +264,21 @@ const Invoice = ({ order, productDetails }) => {
 
           {/* Right Side - Delivery Charge & Grand Total */}
           <div style={{ textAlign: "right" }}>
-            <p>
-              <strong>Delivery Charge: </strong> ₹
-              {products.reduce(
-                (acc, product) =>
-                  acc + (parseInt(product.deliverycharge, 10) || 0),
-                0
-              )}
-            </p>
+            {products.reduce(
+              (acc, product) =>
+                acc + (parseInt(product.deliverycharge, 10) || 0),
+              0
+            ) > 0 && (
+              <p>
+                <strong>Delivery Charge: </strong> ₹
+                {products.reduce(
+                  (acc, product) =>
+                    acc + (parseInt(product.deliverycharge, 10) || 0),
+                  0
+                )}
+              </p>
+            )}
+
             <p>
               <strong>Grand Total: </strong> ₹{order.total_amount}
             </p>

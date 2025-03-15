@@ -47,22 +47,6 @@ const AdPage = () => {
     }));
   }, [ads]);
 
-  if (loading) {
-    return (
-      <div className="spinner-container">
-        <div className="spinner">
-          {[...Array(12)].map((_, index) => (
-            <div key={index} className="spinner-blade"></div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (ads.length === 0) {
-    return <p>No ads available</p>;
-  }
-
   return (
     <section className="ad-page">
       <div className="ad-first-page">
@@ -70,7 +54,15 @@ const AdPage = () => {
           <h2 className="text-center offer-heading">Exclusive Offers For You!</h2>
 
           <div className="ads-container">
-            {isMobile ? (
+            {loading ? (
+              <div className="skeleton-container">
+                {[...Array(3)].map((_, index) => (
+                  <div key={index} className="skeleton-ad">
+                    <div className="skeleton-image"></div>
+                  </div>
+                ))}
+              </div>
+            ) : isMobile ? (
               <Swiper
                 spaceBetween={10}
                 slidesPerView={1}

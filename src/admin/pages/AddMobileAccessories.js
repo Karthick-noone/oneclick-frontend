@@ -1480,6 +1480,15 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
               className="laptops-input"
             />
 
+<label className="laptops-label">Effective Price</label>
+            <input
+              type="text"
+              name="effectiveprice"
+              value={newProduct.effectiveprice}
+              onChange={handleChange}
+              className="laptops-input"
+            />
+
             <label className="laptops-label">Label</label>
             <input
               type="text"
@@ -2106,6 +2115,24 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                })
                              }
                              placeholder="Enter product price"
+                             className="adminmodal-input"
+                           />
+                         </div>
+
+                         <div className="feature-item">
+                           <label className="feature-label">Effective Price</label>
+           
+                           <input
+                             type="text"
+                             name="effectiveprice"
+                             value={editingProduct.effectiveprice}
+                             onChange={(e) =>
+                               setEditingProduct({
+                                 ...editingProduct,
+                                 effectiveprice: e.target.value,
+                               })
+                             }
+                             placeholder="Enter product effectiveprice"
                              className="adminmodal-input"
                            />
                          </div>

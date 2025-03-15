@@ -8,21 +8,25 @@ import "slick-carousel/slick/slick-theme.css";
 
 const Homepage = () => {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${ApiUrl}/fetchedithomepage`);
+        // Simulate network delay for testing skeleton
+        await new Promise(resolve => setTimeout(resolve, 2000));
         console.log("Response from API:", response.data);
-        setData(response.data || []); // Ensure data is always an array
+        setData(response.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, []);
 
-  // Memoized Custom Arrows to prevent unnecessary re-renders
   const CustomPrevArrow = useCallback(({ onClick }) => (
     <button className="slider-prev-arrow" onClick={onClick}>
       ◄
@@ -35,7 +39,6 @@ const Homepage = () => {
     </button>
   ), []);
 
-  // Memoized Slider Settings
   const sliderSettings = useMemo(() => ({
     dots: true,
     infinite: true,
@@ -51,7 +54,13 @@ const Homepage = () => {
   return (
     <div className="box2">
       <div className="homepage-container">
-        {data.length > 0 ? (
+        {loading ? (
+          <div className="skeleton-container">
+            {[...Array(1)].map((_, index) => (
+              <div key={index} className="skeleton-slide"></div>
+            ))}
+          </div>
+        ) : data.length > 0 ? (
           <Slider {...sliderSettings}>
             {data.map((item, index) => (
               <div key={index} className="slider-image-container">
@@ -67,11 +76,7 @@ const Homepage = () => {
             ))}
           </Slider>
         ) : (
-          <div className="spinner-container">
-            <div className="spinner">
-              {/* Spinner content here */}
-            </div>
-          </div>
+          <div className="no-data-message">No data available</div>
         )}
       </div>
     </div>
