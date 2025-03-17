@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Slider from "react-slick";
 import axios from "axios";
 import { ApiUrl } from "./ApiUrl";
@@ -6,26 +7,21 @@ import "./css/Homepage.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const Homepage = () => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+const fetchHomepageData = async () => {
+  const response = await axios.get(`${ApiUrl}/fetchedithomepage`);
+  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating delay
+  return response.data || [];
+};
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${ApiUrl}/fetchedithomepage`);
-        // Simulate network delay for testing skeleton
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        console.log("Response from API:", response.data);
-        setData(response.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+const Homepage = () => {
+  const { data = [], isLoading, isError } = useQuery({
+    queryKey: ["homepageData"],
+    queryFn: fetchHomepageData,
+    staleTime: Infinity, // Keeps data fresh until manual refetch
+    cacheTime: 100000, // 5 minutes before unused cache is garbage collected
+    refetchOnWindowFocus: false, // Prevents refetch when switching tabs
+  });
+  
 
   const CustomPrevArrow = useCallback(({ onClick }) => (
     <button className="slider-prev-arrow" onClick={onClick}>
@@ -54,12 +50,12 @@ const Homepage = () => {
   return (
     <div className="box2">
       <div className="homepage-container">
-        {loading ? (
+        {isLoading ? (
           <div className="skeleton-container">
-            {[...Array(1)].map((_, index) => (
-              <div key={index} className="skeleton-slide"></div>
-            ))}
+            <div className="skeleton-slide"></div>
           </div>
+        ) : isError ? (
+          <div className="error-message">Error fetching data</div>
         ) : data.length > 0 ? (
           <Slider {...sliderSettings}>
             {data.map((item, index) => (

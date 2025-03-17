@@ -1,4 +1,59 @@
-/* Header2.css */
+/* From Uiverse.io by adamgiebl */ 
+.cssbuttons-io-button {
+  background: #a370f0;
+  color: white;
+  font-family: inherit;
+  padding: 0.35em;
+  padding-left: 1.2em;
+  font-size: 17px;
+  font-weight: 500;
+  border-radius: 0.9em;
+  border: none;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  box-shadow: inset 0 0 1.6em -0.6em #714da6;
+  overflow: hidden;
+  position: relative;
+  height: 2.8em;
+  padding-right: 3.3em;
+  cursor: pointer;
+}
+
+.cssbuttons-io-button .icon3 {
+  background: #a370f0;
+  margin-left: 1em;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.2em;
+  width: 2.2em;
+  border-radius: 0.7em;
+  box-shadow: 0.1em 0.1em 0.6em 0.2em #7b52b9;
+  right: 0.3em;
+  transition: all 0.3s;
+}
+
+.cssbuttons-io-button:hover .icon3 {
+  width: calc(100% - 0.6em);
+}
+
+.cssbuttons-io-button .icon3 svg {
+  width: 1.1em;
+  transition: transform 0.3s;
+  color: #7b52b9;
+}
+
+.cssbuttons-io-button:hover .icon3 svg {
+  transform: translateX(0.1em);
+}
+
+.cssbuttons-io-button:active .icon3 {
+  transform: scale(0.95);
+}
+
+
 
 /* Header2.css */
 .item-features {
@@ -151,6 +206,26 @@
 }
 
 
+.icons {
+  transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.icons:hover {
+  transform: scale(1.2);
+  filter: brightness(1.4);
+}
+
+.icons2 {
+  transform: rotateY(180deg); /* Initially flipped */
+  transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.icons2:hover {
+  transform: scale(1.2) rotateY(180deg) !important; /* Zoom on hover */
+  filter: brightness(1.4);
+}
 
 /* .dots{
   margin-left: 18px;
@@ -158,9 +233,16 @@
 .dots {
   font-size: 20px;
   color: #333;
-  cursor: pointer;
+  cursor:pointer;
   margin-left: 22px;
+  transition: transform 0.3s ease-in-out;
+
 }
+
+.dots:hover {
+  transform: rotate(180deg);
+}
+
 .dropdown-item {
   display: flex;
   align-items: center;
@@ -548,7 +630,7 @@
   position: fixed; /* Ensure dropdown is positioned relative to this container */
   display: flex; /* Align input and button horizontally */
   align-items: center; /* Center vertically */
-  max-width: 700px; /* Maximum width for the search box */
+  max-width: 710px; /* Maximum width for the search box */
   margin: 0 auto; /* Center the search box in its container */
   border-radius: 5px; /* Rounded corners for the rectangular shape */
   overflow: hidden; /* Hide overflow for rounded corners */
@@ -582,35 +664,76 @@
   color: #333; /* Icon color */
 }
 
-
-/* Suggestions dropdown container */
 .suggestions-dropdown {
-  position: absolute; /* Position dropdown relative to search box */
-  top: 100%; /* Position it directly below the search box */
-  left: 0;
-  width: 100%;
-  border: 1px solid #ddd; /* Border for the dropdown */
-  border-radius: 4px; /* Rounded corners for dropdown */
-  background-color: white; /* Background color for dropdown */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow for dropdown */
-  max-height: 200px; /* Max height for scrolling */
-  overflow-y: auto; /* Enable vertical scroll if needed */
-  z-index: 1000; /* Ensure dropdown appears above other elements */
+  position: absolute;
+  top: 75%; /* Push dropdown below the search box */
+  left: 53.3%;
+  transform: translateX(-50%); /* Center it below the search bar */
+  width: 100%; /* Default: Full width of search box */
+  max-width: 710px; /* Limit width for large screens */
+  background: #fff; /* White background */
+  border: 1px solid #ddd;
+  border-radius: 8px; /* Slightly rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 1003;
+  transition: all 0.2s ease-in-out;
 }
 
-/* Each suggestion item */
+/* Hide dropdown on small screens until search is active */
+@media (max-width: 768px) {
+  .suggestions-dropdown {
+    width: 90%;
+    max-width: 500px;
+    border-radius: 6px;
+    left: 49.3%;
+    top:73%
+  }
+}
+
+/* Hover & Click Effect */
 .suggestions-dropdown li {
-  padding: 10px 15px; /* Padding for items */
-  cursor: pointer; /* Pointer cursor on hover */
-  list-style: none; /* Remove default list style */
-  font-size: 0.875rem; /* Font size for suggestions */  
-  transition: background-color 0.3s; /* Smooth background color transition */
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+  font-size: 16px;
+  color: #333;
 }
 
-/* Hover state for suggestion items */
 .suggestions-dropdown li:hover {
-  background-color: #f1f1f1; /* Light background color on hover */
+  background: #f5f5f5;
 }
+
+/* Improve scrollbar visibility */
+.suggestions-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 4px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+
+.suggestions-dropdown li {
+  padding: 10px 15px;
+  cursor: pointer;
+  color: #333;
+  text-align: left;
+}
+
+.suggestions-dropdown li:hover {
+  background-color: #f0f0f0;
+}
+
 
 /* Error message styling */
 .no-suggestions {
@@ -640,6 +763,11 @@
 .search-icon {
   margin-right: 12px;
 }
+
+.search-icon:hover {
+  transform: scale(1.2);
+}
+
 /* Button hover effect */
 .search-box button:hover {
   background-color: #0056b3; /* Darker background on hover */

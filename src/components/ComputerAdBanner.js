@@ -1,30 +1,29 @@
-import React, { useEffect, useState } from "react";
-import "./css/ComputerAdBanner.css"; // Importing styles
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import "./css/ComputerAdBanner.css";
 import Header2 from "./Header2";
 import axios from "axios";
 import { ApiUrl } from "./ApiUrl";
 import { useNavigate } from "react-router-dom";
 import Footer from "./footer";
 
+// Fetch function for TanStack Query
+const fetchProducts = async () => {
+  const response = await axios.get(`${ApiUrl}/fetchcomputersofferspage`);
+  return response.data || [];
+};
+
 const AdBanner = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(`${ApiUrl}/fetchcomputersofferspage`);
-        console.log("Fetched products:", response.data);
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+  // Use TanStack Query for data fetching
+  const { data: products = [], isLoading, isError } = useQuery({
+    queryKey: ["computersOffersPage"],
+    queryFn: fetchProducts,
+    staleTime: Infinity, // Keeps data fresh until manual refetch
+    cacheTime: 300000, // 5 minutes before unused cache is garbage collected
+    refetchOnWindowFocus: false, // Prevents refetching when switching tabs
+  });
 
   const handleAdClick = (product) => {
     navigate(`/${product.category}?search=${product.brand_name.toLowerCase()}`);
@@ -42,71 +41,89 @@ const AdBanner = () => {
         {/* ✅ Section 1: Banner Images */}
         <div className="box">
           <div className="bannerr-container4">
-            {loading
+            {isLoading
               ? [...Array(2)].map((_, index) => (
                   <div className="skeleton-banner" key={index}></div>
                 ))
-              : bannerProducts.map((banner, index) => (
-                  <div className="banner-image-display" key={index}>
-                    <img
-                      onClick={() => handleAdClick(banner)}
-                      src={`${ApiUrl}/uploads/offerspage/${banner.image}`}
-                      alt={`Banner for ${banner.brand_name}`}
-                      className="banner-image"
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
+              : isError ? (
+                  <div className="error-message">Failed to load banners</div>
+                ) : bannerProducts.length > 0 ? (
+                  bannerProducts.map((banner, index) => (
+                    <div className="banner-image-display" key={index}>
+                      <img
+                        onClick={() => handleAdClick(banner)}
+                        src={`${ApiUrl}/uploads/offerspage/${banner.image}`}
+                        alt={`Banner for ${banner.brand_name}`}
+                        className="banner-image"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-data-message">No banner ads available</div>
+                )}
           </div>
         </div>
 
         {/* ✅ Section 2: Products with Empty Title */}
         <div className="box">
           <div className="offer-ad-container4">
-            {loading
+            {isLoading
               ? [...Array(3)].map((_, index) => (
                   <div className="skeleton-product" key={index}></div>
                 ))
-              : noTitleProducts.map((product) => (
-                  <div key={product.id} className="single-ad-container4" onClick={() => handleAdClick(product)}>
-                    <div className="image-wrapper">
-                      {product.image ? (
-                        <>
-                          <p className="brand-namee">{product.brand_name}</p>
-                          <img
-                            src={`${ApiUrl}/uploads/offerspage/${product.image}`}
-                            alt="Product"
-                            className="offer-add"
-                            loading="lazy"
-                          />
-                        </>
-                      ) : (
-                        <p>No images available</p>
-                      )}
+              : isError ? (
+                  <div className="error-message">Failed to load products</div>
+                ) : noTitleProducts.length > 0 ? (
+                  noTitleProducts.map((product) => (
+                    <div key={product.id} className="single-ad-container4" onClick={() => handleAdClick(product)}>
+                      <div className="image-wrapper">
+                        {product.image ? (
+                          <>
+                            <p className="brand-namee">{product.brand_name}</p>
+                            <img
+                              src={`${ApiUrl}/uploads/offerspage/${product.image}`}
+                              alt="Product"
+                              className="offer-add"
+                              loading="lazy"
+                            />
+                          </>
+                        ) : (
+                          <p>No images available</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="no-data-message">No products available</div>
+                )}
           </div>
         </div>
 
         {/* ✅ Section 3: Portrait Images */}
         <div className="box">
           <div className="portrait-container2">
-            {loading
+            {isLoading
               ? [...Array(2)].map((_, index) => (
                   <div className="skeleton-portrait" key={index}></div>
                 ))
-              : portraitProducts.map((portrait, index) => (
-                  <div key={index}>
-                    <img
-                      onClick={() => handleAdClick(portrait)}
-                      src={`${ApiUrl}/uploads/offerspage/${portrait.image}`}
-                      alt={`Portrait for ${portrait.brand_name}`}
-                      className="portrait-image"
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
+              : isError ? (
+                  <div className="error-message">Failed to load portraits</div>
+                ) : portraitProducts.length > 0 ? (
+                  portraitProducts.map((portrait, index) => (
+                    <div key={index}>
+                      <img
+                        onClick={() => handleAdClick(portrait)}
+                        src={`${ApiUrl}/uploads/offerspage/${portrait.image}`}
+                        alt={`Portrait for ${portrait.brand_name}`}
+                        className="portrait-image"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-data-message">No portrait ads available</div>
+                )}
           </div>
         </div>
       </div>

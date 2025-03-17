@@ -1,31 +1,32 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
-import './css/AdPage.css';
-import { ApiUrl } from './ApiUrl';
-import axios from 'axios';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/navigation';
+import React, { useRef, useMemo, useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import "./css/AdPage.css";
+import { ApiUrl } from "./ApiUrl";
+import axios from "axios";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+
+// Fetch function for TanStack Query
+const fetchAds = async () => {
+  const response = await axios.get(`${ApiUrl}/fetchdoubleadpage`);
+  return response.data || [];
+};
 
 const AdPage = () => {
-  const [ads, setAds] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const swiperRef = useRef(null);
 
+  // Use TanStack Query for data fetching
+  const { data: ads = [], isLoading, isError } = useQuery({
+    queryKey: ["doubleAdPage"],
+    queryFn: fetchAds,
+    staleTime: Infinity,
+    cacheTime: 300000,
+    refetchOnWindowFocus: false,
+  });
+
   useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const response = await axios.get(`${ApiUrl}/fetchdoubleadpage`);
-        setAds(response.data || []);
-      } catch (error) {
-        console.error('Error fetching ads:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAds();
-
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
@@ -35,15 +36,15 @@ const AdPage = () => {
       window.resizeTimer = setTimeout(handleResize, 200);
     };
 
-    window.addEventListener('resize', debounceResize);
-    return () => window.removeEventListener('resize', debounceResize);
+    window.addEventListener("resize", debounceResize);
+    return () => window.removeEventListener("resize", debounceResize);
   }, []);
 
   // Preprocess images to avoid repeated operations
   const processedAds = useMemo(() => {
     return ads.map((ad) => ({
       ...ad,
-      images: ad.image ? ad.image.split(',') : [],
+      images: ad.image ? ad.image.split(",") : [],
     }));
   }, [ads]);
 
@@ -54,7 +55,7 @@ const AdPage = () => {
           <h2 className="text-center offer-heading">Exclusive Offers For You!</h2>
 
           <div className="ads-container">
-            {loading ? (
+            {isLoading ? (
               <div className="skeleton-container">
                 {[...Array(3)].map((_, index) => (
                   <div key={index} className="skeleton-ad">
@@ -62,6 +63,8 @@ const AdPage = () => {
                   </div>
                 ))}
               </div>
+            ) : isError ? (
+              <div className="error-message">Failed to load ads</div>
             ) : isMobile ? (
               <Swiper
                 spaceBetween={10}

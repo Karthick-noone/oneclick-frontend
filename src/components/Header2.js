@@ -30,6 +30,10 @@ import "nprogress/nprogress.css";
 import NProgress from "nprogress";
 // import isOfferActive from './ProductDetail'
 
+import usericon from "./img/user.png";
+import wishlisticon from "./img/wish-list.png";
+import carticon from "./img/shopping-cart3.png";
+
 const Header2 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
@@ -40,6 +44,8 @@ const Header2 = () => {
   const userCardRef = useRef(null);
   const [isMobileView, setIsMobileView] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const [suggestions, setSuggestions] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDropdownOpen4, setIsDropdownOpen4] = useState(false);
@@ -50,6 +56,7 @@ const Header2 = () => {
   const [isOfferActive, setIsOfferActive] = useState(true);
   const [product, setProduct] = useState(null);
   const [cartLoaded, setCartLoaded] = useState(false);
+  const [query, setQuery] = useState(""); // ✅ Fix: Declare query state
 
   useEffect(() => {
     if (cartItems.length === 0) {
@@ -57,31 +64,33 @@ const Header2 = () => {
       setProduct(null);
       return;
     }
-  
+
     let activeOffer = false;
     let bestProduct = null;
-  
+
     cartItems.forEach((item) => {
       if (item.offer_end_time) {
         const now = new Date();
         const offerEndTime = new Date(item.offer_end_time);
-  
-        console.log(`Checking offer for ${item.prod_name}:`, offerEndTime.toLocaleString());
-  
+
+        console.log(
+          `Checking offer for ${item.prod_name}:`,
+          offerEndTime.toLocaleString()
+        );
+
         if (offerEndTime > now) {
           activeOffer = true;
           bestProduct = item; // Assign the first item with an active offer
         }
       }
     });
-  
+
     setIsOfferActive(activeOffer);
     setProduct(bestProduct); // Assign the product with the active offer (or null if none)
-  
+
     console.log(`Final Offer Status: ${activeOffer ? "Yes" : "No"}`);
     console.log("Assigned product for offer tracking:", bestProduct);
   }, [cartItems]);
-  
 
   useEffect(() => {
     NProgress.configure({ showSpinner: false }); // Disable spinner
@@ -96,6 +105,39 @@ const Header2 = () => {
     // Cleanup function to stop NProgress if the component unmounts
     return () => clearTimeout(timeout);
   }, []);
+
+   useEffect(() => {
+    // Hide dropdown on scroll
+    const handleScroll = () => {
+      if (showSuggestions) {
+        setShowSuggestions(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [showSuggestions]);
+
+  useEffect(() => {
+    // Hide dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      // Check if click happened inside the search container
+      if (
+        !event.target.closest(".search-container") &&
+        !event.target.closest(".suggestions-dropdown")
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -144,156 +186,95 @@ const Header2 = () => {
   };
   const navigate = useNavigate();
 
-useEffect(() => {
-    const fetchSuggestions = async () => {
-      try {
-        const response = await fetch(
-          `${ApiUrl}/api/suggestions?query=${encodeURIComponent(searchQuery.trim())}`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          if (data.message) {
-            setSuggestions([]);
-            setErrorMessage(data.message);
-            setIsDropdownOpen3(true);
-          } else {
-            setSuggestions([data.category]);
-            setErrorMessage("");
-            setIsDropdownOpen3(true);
-          }
-        } else {
-          console.error("Failed to fetch suggestions");
-        }
-      } catch (error) {
-        console.error("Error fetching suggestions:", error);
-      }
-    };
-
-    if (searchQuery.trim()) {
-      fetchSuggestions();
-    } else {
+  const fetchSuggestions = async (query) => {
+    if (!query) {
+      console.log("Empty query, skipping API call.");
       setSuggestions([]);
-      setIsDropdownOpen3(false);
-      setErrorMessage("");
+      setShowSuggestions(false);
+      return;
     }
+  
+    console.log(`Fetching suggestions for: ${query}`);
+  
+    try {
+      const response = await fetch(`${ApiUrl}/suggestions?query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+    
+      console.log("Raw API response:", data); // Debugging log
+    
+      if (response.ok && Array.isArray(data.suggestions) && data.suggestions.length) {
+        console.log("Suggestions received:", data.suggestions);
+        setSuggestions([...new Set(data.suggestions)]); // Remove duplicates
+        setShowSuggestions(true);  // ✅ Ensure this is set to true
+      } else {
+        console.warn("No valid suggestions found.");
+        setSuggestions([]);
+        setShowSuggestions(false);  // ✅ Hide when no suggestions
+      }
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+    
+    
+    
+  };
+  
+  // Debounce API calls
+  useEffect(() => {
+    console.log(`Search query changed: ${searchQuery}`);
+    const timer = setTimeout(() => {
+      if (searchQuery.trim()) {
+        fetchSuggestions(searchQuery.trim().toLowerCase());
+      }
+    }, 300); // 300ms delay
+  
+    return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  const handleSuggestionClick = (suggestion) => {
+    console.log(`Suggestion clicked: ${suggestion}`);
+    setSearchQuery(suggestion);
+    setShowSuggestions(false);
+    handleSearch(); // Perform search
+  };
+  
+  
   const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value);
+    const value = e.target.value;
+    setSearchQuery(value);
+  
+    if (value.trim() === "") {
+      setShowSuggestions(false); // Hide when input is empty
+    } else {
+      setShowSuggestions(true);  // Ensure it shows when typing
+    }
   };
+  
 
-  // Define your category and keyword mappings
-  const keywordMapping = [
-    {
-      term: "Computers",
-      keywords: [
-        "laptop",
-        "laptops",
-        "desktop",
-        "desktops",
-        "computer",
-        "computers",
-        "notebook",
-      ],
-    },
-    {
-      term: "Mobiles",
-      keywords: [
-        "mobile",
-        "mobiles",
-        "smartphone",
-        "smartphones",
-        "phones",
-        "phone",
-        "android",
-        "iphone",
-        "oneplus", // add the normalized product name here
-      ],
-    },
-    { term: "CCTV", keywords: ["cctv", "security camera", "surveillance"] },
-    {
-      term: "Printers",
-      keywords: ["printer", "printers", "scanner", "scanners", "fax"],
-    },
-    {
-      term: "ComputerAccessories",
-      keywords: [
-        "keyboard",
-        "mouse",
-        "monitor",
-        "webcam",
-        "laptop charger",
-        "adapter",
-      ],
-    },
-    {
-      term: "MobileAccessories",
-      keywords: [
-        "charger",
-        "mobile charger",
-        "back cover",
-        "back case",
-        "flip cover",
-        "case",
-        "screen protector",
-        "power bank",
-        "c type charger",
-      ],
-    },
-    {
-      term: "Headphones",
-      keywords: [
-        "headphone",
-        "headphones",
-        "earphone",
-        "earphones",
-        "earbuds",
-        "headset",
-        "wireless headphone",
-        "wired headphone",
-        "wired headphones",
-      ],
-    },
-    {
-      term: "Speakers",
-      keywords: [
-        "speaker",
-        "speakers",
-        "bluetooth speaker",
-        "audio",
-        "home theatre",
-      ],
-    },
-    { term: "TV", keywords: ["television", "tv", "tele"] },
-    {
-      term: "Watch",
-      keywords: ["watch", "smart watch", "time", "clock", "wall clock"],
-    },
-  ];
-
-  // Synonym mapping to normalize variations; note how "one plus" maps to "oneplus"
-  const synonymMapping = {
-    xiaomi: "redmi",
-    redmi: "redmi",
-    "one plus": "oneplus",
-    oneplus: "oneplus",
-  };
-
+ 
   const handleSearch = async () => {
     const trimmedQuery = searchQuery.trim().toLowerCase();
-  
+
     if (!trimmedQuery) {
       console.warn("Search term is empty.");
       return;
     }
-  
+
     try {
-      const response = await fetch(`${ApiUrl}/api/suggestions?query=${encodeURIComponent(trimmedQuery)}`);
+      const response = await fetch(
+        `${ApiUrl}/api/suggestions?query=${encodeURIComponent(trimmedQuery)}`
+      );
       const data = await response.json();
-  
+
       if (response.ok && data.category) {
         console.log(`Navigating to category: ${data.category}`);
-        navigate(`/${encodeURIComponent(data.category)}?search=${encodeURIComponent(trimmedQuery)}`);
+        navigate(
+          `/${encodeURIComponent(data.category)}?search=${encodeURIComponent(
+            trimmedQuery
+          )}`
+        );
       } else {
         console.warn("No category found.");
         Swal.fire({
@@ -313,14 +294,12 @@ useEffect(() => {
       });
     }
   };
-  
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
-  
-
 
   // const handleSuggestionClick = (suggestion) => {
   //   setSearchQuery(suggestion);
@@ -379,12 +358,15 @@ useEffect(() => {
 
     return cartItems
       .reduce((total, item) => {
-        const price = parseFloat(item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price);
+        const price = parseFloat(
+          item.offer_price > 0 && isOfferActive
+            ? item.offer_price
+            : item.prod_price
+        );
         return total + (isNaN(price) ? 0 : price * item.quantity);
       }, 0)
       .toFixed(0);
   };
-
 
   const discount = () => {
     return cartItems
@@ -755,11 +737,11 @@ useEffect(() => {
             email,
             username: localStorage.getItem("username"),
           });
-  
+
           const fetchedCart = response.data.products || [];
           setCartItems(fetchedCart);
           setCartLoaded(true);
-  
+
           console.log("Fetched cart items:", fetchedCart);
         } catch (error) {
           console.error("Error fetching cart items:", error);
@@ -767,17 +749,52 @@ useEffect(() => {
           setIsLoading(false);
         }
       };
-  
+
       fetchCartItems();
       const intervalId = setInterval(fetchCartItems, 5000);
-  
+
       return () => clearInterval(intervalId);
     }
-  }, [email]);// Dependency on `email` so it will trigger fetch when email changes
+  }, [email]); // Dependency on `email` so it will trigger fetch when email changes
 
   const handleViewCart = () => {
     navigate("/Cart", { state: { isOfferActive, product } });
   };
+
+  const handleSelect = async (suggestion) => {
+    setQuery(suggestion); // Update input field
+    setShowSuggestions(false); // Hide dropdown
+  
+    try {
+      const response = await fetch(
+        `${ApiUrl}/api/suggestions?query=${encodeURIComponent(suggestion)}`
+      );
+      const data = await response.json();
+  
+      if (response.ok && data.category) {
+        console.log(`Navigating to: /${data.category}?search=${suggestion}`);
+        navigate(`/${encodeURIComponent(data.category)}?search=${encodeURIComponent(suggestion)}`);
+      } else {
+        console.warn("No category found.");
+        Swal.fire({
+          title: "Product not found",
+          text: "We could not find any products matching your search.",
+          icon: "warning",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching category:", error);
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred while searching.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+  
+  
 
   return (
     <>
@@ -793,30 +810,50 @@ useEffect(() => {
               style={{ marginLeft: "50px" }}
               alt="Company Logo"
               loading="lazy"
-
             />
           </a>
         </div>
         <div className="search-box">
-          <input
-            type="text"
-            className="searchboxinput"
-            value={searchQuery}
-            onChange={handleSearchInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder="Search for products..."
-          />
-          <div className="search-icon-container" onClick={handleSearch}>
-            <FaSearch className="search-icon" />
-          </div>
-        </div>
+  <input
+    type="text"
+    className="searchboxinput"
+    value={searchQuery}
+    onChange={handleSearchInputChange}
+    onKeyPress={handleKeyPress}
+    placeholder="Search for products..."
+  />
+  <div className="search-icon-container" onClick={handleSearch}>
+    <FaSearch className="search-icon" />
+  </div>
+</div>
+
+{/* Dropdown should be OUTSIDE search-box */}
+{showSuggestions && suggestions.length > 0 && (
+  <ul className="suggestions-dropdown">
+    {suggestions.map((suggestion, index) => (
+      <li key={index} onClick={() => handleSelect(suggestion)}>
+        {suggestion}
+      </li>
+    ))}
+  </ul>
+)}
+
 
         <div className="iconss">
-          <FaUser
+          {/* <FaUser
             title={username || "Login"}
             style={{ color: "white" }}
             className="users"
             onClick={toggleUserCard}
+          /> */}
+          <img
+            title={username || "Login"}
+            // style={{ color: "white" }}
+            className="icons"
+            onClick={toggleUserCard}
+            src={usericon}
+            style={{ width: "25px", cursor:'pointer' }}
+            alt=""
           />
 
           {isDropdownOpen && (
@@ -859,22 +896,41 @@ useEffect(() => {
               </a>
             </div>
           )}
-          <FaHeart
+          {/* <FaHeart
             style={{ color: "white" }}
             title="Wish List"
             onClick={toggleWishlist}
+          /> */}
+          <img
+            title="Wish List"
+            onClick={toggleWishlist}
+            src={wishlisticon}
+            className="icons2"
+            style={{ width: "25px", cursor:'pointer'  }}
+            alt=""
           />
+
           <div className="cart-icon-container">
-            <FaShoppingCart
+            {/* <FaShoppingCart
               style={{ color: "white", marginTop: "4px" }}
               title="Cart"
               onClick={toggleSidebar}
+            /> */}
+            <img
+              title="Cart"
+              onClick={toggleSidebar}
+              src={carticon}
+              style={{ width: "25px", cursor:'pointer'  }}
+              alt=""
+              className="icons"
             />
+
             <FaEllipsisV
               style={{ color: "white" }}
               className="dots"
               onClick={handleToggleDropdown}
             />
+            
 
             {getTotalItemsCount() > 0 && (
               <span className="cart-count">{getTotalItemsCount()}</span>
@@ -995,8 +1051,10 @@ useEffect(() => {
                         </p>
                         <p style={{ color: "#27ae60" }}>
                           {" "}
-                          {/* ₹{item.prod_price * item.quantity} */}
-                          ₹{item.offer_price > 0 && isOfferActive ? item.offer_price * item.quantity : item.prod_price * item.quantity}
+                          {/* ₹{item.prod_price * item.quantity} */}₹
+                          {item.offer_price > 0 && isOfferActive
+                            ? item.offer_price * item.quantity
+                            : item.prod_price * item.quantity}
                         </p>
 
                         <div className="quantity-controls">
@@ -1041,9 +1099,42 @@ useEffect(() => {
                   style={{ textDecoration: "none", color: "black" }}
                   href="/Cart"
                 >
-                  <button className="change-btn" onClick={handleViewCart}>
-                    View Cart <FaShoppingCart  />
-                  </button>
+                  {/* <button className="change-btn" onClick={handleViewCart}>
+                    View Cart <FaShoppingCart />
+                  </button> */}
+{/* <button class="Btn">
+  
+  <div class="sign" onClick={handleViewCart}> <svg
+                                class="svg-icon"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                              </svg></div>
+  
+  <div class="text">View Cart</div>
+</button> */}
+
+<button class="cssbuttons-io-button">
+View Cart
+  <div class="icon3" onClick={handleViewCart}>
+  <svg
+                                class="svg-icon"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                              </svg>
+  </div>
+</button>
+
+
+
+
                 </a>
               </div>
             </div>

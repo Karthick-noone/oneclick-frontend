@@ -7,7 +7,7 @@ import Header2 from "./Header2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaTimes, FaTrash, FaCheck } from "react-icons/fa";
+import { FaTimes, FaTrash, FaCheck, FaInfoCircle } from "react-icons/fa";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {
   FaMoneyBillWave,
@@ -17,6 +17,9 @@ import {
 } from "react-icons/fa";
 import Swal from "sweetalert2";
 import Footer from "./footer";
+import orderTruck from "./img/order-truck.gif";
+import confetti from "canvas-confetti";
+
 
 const BuyNow = () => {
   const navigate = useNavigate();
@@ -47,6 +50,7 @@ const BuyNow = () => {
   const [coupons, setCoupons] = useState(0);
   const [couponValue, setCouponValue] = useState(0);
   const [minPurchaseLimit, setMinPurchaseLimit] = useState(0);
+  const [isOrdering, setIsOrdering] = useState(false);
 
   const location = useLocation();
   const { product, email } = location.state || {}; // Get product and email
@@ -411,6 +415,14 @@ const BuyNow = () => {
     }
   }, [addressDetails]);
 
+   const firework = () => {
+      confetti({
+        particleCount: 200,
+        spread: 100,
+        origin: { y: 0.6 },
+      });
+    };
+
   const handlePlaceOrder = async () => {
     console.log("handlePlaceOrder function called");
 
@@ -500,20 +512,27 @@ const BuyNow = () => {
     };
 
     console.log("Order Data:", orderData);
-
+    setIsOrdering(true); // Show GIF while ordering
+    setTimeout(async () => {
     try {
       const response = await axios.post(`${ApiUrl}/place-order`, orderData);
 
       if (response.status === 200) {
-        console.log("Order placed successfully", response.data);
-
-        Swal.fire({
-          icon: "success",
-          title: "Order Placed",
-          text: "Your order has been placed successfully!",
-          timer: 5000,
-          showConfirmButton: false,
-        }).then(() => {
+                console.log("Order placed successfully");
+                firework();
+                Swal.fire({
+                  title: "🎉 Order Placed Successfully! 🎊",
+                  text: "Your order is on its way! Get ready to receive it soon.",
+                  icon: "success",
+                  timer: 6000,
+                  showConfirmButton: false,
+                  // background: "linear-gradient(135deg, #ff512f, #dd2476)", // Strong red-pink gradient
+                  background: "linear-gradient(135deg, #11998e, #38ef7d)",
+                  color: "#fff", // White text for contrast
+                  customClass: {
+                    popup: "animated tada", // Fun animation on popup
+                  },
+                }).then(() => {
           window.history.replaceState(null, "", "/MyOrders");
           navigate("/MyOrders");
         });
@@ -535,7 +554,10 @@ const BuyNow = () => {
         timer: 5000,
         showConfirmButton: false,
       });
+    }finally {
+      setIsOrdering(false); // Hide GIF after order attempt (whether success or failure)
     }
+  }, 3000); // Delay execution by 2 seconds
   };
 
   const capitalizeFirstLetter = (string) => {
@@ -806,6 +828,22 @@ const BuyNow = () => {
                 Apply
               </button>
             </div>
+             <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginTop: "5px",
+                            marginBottom: "2px",
+                            color: "#555",
+                            fontSize: "0.83em",
+                          }}
+                        >
+                          <FaInfoCircle style={{ marginRight: "5px", color: "#ff5722" }} />
+                          <span>
+                            {" "}
+                            If you have multiple coupons, apply the one you prefer.
+                          </span>
+                        </div>
             {message && (
               <p
                 style={{
@@ -867,7 +905,15 @@ const BuyNow = () => {
                       onClick={() => handlePlaceOrder("cod")} // Pass "cod" to handlePayment function
                       className="summary-place-order-btn"
                     >
-                      Place Order
+                      {isOrdering ? (
+                                              <img
+                                                src={orderTruck}
+                                                alt="Ordering..."
+                                                style={{ height: "100px", padding: "1px" }}
+                                              />
+                                            ) : (
+                                              "Order Now"
+                                            )}
                     </button>
                   </div>
                 )}
@@ -923,7 +969,15 @@ const BuyNow = () => {
                       onClick={() => handlePlaceOrder("pickup")} // Pass "cod" to handlePayment function
                       className="summary-place-order-btn"
                     >
-                      Place Order
+                     {isOrdering ? (
+                                             <img
+                                               src={orderTruck}
+                                               alt="Ordering..."
+                                               style={{ height: "100px", padding: "1px" }}
+                                             />
+                                           ) : (
+                                             "Order Now"
+                                           )}
                     </button>
                   </div>
                 )}
@@ -969,7 +1023,7 @@ const BuyNow = () => {
                         onClick={handleConfirm}
                         className="modal4-confirm-btn"
                       >
-                        Confirm Address
+                        Set Address
                       </button>
                       <a style={{ textDecoration: "none" }} href="/Useraddress">
                         <button className="modal4-confirm-btn">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./css/Cart.css";
 import { ApiUrl } from "./ApiUrl";
 // import Header1 from './Header1';
@@ -7,7 +7,15 @@ import Header2 from "./Header2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaTimes, FaTrash, FaCheck, FaShoppingBag, FaStore } from "react-icons/fa";
+import {
+  FaTimes,
+  FaTrash,
+  FaCheck,
+  FaShoppingBag,
+  FaStore,
+  FaInfo,
+  FaInfoCircle,
+} from "react-icons/fa";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {
   FaMoneyBillWave,
@@ -17,6 +25,8 @@ import {
 } from "react-icons/fa";
 import Swal from "sweetalert2";
 import Footer from "./footer";
+import orderTruck from "./img/order-truck.gif";
+import confetti from "canvas-confetti";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -50,7 +60,7 @@ const Checkout = () => {
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   // const [isOfferActive, setIsOfferActive] = useState(true);
   const [item, setitem] = useState(null);
-
+  const [isOrdering, setIsOrdering] = useState(false);
 
   const location = useLocation();
   const { isOfferActive, product } = location.state || {}; // Ensure it doesn't break if undefined
@@ -432,7 +442,9 @@ const Checkout = () => {
     const totalPrice = cartItems
       .reduce((total, item) => {
         const price = parseFloat(
-          item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive
+            ? item.offer_price
+            : item.prod_price
         );
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
 
@@ -676,7 +688,9 @@ const Checkout = () => {
     return cartItems
       .reduce((total, item) => {
         const prod_price = parseFloat(
-          item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive
+            ? item.offer_price
+            : item.prod_price
         );
         return total + (isNaN(prod_price) ? 0 : prod_price * item.quantity);
       }, 0)
@@ -687,7 +701,9 @@ const Checkout = () => {
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
         const price = parseFloat(
-          item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive
+            ? item.offer_price
+            : item.prod_price
         );
         const discountPerItem = actual_price - price;
         return (
@@ -867,6 +883,14 @@ const Checkout = () => {
     }
   }, [addressDetails]);
 
+  const firework = () => {
+    confetti({
+      particleCount: 200,
+      spread: 100,
+      origin: { y: 0.6 },
+    });
+  };
+
   const handlePlaceOrder = async () => {
     console.log("handlePlaceOrder function called");
 
@@ -920,7 +944,10 @@ const Checkout = () => {
     const enrichedCartItems = cartItems.map((item) => ({
       id: item.id,
       quantity: item.quantity, // Map 'prod_quantity' to 'quantity'
-      prod_price: item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price, // Map 'prod_price' to 'prod_price'
+      prod_price:
+        item.offer_price > 0 && isOfferActive
+          ? item.offer_price
+          : item.prod_price, // Map 'prod_price' to 'prod_price'
       prod_name: item.prod_name, // Map 'prod_name' to 'prod_name'
       prod_img: item.image, // Map 'prod_image' to 'image'
       prod_description: item.prod_description, // Map 'prod_description' to 'prod_description'
@@ -949,60 +976,70 @@ const Checkout = () => {
         selectedPaymentMethod === "cod"
           ? "Pending"
           : selectedPaymentMethod === "pickup"
-          ? "Ready for Pickup"
+          ? "Pending"
           : "Paid", // Status based on selection
     };
+    setIsOrdering(true); // Show GIF while ordering
+    setTimeout(async () => {
+      try {
+        // Send the order data and store cart items in the backend
+        const response = await axios.post(`${ApiUrl}/place-order`, orderData);
 
-    try {
-      // Send the order data and store cart items in the backend
-      const response = await axios.post(`${ApiUrl}/place-order`, orderData);
+        if (response.status === 200) {
+          console.log("Order placed successfully");
+          firework();
+          Swal.fire({
+            title: "🎉 Order Placed Successfully! 🎊",
+            text: "Your order is on its way! Get ready to receive it soon.",
+            icon: "success",
+            timer: 6000,
+            showConfirmButton: false,
+            // background: "linear-gradient(135deg, #ff512f, #dd2476)", // Strong red-pink gradient
+            background: "linear-gradient(135deg, #11998e, #38ef7d)",
+            color: "#fff", // White text for contrast
+            customClass: {
+              popup: "animated tada", // Fun animation on popup
+            },
+          }).then(async () => {
+            try {
+              // Call backend to clear the cart after placing order
+              await axios.post(`${ApiUrl}/clear-cart`, { email, cartItems });
+              console.log("Cart cleared successfully from the database");
+            } catch (clearCartError) {
+              console.error("Error clearing cart:", clearCartError.message);
+            }
 
-      if (response.status === 200) {
-        console.log("Order placed successfully");
+            clearCart(); // Clear cart in local state
+            const storedEmail = localStorage.getItem("email");
+            if (storedEmail) {
+              const cartKey = `${storedEmail}-cart`;
+              localStorage.removeItem(cartKey); // Clear local storage cart
+            }
 
+            navigate("/MyOrders");
+          });
+        } else {
+          console.log("Unexpected response status:", response.status);
+          throw new Error("Unexpected response status");
+        }
+      } catch (error) {
+        console.error(
+          "Error placing order:",
+          error.response?.data || error.message
+        );
         Swal.fire({
-          icon: "success",
-          title: "Order Placed",
-          text: "Your order has been placed successfully!",
+          icon: "error",
+          title: "Order Error",
+          text: `An error occurred: ${
+            error.response?.data?.message || error.message
+          }`,
           timer: 5000,
           showConfirmButton: false,
-        }).then(async () => {
-          try {
-            // Call backend to clear the cart after placing order
-            await axios.post(`${ApiUrl}/clear-cart`, { email, cartItems });
-            console.log("Cart cleared successfully from the database");
-          } catch (clearCartError) {
-            console.error("Error clearing cart:", clearCartError.message);
-          }
-
-          clearCart(); // Clear cart in local state
-          const storedEmail = localStorage.getItem("email");
-          if (storedEmail) {
-            const cartKey = `${storedEmail}-cart`;
-            localStorage.removeItem(cartKey); // Clear local storage cart
-          }
-
-          navigate("/MyOrders");
         });
-      } else {
-        console.log("Unexpected response status:", response.status);
-        throw new Error("Unexpected response status");
+      } finally {
+        setIsOrdering(false); // Hide GIF after order attempt (whether success or failure)
       }
-    } catch (error) {
-      console.error(
-        "Error placing order:",
-        error.response?.data || error.message
-      );
-      Swal.fire({
-        icon: "error",
-        title: "Order Error",
-        text: `An error occurred: ${
-          error.response?.data?.message || error.message
-        }`,
-        timer: 5000,
-        showConfirmButton: false,
-      });
-    }
+    }, 3000); // Delay execution by 2 seconds
   };
   // Function to clear the cart
   const clearCart = () => {
@@ -1486,6 +1523,22 @@ const Checkout = () => {
                 Apply
               </button>
             </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginTop: "5px",
+                marginBottom: "2px",
+                color: "#555",
+                fontSize: "0.83em",
+              }}
+            >
+              <FaInfoCircle style={{ marginRight: "5px", color: "#ff5722" }} />
+              <span>
+                {" "}
+                If you have multiple coupons, apply the one you prefer.
+              </span>
+            </div>
             {message && (
               <p
                 style={{
@@ -1561,7 +1614,15 @@ const Checkout = () => {
                       onClick={() => handlePlaceOrder("cod")} // Pass "cod" to handlePayment function
                       className="summary-place-order-btn"
                     >
-                      Place Order
+                      {isOrdering ? (
+                        <img
+                          src={orderTruck}
+                          alt="Ordering..."
+                          style={{ height: "100px", padding: "1px" }}
+                        />
+                      ) : (
+                        "Order Now"
+                      )}
                     </button>
                   </div>
                 )}
@@ -1617,7 +1678,15 @@ const Checkout = () => {
                       onClick={() => handlePlaceOrder("pickup")} // Pass "cod" to handlePayment function
                       className="summary-place-order-btn"
                     >
-                      Place Order
+                      {isOrdering ? (
+                        <img
+                          src={orderTruck}
+                          alt="Ordering..."
+                          style={{ height: "100px", padding: "1px" }}
+                        />
+                      ) : (
+                        "Order Now"
+                      )}
                     </button>
                   </div>
                 )}
