@@ -410,14 +410,14 @@ const ProductList = () => {
             }}
             onInit={(swiper) => console.log("Swiper initialized:", swiper)}
           >
-            {loading
+            {loading || combinedProducts.length === 0
               ? [...Array(5)].map((_, index) => (
                   <SwiperSlide key={index}>
-                    <div className="skeleton-product-card">
-                      <div className="skeleton-image"></div>
-                      <div className="skeleton-text"></div>
-                      <div className="skeleton-text short"></div>
-                      <div className="skeleton-price"></div>
+                    <div className="skeletonproductcard">
+                      <div className="skeletonimage"></div>
+                      <div className="skeletontext"></div>
+                      <div className="skeletontext short"></div>
+                      <div className="skeletonprice"></div>
                     </div>
                   </SwiperSlide>
                 ))

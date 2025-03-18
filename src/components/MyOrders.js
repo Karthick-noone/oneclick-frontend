@@ -13,6 +13,7 @@ import stamp2 from "./img/cancelled-stamp.png";
 
 import ReactDOMServer from "react-dom/server"; // Add this import at the top
 import Invoice from "../admin/pages/Invoice";
+import RecentlyViewed from "./RecentlyViewed";
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null); // For modal
@@ -598,6 +599,7 @@ const MyOrders = () => {
           </button>
         </Modal>
       </div>
+      {/* <RecentlyViewed /> */}
       <Footer />
     </>
   );

@@ -57,7 +57,7 @@ const AdPage = () => {
           <div className="ads-container">
             {isLoading ? (
               <div className="skeleton-container">
-                {[...Array(3)].map((_, index) => (
+                {[...Array(4)].map((_, index) => (
                   <div key={index} className="skeleton-ad">
                     <div className="skeleton-image"></div>
                   </div>

@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 const FullAdPage = () => {
   const [adImages, setAdImages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchAdImages = async () => {
@@ -16,7 +15,6 @@ const FullAdPage = () => {
         setAdImages(response.data || []);
       } catch (err) {
         console.error("Error fetching images:", err);
-        setError("Failed to load images");
       } finally {
         setLoading(false);
       }
@@ -39,12 +37,13 @@ const FullAdPage = () => {
     }));
   }, [adImages]);
 
-  if (loading) return <div className="loading-spinner">Loading...</div>;
-  if (error) return <div className="error-message">{error}</div>;
-
   return (
     <div className="full-page-container">
-      {processedAds.length > 0 ? (
+      {loading || processedAds.length === 0 ? (
+        // Always display skeleton banner when loading or when there's no data
+        <div className="skeleton-border">
+        <div className="skeleton-ad-banner"></div></div>
+      ) : (
         processedAds.map((ad, index) => (
           <div key={index} className="ad-image-container">
             <Link to={`/${ad.mappedCategory}`} className="ad-link">
@@ -59,8 +58,6 @@ const FullAdPage = () => {
             </Link>
           </div>
         ))
-      ) : (
-        <p>No ads available</p>
       )}
     </div>
   );

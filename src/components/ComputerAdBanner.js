@@ -20,16 +20,15 @@ const AdBanner = () => {
   const { data: products = [], isLoading, isError } = useQuery({
     queryKey: ["computersOffersPage"],
     queryFn: fetchProducts,
-    staleTime: Infinity, // Keeps data fresh until manual refetch
-    cacheTime: 300000, // 5 minutes before unused cache is garbage collected
-    refetchOnWindowFocus: false, // Prevents refetching when switching tabs
+    staleTime: Infinity,
+    cacheTime: 300000,
+    refetchOnWindowFocus: false,
   });
 
   const handleAdClick = (product) => {
     navigate(`/${product.category}?search=${product.brand_name.toLowerCase()}`);
   };
 
-  // ✅ Correct filtering
   const bannerProducts = products.filter((product) => product.title === "banner");
   const portraitProducts = products.filter((product) => product.title === "portrait");
   const noTitleProducts = products.filter((product) => !product.title || product.title.trim() === "");
@@ -38,7 +37,7 @@ const AdBanner = () => {
     <>
       <Header2 />
       <div className="ad-section-container4">
-        {/* ✅ Section 1: Banner Images */}
+        {/* Banner Images */}
         <div className="box">
           <div className="bannerr-container4">
             {isLoading
@@ -59,13 +58,11 @@ const AdBanner = () => {
                       />
                     </div>
                   ))
-                ) : (
-                  <div className="no-data-message">No banner ads available</div>
-                )}
+                ) : null}
           </div>
         </div>
 
-        {/* ✅ Section 2: Products with Empty Title */}
+        {/* Products with Empty Title */}
         <div className="box">
           <div className="offer-ad-container4">
             {isLoading
@@ -88,19 +85,15 @@ const AdBanner = () => {
                               loading="lazy"
                             />
                           </>
-                        ) : (
-                          <p>No images available</p>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   ))
-                ) : (
-                  <div className="no-data-message">No products available</div>
-                )}
+                ) : null}
           </div>
         </div>
 
-        {/* ✅ Section 3: Portrait Images */}
+        {/* Portrait Images */}
         <div className="box">
           <div className="portrait-container2">
             {isLoading
@@ -121,9 +114,7 @@ const AdBanner = () => {
                       />
                     </div>
                   ))
-                ) : (
-                  <div className="no-data-message">No portrait ads available</div>
-                )}
+                ) : null}
           </div>
         </div>
       </div>
