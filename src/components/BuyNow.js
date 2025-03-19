@@ -7,7 +7,7 @@ import Header2 from "./Header2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaTimes, FaTrash, FaCheck, FaInfoCircle } from "react-icons/fa";
+import { FaTimes, FaTruck, FaCheck, FaInfoCircle } from "react-icons/fa";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {
   FaMoneyBillWave,
@@ -138,10 +138,18 @@ const BuyNow = () => {
         const itemQuantity = item.quantity || 1;
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
         return total + price * itemQuantity + deliveryCharge;
-      }, 0);
+      }, );
     }
 
     return totalPrice; // Return raw total (without coupon discount)
+  };
+
+  const getDeliveryDate = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + 10); // Add 10 days
+
+    const options = { month: "short", day: "numeric", weekday: "short" };
+    return today.toLocaleDateString("en-US", options);
   };
 
   // Apply coupon via API call
@@ -805,9 +813,7 @@ const BuyNow = () => {
                   <br />
                   Extra Discount on Orders Over ₹{minPurchaseLimit}
                 </span>
-                <span style={{ color: "green" }}>
-                  - ₹{couponValue}
-                </span>
+                <span style={{ color: "green" }}>- ₹{couponValue}</span>
               </div>
             )}
             <div className="summary-item">
@@ -832,18 +838,36 @@ const BuyNow = () => {
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            marginTop: "5px",
+                            // marginTop: "5px",
                             marginBottom: "2px",
                             color: "#555",
                             fontSize: "0.83em",
                           }}
                         >
-                          <FaInfoCircle style={{ marginRight: "5px", color: "#ff5722" }} />
+                          <FaInfoCircle style={{ marginRight: "5px",marginBottom:"5px", color: "#ff5722" }} />
                           <span>
                             {" "}
                             If you have multiple coupons, apply the one you prefer.
                           </span>
                         </div>
+                              {finalAmount > 0 && (
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          marginBottom: "5px",
+                                          alignItems: "center",
+                                          fontSize: "1em",
+                                          color: "#333",
+                                          fontWeight: "bold",
+                                          
+                                        }}
+                                      >
+                                       <FaTruck style={{marginRight:"2px"}}/> Delivery by {getDeliveryDate()}
+                                        {delivery_charge == 0 && (
+                                          <span style={{ color: "green"  }}>&nbsp;• Free</span>
+                                        )}
+                                      </div>
+                                    )}
             {message && (
               <p
                 style={{

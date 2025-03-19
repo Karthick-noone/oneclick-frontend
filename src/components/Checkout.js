@@ -15,6 +15,7 @@ import {
   FaStore,
   FaInfo,
   FaInfoCircle,
+  FaTruck,
 } from "react-icons/fa";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {
@@ -120,6 +121,13 @@ const Checkout = () => {
     if (validCharacters.test(inputValue)) {
       setCoupon(inputValue); // Only set the value if it's valid
     }
+  };
+  const getDeliveryDate = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + 10); // Add 10 days
+
+    const options = { month: "short", day: "numeric", weekday: "short" };
+    return today.toLocaleDateString("en-US", options);
   };
 
   const handleApplyCoupon = async (couponCode) => {
@@ -1527,18 +1535,36 @@ const Checkout = () => {
               style={{
                 display: "flex",
                 alignItems: "center",
-                marginTop: "5px",
+                // marginTop: "5px",
                 marginBottom: "2px",
                 color: "#555",
                 fontSize: "0.83em",
               }}
             >
-              <FaInfoCircle style={{ marginRight: "5px", color: "#ff5722" }} />
+              <FaInfoCircle style={{ marginRight: "5px",marginBottom:"5px", color: "#ff5722" }} />
               <span>
                 {" "}
                 If you have multiple coupons, apply the one you prefer.
               </span>
             </div>
+            {finalAmount > 0 && (
+              <div
+                style={{
+                  display: "flex",
+                  marginBottom: "5px",
+                  alignItems: "center",
+                  fontSize: "1em",
+                  color: "#333",
+                  fontWeight: "bold",
+                  
+                }}
+              >
+               <FaTruck style={{marginRight:"2px"}}/> Delivery by {getDeliveryDate()}
+                {calculateDeliveryCharge() === "0.00" && (
+                  <span style={{ color: "green"  }}>&nbsp;• Free</span>
+                )}
+              </div>
+            )}
             {message && (
               <p
                 style={{
