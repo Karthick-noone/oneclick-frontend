@@ -204,7 +204,16 @@
   justify-content: center;
   align-items: center;
 }
+.clear-icon {
+  font-size: 18px;
+  color: #999;
+  cursor: pointer;
+  margin-right: 5px;
+}
 
+.clear-icon:hover {
+  color: #333;
+}
 
 .icons {
   transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;

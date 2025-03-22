@@ -808,7 +808,7 @@ const handleUpdate = async (e) => {
                   <strong>Phone Number</strong> <span>{addr.phone}</span>
                 </p>
 
-                <div className="button-container">
+                <div className="buttons-container">
                   {/* {isSelecting && (
                     <input
                       type="checkbox"
@@ -820,10 +820,10 @@ const handleUpdate = async (e) => {
                     <>
                       <button
                         className="adr-btn"
-                        title="Add this address as your current address"
+                        title="Set this address as your current address"
                         onClick={() => handleAddClick(addr)}
                       >
-                        Add
+                        Set
                       </button>
                       <button
                         className="adr-btn"

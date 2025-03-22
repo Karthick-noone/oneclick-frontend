@@ -29,6 +29,7 @@ import Swal from "sweetalert2";
 import "nprogress/nprogress.css";
 import NProgress from "nprogress";
 // import isOfferActive from './ProductDetail'
+import { IoMdClose } from "react-icons/io"; // Importing close icon
 
 import usericon from "./img/user.png";
 import wishlisticon from "./img/wish-list.png";
@@ -216,9 +217,11 @@ const Header2 = () => {
       setSuggestions([]);
       setShowSuggestions(false);
     }
-    
-    
-    
+  };
+
+  const handleClearInput = () => {
+    setSearchQuery("");
+    setShowSuggestions(false);
   };
   
   // Debounce API calls
@@ -822,6 +825,9 @@ const Header2 = () => {
     onKeyPress={handleKeyPress}
     placeholder="Search for products..."
   />
+   {searchQuery && (
+          <IoMdClose className="clear-icon" onClick={handleClearInput} />
+        )}
   <div className="search-icon-container" onClick={handleSearch}>
     <FaSearch className="search-icon" />
   </div>

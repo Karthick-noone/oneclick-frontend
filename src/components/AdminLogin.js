@@ -87,6 +87,7 @@ const LoginPage = () => {
           icon: "success",
           title: `🎉 ${role} Login successful`,
           text: "You have logged in successfully!",
+          timer:4000,
           customClass: {
             popup: "my-popup", // Custom class for success popup
           },

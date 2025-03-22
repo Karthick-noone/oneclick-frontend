@@ -21,6 +21,7 @@ const ProductDetailPage = () => {
     brand_name: "",
     description: "",
     offer: "",
+    category: "",
     images: [],
   });
   const [editingProduct, setEditingProduct] = useState(null);
@@ -73,7 +74,13 @@ const ProductDetailPage = () => {
 }, []);
 
 
-  
+const handleCategoryChange = (e) => {
+  setNewProduct((prevProduct) => ({
+    ...prevProduct,
+    category: e.target.value, // Ensure category is updated inside newProduct
+  }));
+};
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewProduct({
@@ -235,6 +242,15 @@ const ProductDetailPage = () => {
       return;
     }
   
+    if (!newProduct.category) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "Please fill in all required fields.",
+      });
+      return;
+    }
+  
     if (newProduct.images.length === 0) {
       Swal.fire({
         icon: "warning",
@@ -248,6 +264,7 @@ const ProductDetailPage = () => {
     formData.append("title", newProduct.title);
     formData.append("description", newProduct.description);
     formData.append("offer", newProduct.offer);
+    formData.append("category", newProduct.category);
     formData.append("brand_name", newProduct.brand_name);
   
     // Add banner image with prefix if it exists
@@ -289,6 +306,7 @@ const ProductDetailPage = () => {
           title: "",
           description: "",
           brand_name: "",
+          category: "",
           images: [],
         });
       });
@@ -325,6 +343,7 @@ const ProductDetailPage = () => {
     setEditingProduct({
       id: product.id,
       brand_name: product.brand_name,
+      category: product.category,
       images: [],
     });
   
@@ -353,8 +372,20 @@ const ProductDetailPage = () => {
       return;
     }
   
+  
+    if (!editingProduct.category) {
+      console.warn("Warning: Category is missing.");
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "Please fill in all required fields.",
+      });
+      return;
+    }
+  
     const formData = new FormData();
     formData.append("brand_name", editingProduct.brand_name);
+    formData.append("category", editingProduct.category);
   
     if (selectedFiles) {
       // Add "product_banner_" prefix to the file name
@@ -603,6 +634,28 @@ return (
         placeholder="Enter brand name"
         className="laptops-cardd-input"
       />
+      <select
+      name="category"
+      // value={editingProduct.category}
+      value={newProduct.category}  // Bind the state to the select value
+      onChange={handleCategoryChange}  // Update category on change
+      // onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+      className="ad-form-input"
+    >
+      <option value="">Select Category</option>
+      <option value="computers">Computer</option>
+      <option value="mobiles">Mobile</option>
+      <option value="printers">Printers</option>
+      <option value="headphones">Headphone</option>
+      <option value="speaker">Speaker</option>
+      <option value="cctv">CCTV</option>
+      <option value="tv">TV</option>
+      <option value="watch">Watch</option>
+      <option value="computeraccessories">Computer Accessories</option>
+      <option value="mobileaccessories">Mobile Accessories</option>
+      <option value="printeraccessories">Printer Accessories</option>
+              <option value="cctvaccessories">CCTV Accessories</option>
+    </select>
       <input
         type="file"
         accept="image/jpeg, image/png"
@@ -697,7 +750,31 @@ return (
           className="adminmodal-input"
         />
 
-
+<select
+      name="category"
+      // value={editingProduct.category}
+      value={editingProduct.category}
+          onChange={(e) =>
+            setEditingProduct({ ...editingProduct, category: e.target.value })
+          }
+      // onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+      className="adminmodal-input"
+      style={{marginRight:' 10px'}}
+    >
+      <option value="">Select Category</option>
+      <option value="computers">Computer</option>
+      <option value="mobiles">Mobile</option>
+      <option value="printers">Printers</option>
+      <option value="headphones">Headphone</option>
+      <option value="speaker">Speaker</option>
+      <option value="cctv">CCTV</option>
+      <option value="tv">TV</option>
+      <option value="watch">Watch</option>
+      <option value="computeraccessories">Computer Accessories</option>
+      <option value="mobileaccessories">Mobile Accessories</option>
+      <option value="printeraccessories">Printer Accessories</option>
+              <option value="cctvaccessories">CCTV Accessories</option>
+    </select>
 
         <button
           onClick={handleUpdateProduct}

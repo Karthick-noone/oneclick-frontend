@@ -20,7 +20,6 @@ import Footer from "./footer";
 import orderTruck from "./img/order-truck.gif";
 import confetti from "canvas-confetti";
 
-
 const BuyNow = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
@@ -138,7 +137,7 @@ const BuyNow = () => {
         const itemQuantity = item.quantity || 1;
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
         return total + price * itemQuantity + deliveryCharge;
-      }, );
+      });
     }
 
     return totalPrice; // Return raw total (without coupon discount)
@@ -167,25 +166,25 @@ const BuyNow = () => {
       setTimeout(() => setMessage(""), 3000);
       return;
     }
-  
+
     try {
       console.log("Applying coupon:", couponCode, "for the selected product");
       // Extract product IDs from items (using prod_id or id)
       const productIds = items.map((item) => item.prod_id || item.id);
       console.log("Product IDs:", productIds);
-  
+
       const { data } = await axios.post(`${ApiUrl}/api/apply-coupon`, {
         couponCode,
         product_ids: productIds,
       });
       console.log("Response from server:", data);
-  
+
       if (data.success) {
         // Choose the discount returned by the API (either discount1 or discount2)
         const discount = data.discount1 ?? data.discount2 ?? 0;
-  
+
         console.log("discount", discount);
-  
+
         // If discount1 is applied, enforce the minimum purchase limit
         if (
           data.discount1 !== undefined &&
@@ -198,22 +197,22 @@ const BuyNow = () => {
           setTimeout(() => setMessage(""), 3000);
           return;
         }
-  
+
         // Save coupon details (for potential future use or display)
         setDiscountAmount(data.discount2 ?? 0);
         setCouponValue(data.discount1 ?? 0);
         setMinPurchaseLimit(data.min_purchase_limit ?? 0);
-  
+
         // Subtract the discount from the raw total price
         const rawTotal = calculateTotalPrice();
         const newAmount = Math.max(0, rawTotal - discount);
         setTotalAmount(newAmount);
-  
+
         setIsCouponApplied(true);
         setMessage("Coupon applied successfully!");
         setMessageType("success");
         setCoupon("");
-  
+
         setTimeout(() => setMessage(""), 3000);
       } else {
         setMessage(data.message || "Failed to apply coupon.");
@@ -231,7 +230,6 @@ const BuyNow = () => {
       setTimeout(() => setMessage(""), 3000);
     }
   };
-  
 
   useEffect(() => {
     // Fetch the username from local storage when the component mounts
@@ -381,11 +379,13 @@ const BuyNow = () => {
     const email = localStorage.getItem("email");
 
     const options = {
-      key: "rzp_test_mtjdapiflomQkN", // Sample Razorpay Test Key ID
-      key_secret: "g13PipAk6MMAEj2Rr3lajUmJ", // Sample Razorpay Test Key Secret
+      // key: "rzp_test_mtjdapiflomQkN", // Sample Razorpay Test Key ID test key
+      // key_secret: "g13PipAk6MMAEj2Rr3lajUmJ", // Sample Razorpay Test Key Secret
+      key: "rzp_live_YExdymlgVGlrcC", // Replace with your Razorpay Test Key ID
+      key_secret: "IUFWdAs57nzoQqnrPZM1pzzt", // Replace with your Razorpay Test Key ID
       amount: finalAmountToSend * 100, // Amount in paise (Razorpay works in paise)
       currency: "INR",
-      name: "One CLick",
+      name: "One Click",
       description: "Order Payment",
       handler: async function (response) {
         try {
@@ -423,13 +423,13 @@ const BuyNow = () => {
     }
   }, [addressDetails]);
 
-   const firework = () => {
-      confetti({
-        particleCount: 200,
-        spread: 100,
-        origin: { y: 0.6 },
-      });
-    };
+  const firework = () => {
+    confetti({
+      particleCount: 200,
+      spread: 100,
+      origin: { y: 0.6 },
+    });
+  };
 
   const handlePlaceOrder = async () => {
     console.log("handlePlaceOrder function called");
@@ -522,50 +522,50 @@ const BuyNow = () => {
     console.log("Order Data:", orderData);
     setIsOrdering(true); // Show GIF while ordering
     setTimeout(async () => {
-    try {
-      const response = await axios.post(`${ApiUrl}/place-order`, orderData);
+      try {
+        const response = await axios.post(`${ApiUrl}/place-order`, orderData);
 
-      if (response.status === 200) {
-                console.log("Order placed successfully");
-                firework();
-                Swal.fire({
-                  title: "🎉 Order Placed Successfully! 🎊",
-                  text: "Your order is on its way! Get ready to receive it soon.",
-                  icon: "success",
-                  timer: 6000,
-                  showConfirmButton: false,
-                  // background: "linear-gradient(135deg, #ff512f, #dd2476)", // Strong red-pink gradient
-                  background: "linear-gradient(135deg, #11998e, #38ef7d)",
-                  color: "#fff", // White text for contrast
-                  customClass: {
-                    popup: "animated tada", // Fun animation on popup
-                  },
-                }).then(() => {
-          window.history.replaceState(null, "", "/MyOrders");
-          navigate("/MyOrders");
+        if (response.status === 200) {
+          console.log("Order placed successfully");
+          firework();
+          Swal.fire({
+            title: "🎉 Order Placed Successfully! 🎊",
+            text: "Your order is on its way! Get ready to receive it soon.",
+            icon: "success",
+            timer: 6000,
+            showConfirmButton: false,
+            // background: "linear-gradient(135deg, #ff512f, #dd2476)", // Strong red-pink gradient
+            background: "linear-gradient(135deg, #11998e, #38ef7d)",
+            color: "#fff", // White text for contrast
+            customClass: {
+              popup: "animated tada", // Fun animation on popup
+            },
+          }).then(() => {
+            window.history.replaceState(null, "", "/MyOrders");
+            navigate("/MyOrders");
+          });
+        } else {
+          console.warn("Unexpected response status:", response.status);
+          throw new Error("Unexpected response status");
+        }
+      } catch (error) {
+        console.error(
+          "Error placing order:",
+          error.response?.data || error.message
+        );
+        Swal.fire({
+          icon: "error",
+          title: "Order Error",
+          text: `An error occurred: ${
+            error.response?.data?.message || error.message
+          }`,
+          timer: 5000,
+          showConfirmButton: false,
         });
-      } else {
-        console.warn("Unexpected response status:", response.status);
-        throw new Error("Unexpected response status");
+      } finally {
+        setIsOrdering(false); // Hide GIF after order attempt (whether success or failure)
       }
-    } catch (error) {
-      console.error(
-        "Error placing order:",
-        error.response?.data || error.message
-      );
-      Swal.fire({
-        icon: "error",
-        title: "Order Error",
-        text: `An error occurred: ${
-          error.response?.data?.message || error.message
-        }`,
-        timer: 5000,
-        showConfirmButton: false,
-      });
-    }finally {
-      setIsOrdering(false); // Hide GIF after order attempt (whether success or failure)
-    }
-  }, 3000); // Delay execution by 2 seconds
+    }, 3000); // Delay execution by 2 seconds
   };
 
   const capitalizeFirstLetter = (string) => {
@@ -775,11 +775,9 @@ const BuyNow = () => {
             </h4>
             <div className="summary-item">
               <span>
-                Price (
-                {/* {getTotalItemsCount() === 1
-                  ? "1 item"
-                  : `${getTotalItemsCount()} items`} */}
-                {quantity} Item)
+                Price
+                {quantity > 0 &&
+                  (quantity === 1 ? " (1 item)" : ` (${quantity} items)`)}
               </span>
               <span>₹{product.prod_price * quantity}</span>
             </div>
@@ -834,40 +832,46 @@ const BuyNow = () => {
                 Apply
               </button>
             </div>
-             <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            // marginTop: "5px",
-                            marginBottom: "2px",
-                            color: "#555",
-                            fontSize: "0.83em",
-                          }}
-                        >
-                          <FaInfoCircle style={{ marginRight: "5px",marginBottom:"5px", color: "#ff5722" }} />
-                          <span>
-                            {" "}
-                            If you have multiple coupons, apply the one you prefer.
-                          </span>
-                        </div>
-                              {finalAmount > 0 && (
-                                      <div
-                                        style={{
-                                          display: "flex",
-                                          marginBottom: "5px",
-                                          alignItems: "center",
-                                          fontSize: "1em",
-                                          color: "#333",
-                                          fontWeight: "bold",
-                                          
-                                        }}
-                                      >
-                                       <FaTruck style={{marginRight:"2px"}}/> Delivery by {getDeliveryDate()}
-                                        {delivery_charge === 0 && (
-                                          <span style={{ color: "green"  }}>&nbsp;• Free</span>
-                                        )}
-                                      </div>
-                                    )}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                // marginTop: "5px",
+                marginBottom: "2px",
+                color: "#555",
+                fontSize: "0.83em",
+              }}
+            >
+              <FaInfoCircle
+                style={{
+                  marginRight: "5px",
+                  marginBottom: "5px",
+                  color: "#ff5722",
+                }}
+              />
+              <span>
+                {" "}
+                If you have multiple coupons, apply the one you prefer.
+              </span>
+            </div>
+            {finalAmount > 0 && (
+              <div
+                style={{
+                  display: "flex",
+                  marginBottom: "5px",
+                  alignItems: "center",
+                  fontSize: "1em",
+                  color: "#333",
+                  fontWeight: "bold",
+                }}
+              >
+                <FaTruck style={{ marginRight: "2px" }} /> Delivery by{" "}
+                {getDeliveryDate()}
+                {delivery_charge === 0 && (
+                  <span style={{ color: "green" }}>&nbsp;• Free</span>
+                )}
+              </div>
+            )}
             {message && (
               <p
                 style={{
@@ -899,8 +903,9 @@ const BuyNow = () => {
             <div>
               {isCouponApplied && (
                 <p className="discount-message">
-      You will save up to ₹{couponValue || discountAmount} on this order!
-      </p>
+                  You will save up to ₹{couponValue || discountAmount} on this
+                  order!
+                </p>
               )}
             </div>
             <center>
@@ -930,84 +935,83 @@ const BuyNow = () => {
                       className="summary-place-order-btn"
                     >
                       {isOrdering ? (
-                                              <img
-                                                src={orderTruck}
-                                                alt="Ordering..."
-                                                style={{ height: "100px", padding: "1px" }}
-                                              />
-                                            ) : (
-                                              "Order Now"
-                                            )}
+                        <img
+                          src={orderTruck}
+                          alt="Ordering..."
+                          style={{ height: "100px", padding: "1px" }}
+                        />
+                      ) : (
+                        "Order Now"
+                      )}
                     </button>
                   </div>
                 )}
               </div>
 
               <div
-                className={`summary-item2 ${
-                  selectedPaymentMethod === "card" ? "selected" : ""
-                }`}
-              >
-                <FaCreditCard className="payment-icon" />
-                <span className="methods">Pay Online</span>
-                <span>
-                  <input
-                    type="radio"
-                    name="payment-method"
-                    value="card"
-                    checked={selectedPaymentMethod === "card"}
-                    onChange={handlePaymentMethodChange}
-                  />
-                </span>
-                {selectedPaymentMethod === "card" && (
-                 <div className="continue-wrapper">
-                  
-                 <button
-                   class="pay-btn"
-                   onClick={() => handlePayment("Online")}
-                 >
-                   <span class="btn-text">Pay Now</span>
-                   <div class="icon-container">
-                     <svg viewBox="0 0 24 24" class="icon3 card-icon">
-                       <path
-                         d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18C2,19.11 2.89,20 4,20H20C21.11,20 22,19.11 22,18V6C22,4.89 21.11,4 20,4Z"
-                         fill="currentColor"
-                       ></path>
-                     </svg>
-                     <svg viewBox="0 0 24 24" class="icon3 paymentt-icon">
-                       <path
-                         d="M2,17H22V21H2V17M6.25,7H9V6H6V3H18V6H15V7H17.75L19,17H5L6.25,7M9,10H15V8H9V10M9,13H15V11H9V13Z"
-                         fill="currentColor"
-                       ></path>
-                     </svg>
-                     <svg viewBox="0 0 24 24" class="icon3 dollar-icon">
-                       <path
-                         d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"
-                         fill="currentColor"
-                       ></path>
-                     </svg>
-
-                     <svg
-                       viewBox="0 0 24 24"
-                       class="icon3 wallet-icon default-icon"
-                     >
-                       <path
-                         d="M21,18V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V6H12C10.89,6 10,6.9 10,8V16A2,2 0 0,0 12,18M12,16H22V8H12M16,13.5A1.5,1.5 0 0,1 14.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,12A1.5,1.5 0 0,1 16,13.5Z"
-                         fill="currentColor"
-                       ></path>
-                     </svg>
-
-                     <svg viewBox="0 0 24 24" class="icon3 check-icon">
-                       <path
-                         d="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z"
-                         fill="currentColor"
-                       ></path>
-                     </svg>
-                   </div>
-                 </button>
-               </div>
-                )}
-              </div>
+                              className={`summary-item2 ${
+                                selectedPaymentMethod === "card" ? "selected" : ""
+                              }`}
+                            >
+                              <FaCreditCard className="payment-icon" />
+                              <span className="methods">Pay Online</span>
+                              <span>
+                                <input
+                                  type="radio"
+                                  name="payment-method"
+                                  value="card"
+                                  checked={selectedPaymentMethod === "card"}
+                                  onChange={handlePaymentMethodChange}
+                                />
+                              </span>
+                              {selectedPaymentMethod === "card" && (
+                                <div className="continue-wrapper">
+                                  <button
+                                    class="pay-btn"
+                                    onClick={() => handlePayment("Online")}
+                                  >
+                                    <span class="btn-text">Pay Now</span>
+                                    <div class="icon-container">
+                                      <svg viewBox="0 0 24 24" class="icon5 card-icon">
+                                        <path
+                                          d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18C2,19.11 2.89,20 4,20H20C21.11,20 22,19.11 22,18V6C22,4.89 21.11,4 20,4Z"
+                                          fill="currentColor"
+                                        ></path>
+                                      </svg>
+                                      <svg viewBox="0 0 24 24" class="icon5 paymentt-icon">
+                                        <path
+                                          d="M2,17H22V21H2V17M6.25,7H9V6H6V3H18V6H15V7H17.75L19,17H5L6.25,7M9,10H15V8H9V10M9,13H15V11H9V13Z"
+                                          fill="currentColor"
+                                        ></path>
+                                      </svg>
+                                      <svg viewBox="0 0 24 24" class="icon5 dollar-icon">
+                                        <path
+                                          d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"
+                                          fill="currentColor"
+                                        ></path>
+                                      </svg>
+              
+                                      <svg
+                                        viewBox="0 0 24 24"
+                                        class="icon5 wallet-icon default-icon"
+                                      >
+                                        <path
+                                          d="M21,18V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V6H12C10.89,6 10,6.9 10,8V16A2,2 0 0,0 12,18M12,16H22V8H12M16,13.5A1.5,1.5 0 0,1 14.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,12A1.5,1.5 0 0,1 16,13.5Z"
+                                          fill="currentColor"
+                                        ></path>
+                                      </svg>
+              
+                                      <svg viewBox="0 0 24 24" class="icon5 check-icon">
+                                        <path
+                                          d="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z"
+                                          fill="currentColor"
+                                        ></path>
+                                      </svg>
+                                    </div>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
 
               <div
                 className={`summary-item2 ${
@@ -1031,15 +1035,15 @@ const BuyNow = () => {
                       onClick={() => handlePlaceOrder("pickup")} // Pass "cod" to handlePayment function
                       className="summary-place-order-btn"
                     >
-                     {isOrdering ? (
-                                             <img
-                                               src={orderTruck}
-                                               alt="Ordering..."
-                                               style={{ height: "100px", padding: "1px" }}
-                                             />
-                                           ) : (
-                                             "Order Now"
-                                           )}
+                      {isOrdering ? (
+                        <img
+                          src={orderTruck}
+                          alt="Ordering..."
+                          style={{ height: "100px", padding: "1px" }}
+                        />
+                      ) : (
+                        "Order Now"
+                      )}
                     </button>
                   </div>
                 )}

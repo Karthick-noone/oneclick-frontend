@@ -93,7 +93,7 @@
     min-width: 0; /* Important: allows the flex item to shrink properly */
   }
   
-  .button-container {
+  .buttons-container {
     position: relative;
     top: 10px;
     right: 10px;
@@ -186,7 +186,7 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     /* margin-top: 10px; */
-    z-index: 1000;
+    z-index: 1001;
   }
   
   .model-content {
@@ -256,7 +256,7 @@
     border-radius: 5px;
   }
   
-  .address-card .button-container {
+  .address-card .buttons-container {
     margin-top: 10px;
   }
   

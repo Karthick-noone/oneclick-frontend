@@ -180,12 +180,35 @@ const Checkout = () => {
         setTotalAmount(newAmount);
         setNewTotalAmount(newAmount);
 
+        // setIsCouponApplied(true);
+        // setMessage("Coupon applied successfully!");
+        // setMessageType("success");
+        // setCoupon("");
         setIsCouponApplied(true);
-        setMessage("Coupon applied successfully!");
+        // setMessage("Coupon applied successfully!");
         setMessageType("success");
         setCoupon("");
 
-        setTimeout(() => setMessage(""), 3000);
+        Swal.fire({
+          title: "🎉 Coupon Applied! 🎉",
+          html: `
+            <div style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+              <img src="https://cdn-icons-png.flaticon.com/512/879/879757.png" alt="Discount" width="80" style="margin-bottom: 10px;">
+              <p style="color: #155724;">Your discount has been successfully applied. Enjoy your savings!</p>
+              
+            </div>
+          `,
+          icon: "success",
+          showConfirmButton: false,
+          timer: 5000,
+          background: "#f0fff4",
+          color: "#155724",
+          customClass: {
+            popup: "animated bounceIn",
+          },
+        });
+
+        setTimeout(() => setMessage(""), 5000);
       } else {
         setMessage(data.message || "Failed to apply coupon.");
         setMessageType("error");
@@ -853,7 +876,7 @@ const Checkout = () => {
       // key_secret: "g13PipAk6MMAEj2Rr3lajUmJ", // Replace with your Razorpay Test Key ID(karthick)
       amount: finalAmountToSend * 100, // Amount in paise (Razorpay works in paise)
       currency: "INR",
-      name: "One CLick",
+      name: "One Click",
       description: "Order Payment",
       handler: async function (response) {
         try {
@@ -1083,7 +1106,7 @@ const Checkout = () => {
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
-              <strong>LOGIN </strong>
+              <strong> LOGIN </strong> 
 
               {username ? (
                 <>
@@ -1472,11 +1495,9 @@ const Checkout = () => {
             </h4>
             <div className="summary-item">
               <span>
-                Price (
-                {getTotalItemsCount() === 1
-                  ? "1 item"
-                  : `${getTotalItemsCount()} items`}
-                )
+                Price {getTotalItemsCount() > 0 && (
+  getTotalItemsCount() === 1 ? " (1 item)" : ` (${getTotalItemsCount()} items)`
+)}
               </span>
               <span>₹{calculateSellingPrice()}</span>
             </div>
@@ -1531,6 +1552,25 @@ const Checkout = () => {
                 Apply
               </button>
             </div>
+
+            {message && (
+              <p
+                style={{
+                  color:
+                    messageType === "success"
+                      ? "green"
+                      : messageType === "error"
+                      ? "red"
+                      : "orange", // Orange for warning (if coupon is already applied)
+                  // fontWeight: "bold",
+                  marginTop: "5px",
+                  marginBottom: "5px",
+                  fontSize: "14px",
+                }}
+              >
+                {message}
+              </p>
+            )}
             <div
               style={{
                 display: "flex",
@@ -1571,23 +1611,7 @@ const Checkout = () => {
                 )}
               </div>
             )}
-            {message && (
-              <p
-                style={{
-                  color:
-                    messageType === "success"
-                      ? "green"
-                      : messageType === "error"
-                      ? "red"
-                      : "orange", // Orange for warning (if coupon is already applied)
-                  // fontWeight: "bold",
-                  marginTop: "5px",
-                  fontSize: "14px",
-                }}
-              >
-                {message}
-              </p>
-            )}{" "}
+            {" "}
             <hr />
             <div className="summary-item">
               <strong>Total Amount</strong>
@@ -1678,7 +1702,6 @@ const Checkout = () => {
                 </span>
                 {selectedPaymentMethod === "card" && (
                   <div className="continue-wrapper">
-                  
                     <button
                       class="pay-btn"
                       onClick={() => handlePayment("Online")}

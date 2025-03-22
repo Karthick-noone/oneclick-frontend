@@ -1118,11 +1118,12 @@ const CartPage = () => {
             </h4>
             <div className="summary-item">
               <span>
-                Price (
-                {getTotalItemsCount() === 1
-                  ? "1 item"
-                  : `${getTotalItemsCount()} items`}
-                )
+                Price 
+                {getTotalItemsCount() > 0 && (
+  getTotalItemsCount() === 1 ? " (1 item)" : ` (${getTotalItemsCount()} items)`
+)}
+
+                
               </span>
               <span>₹{calculateSellingPrice()}</span>
             </div>
@@ -1154,9 +1155,10 @@ const CartPage = () => {
             </div>
             <hr />
             <div className="summary-item">
+              {save() > 0 &&
               <span style={{ color: "green" }}>
                 You will save ₹{save()} on this order
-              </span>
+              </span>}
               {/* <span>₹10000</span> */}
             </div>
             <button
