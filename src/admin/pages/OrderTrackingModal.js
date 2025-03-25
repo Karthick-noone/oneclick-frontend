@@ -68,7 +68,6 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
     }
   }, [isOpen, fetchDeliveryStatus]);
 
-
   const maxDate = () => {
     if (orderDate) {
       const maxDateObj = new Date(orderDate);
@@ -120,7 +119,9 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
         title: "Status Updated",
         text: "The delivery status and date have been updated successfully!",
         confirmButtonText: "OK",
-      }).then(() => {window.location.reload();})
+      }).then(() => {
+        window.location.reload();
+      });
     } catch (error) {
       console.error(
         "Error updating status:",
@@ -144,10 +145,6 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
 
   // Get the index of the current delivery status
   const currentIndex = statuses.indexOf(deliveryStatus);
-
-
-
-
 
   return (
     <Modal
@@ -174,31 +171,28 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
       }}
     >
       {loading ? (
-        <div className="spinner-container" style={{height:'360px'}}>
-          <div className="spinner">
-            {/* Spinner content here */}
-          </div>
+        <div className="spinner-container" style={{ height: "360px" }}>
+          <div className="spinner">{/* Spinner content here */}</div>
         </div>
       ) : (
-
         <>
-      <button
-        onClick={handleModalClose}
-        className="modal-close-button10 close-button"
-      >
-        &#10006; {/* Using a close icon (fatimes) */}
-      </button>
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-      {isCancelled ? "Order Cancelled" : "Delivery Status"}
-      </h2>
+          <button
+            onClick={handleModalClose}
+            className="modal-close-button10 close-button"
+          >
+            &#10006; {/* Using a close icon (fatimes) */}
+          </button>
+          <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+            {isCancelled ? "Order Cancelled" : "Delivery Status"}
+          </h2>
 
-      {/* Delivery Date Input */}
-      {!isCancelled && (
+          {/* Delivery Date Input */}
+          {!isCancelled && (
             <label htmlFor="delivery-date" style={{ marginBottom: "10px" }}>
               Set Delivery Date:
             </label>
           )}
-      {!isCancelled && (
+          {!isCancelled && (
             <input
               type="date"
               id="delivery-date"
@@ -216,114 +210,110 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
               }}
             />
           )}
-      {/* Vertical Tracking Bar */}
-      <div className="vertical-tracking-bar">
-        {statuses.map((status, index) => (
-          <div className="tracking-step" key={status}>
-            <div
-              className="tracking-dot"
-              style={{
-                backgroundColor: index <= currentIndex ? "green" : "gray",
-                position: "relative",
-              }}
-            >
-              {index === currentIndex && (
-                <FaCheck
+          {/* Vertical Tracking Bar */}
+          <div className="vertical-tracking-bar">
+            {statuses.map((status, index) => (
+              <div className="tracking-step" key={status}>
+                <div
+                  className="tracking-dot"
                   style={{
-                    fontSize: "10px",
-                    color: "white",
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
+                    backgroundColor: index <= currentIndex ? "green" : "gray",
+                    position: "relative",
+                  }}
+                >
+                  {index === currentIndex && (
+                    <FaCheck
+                      style={{
+                        fontSize: "10px",
+                        color: "white",
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    />
+                  )}
+                </div>
+                <input
+                  type="radio"
+                  value={status}
+                  checked={selectedStatus === status}
+                  onChange={handleStatusChange}
+                  disabled={isCancelled}
+                  style={{
+                    display: isCancelled ? "none" : "block",
+                  }}
+                />
+                <label style={{ marginLeft: "10px" }}>{status}</label>
+                {/* Display delivery date near 'Delivered' status */}
+                {status === "Delivered" && deliveryDate && (
+                  <p
+                    style={{
+                      marginLeft: "10px",
+                      color: "green",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {/* Format the delivery date to 'dd MMM yyyy' */}
+                    {(() => {
+                      const dateObj = new Date(deliveryDate);
+                      const day = String(dateObj.getDate()).padStart(2, "0"); // Ensure day has leading zero
+                      const month = dateObj.toLocaleString("default", {
+                        month: "short",
+                      }); // Get month as short name
+                      const year = dateObj.getFullYear(); // Get year
+
+                      return `${day} ${month} ${year}`; // Return formatted date
+                    })()}
+                  </p>
+                )}
+              </div>
+            ))}
+            <div className="tracking-line-container">
+              <div className="tracking-line" />
+              <div
+                className="tracking-line-completed"
+                style={{
+                  height: `${((currentIndex + 1) * 100) / statuses.length}%`, // Calculate height based on current status
+                  transition: "height 0.3s ease", // Optional: Add a transition for smoothness
+                }}
+              />
+
+              {deliveryStatus !== "Delivered" && !isCancelled && (
+                <div
+                  className="tracking-dot2"
+                  style={{
+                    top: `${((currentIndex + 1) * 100) / statuses.length}%`,
                   }}
                 />
               )}
             </div>
-            <input
-              type="radio"
-              value={status}
-              checked={selectedStatus === status}
-              onChange={handleStatusChange}
+          </div>
+
+          {/* Update Status Button */}
+
+          {!isCancelled && (
+            <button
+              onClick={handleUpdateStatus}
               disabled={isCancelled}
               style={{
-
-                display:isCancelled ?'none': "block",
-
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#007bff",
+                color: "#fff",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                transition: "background-color 0.3s ease",
               }}
-
-            />
-            <label style={{ marginLeft: "10px" }}>{status}</label>
-            {/* Display delivery date near 'Delivered' status */}
-            {status === "Delivered" && deliveryDate && (
-              <p
-                style={{
-                  marginLeft: "10px",
-                  color: "green",
-                  fontWeight: "bold",
-                }}
-              >
-                {/* Format the delivery date to 'dd MMM yyyy' */}
-                {(() => {
-                  const dateObj = new Date(deliveryDate);
-                  const day = String(dateObj.getDate()).padStart(2, "0"); // Ensure day has leading zero
-                  const month = dateObj.toLocaleString("default", {
-                    month: "short",
-                  }); // Get month as short name
-                  const year = dateObj.getFullYear(); // Get year
-
-                  return `${day} ${month} ${year}`; // Return formatted date
-                })()}
-              </p>
-            )}
-          </div>
-        ))}
-        <div className="tracking-line-container">
-          <div className="tracking-line" />
-          <div
-            className="tracking-line-completed"
-            style={{
-              height: `${((currentIndex + 1) * 100) / statuses.length}%`, // Calculate height based on current status
-              transition: "height 0.3s ease", // Optional: Add a transition for smoothness
-            }}
-          />
-
-{deliveryStatus !== 'Delivered' && !isCancelled && (
-  <div
-    className="tracking-dot2"
-    style={{ top: `${((currentIndex + 1) * 100) / statuses.length}%` }}
-  />
-)}
-
-        </div>
-      </div>
-
-      {/* Update Status Button */}
-
-      {!isCancelled && (
-
-      <button
-        onClick={handleUpdateStatus}
-        disabled={isCancelled}
-        style={{
-          marginTop: "20px",
-          padding: "10px 20px",
-          backgroundColor: "#007bff",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          transition: "background-color 0.3s ease",
-        }}
-        onMouseEnter={(e) => (e.target.style.backgroundColor = "#0056b3")}
-        onMouseLeave={(e) => (e.target.style.backgroundColor = "#007bff")}
-      >
-        Update Status
-      </button>
-
+              onMouseEnter={(e) => (e.target.style.backgroundColor = "#0056b3")}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = "#007bff")}
+            >
+              Update Status
+            </button>
+          )}
+        </>
       )}
-      </>
-         )}
     </Modal>
   );
 };

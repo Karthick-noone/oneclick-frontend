@@ -205,7 +205,7 @@ const ProductDetail = ({ accessoryCategory }) => {
   const handleProductClick = (productId) => {
     // Navigate to the product detail page
     navigate(`/product/${productId}`);
-    window.location.reload();
+    // window.location.reload();
   };
 
   useEffect(() => {
