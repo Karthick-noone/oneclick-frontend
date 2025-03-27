@@ -826,7 +826,7 @@ const Header2 = () => {
     placeholder="Search for products..."
   />
    {searchQuery && (
-          <IoMdClose className="clear-icon" onClick={handleClearInput} />
+          <IoMdClose title="Clear" className="clear-icon" onClick={handleClearInput} />
         )}
   <div className="search-icon-container" onClick={handleSearch}>
     <FaSearch className="search-icon" />

@@ -1692,7 +1692,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                       )}
                       {product.others && (
                         <li style={listItemStyle}>
-                          <span style={labelStyle}>Others</span>
+                          <span style={labelStyle}>Other Features</span>
                           <span style={valueStyle}>{product.others}</span>
                         </li>
                       )}

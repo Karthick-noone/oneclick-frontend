@@ -50,23 +50,23 @@ const Footer = () => {
             <FaShareAlt /> Follow Us
           </h4>
           <p>
-            <FaFacebookF style={{ color: "#3b5998", marginRight: "8px" }} />{" "}
+            <FaFacebookF style={{ color: "white", marginRight: "8px" }} />{" "}
             Facebook
           </p>
           <p>
-            <FaInstagram style={{ color: "#E1306C", marginRight: "8px" }} />{" "}
+            <FaInstagram style={{ color: "white", marginRight: "8px" }} />{" "}
             Instagram
           </p>
           <p>
-            <FaTwitter style={{ color: "#1DA1F2", marginRight: "8px" }} />{" "}
+            <FaTwitter style={{ color: "white", marginRight: "8px" }} />{" "}
             Twitter
           </p>
           <p>
-            <FaYoutube style={{ color: "#FF0000", marginRight: "8px" }} />{" "}
+            <FaYoutube style={{ color: "white", marginRight: "8px" }} />{" "}
             YouTube
           </p>
           <p>
-            <FaWhatsapp style={{ color: "#25D366", marginRight: "8px" }} />{" "}
+            <FaWhatsapp style={{ color: "white", marginRight: "8px" }} />{" "}
             WhatsApp
           </p>
         </div>
@@ -91,7 +91,7 @@ const Footer = () => {
             <p>FAQ</p>
           </a>
           <a href="/Adminlogin">
-            <p style={{ color: "black", textDecoration: "none" }}>ADMIN</p>
+            <p style={{ color: "white", textDecoration: "none" }}>ADMIN</p>
           </a>
         </div>
       </footer>

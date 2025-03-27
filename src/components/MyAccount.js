@@ -386,7 +386,7 @@ const MyAccount = () => {
         </div>
 
         {/* Account Settings */}
-        <div style={styles.infoSection}>
+        {/* <div style={styles.infoSection}>
           <h3>Account Settings</h3>
           <p>
             Manage your account, update your profile, and change your password.
@@ -394,7 +394,9 @@ const MyAccount = () => {
           <a href="/ForgotPassword">
             <button className="change-btn"> Change Password</button>
           </a>
-        </div></div>
+        </div> */}
+        
+        </div>
 
       {/* Footer */}
       <Footer />
