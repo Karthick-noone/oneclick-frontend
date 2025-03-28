@@ -494,11 +494,11 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
     });
   };
 
-  const handleImageUpload = (event) => {
+ const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
       console.log("Selected image for upload:", file);
-
+  
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (e) => {
@@ -506,42 +506,43 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
         img.src = e.target.result;
         img.onload = () => {
           console.log("Original image dimensions:", img.width, img.height);
-
+  
           const canvas = document.createElement("canvas");
           const MAX_WIDTH = 500; // Define max width
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
-
+  
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
+  
           console.log("Resizing image to:", canvas.width, canvas.height);
-
+  
+          // Generate unique filename with timestamp
+          const timestamp = new Date().toISOString().replace(/[-:.]/g, ""); // Format: YYYYMMDDTHHMMSS
+          const fileExtension = file.name.split(".").pop(); // Extract file extension
+          const newFileName = `image_${timestamp}.${fileExtension}`;
+  
           // Compress image
           canvas.toBlob(
             (blob) => {
-              console.log(
-                "Resized image size (in KB):",
-                (blob.size / 1024).toFixed(2)
-              );
+              console.log("Resized image size (KB):", (blob.size / 1024).toFixed(2));
+  
               if (blob.size / 1024 < 50) {
                 console.log("Image is under 50 KB, ready for upload.");
-                setSelectedFile(blob); // Update state with resized image
+                // 🔥 Convert Blob to File and Set State with new filename
+                const newFile = new File([blob], newFileName, { type: "image/jpeg" });
+                setSelectedFile(newFile);
               } else {
-                console.log(
-                  "Image still above 50 KB, applying further compression."
-                );
-                // Further compress if above 50 KB
+                console.log("Image still above 50 KB, applying further compression.");
                 canvas.toBlob(
                   (compressedBlob) => {
-                    console.log(
-                      "Compressed image size (in KB):",
-                      (compressedBlob.size / 1024).toFixed(2)
-                    );
-                    setSelectedFile(compressedBlob);
+                    console.log("Compressed image size (KB):", (compressedBlob.size / 1024).toFixed(2));
+                    // 🔥 Convert Compressed Blob to File with new filename
+                    const compressedFile = new File([compressedBlob], newFileName, { type: "image/jpeg" });
+                    setSelectedFile(compressedFile);
                   },
                   "image/jpeg",
                   0.7
@@ -555,7 +556,6 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
       };
     }
   };
-
   // Your existing handleImageUpdate function
   const handleImageUpdate = () => {
     const formData = new FormData();
@@ -2800,7 +2800,7 @@ const SamplePrevArrow = (props) => {
       style={{
         ...style,
         display: "flex",
-        justifyContent: "center",
+        justifyContent: "center !important",
         alignItems: "center",
         left: "10px",
         zIndex: 10,
