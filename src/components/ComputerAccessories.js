@@ -624,7 +624,7 @@ const ComputerAccessories = () => {
                     </div>
                   )}
                   <>
-                    <br />
+                    {/* <br /> */}
                     {/* {coupons[product.prod_id] && ( // Access using prod_id
                 <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
                   <span>
@@ -758,7 +758,7 @@ const ComputerAccessories = () => {
                   )}
 
                   <>
-                    <br />
+                    {/* <br /> */}
                     {/* {coupons[product.prod_id] && ( // Access using prod_id
                 <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
                   <span>

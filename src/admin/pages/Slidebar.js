@@ -367,7 +367,7 @@ const Slidebar = () => {
                         href="/Admin/EditHomePage"
                         className={isActive("/Admin/EditHomePage")}
                       >
-                        Edit Home Page
+                        Edit Home Page Slider
                       </a>
                     </li>
                     <li>
@@ -383,7 +383,7 @@ const Slidebar = () => {
                         href="/Admin/EditSingleImageAd"
                         className={isActive("/Admin/EditSingleImageAd")}
                       >
-                        Edit Single Images Ad
+                        Edit Single Image Ad
                       </a>
                     </li>
                     <li>
@@ -391,7 +391,7 @@ const Slidebar = () => {
                         href="/Admin/EditLoginBackgroundImage"
                         className={isActive("/Admin/EditLoginBackgroundImage")}
                       >
-                        Edit Login Background Image
+                        Edit Login Page Background Image
                       </a>
                     </li>
                     <li>
@@ -399,7 +399,7 @@ const Slidebar = () => {
                         href="/Admin/CouponManager"
                         className={isActive("/Admin/CouponManager")}
                       >
-                        Edit Coupon Code
+                        Edit Common Coupon Code
                       </a>
                     </li>
                   </ul>
@@ -411,7 +411,7 @@ const Slidebar = () => {
                   onClick={toggleOfferPage}
                   className={isOfferPageActive() ? "active" : ""}
                 >
-                  <FaTag className="menu-icon" /> {isOpen && "Offer Pages"}
+                  <FaTag className="menu-icon" /> {isOpen && "Ad Pages"}
                   {isOpen &&
                     (isOfferPageOpen ? (
                       <FaChevronDown className="submenu-icon" />
@@ -426,7 +426,7 @@ const Slidebar = () => {
                         href="/Admin/ComputersAd"
                         className={isActive("/Admin/ComputersAd")}
                       >
-                        Computer Offer Page
+                        Computer Ad Page
                       </a>
                     </li>
                     <li>
@@ -434,7 +434,7 @@ const Slidebar = () => {
                         href="/Admin/MobileAd"
                         className={isActive("/Admin/MobileAd")}
                       >
-                        Mobile Offer Page
+                        Mobile Ad Page
                       </a>
                     </li>
                     <li>
@@ -442,7 +442,7 @@ const Slidebar = () => {
                         href="/Admin/CCTVAd"
                         className={isActive("/Admin/CCTVAd")}
                       >
-                        CCTV Offer Page
+                        CCTV Ad Page
                       </a>
                     </li>
                     <li>
@@ -450,7 +450,7 @@ const Slidebar = () => {
                         href="/Admin/ProductDetailPage"
                         className={isActive("/Admin/ProductDetailPage")}
                       >
-                        Product Detail Offer Page
+                        Product Detail Page Ad
                       </a>
                     </li>
                   </ul>

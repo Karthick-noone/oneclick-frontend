@@ -84,6 +84,7 @@
 .thumbnail:hover,
 .thumbnail.active {
   border-color: #007bff; /* Change border color on hover */
+  padding: 5px;
   /* border: 2px solid; */
 }
 

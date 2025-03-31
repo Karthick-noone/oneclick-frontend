@@ -126,16 +126,16 @@ const Reports = () => {
   // Filter orders based on year, month, and status
   const filteredOrders = ordersReport.filter((order) => {
     const orderYear = new Date(order.order_date).getFullYear();
-    const orderMonth = new Date(order.order_date).getMonth(); // 0 for January, 1 for February, etc.
+    const orderMonth = new Date(order.order_date).getMonth() + 1; // Ensure it's 1-12
 
     return (
-      (selectedYear ? orderYear === parseInt(selectedYear) : true) &&
-      (selectedMonth ? orderMonth === months.indexOf(selectedMonth) : true) &&
+      (selectedYear ? orderYear === selectedYear : true) && // Ensure `selectedYear` is used as a number
+      (selectedMonth ? orderMonth === Number(selectedMonth) : true) &&
       (selectedStatus ? order.status === selectedStatus : true) &&
       (searchQuery
-        ? order.unique_id.toLowerCase().includes(searchQuery.toLowerCase()) || // Filter by unique ID
-          order.username.toLowerCase().includes(searchQuery.toLowerCase()) || // Filter by username
-          (address && address.phone && address.phone.includes(searchQuery)) // Filter by phone if available
+        ? order.unique_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          order.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (order.contact_number && order.contact_number.includes(searchQuery))
         : true)
     );
   });
@@ -267,11 +267,10 @@ const Reports = () => {
             value={selectedStatus}
             className="order_status_filter"
           >
-            <option  value="">Order Status</option>
+            <option value="">Order Status</option>
             {statuses.map((status) => (
               <option key={status} value={status}>
-            <span className="order_status_option">{status}</span>
-                
+                <span className="order_status_option">{status}</span>
               </option>
             ))}
           </select>
@@ -280,10 +279,9 @@ const Reports = () => {
             id="year"
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            style={{ width: "25px" }}
-            className="order_month_filter"
-
+            className="order_year_filter"
           >
+            <option value="">Year</option>
             {Array.from(
               { length: 5 },
               (_, i) => new Date().getFullYear() - i
@@ -298,9 +296,6 @@ const Reports = () => {
             id="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(Number(e.target.value))}
-            style={{ width: "25px" }}
-            className="order_year_filter"
-
           >
             {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
               <option key={month} value={month}>
@@ -327,42 +322,39 @@ const Reports = () => {
               </tr>
             </thead>
             <tbody>
-            {currentOrders.length > 0 ? (
+              {currentOrders.length > 0 ? (
+                currentOrders.map((order, index) => (
+                  <tr key={index}>
+                    <td>{indexOfFirstOrderItem + index + 1}</td>
+                    <td>#{order.unique_id}</td>
+                    <td>{formatDate(order.order_date)}</td>
+                    <td>{order.username}</td>
+                    <td>{order.contact_number}</td>
 
-              currentOrders.map((order, index) => (
-                <tr key={index}>
-                  <td>{indexOfFirstOrderItem + index + 1}</td>
-                  <td>#{order.unique_id}</td>
-                  <td>{formatDate(order.order_date)}</td>
-                  <td>{order.username}</td>
-                  <td>{order.contact_number}</td>
-
-                  <td>{order.total_amount}</td>
-                  <td>{order.payment_method}</td>
-                  <td>{order.status}</td>
-                  <td>
-                    {" "}
-                    <button
-                      className="btn btn-delete"
-                      onClick={() => deleteOrder(order.unique_id)}
-                    >
-                      <FaTrash />
-                    </button>
+                    <td>{order.total_amount}</td>
+                    <td>{order.payment_method}</td>
+                    <td>{order.status}</td>
+                    <td>
+                      {" "}
+                      <button
+                        className="btn btn-delete"
+                        onClick={() => deleteOrder(order.unique_id)}
+                      >
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="11"
+                    style={{ textAlign: "center", padding: "20px" }}
+                  >
+                    No orders found
                   </td>
                 </tr>
-                   ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="11"
-                        style={{ textAlign: "center", padding: "20px" }}
-                      >
-                        No orders found
-                      </td>
-                    </tr>
-                  )}
-
-
+              )}
             </tbody>
           </table>
         </div>

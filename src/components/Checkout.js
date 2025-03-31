@@ -1653,7 +1653,7 @@ const Checkout = () => {
                   selectedPaymentMethod === "cod" ? "selected" : ""
                 }`}
               >
-                <FaMoneyBillWave className="payment-icon" />
+                <FaMoneyBillWave className="payment-icon" style={{color:'green'}} />
                 <span className="methods">Cash on Delivery</span>
                 <span>
                   <input
@@ -1689,7 +1689,7 @@ const Checkout = () => {
                   selectedPaymentMethod === "card" ? "selected" : ""
                 }`}
               >
-                <FaCreditCard className="payment-icon" />
+                <FaCreditCard className="payment-icon" style={{color:'skyblue'}}/>
                 <span className="methods">Pay Online</span>
                 <span>
                   <input
@@ -1754,7 +1754,7 @@ const Checkout = () => {
                   selectedPaymentMethod === "pickup" ? "selected" : ""
                 }`}
               >
-                <FaStore className="payment-icon" />
+                <FaStore className="payment-icon" style={{color:'orange'}}/>
                 <span className="methods">Pick Up From Store</span>
                 <span>
                   <input

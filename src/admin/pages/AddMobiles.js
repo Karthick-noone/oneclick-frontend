@@ -2792,6 +2792,8 @@ const SampleNextArrow = (props) => {
     </div>
   );
 };
+
+
 const SamplePrevArrow = (props) => {
   const { className, style, onClick } = props;
   return (

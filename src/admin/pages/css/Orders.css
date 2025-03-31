@@ -20,7 +20,7 @@
 
 .btn-cancel:disabled {
   background-color: #eecdcd;
-  cursor: not-allowed;
+  cursor: pointer;
   color: #dc3545;
 }
 
@@ -84,7 +84,6 @@
   gap: 30px;
   padding: 10px;
   flex-wrap: wrap;
-
 }
 
 .filter-radio-buttons label {

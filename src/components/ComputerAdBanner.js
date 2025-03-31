@@ -29,67 +29,71 @@ const AdBanner = () => {
     navigate(`/${product.category}?search=${product.brand_name.toLowerCase()}`);
   };
 
-  const bannerProducts = products.filter((product) => product.title === "banner" && product.image);
-  const portraitProducts = products.filter((product) => product.title === "portrait" && product.image);
-  const noTitleProducts = products.filter((product) => (!product.title || product.title.trim() === "") && product.image);
+  const bannerProducts = products.filter((product) => product.title === "banner");
+  const portraitProducts = products.filter((product) => product.title === "portrait");
+  const noTitleProducts = products.filter((product) => !product.title || product.title.trim() === "");
 
   return (
     <>
       <Header2 />
       <div className="ad-section-container4">
-        {/* Banner Images Section */}
-        {bannerProducts.length > 0 && (
-          <div className="box">
-            <div className="bannerr-container4">
-              {isLoading
-                ? [...Array(2)].map((_, index) => <div className="skeleton-banner" key={index}></div>)
-                : isError ? (
-                    <div className="error-message">Failed to load banners</div>
-                  ) : (
-                    bannerProducts.map((banner, index) => (
-                      <div className="banner-image-display" key={index}>
-                        <img
-                          onClick={() => handleAdClick(banner)}
-                          src={`${ApiUrl}/uploads/offerspage/${banner.image}`}
-                          alt={`Banner for ${banner.brand_name}`}
-                          className="banner-image"
-                          loading="lazy"
-                        />
-                      </div>
-                    ))
-                  )}
-            </div>
+        {/* Banner Images */}
+        <div className="box">
+          <div className="bannerr-container4">
+            {isLoading
+              ? [...Array(2)].map((_, index) => (
+                  <div className="skeleton-banner" key={index}></div>
+                ))
+              : isError ? (
+                  <div className="error-message">Failed to load banners</div>
+                ) : bannerProducts.length > 0 ? (
+                  bannerProducts.map((banner, index) => (
+                    <div className="banner-image-display" key={index}>
+                      <img
+                        onClick={() => handleAdClick(banner)}
+                        src={`${ApiUrl}/uploads/offerspage/${banner.image}`}
+                        alt={`Banner for ${banner.brand_name}`}
+                        className="banner-image"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))
+                ) : null}
           </div>
-        )}
+        </div>
 
-        {/* Products with Empty Title Section */}
-        {noTitleProducts.length > 0 && (
-          <div className="box">
-            <div className="offer-ad-container4">
-              {isLoading
-                ? [...Array(3)].map((_, index) => <div className="skeleton-product" key={index}></div>)
-                : isError ? (
-                    <div className="error-message">Failed to load products</div>
-                  ) : (
-                    noTitleProducts.map((product) => (
-                      <div key={product.id} className="single-ad-container4" onClick={() => handleAdClick(product)}>
-                        <div className="image-wrapper">
-                          <p className="brand-namee">{product.brand_name}</p>
-                          <img
-                            src={`${ApiUrl}/uploads/offerspage/${product.image}`}
-                            alt="Product"
-                            className="offer-add"
-                            loading="lazy"
-                          />
-                        </div>
+        {/* Products with Empty Title */}
+        <div className="box">
+          <div className="offer-ad-container4">
+            {isLoading
+              ? [...Array(3)].map((_, index) => (
+                  <div className="skeleton-product" key={index}></div>
+                ))
+              : isError ? (
+                  <div className="error-message">Failed to load products</div>
+                ) : noTitleProducts.length > 0 ? (
+                  noTitleProducts.map((product) => (
+                    <div key={product.id} className="single-ad-container4" onClick={() => handleAdClick(product)}>
+                      <div className="image-wrapper">
+                        {product.image ? (
+                          <>
+                            <p className="brand-namee">{product.brand_name}</p>
+                            <img
+                              src={`${ApiUrl}/uploads/offerspage/${product.image}`}
+                              alt="Product"
+                              className="offer-add"
+                              loading="lazy"
+                            />
+                          </>
+                        ) : null}
                       </div>
-                    ))
-                  )}
-            </div>
+                    </div>
+                  ))
+                ) : null}
           </div>
-        )}
+        </div>
 
-        {/* Portrait Images Section */}
+        {/* Portrait Images */}
         {portraitProducts.length > 0 && (
           <div className="box">
             <div className="portrait-container2">
