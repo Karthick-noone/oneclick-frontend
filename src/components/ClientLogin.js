@@ -41,7 +41,22 @@ const LoginPage = () => {
 
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    // setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+     // Validation for contact number
+     if (name === "contact_number") {
+      // Check if the value is empty or if it starts with 6-9 and is exactly 10 digits long
+      if (value === "" || /^[6-9]\d{0,9}$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+    }
+
+    if (name === "password") {
+      setFormData({ ...formData, [name]: value });
+    }
+
+    
   };
   const navigate = useNavigate();
 // Function to inject keyframes
@@ -210,7 +225,7 @@ document.head.appendChild(styleElement);
         </button>
         <center>
           <a href="/">
-            <img src={logo} width={'200px'} loading="lazy" alt="Logo" />
+            <img src={logo} width={'200px'}  alt="Logo" />
           </a>
         </center>
         <h2 style={styles.title}>User Login</h2>
@@ -220,7 +235,7 @@ document.head.appendChild(styleElement);
           <input
             type="tel"
             name="contact_number"
-            placeholder="Mobile Number"
+            placeholder="WhatsApp Number"
             value={formData.contact_number}
             onChange={handleChange}
             style={styles.input}

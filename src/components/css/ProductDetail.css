@@ -56,16 +56,18 @@
   transform: translateY(-50%);
   width: 30px;
   height: 30px;
-  display: none !important; /* Hide arrows by default */
   justify-content: center;
   align-items: center;
   cursor: pointer;
   z-index: 2;
+  opacity: 0; /* Hide arrows instead of display: none */
+  transition: opacity 0.3s ease-in-out;
+  display: none !important; 
 }
 
 .thumbnails-wrapper:hover .slick-prev,
 .thumbnails-wrapper:hover .slick-next {
-  display: flex !important; /* Show arrows on hover */
+  opacity: 1; /* Make arrows visible on hover */
 }
 
 /* Thumbnail image style */

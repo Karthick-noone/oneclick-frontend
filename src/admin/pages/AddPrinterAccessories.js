@@ -1684,6 +1684,10 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                 <span>₹{product.prod_price}</span>
                               </p>
                               <p>
+                                <strong>Effective Price</strong>
+                                <span>₹{product.effectiveprice}</span>
+                              </p>
+                              <p>
                                 <strong>Delivery charge</strong>
                                 <span>₹{product.deliverycharge}</span>
                               </p>

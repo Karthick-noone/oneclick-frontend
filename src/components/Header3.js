@@ -108,7 +108,7 @@ const Header3 = () => {
     <header
       className="header3"
       ref={headerRef}
-      style={{ position: "sticky", top: "85px", zIndex: 1001 }}
+      style={{ position: "sticky", top: "72px", zIndex: 1001 }}
     >
       <div
         style={{

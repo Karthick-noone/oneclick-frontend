@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { ApiUrl } from "./ApiUrl";
 import { useNavigate } from "react-router-dom"; // Import useNavigate hook
-import { FaEye, FaEyeSlash, FaSignOutAlt } from "react-icons/fa"; // Import eye icons
+import { FaEye, FaEyeSlash, FaInfoCircle, FaSignOutAlt } from "react-icons/fa"; // Import eye icons
 import logo from "./img/logo3.png";
 // import { Zoom } from "react-toastify";
 import confetti from "canvas-confetti"; // Ensure you import confetti
@@ -82,6 +82,15 @@ const SignupPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // useEffect(() => {
+  //   if (Object.keys(errors).length > 0) {
+  //     const timer = setTimeout(() => {
+  //       setErrors({});
+  //     }, 5000);
+  
+  //     return () => clearTimeout(timer); // Cleanup function to avoid memory leaks
+  //   }
+  // }, [errors]);
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -104,6 +113,10 @@ const SignupPage = () => {
     if (name === "email" || name === "password" || name === "confirmPassword") {
       setFormData({ ...formData, [name]: value });
     }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "", // Clear the error when user starts typing
+    }));
   };
 
   // Add styles for shake animation and error popup
@@ -271,16 +284,18 @@ const SignupPage = () => {
       <div style={styles.container}>
         <button style={styles.signOutButton}>
           <a href="/" style={{ color: "white" }}>
-            <FaSignOutAlt />
+            <FaSignOutAlt title="Exit"/>
           </a>
         </button>
         <center>
           <a href="/">
-            <img src={logo} width={"200px"} loading="lazy" alt="Logo" />
+            <img src={logo} width={"200px"}  alt="Logo" />
           </a>
         </center>
-        <h2 style={styles.title}>User SignUp</h2>
-        <form style={styles.form} onSubmit={handleSubmit}>
+        <h2 style={styles.title}>SignUp</h2>
+        <form style={styles.form} onSubmit={handleSubmit} autoComplete="off">
+        <div style={styles.row}>
+        <div style={styles.inputContainer}>
           <label style={styles.label} htmlFor="username">
             Username
           </label>
@@ -289,13 +304,15 @@ const SignupPage = () => {
             name="username"
             placeholder="Username"
             value={formData.username}
-            onChange={handleChange}
+            onChange={handleChange} 
             style={styles.input}
             className="staff-input"
 
           />
           {errors.username && <p style={styles.error}>{errors.username}</p>}
 
+          </div>
+          <div style={styles.inputContainer}>
           <label style={styles.label} htmlFor="email">
             Email
           </label>
@@ -310,18 +327,21 @@ const SignupPage = () => {
 
           />
           {errors.email && <p style={styles.error}>{errors.email}</p>}
+          </div>
+          </div>
+
+          <div style={styles.row}>
+          <div style={styles.inputContainer}>
 
           <label style={styles.label} htmlFor="contactNumber">
-            WhatsApp Number
+            WhatsApp Number <FaInfoCircle style={{cursor:'pointer', marginLeft:'5px'}} title="Use your WhatsApp number to get more updates and exclusive
+            coupons!" />
           </label>
-          <span style={{ color: "grey", fontSize: "12px" }}>
-            (Use your WhatsApp number to get more updates and exclusive
-            coupons!)
-          </span>
+        
           <input
             type="text"
             name="contactNumber"
-            placeholder="Mobile Number"
+            placeholder="WhatsApp Number"
             value={formData.contactNumber}
             onChange={handleChange}
             style={styles.input}
@@ -331,6 +351,10 @@ const SignupPage = () => {
           {errors.contactNumber && (
             <p style={styles.error}>{errors.contactNumber}</p>
           )}
+
+          </div>
+
+          <div style={styles.inputContainer}>
 
           <label style={styles.label} htmlFor="password">
             Password
@@ -356,7 +380,12 @@ const SignupPage = () => {
             </span>
           </div>
           {errors.password && <p style={styles.error}>{errors.password}</p>}
+          </div>
+          </div>
 
+          <div style={styles.row}>
+
+    <div style={styles.inputContainer}>
           <label style={styles.label} htmlFor="confirmPassword">
             Confirm Password
           </label>
@@ -384,9 +413,16 @@ const SignupPage = () => {
             <p style={styles.error}>{errors.confirmPassword}</p>
           )}
 
-          <button type="submit" style={styles.button}>
+</div>
+<div style={styles.inputContainer}>
+
+<button type="submit" style={styles.button}>
             Sign Up
           </button>
+</div>
+</div>
+
+          
         </form>
       </div>
     </div>
@@ -410,6 +446,15 @@ const swalStyles = {
 };
 
 const styles = {
+  row: {
+    display: "flex",
+    justifyContent: "space-between", // Ensures spacing between inputs
+    gap: "10px", // Adds space between the two inputs
+    marginBottom: "10px", // Space between rows
+  },
+  inputContainer: {
+    width: "68%", // Each input takes almost half the row width
+  },
   background: {
     display: "flex",
     justifyContent: "center",
@@ -437,7 +482,7 @@ const styles = {
     marginTop: "5px",
   },
   container: {
-    maxWidth: "400px",
+    maxWidth: "550px",
     width: "100%",
     margin: "20px auto",
     padding: "15px",
@@ -446,6 +491,7 @@ const styles = {
     backgroundColor: "rgba(0, 0, 0, 0.8)",
     position: "relative",
     zIndex: 2,
+    // zoom:0.9
   },
   signOutButton: {
     position: "absolute",
@@ -460,7 +506,7 @@ const styles = {
   title: {
     textAlign: "center",
     marginBottom: "15px", // Reduce margin for a compact look
-    fontSize: "20px", // Slightly reduce the title font size
+    fontSize: "25px", // Slightly reduce the title font size
     fontWeight: "bold",
     color: "white",
   },
@@ -513,17 +559,18 @@ const styles = {
   },
   button: {
     padding: "8px", // Reduce button padding
-    margin: "15px 0", // Reduce margin for a smaller card layout
+    margin: "30px 0px", // Reduce margin for a smaller card layout
     borderRadius: "5px",
     border: "none",
     backgroundColor: "#007BFF",
     color: "#fff",
     fontSize: "16px", // Adjust button font size
     cursor: "pointer",
+    width:'100%'
   },
   error: {
     color: "red",
-    fontSize: "12px", // Reduce error message font size
+    fontSize: "14px", // Reduce error message font size
     margin: "4px 0", // Reduce error message margin
   },
 };

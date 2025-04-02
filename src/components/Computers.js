@@ -530,7 +530,7 @@ const Computers = () => {
                       }`}
                       alt={product.prod_name}
                       className="product-image"
-                    loading="lazy"
+                    // loading="lazy"
 
                     />
                     <span
@@ -663,7 +663,7 @@ const Computers = () => {
                       }`}
                       alt={product.prod_name}
                       className="product-image"
-                    loading="lazy"
+                    // loading="lazy"
 
                     />
                     <span

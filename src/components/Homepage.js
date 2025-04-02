@@ -65,7 +65,7 @@ const Homepage = () => {
                     src={`${ApiUrl}/uploads/edithomepage/${item.image}`}
                     alt={`Ad ${index + 1}`}
                     className="slider-image"
-                    loading="lazy"
+                    // loading="lazy"
                   />
                 </a>
               </div>
