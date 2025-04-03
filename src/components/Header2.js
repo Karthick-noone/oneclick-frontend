@@ -1107,7 +1107,6 @@ const Header2 = () => {
             )}
             <div className="cart-total">
               <div className="sidebarcart-footer">
-                <p>₹{calculateTotalPrice()}</p>
                 <a
                   style={{ textDecoration: "none", color: "black" }}
                   href="/Cart"
@@ -1145,6 +1144,10 @@ const Header2 = () => {
                     </div>
                   </button>
                 </a>
+
+                <p className="total-prices">₹{calculateTotalPrice()}</p>  
+
+
               </div>
             </div>
           </div>

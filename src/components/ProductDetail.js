@@ -15,6 +15,9 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate at the top
 import Slider from "react-slick"; // Import the slider component
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css"; // Ensure styles are applied
+
 import {
   FaMemory,
   FaHdd,
@@ -56,7 +59,11 @@ const ProductDetail = ({ accessoryCategory }) => {
   const [coupons, setCoupons] = useState({}); // State to hold coupon codes for products
   const [favorites, setFavorites] = useState({});
   const [, setImages] = useState([]);
-
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    // Simulate loading delay (remove this in real API calls)
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
   // State for storing related items
   const [relatedItems, setRelatedItems] = useState([]);
   // State for tracking the current index for carousel
@@ -852,25 +859,37 @@ const ProductDetail = ({ accessoryCategory }) => {
     // return () => clearInterval(intervalId);
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="spinner-container">
-        <div className="spinner" style={{ marginTop: "200px" }}>
-          {[...Array(12)].map((_, index) => (
-            <div key={index} className="spinner-blade"></div>
-          ))}
-        </div>
-      </div>
-    ); // You can replace this with a loading spinner or skeleton screen
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="spinner-container">
+  //       <div className="spinner" style={{ marginTop: "200px" }}>
+  //         {[...Array(12)].map((_, index) => (
+  //           <div key={index} className="spinner-blade"></div>
+  //         ))}
+  //       </div>
+  //     </div>
+  //   ); // You can replace this with a loading spinner or skeleton screen
+  // }
 
-  if (!product) {
-    return <div>Product not found.</div>;
+  // if (!product) {
+  //   return <div>Product not found.</div>;
+  // }
+
+  // if (isLoading || !product) {
+  //   return <Skeleton width={300} height={200} style={{ marginTop: "20px" }} />;
+  // }
+  
+  if (isLoading || !product) {
+    return <Header2 />; // Show nothing when loading or if the product is not found
   }
-  // Check if prod_img is in a valid format
-  const images = Array.isArray(product.prod_img)
+  
+  // // Ensure product exists before accessing prod_img
+  const images = product?.prod_img
+  ? Array.isArray(product.prod_img)
     ? product.prod_img
-    : JSON.parse(product.prod_img || "[]");
+    : JSON.parse(product.prod_img)
+  : [];
+
 
   const handleMouseMove = (e) => {
     const image = zoomRef.current;
@@ -887,7 +906,7 @@ const ProductDetail = ({ accessoryCategory }) => {
     });
   };
 
-  const hasMultipleImages = images.length > 1;
+  // const hasMultipleImages = images.length > 1;
 
   // useEffect(() => {
   //   if (images && images.length > 0) {
@@ -929,89 +948,89 @@ const ProductDetail = ({ accessoryCategory }) => {
     navigate(url); // Navigate to the constructed URL
   };
 
-  const settings = {
-    dots: false,
-    infinite: images.length > 1,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: images.length > 1 ? 1 : 0,
-    arrows: images.length > 1,
-    autoplay: false,
-    draggable: images.length > 1,
-    swipe: images.length > 1,
-    prevArrow: (
-      <div className="arrow-container left-arrow">
-        <img
-          src={leftarrow}
-          style={{
-            width: "30px",
-            borderRadius: "50%",
-            backgroundColor: "white",
-            padding: "5px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
-          }}
-          alt="Previous"
-        />
-      </div>
-    ),
-    nextArrow: (
-      <div className="arrow-container right-arrow">
-        <img
-          src={rightarrow}
-          style={{
-            width: "30px",
-            borderRadius: "50%",
-            backgroundColor: "white",
-            padding: "5px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
-          }}
-          alt="Next"
-        />
-      </div>
-    ),
-  };
+  // const settings = {
+  //   dots: false,
+  //   infinite: images.length > 1,
+  //   speed: 500,
+  //   slidesToShow: 1,
+  //   slidesToScroll: images.length > 1 ? 1 : 0,
+  //   arrows: images.length > 1,
+  //   autoplay: false,
+  //   draggable: images.length > 1,
+  //   swipe: images.length > 1,
+  //   prevArrow: (
+  //     <div className="arrow-container left-arrow">
+  //       <img
+  //         src={leftarrow}
+  //         style={{
+  //           width: "30px",
+  //           borderRadius: "50%",
+  //           backgroundColor: "white",
+  //           padding: "5px",
+  //           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
+  //         }}
+  //         alt="Previous"
+  //       />
+  //     </div>
+  //   ),
+  //   nextArrow: (
+  //     <div className="arrow-container right-arrow">
+  //       <img
+  //         src={rightarrow}
+  //         style={{
+  //           width: "30px",
+  //           borderRadius: "50%",
+  //           backgroundColor: "white",
+  //           padding: "5px",
+  //           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
+  //         }}
+  //         alt="Next"
+  //       />
+  //     </div>
+  //   ),
+  // };
 
-  const settings2 = {
-    dots: false,
-    infinite: sortedFilteredProducts.length > 5, // Enable infinite loop only if more than 5 products
-    speed: 500,
-    slidesToShow: 5, // Number of items to show at once
-    slidesToScroll: 1,
-    arrows: true, // Enable arrows
-    prevArrow: (
-      <button className="custom-arrow left-arrow">
-        <img src={leftarrow} alt="Previous" style={{ width: "30px" }} />
-      </button>
-    ),
-    nextArrow: (
-      <button className="custom-arrow right-arrow">
-        <img src={rightarrow} alt="Next" style={{ width: "30px" }} />
-      </button>
-    ),
-    responsive: [
-      {
-        breakpoint: 1024, // Tablet
-        settings2: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 768, // Mobile
-        settings2: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 480, // Smaller devices
-        settings2: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
+  // const settings2 = {
+  //   dots: false,
+  //   infinite: sortedFilteredProducts.length > 5, // Enable infinite loop only if more than 5 products
+  //   speed: 500,
+  //   slidesToShow: 5, // Number of items to show at once
+  //   slidesToScroll: 1,
+  //   arrows: true, // Enable arrows
+  //   prevArrow: (
+  //     <button className="custom-arrow left-arrow">
+  //       <img src={leftarrow} alt="Previous" style={{ width: "30px" }} />
+  //     </button>
+  //   ),
+  //   nextArrow: (
+  //     <button className="custom-arrow right-arrow">
+  //       <img src={rightarrow} alt="Next" style={{ width: "30px" }} />
+  //     </button>
+  //   ),
+  //   responsive: [
+  //     {
+  //       breakpoint: 1024, // Tablet
+  //       settings2: {
+  //         slidesToShow: 3,
+  //         slidesToScroll: 1,
+  //       },
+  //     },
+  //     {
+  //       breakpoint: 768, // Mobile
+  //       settings2: {
+  //         slidesToShow: 2,
+  //         slidesToScroll: 1,
+  //       },
+  //     },
+  //     {
+  //       breakpoint: 480, // Smaller devices
+  //       settings2: {
+  //         slidesToShow: 1,
+  //         slidesToScroll: 1,
+  //       },
+  //     },
+  //   ],
+  // };
 
   const NextArrow = (props) => {
     const { className, style, onClick } = props;
@@ -1101,9 +1120,9 @@ const ProductDetail = ({ accessoryCategory }) => {
                 style={{ marginTop: "5px", marginLeft: "5px" }}
               >
                 <a style={{ textDecoration: "none", color: "grey" }} href="/">
-                  Home{" "}
+                   Home{" "}
                 </a>{" "}
-                <span style={{ color: "grey" }}>&gt;</span>
+                <span style={{ color: "grey" }}>&gt; </span>
                 <a
                   style={{ textDecoration: "none", color: "grey" }}
                   href={`/${
@@ -1117,12 +1136,29 @@ const ProductDetail = ({ accessoryCategory }) => {
               </div>
               <div className="product-detail-image-container">
                 <div className="carousel-container">
-                  {product.offer_label && (
-                    <div className="product-label2">{product.offer_label}</div>
+                  {loading && product.offer_label ? (
+                    <Skeleton
+                      width={100}
+                      height={30}
+                      className="product-label-skeleton"
+                    />
+                  ) : (
+                    product.offer_label && (
+                      <div className="product-label2">
+                        {product.offer_label}
+                      </div>
+                    )
                   )}
 
                   <div className="big-image-container">
-                    {images && images.length > 0 ? (
+                    {loading || !images || images.length === 0 ? (
+                      <Skeleton
+                        height={400}
+                        width={400}
+                        className="product-image-skeleton"
+                        style={{ marginTop: "10px" }}
+                      />
+                    ) : (
                       <div
                         className="zoom-container"
                         onMouseMove={handleMouseMove} // Apply zoom for all images
@@ -1138,16 +1174,29 @@ const ProductDetail = ({ accessoryCategory }) => {
                           style={zoomStyle}
                         />
                       </div>
-                    ) : (
-                      <div>No image available</div>
                     )}
                   </div>
                 </div>
 
                 {/* Display Thumbnails only if more than one image exists */}
-                {images && images.length > 1 && (
-                  <div className="thumbnails-wrapper">
-                    <div className="thumbnails-container">
+                <div className="thumbnails-wrapper">
+                  <div className="thumbnails-container">
+                    {loading && images && images.length > 1 ? (
+                      <div
+                        className="thumbnail-skeletons"
+                        style={{ display: "flex" }}
+                      >
+                        {[...Array(5)].map((_, index) => (
+                          <Skeleton
+                            key={index}
+                            width={80}
+                            height={80}
+                            style={{ marginLeft: "10px" }}
+                            className="thumbnail-skeleton"
+                          />
+                        ))}
+                      </div>
+                    ) : images && images.length > 1 ? (
                       <Slider {...thumbnailSliderSettings}>
                         {images.map((image, index) => (
                           <div key={index}>
@@ -1163,210 +1212,225 @@ const ProductDetail = ({ accessoryCategory }) => {
                           </div>
                         ))}
                       </Slider>
-                    </div>
+                    ) : null}
                   </div>
-                )}
+                </div>
               </div>
 
               <div className="side-row">
                 <div className="product-main-row">
                   {/* Product details */}
                   <div className="product-detail-info">
+                    {/* Breadcrumb Navigation */}
                     <div
                       className="non-responsive-navigation"
                       style={{ marginBottom: "15px" }}
                     >
-                      <a
-                        style={{ textDecoration: "none", color: "grey" }}
-                        href="/"
-                      >
-                        {" "}
-                        Home{" "}
-                      </a>{" "}
-                      <span style={{ color: "grey" }}>&gt;</span>
-                      <a
-                        style={{ textDecoration: "none", color: "grey" }}
-                        href={`/${
-                          product.category === "TV" ? "TV" : product.category
-                        }`} // Conditional URL
-                      >
-                        {" "}
-                        {product.category}{" "}
-                      </a>
+                      {loading ? (
+                        <Skeleton width={150} height={20} />
+                      ) : (
+                        <>
+                          <a
+                            style={{ textDecoration: "none", color: "grey" }}
+                            href="/"
+                          >
+                            Home
+                          </a>{" "}
+                          <span style={{ color: "grey" }}>&gt; </span>
+                          <a
+                            style={{ textDecoration: "none", color: "grey" }}
+                            href={`/${
+                              product.category === "TV"
+                                ? "TV"
+                                : product.category
+                            }`}
+                          >
+                            {product.category}
+                          </a>
+                        </>
+                      )}
                     </div>
 
+                    {/* Product Title */}
                     <h2 className="product-detail-title">
-                      {product.prod_name.charAt(0).toUpperCase() +
-                        product.prod_name.slice(1)}
+                      {loading ? (
+                        <Skeleton width={380} height={40} />
+                      ) : (
+                        product.prod_name
+                      )}
                     </h2>
-                    {/* {product.offer_price} */}
 
-                    {couponCode && couponCode.trim() ? (
-                      // {couponNumber > 0 ? (
-                      <p
-                        className="coupon-discount-label"
-                        style={{
-                          marginTop: "10px",
-                          marginBottom: "10px",
-                          fontSize: "12px",
-                        }}
-                      >
-                        Apply coupon code and get an amazing discount!
-                      </p>
-                    ) : (
-                      <p></p>
-                    )}
-                    {/* <span style={{color:'grey'}}>({product.subtitle})</span> */}
+                    {/* Coupon Section */}
+                    {couponCode && couponCode.trim() && (
+  loading ? (
+    <Skeleton
+      width={250}
+      height={15}
+      style={{ marginTop: "10px", marginBottom: "10px" }}
+    />
+  ) : (
+    <p
+      className="coupon-discount-label"
+      style={{
+        marginTop: "10px",
+        // marginBottom: "10px",
+        fontSize: "12px",
+      }}
+    >
+      Apply coupon code and get an amazing discount!
+    </p>
+  )
+)}
+
+                    {/* Price Section */}
                     <p>
                       <div>
-                        <span>
-                          <span className="product-detail-price">
-                            ₹
-                            {product.offer_price > 0 &&
-                            isOfferActive &&
-                            product.offer_price
-                              ? product.offer_price
-                              : product.prod_price}{" "}
-                          </span>{" "}
-                          M.R.P
-                          <span
-                            className="product-detail-actual-price"
-                            style={{ textDecoration: "line-through" }}
-                          >
-                            ₹{product.actual_price}{" "}
-                          </span>
-                        </span>
-                        <span
-                          className="offer-text"
-                          style={{ marginLeft: "12px" }}
-                        >
-                          <span
-                            className="save-tag"
-                            style={{ marginLeft: "5px" }}
-                          >
-                            <span>
-                              {Math.round(
-                                ((product?.actual_price -
-                                  (product?.offer_price > 0 && isOfferActive
-                                    ? product?.offer_price
-                                    : product?.prod_price)) /
-                                  product?.actual_price) *
-                                  100
-                              )}
-                              % OFF
+                        {loading ? (
+                          <div style={{ display: "flex" }}>
+                            <Skeleton width={100} height={30} />
+                            <Skeleton
+                              width={80}
+                              height={30}
+                              style={{ marginLeft: "10px" }}
+                            />
+                            <Skeleton
+                              width={60}
+                              height={30}
+                              style={{ marginLeft: "12px" }}
+                            />
+                            <Skeleton
+                              width={100}
+                              height={30}
+                              style={{ marginLeft: "10px" }}
+                            />
+                          </div>
+                        ) : (
+                          <span>
+                            <span className="product-detail-price">
+                              ₹
+                              {product.offer_price > 0 &&
+                              isOfferActive &&
+                              product.offer_price
+                                ? product.offer_price
+                                : product.prod_price}{" "}
+                            </span>{" "}
+                            M.R.P
+                            <span
+                              className="product-detail-actual-price"
+                              style={{ textDecoration: "line-through" }}
+                            >
+                              ₹{product.actual_price}{" "}
+                            </span>
+                            <span className="offerr-tag">
+                              Save upto ₹
+                              {product.actual_price -
+                                (product.offer_price > 0 &&
+                                isOfferActive &&
+                                product.offer_price
+                                  ? product.offer_price
+                                  : product.prod_price)}
                             </span>
                           </span>
-                        </span>
+                        )}
 
-                        <p className="offerr-tag">
-                          Save upto ₹
-                          {product.actual_price -
-                            (product.offer_price > 0 &&
-                            isOfferActive &&
-                            product.offer_price
-                              ? product.offer_price
-                              : product.prod_price)}
-                        </p>
-
-                        {/* Timer display */}
-                        {product.offer_price > 0 &&
-                          isOfferActive &&
-                          product.offer_price &&
-                          remainingTime && (
-                            <div className="offer-timer">
-                              {remainingTime.days ? (
-                                <p style={{ color: "red" }}>
-                                  {remainingTime.days} day(s) left for this
-                                  offer
-                                </p>
-                              ) : (
-                                <p>
-                                  Deals end in{" "}
-                                  <span className="timer-tag">
-                                    {remainingTime.hours}h :{" "}
-                                    {remainingTime.minutes}m :{" "}
-                                    {remainingTime.seconds}s
-                                  </span>
-                                </p>
-                              )}
-                            </div>
-                          )}
+                        {/* {loading ? (
+        <Skeleton width={120} height={20} style={{ marginTop: "10px" }} />
+      ) : (
+        <p className="offerr-tag">
+          Save upto ₹
+          {product.actual_price -
+            (product.offer_price > 0 && isOfferActive && product.offer_price
+              ? product.offer_price
+              : product.prod_price)}
+        </p>
+      )} */}
                       </div>
                     </p>
 
-                    {/* </p> */}
-                    <div className="coupon-box">
-                      <div className="price-table">
-                        <div className="price-row">
-                          {/* Actual Price */}
-                          <div
-                            className="price-cell"
-                            style={{ backgroundColor: "white" }}
-                          >
-                            <span className="price-label">M.R.P Rate</span>
-                            <span className="actual-priceee">
-                              ₹
-                              {/* {coupons[product?.prod_id]
-                                ? product?.offer_price || product?.prod_price
-                                : product?.actual_price} */}
-                              {product?.actual_price}
-                            </span>
-                          </div>
+                    {/* Price Table */}
+                    {loading ? (
+                      <Skeleton
+                        width={380}
+                        height={90}
+                        style={{ marginTop: "15px" }}
+                      />
+                    ) : (
+                      <div className="coupon-box">
+                        <div className="price-table">
+                          <div className="price-row">
+                            {/* MRP Price */}
+                            <div
+                              className="price-cell"
+                              style={{ backgroundColor: "white" }}
+                            >
+                              <span className="price-label">M.R.P Rate</span>
+                              {loading ? (
+                                <Skeleton width={60} height={20} />
+                              ) : (
+                                <span className="actual-priceee">
+                                  ₹{product?.actual_price}
+                                </span>
+                              )}
+                            </div>
 
-                          {/* Discount */}
-                          <div
-                            className="price-cell"
-                            style={{ backgroundColor: "white" }}
-                          >
-                            <span className="price-label">Discount</span>
-                            {/* <span className="discounted-priceee">
-                              {coupons[product?.prod_id]
-                                ? // If a coupon exists, calculate and round discount percentage
-                                  `${Math.round(
-                                    ((product?.actual_price - couponNumber) /
-                                      product?.actual_price) *
-                                      100
-                                  )}%`
-                                : // If no coupon, calculate and round discount percentage
-                                  `${Math.round(
-                                    ((product?.actual_price -
-                                      (product?.offer_price ||
-                                        product?.prod_price)) /
-                                      product?.actual_price) *
-                                      100
-                                  )}%`}
-                            </span> */}
-                            <span className="discounted-priceee">
-                              {`${Math.round(
-                                ((product.actual_price -
-                                  (product.offer_price > 0 && isOfferActive
-                                    ? product.offer_price
-                                    : product.prod_price)) /
-                                  product.actual_price) *
-                                  100
-                              )}%`}
-                            </span>
-                          </div>
+                            {/* Discount */}
+                            <div
+                              className="price-cell"
+                              style={{ backgroundColor: "white" }}
+                            >
+                              <span className="price-label">Discount</span>
+                              {loading ? (
+                                <Skeleton width={50} height={20} />
+                              ) : (
+                                <span className="discounted-priceee">{`${Math.round(
+                                  ((product.actual_price -
+                                    (product.offer_price > 0 && isOfferActive
+                                      ? product.offer_price
+                                      : product.prod_price)) /
+                                    product.actual_price) *
+                                    100
+                                )}%`}</span>
+                              )}
+                            </div>
 
-                          {/* Effective Price */}
-                          <div className="price-cell">
-                            <span className="price-label">Effective Price</span>
-                            <span className="total-priceee">
-                              ₹
-                              {isOfferActive && product?.offer_price > 0
-                                ? product?.offer_price
-                                : product?.prod_price}
-                            </span>
+                            {/* Effective Price */}
+                            <div className="price-cell">
+                              <span className="price-label">
+                                Effective Price
+                              </span>
+                              {loading ? (
+                                <Skeleton width={70} height={20} />
+                              ) : (
+                                <span className="total-priceee">
+                                  ₹
+                                  {isOfferActive && product?.offer_price > 0
+                                    ? product?.offer_price
+                                    : product?.prod_price}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
-                    {product.status === "unavailable" ? (
-                      <p className="product-detail-out-of-stock">
-                        Out of Stock
-                      </p>
-                    ) : (
+                    {/* Add to Cart & Buy Now Buttons */}
+                    {loading ? (
+                      <div className="add-to-cart-container">
+                        <Skeleton
+                          width={150}
+                          height={50}
+                          style={{ marginRight: "10px" }}
+                        />
+                        <Skeleton width={150} height={50} />
+                        <Skeleton
+                          circle
+                          width={25}
+                          height={25}
+                          style={{ marginTop: "15px" }}
+                        />
+                      </div>
+                    ) : product.status !== "unavailable" ? (
                       <div className="add-to-cart-container">
                         <button
                           title="Add To Cart"
@@ -1375,10 +1439,9 @@ const ProductDetail = ({ accessoryCategory }) => {
                         >
                           ADD TO CART{" "}
                           <span style={{ marginLeft: "10px" }}>
-                            {/* <FaShoppingBag /> */}
-                            <button class="icon-button">
+                            <button className="icon-button">
                               <svg
-                                class="svg-icon"
+                                className="svg-icon"
                                 viewBox="0 0 24 24"
                                 xmlns="http://www.w3.org/2000/svg"
                               >
@@ -1389,6 +1452,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                             </button>
                           </span>
                         </button>
+
                         <button
                           title="Buy Now"
                           onClick={(event) => handleBuyNow(product, event)}
@@ -1397,317 +1461,436 @@ const ProductDetail = ({ accessoryCategory }) => {
                           BUY NOW{" "}
                           <span style={{ marginLeft: "10px" }}>&gt;</span>
                         </button>
-                        {/* <FaHeart
-                          title="Add to wishlist"
-                          className={`heart-icon ${isFavorite ? "filled" : ""}`}
-                          onClick={(event) => toggleFavorite(product, event)}
-                        /> */}
 
-                        <span
-                          title={
-                            favorites[`${product.id}`]
-                              ? "Remove from Wishlist"
-                              : "Add to Wishlist"
-                          }
-                          className={`heart-icon ${
-                            favorites[`${product.id}`] ? "filled" : ""
-                          }`}
-                          onClick={(event) =>
-                            handleToggleFavorite(product, event)
-                          } // Unified handler
-                        >
-                          {favorites[`${product.id}`] ? (
-                            <FaHeart
-                              title="Remove from wishlist"
-                              style={{ color: "red" }}
-                            /> // Filled heart
-                          ) : (
-                            <FaRegHeart title="Add to wishlist" /> // Empty heart
-                          )}
-                        </span>
-                        <span
-                          style={{
-                            color: "green",
-                            marginTop: "5px",
-                            fontWeight: "bold",
-                            fontSize: "18px",
-                          }}
-                        >
-                          {/* In Stock */}
-                        </span>
+                        {/* Wishlist Heart Icon */}
+                        {loading ? (
+                          <Skeleton
+                            circle
+                            width={30}
+                            height={30}
+                            style={{ marginLeft: "10px" }}
+                          />
+                        ) : (
+                          <span
+                            title={
+                              favorites[`${product.id}`]
+                                ? "Remove from Wishlist"
+                                : "Add to Wishlist"
+                            }
+                            className={`heart-icon ${
+                              favorites[`${product.id}`] ? "filled" : ""
+                            }`}
+                            onClick={(event) =>
+                              handleToggleFavorite(product, event)
+                            }
+                          >
+                            {favorites[`${product.id}`] ? (
+                              <FaHeart
+                                title="Remove from wishlist"
+                                style={{ color: "red" }}
+                              />
+                            ) : (
+                              <FaRegHeart title="Add to wishlist" />
+                            )}
+                          </span>
+                        )}
                       </div>
+                    ) : (
+                      <p className="product-detail-out-of-stock">
+                        Out of Stock
+                      </p>
                     )}
                   </div>
 
-                  {relatedAccessories.length > 0 && (
+                  {loading && relatedAccessories.length > 0 ? (
                     <div className="product-detail-infooo">
                       <div className="product-detail-infoo">
                         <div className="related-accessories">
-                          <h4>Get An Extra Discount</h4>
-                          {relatedAccessories.map((accessory) => {
-                            const images = Array.isArray(accessory.prod_img)
-                              ? accessory.prod_img
-                              : JSON.parse(accessory.prod_img || "[]");
-
-                            const firstImage =
-                              images.length > 0
-                                ? images[0]
-                                : "fallback_image.jpg"; // Fallback image
-
-                            return (
-                              <div
-                                key={accessory.id}
-                                className="accessory-item"
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  marginTop: "15px",
-                                }}
-                              >
-                                {/* <input
-                                  type="checkbox"
-                                  id={`accessory-${accessory.id}`}
-                                  onChange={(event) =>
-                                    handleCheckboxChange(event, accessory.id)
-                                  }
-                                  style={{ marginRight: "10px" }}
-                                /> */}
-
-                                <div className="container">
-                                  <input
-                                    type="checkbox"
-                                    id={`accessory-${accessory.id}`}
-                                    className="custom-checkbox" // Use the custom class for our CSS
-                                    onChange={(event) =>
-                                      handleCheckboxChange(event, accessory.id)
-                                    }
-                                    style={{ display: "none" }} // Hide the native checkbox
-                                  />
-                                  <label
-                                    htmlFor={`accessory-${accessory.id}`}
-                                    className="check"
-                                    style={{ marginRight: "10px" }}
-                                  >
-                                    <svg
-                                      width="18px"
-                                      height="18px"
-                                      viewBox="0 0 18 18"
-                                    >
-                                      {/* The circle outline remains the same */}
-                                      <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
-                                      {/* Plus icon group (visible when unchecked) */}
-                                      <g className="plus">
-                                        <line
-                                          x1="9"
-                                          y1="4"
-                                          x2="9"
-                                          y2="14"
-                                          stroke="#333"
-                                          strokeWidth="1.5"
-                                          strokeLinecap="round"
-                                        />
-                                        <line
-                                          x1="4"
-                                          y1="9"
-                                          x2="14"
-                                          y2="9"
-                                          stroke="#333"
-                                          strokeWidth="1.5"
-                                          strokeLinecap="round"
-                                        />
-                                      </g>
-                                      {/* Check mark for the animated state */}
-                                      <polyline points="1 9 7 14 15 4"></polyline>
-                                    </svg>
-                                  </label>
-                                </div>
-
-                                {/* <span>{accessory.prod_name}</span> */}
-                                <img
-                                  src={`${ApiUrl}/uploads/${accessory.category.toLowerCase()}/${firstImage}`}
-                                  alt={accessory.prod_name}
-                                  className="accessory-image"
-                                  loading="lazy"
+                          <Skeleton
+                            width={200}
+                            height={25}
+                            style={{ marginBottom: "10px" }}
+                          />
+                          {[...Array(2)].map((_, index) => (
+                            <div
+                              key={index}
+                              className="accessory-item"
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                marginTop: "15px",
+                              }}
+                            >
+                              <Skeleton
+                                circle
+                                width={20}
+                                height={20}
+                                style={{ marginRight: "10px" }}
+                              />
+                              <Skeleton
+                                width={45}
+                                height={45}
+                                // style={{ marginLeft: "10px" }}
+                              />
+                              <div style={{ flex: 1 }}>
+                                <Skeleton
+                                  width={120}
+                                  height={20}
                                   style={{
-                                    width: "60px",
-                                    height: "60px",
                                     marginLeft: "10px",
+                                    marginBottom: "5px",
                                   }}
                                 />
-                                <div style={{ flex: 1 }}>
-                                  <h5
-                                    style={{
-                                      marginLeft: "10px",
-                                      marginBottom: "2px",
-                                      marginTop: "0",
-                                    }}
-                                  >
-                                    {accessory.prod_name
-                                      .charAt(0)
-                                      .toUpperCase() +
-                                      accessory.prod_name
-                                        .slice(1)
-                                        .split(" ")
-                                        .slice(0, 3)
-                                        .join(" ")}
-                                  </h5>
-                                  <p
-                                    style={{
-                                      marginLeft: "10px",
-                                      margin: 0,
-                                      fontSize: "14px",
-                                    }}
-                                  >
-                                    Buy Together for
-                                  </p>
-                                </div>
-                                <div style={{ flex: 1, textAlign: "right" }}>
-                                  <p
-                                    style={{
-                                      textDecoration: "line-through",
-                                      color: "gray",
-                                      margin: 0,
-                                    }}
-                                  >
-                                    ₹{accessory.prod_price}
-                                  </p>
-                                  <p
-                                    style={{
-                                      marginLeft: "10px",
-                                      margin: 0,
-                                      color: "green",
-                                      fontWeight: "bold",
-                                    }}
-                                  >
-                                    {accessory.effectiveprice > 0
-                                      ? `₹${accessory.effectiveprice}`
-                                      : "Free"}
-                                  </p>
-                                </div>
+                                <Skeleton
+                                  width={80}
+                                  height={15}
+                                  style={{ marginLeft: "10px" }}
+                                />
                               </div>
-                            );
-                          })}
+                              <div style={{ flex: 1, textAlign: "right" }}>
+                                <Skeleton width={60} height={15} />
+                                <Skeleton
+                                  width={70}
+                                  height={20}
+                                  style={{ marginTop: "5px" }}
+                                />
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                        <button
-                          title="Add To Cart"
-                          onClick={(event) =>
-                            handleAddToCartWithAccessories(
-                              selectedAccessories,
-                              event
-                            )
-                          } // Pass selected accessories
-                          style={{ alignSelf: "left", width: "20%" }}
-                          className="product-detail-add-to-cart2"
-                        >
-                          ADD
-                        </button>
+                        <Skeleton
+                          width={60}
+                          height={30}
+                          style={{ marginTop: "15px" }}
+                        />
                       </div>
                     </div>
+                  ) : (
+                    relatedAccessories.length > 0 && (
+                      <div className="product-detail-infooo">
+                        <div className="product-detail-infoo">
+                          <div className="related-accessories">
+                            <h4>Get An Extra Discount</h4>
+                            {relatedAccessories.map((accessory) => {
+                              const images = Array.isArray(accessory.prod_img)
+                                ? accessory.prod_img
+                                : JSON.parse(accessory.prod_img || "[]");
+
+                              const firstImage =
+                                images.length > 0
+                                  ? images[0]
+                                  : "fallback_image.jpg"; // Fallback image
+
+                              return (
+                                <div
+                                  key={accessory.id}
+                                  className="accessory-item"
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    marginTop: "15px",
+                                  }}
+                                >
+                                  <div className="container">
+                                    <input
+                                      type="checkbox"
+                                      id={`accessory-${accessory.id}`}
+                                      className="custom-checkbox"
+                                      onChange={(event) =>
+                                        handleCheckboxChange(
+                                          event,
+                                          accessory.id
+                                        )
+                                      }
+                                      style={{ display: "none" }}
+                                    />
+                                    <label
+                                      htmlFor={`accessory-${accessory.id}`}
+                                      className="check"
+                                      style={{ marginRight: "10px" }}
+                                    >
+                                      <svg
+                                        width="18px"
+                                        height="18px"
+                                        viewBox="0 0 18 18"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path d="M 1 9 L 1 9 c 0 -5 3 -8 8 -8 L 9 1 C 14 1 17 5 17 9 L 17 9 c 0 4 -4 8 -8 8 L 9 17 C 5 17 1 14 1 9 L 1 9 Z"></path>
+                                        <g className="plus">
+                                          <line
+                                            x1="9"
+                                            y1="4"
+                                            x2="9"
+                                            y2="14"
+                                            stroke="#333"
+                                            strokeWidth="1.5"
+                                            strokeLinecap="round"
+                                          />
+                                          <line
+                                            x1="4"
+                                            y1="9"
+                                            x2="14"
+                                            y2="9"
+                                            stroke="#333"
+                                            strokeWidth="1.5"
+                                            strokeLinecap="round"
+                                          />
+                                        </g>
+                                        <polyline points="1 9 7 14 15 4"></polyline>
+                                      </svg>
+                                    </label>
+                                  </div>
+
+                                  <img
+                                    src={`${ApiUrl}/uploads/${accessory.category.toLowerCase()}/${firstImage}`}
+                                    alt={accessory.prod_name}
+                                    className="accessory-image"
+                                    loading="lazy"
+                                    style={{
+                                      width: "60px",
+                                      height: "60px",
+                                      marginLeft: "10px",
+                                    }}
+                                  />
+                                  <div style={{ flex: 1 }}>
+                                    <h5
+                                      style={{
+                                        marginLeft: "10px",
+                                        marginBottom: "2px",
+                                        marginTop: "0",
+                                      }}
+                                    >
+                                      {accessory.prod_name
+                                        .charAt(0)
+                                        .toUpperCase() +
+                                        accessory.prod_name
+                                          .slice(1)
+                                          .split(" ")
+                                          .slice(0, 3)
+                                          .join(" ")}
+                                    </h5>
+                                    <p
+                                      style={{
+                                        marginLeft: "10px",
+                                        margin: 0,
+                                        fontSize: "14px",
+                                      }}
+                                    >
+                                      Buy Together for
+                                    </p>
+                                  </div>
+                                  <div style={{ flex: 1, textAlign: "right" }}>
+                                    <p
+                                      style={{
+                                        textDecoration: "line-through",
+                                        color: "gray",
+                                        margin: 0,
+                                      }}
+                                    >
+                                      ₹{accessory.prod_price}
+                                    </p>
+                                    <p
+                                      style={{
+                                        marginLeft: "10px",
+                                        margin: 0,
+                                        color: "green",
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      {accessory.effectiveprice > 0
+                                        ? `₹${accessory.effectiveprice}`
+                                        : "Free"}
+                                    </p>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <button
+                            title="Add To Cart"
+                            onClick={(event) =>
+                              handleAddToCartWithAccessories(
+                                selectedAccessories,
+                                event
+                              )
+                            }
+                            style={{ alignSelf: "left", width: "20%" }}
+                            className="product-detail-add-to-cart2"
+                          >
+                            ADD
+                          </button>
+                        </div>
+                      </div>
+                    )
                   )}
                 </div>
 
                 <div className="product-features-row">
-                  {/* <span>{product.category}</span> */}
+                  {/* Title */}
                   <h3 className="product-features-title">
-                    {product.category === "Mobiles" ||
-                    product.category === "Computers"
-                      ? "Key Specifications"
-                      : product.category === "CCTV" ||
-                        product.category === "Watch" ||
-                        product.category === "TV" ||
-                        product.category === "Headphones" ||
-                        product.category === "Speaker"
-                      ? "Features"
-                      : "Description"}
+                    {loading ? (
+                      <Skeleton width={200} height={25} />
+                    ) : product.category === "Mobiles" ||
+                      product.category === "Computers" ? (
+                      "Key Specifications"
+                    ) : [
+                        "CCTV",
+                        "Watch",
+                        "TV",
+                        "Headphones",
+                        "Speaker",
+                      ].includes(product.category) ? (
+                      "Features"
+                    ) : (
+                      "Description"
+                    )}
                   </h3>
 
-                  {product.category === "Mobiles" ||
-                  product.category === "Computers" ? (
-                    // Mobiles and Computers Specifications
-                    <ul style={{ listStyleType: "none", padding: 0 }}>
-                      {product.memory && (
-                        <li style={listItemStyle}>
-                          <span style={labelStyle}>
-                            <FaHdd style={iconStyle} /> RAM
-                          </span>
-                          <span style={valueStyle}>{product.memory}</span>
-                        </li>
-                      )}
-                      {product.storage && (
-                        <li style={listItemStyle}>
-                          <span style={labelStyle}>
-                            <FaMemory style={iconStyle} /> ROM
-                          </span>
-                          <span style={valueStyle}>{product.storage}</span>
-                        </li>
-                      )}
-                      {product.camera && (
-                        <li style={listItemStyle}>
-                          <span style={labelStyle}>
-                            <FaCamera style={iconStyle} /> Camera
-                          </span>
-                          <span style={valueStyle}>{product.camera}</span>
-                        </li>
-                      )}
+                  {/* Key Specifications Skeleton */}
+                  {loading &&
+                    (product.category === "Mobiles" ||
+                      product.category === "Computers") && (
+                      <ul style={{ listStyleType: "none", padding: 0 }}>
+                        {[...Array(5)].map((_, index) => (
+                          <li key={index} style={listItemStyle}>
+                            <Skeleton
+                              width={120}
+                              height={25}
+                              style={{ labelStyle }}
+                            />
+                            <Skeleton
+                              width={80}
+                              height={25}
+                              style={valueStyle}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
 
-                      {product.processor && (
-                        <li style={listItemStyle}>
-                          <span style={labelStyle}>
-                            <FaMicrochip style={iconStyle} /> Processor
-                          </span>
-                          <span style={valueStyle}>{product.processor}</span>
-                        </li>
-                      )}
-                      {product.display && (
-                        <li style={listItemStyle}>
-                          <span style={labelStyle}>
-                            <FaTv style={iconStyle} /> Display
-                          </span>
-                          <span style={valueStyle}>{product.display}</span>
-                        </li>
-                      )}
-                      {product.os && (
-                        <li style={listItemStyle}>
-                          <span style={labelStyle}>
-                            <FaApple style={iconStyle} /> OS
-                          </span>
-                          <span style={valueStyle}>{product.os}</span>
-                        </li>
-                      )}
-                      {product.network && (
-                        <li style={listItemStyle}>
-                          <span style={labelStyle}>
-                            <FaWifi style={iconStyle} /> Network
-                          </span>
-                          <span style={valueStyle}>{product.network}</span>
-                        </li>
-                      )}
-                      {product.battery && (
-                        <li style={listItemStyle}>
-                          <span style={labelStyle}>
-                            <FaBatteryFull style={iconStyle} /> Battery
-                          </span>
-                          <span style={valueStyle}>{product.battery}</span>
-                        </li>
-                      )}
-                      {product.others && (
-                        <li style={listItemStyle}>
-                          <span style={labelStyle}>Other Features</span>
-                          <span style={valueStyle}>{product.others}</span>
-                        </li>
-                      )}
-                    </ul>
-                  ) : product.category === "CCTV" ||
-                    product.category === "Watch" ||
-                    product.category === "TV" ||
-                    product.category === "Headphones" ||
-                    product.category === "Speaker" ? (
-                    // Product Features for CCTV, Watch, TV, Headphones, and Speaker
-                    <p className="product-features">{product.prod_features}</p>
-                  ) : (
-                    // For other categories
-                    <p className="product-features">{product.prod_features}</p>
-                  )}
+                  {/* Features Skeleton */}
+                  {loading &&
+                    ["CCTV", "Watch", "TV", "Headphones", "Speaker"].includes(
+                      product.category
+                    ) && <Skeleton width="100%" height={50} />}
+
+                  {/* Description Skeleton */}
+                  {loading &&
+                    ![
+                      "Mobiles",
+                      "Computers",
+                      "CCTV",
+                      "Watch",
+                      "TV",
+                      "Headphones",
+                      "Speaker",
+                    ].includes(product.category) && (
+                      <Skeleton width="100%" height={80} />
+                    )}
+
+                  {/* Key Specifications Data */}
+                  {!loading &&
+                    (product.category === "Mobiles" ||
+                      product.category === "Computers") && (
+                      <ul style={{ listStyleType: "none", padding: 0 }}>
+                        {product.memory && (
+                          <li style={listItemStyle}>
+                            <span style={labelStyle}>
+                              <FaHdd style={iconStyle} /> RAM
+                            </span>
+                            <span style={valueStyle}>{product.memory}</span>
+                          </li>
+                        )}
+                        {product.storage && (
+                          <li style={listItemStyle}>
+                            <span style={labelStyle}>
+                              <FaMemory style={iconStyle} /> ROM
+                            </span>
+                            <span style={valueStyle}>{product.storage}</span>
+                          </li>
+                        )}
+                        {product.camera && (
+                          <li style={listItemStyle}>
+                            <span style={labelStyle}>
+                              <FaCamera style={iconStyle} /> Camera
+                            </span>
+                            <span style={valueStyle}>{product.camera}</span>
+                          </li>
+                        )}
+                        {product.processor && (
+                          <li style={listItemStyle}>
+                            <span style={labelStyle}>
+                              <FaMicrochip style={iconStyle} /> Processor
+                            </span>
+                            <span style={valueStyle}>{product.processor}</span>
+                          </li>
+                        )}
+                        {product.display && (
+                          <li style={listItemStyle}>
+                            <span style={labelStyle}>
+                              <FaTv style={iconStyle} /> Display
+                            </span>
+                            <span style={valueStyle}>{product.display}</span>
+                          </li>
+                        )}
+                        {product.os && (
+                          <li style={listItemStyle}>
+                            <span style={labelStyle}>
+                              <FaApple style={iconStyle} /> OS
+                            </span>
+                            <span style={valueStyle}>{product.os}</span>
+                          </li>
+                        )}
+                        {product.network && (
+                          <li style={listItemStyle}>
+                            <span style={labelStyle}>
+                              <FaWifi style={iconStyle} /> Network
+                            </span>
+                            <span style={valueStyle}>{product.network}</span>
+                          </li>
+                        )}
+                        {product.battery && (
+                          <li style={listItemStyle}>
+                            <span style={labelStyle}>
+                              <FaBatteryFull style={iconStyle} /> Battery
+                            </span>
+                            <span style={valueStyle}>{product.battery}</span>
+                          </li>
+                        )}
+                        {product.others && (
+                          <li style={listItemStyle}>
+                            <span style={labelStyle}>Other Features</span>
+                            <span style={valueStyle}>{product.others}</span>
+                          </li>
+                        )}
+                      </ul>
+                    )}
+
+                  {/* Features Data */}
+                  {!loading &&
+                    ["CCTV", "Watch", "TV", "Headphones", "Speaker"].includes(
+                      product.category
+                    ) && (
+                      <p className="product-features">
+                        {product.prod_features}
+                      </p>
+                    )}
+
+                  {/* Description Data */}
+                  {!loading &&
+                    ![
+                      "Mobiles",
+                      "Computers",
+                      "CCTV",
+                      "Watch",
+                      "TV",
+                      "Headphones",
+                      "Speaker",
+                    ].includes(product.category) && (
+                      <p className="product-features">
+                        {product.prod_features}
+                      </p>
+                    )}
                 </div>
               </div>
             </div>

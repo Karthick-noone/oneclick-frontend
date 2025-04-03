@@ -523,6 +523,9 @@ const Computers = () => {
                   className="product-card"
                   onClick={() => handleCardClick(product)}
                 >
+                  {product.offer_label && (
+                    <div className="product-label">{product.offer_label}</div>
+                  )}
                   <div className="product-actions">
                     <img
                       src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${

@@ -343,6 +343,114 @@
   font-size: 1.2em;
 }
 
+/* Skeleton Base */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 5px;
+}
+
+/* Skeleton for Cart Summary */
+.skeleton-cart-summary {
+  border-top: 1px solid #ddd;
+  padding: 10px;
+  width: 29%;
+  /* background: #fff; */
+  border-radius: 8px;
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+  height: 250px;
+}
+
+/* Skeleton for Price Summary Title */
+.skeleton-summary-title {
+  width: 150px;
+  height: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+/* Skeleton for Summary Items */
+.skeleton-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Skeleton for Labels (Price, Delivery Charge, etc.) */
+.skeleton-summary-label {
+  width: 120px;
+  height: 20px;
+}
+
+/* Skeleton for Values (₹ Amounts) */
+.skeleton-summary-value {
+  width: 60px;
+  height: 20px;
+}
+
+/* Skeleton for Total Amount */
+.skeleton-summary-total-label {
+  width: 130px;
+  height: 18px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.skeleton-summary-total-value {
+  width: 70px;
+  height: 18px;
+  font-weight: bold;
+}
+
+/* Skeleton for Checkout Button */
+.skeleton-summary-button {
+  width: 100%;
+  height: 50px;
+  /* border-radius: 5px; */
+  margin-top: 25px;
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+
+/* Skeleton Base */
+.login-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 5px;
+}
+
+/* login-Skeleton for Login Section */
+
+/* login-Skeleton for Check Icon */
+.login-skeleton-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+/* login-Skeleton for Username */
+.skeleton-title {
+  width: 50px;
+  height: 20px;
+  margin-top: 5px;
+}
+
+
+
+
+
 .summary-place-order-btn {
   background: #ff5722;
   color: white;
@@ -539,6 +647,226 @@
 
 .cart-address input[type="radio"] {
   margin-right: 10px;
+}
+
+/* Skeleton Base */
+.address-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 5px;
+}
+
+/* "Delivery to" Skeleton */
+.address-skeleton-title {
+  width: 120px;
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+/* Address Text Skeleton */
+.address-skeleton-address {
+  width: 100%;
+  height: 40px;
+  margin-bottom: 8px;
+}
+
+/* Button Skeleton */
+.address-skeleton-btn {
+  width: 80px;
+  height: 30px;
+  border-radius: 5px;
+  float: right;
+  top: -20px;
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+
+/* Skeleton Base */
+.list-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 5px;
+}
+
+/* Image list-Skeleton */
+.list-skeleton-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  margin-right: 20px;
+}
+
+/* list-Skeleton Container */
+.list-skeleton-container {
+  flex-grow: 1;
+}
+
+/* Product Name list-Skeleton */
+.list-skeleton-title {
+  width: 60%;
+  height: 18px;
+  margin-bottom: 6px;
+}
+
+/* Product Description list-Skeleton */
+.list-skeleton-description {
+  width: 80%;
+  height: 14px;
+  margin-bottom: 10px;
+}
+
+/* Quantity Controls list-Skeleton */
+.list-skeleton-quantity {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 10px;
+}
+
+/* Price list-Skeleton */
+.list-skeleton-price {
+  width: 50px;
+  height: 20px;
+  margin-bottom: 8px;
+  margin-left: 10px;
+}
+
+/* Buy Later Button list-Skeleton */
+.list-skeleton-btn {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+
+/* Skeleton Base */
+.buy-later-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 5px;
+}
+
+/* Buy Later Container Skeleton */
+.skeleton-buy-later-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  padding: 15px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Skeleton for "BUY LATER ITEMS" Title */
+.skeleton-buy-later-title {
+  width: 150px;
+  height: 20px;
+  margin-bottom: 10px;
+}
+
+/* Skeleton for Individual Items */
+.skeleton-buy-later-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Skeleton for Product Image */
+.skeleton-buy-later-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+}
+
+/* Skeleton for Product Details */
+.skeleton-buy-later-details {
+  flex-grow: 1;
+  padding-right: 10px;
+}
+
+/* Skeleton for Product Name */
+.skeleton-buy-later-name {
+  width: 120px;
+  height: 16px;
+  margin-bottom: 6px;
+}
+
+/* Skeleton for Product Description */
+.skeleton-buy-later-description {
+  width: 180px;
+  height: 12px;
+}
+
+/* Skeleton for Price Section */
+.skeleton-buy-later-price {
+  width: 80px;
+  height: 16px;
+  margin-top: 5px;
+}
+
+/* Skeleton for Move to Cart Button */
+.skeleton-buy-later-btn {
+  width: 140px;
+  height: 35px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Additional Styles */
+.strikethrough {
+  color: red;
+  text-decoration: line-through;
+  font-size: 13px;
+  margin-right: 5px;
+}
+
+.placeholder-image {
+  width: 100px;
+  height: 100px;
+  background-color: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+  font-size: 14px;
+  border-radius: 8px;
 }
 
 /* Overlay for the modal4 */

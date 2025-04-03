@@ -548,32 +548,40 @@ const ProductList = () => {
                   </div>
 
                   {combinedProducts.length > 5 &&
-                    idx === combinedProducts.length - 1 && (
-                      <div className="see-more-wrapper">
-                        <button
-                          onClick={() => {
-                            if (
-                              product.category === "Headphones" ||
-                              product.category === "Speakers"
-                            ) {
-                              navigate(`/Headphones`);
-                            } else if (
-                              product.category === "ComputerAccessories" ||
-                              product.category === "MobileAccessories" ||
-                              product.category === "CCTVAccessories" ||
-                              product.category === "PrinterAccessories"
-                            ) {
-                              navigate(`/ComputerAccessories`);
-                            } else {
-                              navigate(`/${product.category}`);
-                            }
-                          }}
-                          className="see-more-btn"
-                        >
-                          VIEW MORE
-                        </button>
-                      </div>
-                    )}
+  idx === combinedProducts.length - 1 && (
+    <div className="see-more-wrapper">
+      {/* <button
+        onClick={() => {
+          const lastProductCategory =
+            combinedProducts[combinedProducts.length - 1].category;
+          navigate(`/${lastProductCategory}`);
+        }}
+        className="see-more-btn"
+      >
+        VIEW MORE
+      </button> */}
+<button class="animated-button" onClick={() => {
+          const lastProductCategory =
+            combinedProducts[combinedProducts.length - 1].category;
+          navigate(`/${lastProductCategory}`);
+        }}>
+  <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+    ></path>
+  </svg>
+  <span class="text">View More</span>
+  <span class="circle"></span>
+  <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+    ></path>
+  </svg>
+</button>
+
+    </div>
+  )}
+
                 </SwiperSlide>
               );
             })}

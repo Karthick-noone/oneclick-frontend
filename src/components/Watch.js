@@ -21,11 +21,9 @@ const Watch = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [favorites, setFavorites] = useState({});
-   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
+  const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [loading, setLoading] = useState(true);
 
-
-  
   // const {
   //   cartItems,
   //   addToCart,
@@ -44,13 +42,10 @@ const Watch = () => {
   console.log("Search Query:", searchQuery);
 
   // Normalize a string by trimming, lowercasing, and removing all spaces
-  const normalizeString = (str) =>
-    str.trim().toLowerCase().replace(/\s+/g, "");
+  const normalizeString = (str) => str.trim().toLowerCase().replace(/\s+/g, "");
 
   // Normalize the search query (if it exists)
-  const normalizedSearchQuery = searchQuery
-    ? normalizeString(searchQuery)
-    : "";
+  const normalizedSearchQuery = searchQuery ? normalizeString(searchQuery) : "";
 
   // Filter products based on the normalized, concatenated prod_name and prod_features
   const filteredProducts = searchQuery
@@ -119,7 +114,7 @@ const Watch = () => {
           draggable: true,
           progress: undefined,
         });
-      }finally {
+      } finally {
         setLoading(false); // Stop loading regardless of success or failure
       }
     };
@@ -127,40 +122,40 @@ const Watch = () => {
     fetchProducts();
   }, []);
 
-    const [isOfferActive, setIsOfferActive] = useState(true);
-      const [product, setProduct] = useState(null);
-  
-       useEffect(() => {
-          const now = new Date();
-          // console.log("Current Time:", now.toLocaleString());
-        
-          const activeProduct = products.find((item) => {
-            if (!item.offer_start_time || !item.offer_end_time) {
-              // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
-              return false;
-            }
-        
-            const offerStartTime = new Date(item.offer_start_time);
-            const offerEndTime = new Date(item.offer_end_time);
-        
-            // console.log(
-            //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
-            // );
-        
-            return offerStartTime <= now && offerEndTime > now;
-          });
-        
-          if (activeProduct) {
-            // console.log("Active Product Found:", activeProduct);
-          } else {
-            // console.log("No active product with a valid offer.");
-          }
-        
-          setProduct(activeProduct || null);
-          setIsOfferActive(!!activeProduct);
-        
-          // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
-        }, [products]);
+  const [isOfferActive, setIsOfferActive] = useState(true);
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    const now = new Date();
+    // console.log("Current Time:", now.toLocaleString());
+
+    const activeProduct = products.find((item) => {
+      if (!item.offer_start_time || !item.offer_end_time) {
+        // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
+        return false;
+      }
+
+      const offerStartTime = new Date(item.offer_start_time);
+      const offerEndTime = new Date(item.offer_end_time);
+
+      // console.log(
+      //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
+      // );
+
+      return offerStartTime <= now && offerEndTime > now;
+    });
+
+    if (activeProduct) {
+      // console.log("Active Product Found:", activeProduct);
+    } else {
+      // console.log("No active product with a valid offer.");
+    }
+
+    setProduct(activeProduct || null);
+    setIsOfferActive(!!activeProduct);
+
+    // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
+  }, [products]);
 
   const handleBuyNow = (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
@@ -223,14 +218,14 @@ const Watch = () => {
     if (product && product.id) {
       // Retrieve existing recently viewed products
       let storedProductIds = localStorage.getItem("Recently-viewed");
-  
+
       if (storedProductIds) {
         try {
           storedProductIds = JSON.parse(storedProductIds);
-          
+
           // Ensure it's an array
           if (!Array.isArray(storedProductIds)) {
-            storedProductIds = [storedProductIds]; 
+            storedProductIds = [storedProductIds];
           }
         } catch (error) {
           console.error("Error parsing Recently Viewed data:", error);
@@ -239,26 +234,25 @@ const Watch = () => {
       } else {
         storedProductIds = [];
       }
-  
+
       // Remove the product ID if it already exists (to avoid duplicates)
       storedProductIds = storedProductIds.filter((id) => id !== product.id);
-  
+
       // Add the new product ID to the beginning of the list
       storedProductIds.unshift(product.id);
-  
+
       // Keep only the last 10 recently viewed products
       storedProductIds = storedProductIds.slice(0, 10);
-  
+
       // Save back to localStorage
       localStorage.setItem("Recently-viewed", JSON.stringify(storedProductIds));
-  
+
       // Navigate to product details page
       navigate(`/product/${product.id}`);
     } else {
       console.error("Product is undefined or missing ID:", product);
     }
   };
-  
 
   const handleCloseModal = () => {
     setSelectedProduct(null);
@@ -488,17 +482,17 @@ const Watch = () => {
         <Sidebar />
         <div className="product-list">
           {loading ? (
-        // 1. Loading state
-         [...Array(8)].map((_, index) => (
-          <div key={index} className="skeleton-product-card">
-            <div className="skeleton-image"></div>
-            <div className="skeleton-text"></div>
-            <div className="skeleton-text short"></div>
-            <div className="skeleton-price"></div>
-            <div className="skeleton-buttons"></div>
-          </div>
-        ))
-      ) : products.length === 0 ? (
+            // 1. Loading state
+            [...Array(8)].map((_, index) => (
+              <div key={index} className="skeleton-product-card">
+                <div className="skeleton-image"></div>
+                <div className="skeleton-text"></div>
+                <div className="skeleton-text short"></div>
+                <div className="skeleton-price"></div>
+                <div className="skeleton-buttons"></div>
+              </div>
+            ))
+          ) : products.length === 0 ? (
             <div className="no-products-message">
               <h2>No products here yet...</h2>
               <p>
@@ -521,14 +515,15 @@ const Watch = () => {
                   className="product-card"
                   onClick={() => handleCardClick(product)}
                 >
+                  {product.offer_label && (
+                    <div className="product-label">{product.offer_label}</div>
+                  )}
                   <div className="product-actions">
                     <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                        firstImage
-                      }`}
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
                       alt={product.prod_name}
                       className="product-image"
-                    // loading="lazy"
+                      // loading="lazy"
                     />
                     <span
                       title={
@@ -549,7 +544,10 @@ const Watch = () => {
                     </span>
                   </div>
 
-                  <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
+                  <h3 className="product-name">
+                    {product.prod_name.charAt(0).toUpperCase() +
+                      product.prod_name.slice(1)}
+                  </h3>
 
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
                   <span className="product-subtitle2">{product.subtitle}</span>
@@ -559,14 +557,17 @@ const Watch = () => {
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
+                        ₹
+                        {product.offer_price > 0
+                          ? product.offer_price
+                          : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through", color:'red' }}
+                        style={{ textDecoration: "line-through", color: "red" }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -580,7 +581,10 @@ const Watch = () => {
                     >
                       (
                       {Math.round(
-                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
+                        ((product.actual_price -
+                          (product.offer_price > 0
+                            ? product.offer_price
+                            : product.prod_price)) /
                           product.actual_price) *
                           100
                       )}
@@ -655,12 +659,10 @@ const Watch = () => {
 
                   <div className="product-actions">
                     <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                        firstImage
-                      }`}
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
                       alt={product.prod_name}
                       className="product-image"
-                    // loading="lazy"
+                      // loading="lazy"
                     />
                     <span
                       title={
@@ -681,7 +683,10 @@ const Watch = () => {
                     </span>
                   </div>
 
-                  <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
+                  <h3 className="product-name">
+                    {product.prod_name.charAt(0).toUpperCase() +
+                      product.prod_name.slice(1)}
+                  </h3>
                   <span className="product-subtitle2">{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}
@@ -690,14 +695,17 @@ const Watch = () => {
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
+                        ₹
+                        {product.offer_price > 0
+                          ? product.offer_price
+                          : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through", color:'red' }}
+                        style={{ textDecoration: "line-through", color: "red" }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -711,7 +719,10 @@ const Watch = () => {
                     >
                       (
                       {Math.round(
-                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
+                        ((product.actual_price -
+                          (product.offer_price > 0
+                            ? product.offer_price
+                            : product.prod_price)) /
                           product.actual_price) *
                           100
                       )}

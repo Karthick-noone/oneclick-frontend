@@ -57,6 +57,15 @@ const Sidebar = () => {
                         </li>
                         <li>
                             <a
+                                href="/Mobiles"
+                                onClick={() => handleLinkClick('mobiles')}
+                                className={activeLink === 'mobiles' ? 'active' : ''}
+                            >
+                                <FaMobileAlt /> Mobiles
+                            </a>
+                        </li>
+                        <li>
+                            <a
                                 href="/CCTV"
                                 onClick={() => handleLinkClick('cctv')}
                                 className={activeLink === 'cctv' ? 'active' : ''}
@@ -73,15 +82,7 @@ const Sidebar = () => {
                                 <FaHeadphones /> Headphones
                             </a>
                         </li>
-                        <li>
-                            <a
-                                href="/Mobiles"
-                                onClick={() => handleLinkClick('mobiles')}
-                                className={activeLink === 'mobiles' ? 'active' : ''}
-                            >
-                                <FaMobileAlt /> Mobiles
-                            </a>
-                        </li>
+                       
                         <li>
                             <a
                                 href="/Speakers"
@@ -120,15 +121,6 @@ const Sidebar = () => {
                         </li>
                         <li>
                             <a
-                                href="/MobileAccessories"
-                                onClick={() => handleLinkClick('mobileaccessories')}
-                                className={activeLink === 'mobileaccessories' ? 'active' : ''}
-                            >
-                                <FaMobileAlt /> Mobile Accessories
-                            </a>
-                        </li>
-                        <li>
-                            <a
                                 href="/ComputerAccessories"
                                 onClick={() => handleLinkClick('computeraccessories')}
                                 className={activeLink === 'computeraccessories' ? 'active' : ''}
@@ -136,6 +128,16 @@ const Sidebar = () => {
                                 <FaLaptop /> Computer Accessories
                             </a>
                         </li>
+                        <li>
+                            <a
+                                href="/MobileAccessories"
+                                onClick={() => handleLinkClick('mobileaccessories')}
+                                className={activeLink === 'mobileaccessories' ? 'active' : ''}
+                            >
+                                <FaMobileAlt /> Mobile Accessories
+                            </a>
+                        </li>
+                     
                         <li>
                             <a
                                 href="/CCTVAccessories"

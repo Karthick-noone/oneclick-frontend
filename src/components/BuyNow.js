@@ -25,6 +25,8 @@ import Swal from "sweetalert2";
 import Footer from "./footer";
 import orderTruck from "./img/order-truck.gif";
 import confetti from "canvas-confetti";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css"; // Ensure styles are applied
 
 const BuyNow = () => {
   const navigate = useNavigate();
@@ -63,6 +65,11 @@ const BuyNow = () => {
   console.log("products", product);
 
   const [quantity, setQuantity] = useState(1);
+  const [isLoading, setLoading] = useState(true);
+  useEffect(() => {
+    // Simulate loading delay (remove this in real API calls)
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
 
   const updateQuantity = (newQuantity) => {
     if (newQuantity < 1) return;
@@ -625,10 +632,23 @@ const BuyNow = () => {
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
-              <strong>LOGIN </strong>
+              {/* <strong> LOGIN </strong> */}
 
-              {username ? (
+              {isLoading ? (
                 <>
+                  <div className="login-skeleton skeleton-title"></div>
+
+                  <div className="login-skeleton">
+                    <div
+                      className="login-skeleton skeleton-text"
+                      style={{ marginTop: "8px" }}
+                    ></div>
+                  </div>
+                </>
+              ) : username ? (
+                <>
+                  <strong> LOGIN </strong>
+
                   <FaCheck style={{ color: "green" }} />
                   <br />
                   <span style={{ fontSize: "14px" }}>
@@ -637,15 +657,13 @@ const BuyNow = () => {
                 </>
               ) : (
                 <>
+                  <strong> LOGIN </strong>
                   <FaTimes style={{ color: "red" }} />
                   <br />
-                  {/* <span style={{ fontSize: "14px" }}>Guest</span> */}
-                  {/* <br /> */}
                   <a href="/Login">
                     <button
                       className="change-btn"
                       style={{ cursor: "pointer" }}
-                      // onClick={() => console.log("Redirect to login page")} // Replace with actual login logic
                     >
                       Login
                     </button>
@@ -655,7 +673,16 @@ const BuyNow = () => {
             </div>
             <div className="cart-address">
               {/* <h3>Select a Shipping Address</h3> */}
-              {addressDetails.length > 0 ? (
+              {isLoading ? (
+                <ul>
+                  <li className="addr-list">
+                    {/* Individual skeletons for each section */}
+                    {/* <div className="address-skeleton address-skeleton-btn"></div> */}
+                    <div className="address-skeleton address-skeleton-title"></div>
+                    <div className="address-skeleton address-skeleton-address"></div>
+                  </li>
+                </ul>
+              ) : addressDetails.length > 0 ? (
                 <ul>
                   {addressDetails.map((address) => (
                     <li
@@ -667,6 +694,7 @@ const BuyNow = () => {
                       <button
                         style={{ float: "right" }}
                         className="change-btn"
+                        title="Change Delivery Address"
                         onClick={() =>
                           handleSelectAddressClick(address.address_id)
                         } // Ensure this is calling the correct function
@@ -703,7 +731,12 @@ const BuyNow = () => {
             </div>{" "}
             <div className="cart-product-card">
               <strong style={{ fontSize: "1.0rem" }}>
-                ORDER SUMMARY <FaCheck style={{ color: "green" }} />
+                {isLoading ? (
+                  <Skeleton width={150} height={20} />
+                ) : (
+                  "ORDER SUMMARY"
+                )}
+                {!isLoading && <FaCheck style={{ color: "green" }} />}
               </strong>
               <br />
 
@@ -714,7 +747,9 @@ const BuyNow = () => {
                     className="cart-product d-flex align-items-center"
                   >
                     {/* Handle image */}
-                    {firstImage ? (
+                    {isLoading ? (
+                      <Skeleton width={70} height={70} />
+                    ) : firstImage ? (
                       <div style={{ cursor: "pointer" }}>
                         <img
                           src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
@@ -730,44 +765,71 @@ const BuyNow = () => {
                     )}
 
                     {/* Product details */}
-                    {/* <div style={{ cursor: "pointer" }} className="cart-product-details"> */}
-                    <p className="buy-product-name">{product.prod_name}</p>
-                    {/* </div> */}
-
-                    {product.prod_features && (
-                      <p className="buy-product-description">
-                        {product.prod_features}
-                      </p>
-                    )}
+                    <div className="cart-product-details">
+                      {isLoading ? (
+                        <>
+                          <Skeleton
+                            style={{ marginLeft: "50px" }}
+                            width={250}
+                            height={25}
+                          />
+                          <Skeleton
+                            style={{ marginLeft: "50px" }}
+                            width={240}
+                            height={15}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <p className="buy-product-name">
+                            {product.prod_name}
+                          </p>
+                          {product.prod_features && (
+                            <p className="buy-product-description">
+                              {product.prod_features}
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </div>
 
                     {/* Price and quantity */}
                     <div className="cart-product-price">
-                      <div className="cart-quantity-controls">
-                        <button
-                          onClick={() =>
-                            updateQuantity(Math.max(quantity - 1, 1))
-                          } // Prevent going below 1
-                        >
-                          -
-                        </button>
-                        <span>{quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(quantity + 1)} // Increase quantity
-                        >
-                          +
-                        </button>
-                      </div>
-                      <p
-                        style={{
-                          color: "red",
-                          textDecoration: "line-through",
-                          fontSize: "13px",
-                          marginRight: "5px",
-                        }}
-                      >
-                        ₹{product.actual_price * quantity}
-                      </p>
-                      <p>₹{product.prod_price * quantity}</p>
+                      {isLoading ? (
+                        <>
+                          <Skeleton width={80} height={20} />
+                          <Skeleton width={60} height={20} />
+                        </>
+                      ) : (
+                        <>
+                          <div className="cart-quantity-controls">
+                            <button
+                              onClick={() =>
+                                updateQuantity(Math.max(quantity - 1, 1))
+                              }
+                            >
+                              -
+                            </button>
+                            <span>{quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(quantity + 1)}
+                            >
+                              +
+                            </button>
+                          </div>
+                          <p
+                            style={{
+                              color: "red",
+                              textDecoration: "line-through",
+                              fontSize: "13px",
+                              marginRight: "5px",
+                            }}
+                          >
+                            ₹{product.actual_price * quantity}
+                          </p>
+                          <p>₹{product.prod_price * quantity}</p>
+                        </>
+                      )}
                     </div>
                   </li>
                 </ul>
@@ -777,89 +839,129 @@ const BuyNow = () => {
 
           <div className="cart-summary">
             <h4 style={{ marginTop: "10px", marginBottom: "5px" }}>
-              PRICE SUMMARY
+              {isLoading ? (
+                <Skeleton width={150} height={20} />
+              ) : (
+                "PRICE SUMMARY"
+              )}
             </h4>
+
             <div className="summary-item">
               <span>
-                Price
+                {isLoading ? <Skeleton width={80} /> : "Price"}
                 {quantity > 0 &&
+                  !isLoading &&
                   (quantity === 1 ? " (1 item)" : ` (${quantity} items)`)}
               </span>
-              <span>₹{product.prod_price * quantity}</span>
-            </div>
-            {/* <div className="summary-item">
-              <span>Discount</span>
-              <span style={{ color: "green" }}>- ₹0</span>
-            </div> */}
-            {/* <div className="summary-item">
-              <span>Platform fee</span>
-              <span>-</span>
-            </div> */}
-            <div className="summary-item">
-              <span>Delivery Charge</span>
               <span>
-                {/* <span style={{ textDecoration: "line-through" }}>₹50</span>{" "}
-                <span style={{ color: "green" }}>FREE Delivery</span> */}
-                <span>₹{delivery_charge ? delivery_charge : 0}</span>
+                {isLoading ? (
+                  <Skeleton width={50} />
+                ) : (
+                  `₹${product.prod_price * quantity}`
+                )}
               </span>
             </div>
+
             <div className="summary-item">
-              <span>Coupon Discount</span>
-              <span style={{ color: "green" }}>
-                - ₹{discountAmount}
-                {/* <span style={{ color: "green" }}>FREE Delivery</span> */}
+              <span>
+                {isLoading ? <Skeleton width={120} /> : "Delivery Charge"}
+              </span>
+              <span>
+                {isLoading ? (
+                  <Skeleton width={50} />
+                ) : (
+                  `₹${delivery_charge ? delivery_charge : 0}`
+                )}
               </span>
             </div>
+
+            <div className="summary-item">
+              <span>
+                {isLoading ? <Skeleton width={150} /> : "Coupon Discount"}
+              </span>
+              <span style={{ color: "green" }}>
+                {isLoading ? <Skeleton width={50} /> : `- ₹${discountAmount}`}
+              </span>
+            </div>
+
             {parseFloat(calculateTotalPrice()) >= minPurchaseLimit && (
               <div className="summary-item">
                 <span>
-                  (If you have coupon)
-                  <br />
-                  Extra Discount on Orders Over ₹{minPurchaseLimit}
+                  {isLoading ? (
+                    <Skeleton width={180} />
+                  ) : (
+                    `(If you have coupon) Extra Discount on Orders Over ₹${minPurchaseLimit}`
+                  )}
                 </span>
-                <span style={{ color: "green" }}>- ₹{couponValue}</span>
+                <span style={{ color: "green" }}>
+                  {isLoading ? <Skeleton width={50} /> : `- ₹${couponValue}`}
+                </span>
               </div>
             )}
-            <div className="summary-item">
-              {/* Input for coupon code */}
-              <input
-                value={coupon}
-                onChange={handleCouponChange}
-                type="text"
-                placeholder="Enter Coupon code"
-                disabled={isCouponApplied} // Disable input if coupon is applied
-              />
 
-              {/* Single Apply button for all items */}
-              <button
-                disabled={isCouponApplied}
-                onClick={() => handleApplyCoupon(coupon, product)}
-              >
-                Apply
-              </button>
+            {/* Coupon Input & Button */}
+            <div className="summary-item">
+              {isLoading ? (
+                <Skeleton width={150} height={30} />
+              ) : (
+                <input
+                  value={coupon}
+                  onChange={handleCouponChange}
+                  type="text"
+                  placeholder="Enter Coupon code"
+                  disabled={isCouponApplied}
+                />
+              )}
+
+              {isLoading ? (
+                <Skeleton width={60} height={30} />
+              ) : (
+                <button
+                  disabled={isCouponApplied}
+                  onClick={() => handleApplyCoupon(coupon, product)}
+                >
+                  Apply
+                </button>
+              )}
             </div>
+
+            {/* Info Message */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                // marginTop: "5px",
                 marginBottom: "2px",
                 color: "#555",
                 fontSize: "0.83em",
               }}
             >
-              <FaInfoCircle
-                style={{
-                  marginRight: "5px",
-                  marginBottom: "5px",
-                  color: "#ff5722",
-                }}
-              />
-              <span>
-                {" "}
-                If you have multiple coupons, apply the one you prefer.
-              </span>
+              {isLoading ? (
+                <>
+                  <Skeleton
+                    circle
+                    width={20}
+                    height={20}
+                    style={{ marginRight: "5px" }}
+                  />
+                  <Skeleton width={250} height={15} />
+                </>
+              ) : (
+                <>
+                  <FaInfoCircle
+                    style={{
+                      marginRight: "5px",
+                      marginBottom: "5px",
+                      color: "#ff5722",
+                    }}
+                  />
+                  <span>
+                    If you have multiple coupons, apply the one you prefer.
+                  </span>
+                </>
+              )}
             </div>
+
+            {/* Delivery Information */}
             {finalAmount > 0 && (
               <div
                 style={{
@@ -871,13 +973,30 @@ const BuyNow = () => {
                   fontWeight: "bold",
                 }}
               >
-                <FaTruck style={{ marginRight: "2px" }} /> Delivery by{" "}
-                {getDeliveryDate()}
+                {isLoading ? (
+                  <>
+                    <Skeleton
+                      square
+                      width={20}
+                      height={20}
+                      style={{ marginRight: "5px" }}
+                    />{" "}
+                    <Skeleton width={150} />
+                  </>
+                ) : (
+                  <>
+                    {" "}
+                    <FaTruck style={{ marginRight: "2px" }} /> Delivery by{" "}
+                    {getDeliveryDate()}
+                  </>
+                )}
                 {delivery_charge === 0 && (
                   <span style={{ color: "green" }}>&nbsp;• Free</span>
                 )}
               </div>
             )}
+
+            {/* Message (Success/Error) */}
             {message && (
               <p
                 style={{
@@ -886,26 +1005,34 @@ const BuyNow = () => {
                       ? "green"
                       : messageType === "error"
                       ? "red"
-                      : "orange", // Orange for warning (if coupon is already applied)
-                  // fontWeight: "bold",
+                      : "orange",
                   marginTop: "5px",
                   fontSize: "14px",
                 }}
               >
-                {message}
+                {isLoading ? <Skeleton width={180} /> : message}
               </p>
-            )}{" "}
+            )}
+
             <hr />
             <div className="summary-item">
-              <strong>Total Amount</strong>
+              <strong>
+                {isLoading ? <Skeleton width={120} /> : "Total Amount"}
+              </strong>
               <span style={{ fontWeight: "bold" }}>
-                ₹
-                {isCouponApplied
-                  ? Number(totalAmount).toFixed(2)
-                  : calculateTotalPrice()}
+                {isLoading ? (
+                  <Skeleton width={70} />
+                ) : (
+                  `₹${
+                    isCouponApplied
+                      ? Number(totalAmount).toFixed(2)
+                      : calculateTotalPrice()
+                  }`
+                )}
               </span>
             </div>
             <hr />
+
             <div>
               {isCouponApplied && (
                 <p className="discount-message">
@@ -914,153 +1041,216 @@ const BuyNow = () => {
                 </p>
               )}
             </div>
-            <center>
-              <h4 style={{ marginTop: "10px" }}>Select Payment Method</h4>
-            </center>
-            <div className="payment-methods">
-              <div
-                className={`summary-item2 ${
-                  selectedPaymentMethod === "cod" ? "selected" : ""
-                }`}
-              >
-                <FaMoneyBillWave
-                  className="payment-icon"
-                  style={{ color: "green" }}
-                />
-                <span className="methods">Cash on Delivery</span>
-                <span>
-                  <input
-                    type="radio"
-                    name="payment-method"
-                    value="cod"
-                    checked={selectedPaymentMethod === "cod"}
-                    onChange={handlePaymentMethodChange}
-                  />
-                </span>
-                {selectedPaymentMethod === "cod" && (
-                  <div className="continue-wrapper">
-                    <button
-                      onClick={() => handlePlaceOrder("cod")} // Pass "cod" to handlePayment function
-                      className="summary-place-order-btn"
-                    >
-                      {isOrdering ? (
-                        <img
-                          src={orderTruck}
-                          alt="Ordering..."
-                          style={{ height: "100px", padding: "1px" }}
-                        />
-                      ) : (
-                        "Order Now"
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div
-                className={`summary-item2 ${
-                  selectedPaymentMethod === "card" ? "selected" : ""
-                }`}
-              >
-                <FaCreditCard
-                  className="payment-icon"
-                  style={{ color: "skyblue" }}
-                />
-                <span className="methods">Pay Online</span>
-                <span>
-                  <input
-                    type="radio"
-                    name="payment-method"
-                    value="card"
-                    checked={selectedPaymentMethod === "card"}
-                    onChange={handlePaymentMethodChange}
-                  />
-                </span>
-                {selectedPaymentMethod === "card" && (
-                  <div className="continue-wrapper">
-                    <button
-                      class="pay-btn"
-                      onClick={() => handlePayment("Online")}
-                    >
-                      <span class="btn-text">Pay Now</span>
-                      <div class="icon-container">
-                        <svg viewBox="0 0 24 24" class="icon5 card-icon">
-                          <path
-                            d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18C2,19.11 2.89,20 4,20H20C21.11,20 22,19.11 22,18V6C22,4.89 21.11,4 20,4Z"
-                            fill="currentColor"
-                          ></path>
-                        </svg>
-                        <svg viewBox="0 0 24 24" class="icon5 paymentt-icon">
-                          <path
-                            d="M2,17H22V21H2V17M6.25,7H9V6H6V3H18V6H15V7H17.75L19,17H5L6.25,7M9,10H15V8H9V10M9,13H15V11H9V13Z"
-                            fill="currentColor"
-                          ></path>
-                        </svg>
-                        <svg viewBox="0 0 24 24" class="icon5 dollar-icon">
-                          <path
-                            d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"
-                            fill="currentColor"
-                          ></path>
-                        </svg>
-
-                        <svg
-                          viewBox="0 0 24 24"
-                          class="icon5 wallet-icon default-icon"
+           <center>
+                        <h4 style={{ marginTop: "10px" }}>
+                          {isLoading ? (
+                            <Skeleton width={200} height={20} />
+                          ) : (
+                            "Select Payment Method"
+                          )}
+                        </h4>
+                      </center>
+                      <div className="payment-methods">
+                        {/* Cash on Delivery */}
+                        <div
+                          className={`summary-item2 ${
+                            selectedPaymentMethod === "cod" ? "selected" : ""
+                          }`}
                         >
-                          <path
-                            d="M21,18V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V6H12C10.89,6 10,6.9 10,8V16A2,2 0 0,0 12,18M12,16H22V8H12M16,13.5A1.5,1.5 0 0,1 14.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,12A1.5,1.5 0 0,1 16,13.5Z"
-                            fill="currentColor"
-                          ></path>
-                        </svg>
-
-                        <svg viewBox="0 0 24 24" class="icon5 check-icon">
-                          <path
-                            d="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z"
-                            fill="currentColor"
-                          ></path>
-                        </svg>
+                          {isLoading ? (
+                            <Skeleton width={50} height={50} />
+                          ) : (
+                            <FaMoneyBillWave
+                              className="payment-icon"
+                              style={{ color: "green" }}
+                            />
+                          )}
+                          <span className="methods">
+                            {isLoading ? (
+                              <Skeleton width={150} height={20} />
+                            ) : (
+                              "Cash on Delivery"
+                            )}
+                          </span>
+                          <span>
+                            {isLoading ? (
+                              <Skeleton circle width={20} height={20} />
+                            ) : (
+                              <input
+                                type="radio"
+                                name="payment-method"
+                                value="cod"
+                                checked={selectedPaymentMethod === "cod"}
+                                onChange={handlePaymentMethodChange}
+                              />
+                            )}
+                          </span>
+                          {selectedPaymentMethod === "cod" && (
+                            <div className="continue-wrapper">
+                              <button
+                                onClick={() => handlePlaceOrder("cod")}
+                                className="summary-place-order-btn"
+                              >
+                                {isOrdering ? (
+                                  <img
+                                    src={orderTruck}
+                                    alt="Ordering..."
+                                    style={{ height: "100px", padding: "1px" }}
+                                  />
+                                ) : isLoading ? (
+                                  <Skeleton width={100} height={40} />
+                                ) : (
+                                  "Order Now"
+                                )}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+          
+                        {/* Pay Online */}
+                        <div
+                          className={`summary-item2 ${
+                            selectedPaymentMethod === "card" ? "selected" : ""
+                          }`}
+                        >
+                          {isLoading ? (
+                            <Skeleton width={50} height={50} />
+                          ) : (
+                            <FaCreditCard
+                              className="payment-icon"
+                              style={{ color: "skyblue" }}
+                            />
+                          )}
+                          <span className="methods">
+                            {isLoading ? (
+                              <Skeleton width={150} height={20} />
+                            ) : (
+                              "Pay Online"
+                            )}
+                          </span>
+                          <span>
+                            {isLoading ? (
+                              <Skeleton circle width={20} height={20} />
+                            ) : (
+                              <input
+                                type="radio"
+                                name="payment-method"
+                                value="card"
+                                checked={selectedPaymentMethod === "card"}
+                                onChange={handlePaymentMethodChange}
+                              />
+                            )}
+                          </span>
+                          {selectedPaymentMethod === "card" && (
+                            <div className="continue-wrapper">
+                              <button
+                                className="pay-btn"
+                                onClick={() => handlePayment("Online")}
+                              >
+                                {isLoading ? (
+                                  <Skeleton width={100} height={40} />
+                                ) : (
+                                  "Pay Now"
+                                )}
+          
+                                <div class="icon-container">
+                                  <svg viewBox="0 0 24 24" class="icon5 card-icon">
+                                    <path
+                                      d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18C2,19.11 2.89,20 4,20H20C21.11,20 22,19.11 22,18V6C22,4.89 21.11,4 20,4Z"
+                                      fill="currentColor"
+                                    ></path>
+                                  </svg>
+                                  <svg viewBox="0 0 24 24" class="icon5 paymentt-icon">
+                                    <path
+                                      d="M2,17H22V21H2V17M6.25,7H9V6H6V3H18V6H15V7H17.75L19,17H5L6.25,7M9,10H15V8H9V10M9,13H15V11H9V13Z"
+                                      fill="currentColor"
+                                    ></path>
+                                  </svg>
+                                  <svg viewBox="0 0 24 24" class="icon5 dollar-icon">
+                                    <path
+                                      d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"
+                                      fill="currentColor"
+                                    ></path>
+                                  </svg>
+          
+                                  <svg
+                                    viewBox="0 0 24 24"
+                                    class="icon5 wallet-icon default-icon"
+                                  >
+                                    <path
+                                      d="M21,18V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V6H12C10.89,6 10,6.9 10,8V16A2,2 0 0,0 12,18M12,16H22V8H12M16,13.5A1.5,1.5 0 0,1 14.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,12A1.5,1.5 0 0,1 16,13.5Z"
+                                      fill="currentColor"
+                                    ></path>
+                                  </svg>
+          
+                                  <svg viewBox="0 0 24 24" class="icon5 check-icon">
+                                    <path
+                                      d="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z"
+                                      fill="currentColor"
+                                    ></path>
+                                  </svg>
+                                </div>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+          
+                        {/* Pick Up From Store */}
+                        <div
+                          className={`summary-item2 ${
+                            selectedPaymentMethod === "pickup" ? "selected" : ""
+                          }`}
+                        >
+                          {isLoading ? (
+                            <Skeleton width={50} height={50} />
+                          ) : (
+                            <FaStore
+                              className="payment-icon"
+                              style={{ color: "orange" }}
+                            />
+                          )}
+                          <span className="methods">
+                            {isLoading ? (
+                              <Skeleton width={200} height={20} />
+                            ) : (
+                              "Pick Up From Store"
+                            )}
+                          </span>
+                          <span>
+                            {isLoading ? (
+                              <Skeleton circle width={20} height={20} />
+                            ) : (
+                              <input
+                                type="radio"
+                                name="payment-method"
+                                value="pickup"
+                                checked={selectedPaymentMethod === "pickup"}
+                                onChange={handlePaymentMethodChange}
+                              />
+                            )}
+                          </span>
+                          {selectedPaymentMethod === "pickup" && (
+                            <div className="continue-wrapper">
+                              <button
+                                onClick={() => handlePlaceOrder("pickup")}
+                                className="summary-place-order-btn"
+                              >
+                                {isOrdering ? (
+                                  <img
+                                    src={orderTruck}
+                                    alt="Ordering..."
+                                    style={{ height: "100px", padding: "1px" }}
+                                  />
+                                ) : isLoading ? (
+                                  <Skeleton width={100} height={40} />
+                                ) : (
+                                  "Order Now"
+                                )}
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div
-                className={`summary-item2 ${
-                  selectedPaymentMethod === "pickup" ? "selected" : ""
-                }`}
-              >
-                <FaStore className="payment-icon" style={{ color: "orange" }} />
-                <span className="methods">Pick Up From Store</span>
-                <span>
-                  <input
-                    type="radio"
-                    name="payment-method"
-                    value="pickup"
-                    checked={selectedPaymentMethod === "pickup"}
-                    onChange={handlePaymentMethodChange}
-                  />
-                </span>
-                {selectedPaymentMethod === "pickup" && (
-                  <div className="continue-wrapper">
-                    <button
-                      onClick={() => handlePlaceOrder("pickup")} // Pass "cod" to handlePayment function
-                      className="summary-place-order-btn"
-                    >
-                      {isOrdering ? (
-                        <img
-                          src={orderTruck}
-                          alt="Ordering..."
-                          style={{ height: "100px", padding: "1px" }}
-                        />
-                      ) : (
-                        "Order Now"
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
             {isModalOpen && (
               <div className="modal4-overlay">
                 <div className="modal4-content">

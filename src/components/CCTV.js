@@ -522,6 +522,9 @@ const CCTV = () => {
                   className="product-card"
                   onClick={() => handleCardClick(product)}
                 >
+                  {product.offer_label && (
+                    <div className="product-label">{product.offer_label}</div>
+                  )}
                   <div className="product-actions">
                     <img
                       src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
@@ -658,7 +661,7 @@ const CCTV = () => {
                   <div className="product-actions">
                     <img
                       src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                        images[0]
+                        firstImage
                       }`}
                       alt={product.prod_name}
                       className="product-image"

@@ -36,11 +36,16 @@ const CartPage = () => {
 
   const userid = localStorage.getItem("user_id");
   const [selectedProducts, setSelectedProducts] = useState([]);
-
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const { isOfferActive, product } = location.state || {}; // Ensure it doesn't break if undefined
 
   console.log("Received in Cart:", { isOfferActive, product });
+
+  useEffect(() => {
+    // Simulate loading delay (remove this in real API calls)
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
 
   const handleViewCheckout = () => {
     navigate("/Checkout", { state: { isOfferActive, product } });
@@ -373,7 +378,9 @@ const CartPage = () => {
     return cartItems
       .reduce((total, item) => {
         const price = parseFloat(
-          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive
+            ? item.offer_price
+            : item.prod_price
         );
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
 
@@ -387,7 +394,9 @@ const CartPage = () => {
     return cartItems
       .reduce((total, item) => {
         const prod_price = parseFloat(
-          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive
+            ? item.offer_price
+            : item.prod_price
         );
         return total + (isNaN(prod_price) ? 0 : prod_price * item.quantity);
       }, 0)
@@ -398,7 +407,9 @@ const CartPage = () => {
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
         const price = parseFloat(
-          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive
+            ? item.offer_price
+            : item.prod_price
         );
         const discountPerItem = actual_price - price;
         return (
@@ -413,7 +424,9 @@ const CartPage = () => {
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
         const price = parseFloat(
-          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive
+            ? item.offer_price
+            : item.prod_price
         );
         const discountPerItem = actual_price - price;
         return (
@@ -829,8 +842,16 @@ const CartPage = () => {
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
-              {/* <h3>Select a Shipping Address</h3> */}
-              {addressDetails.length > 0 ? (
+              {loading ? (
+                <ul>
+                  <li className="addr-list">
+                    {/* Individual skeletons for each section */}
+                    {/* <div className="address-skeleton address-skeleton-btn"></div> */}
+                    <div className="address-skeleton address-skeleton-title"></div>
+                    <div className="address-skeleton address-skeleton-address"></div>
+                  </li>
+                </ul>
+              ) : addressDetails.length > 0 ? (
                 <ul>
                   {addressDetails.map((address) => (
                     <li
@@ -846,9 +867,7 @@ const CartPage = () => {
                           handleSelectAddressClick(address.address_id)
                         }
                       >
-                        {selectedAddress === address.address_id
-                          ? "Change"
-                          : "Change"}
+                        Change
                       </button>
                       <strong>Delivery to :</strong>
                       <label>
@@ -865,200 +884,144 @@ const CartPage = () => {
                 <div>
                   <p> Please add one address during checkout. </p>
                   <a href="/Useraddress">
-                    <button className="change-btn">Add Address</button>
+                    <button style={{float:"right"}} className="change-btn">Add Address</button>
                   </a>
                 </div>
               )}
             </div>
             <div className="cart-product-cardd">
-              <ul className="cart-list">
-                {cartItems.length === 0 ? (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <p style={{ marginTop: "5px" }}>Your cart is empty.</p>
-                <a href="/">
-                  <button className="change-btn browse-btn">Browse Products</button>
-                </a>
-              </div>
-                ) : (
-                  cartItems.map((item) => {
-                    // Check if image is a stringified array and parse it
-                    const images = Array.isArray(item.prod_img)
-                      ? item.prod_img
-                      : JSON.parse(item.prod_img || "[]"); // Handle if it's a stringified array
+              {loading ? (
+                <ul className="cart-list ">
+                  {/* Skeleton Loader for Cart Items */}
+                  {[...Array(2)].map((_, index) => (
+                    <li
+                      key={index}
+                      className="cart-product d-flex align-items-center"
+                    >
+                      <div className="list-skeleton list-skeleton-image"></div>
+                      <div className="cart-product-details">
+                        <div className="list-skeleton list-skeleton-title"></div>
+                        <div className="list-skeleton list-skeleton-description"></div>
+                      </div>
 
-                    const firstImage = images.length > 0 ? images[0] : null; // Get the first image or fallback to null
+                      <div className="list-skeleton list-skeleton-quantity"></div>
+                      <div className="list-skeleton list-skeleton-price"></div>
+                      <div className="list-skeleton list-skeleton-btn"></div>
+                    </li>
+                  ))}
+                </ul>
+              ) : cartItems.length === 0 ? (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <p style={{ marginTop: "5px" }}>Your cart is empty.</p>
+                  <a href="/">
+                    <button className="change-btn browse-btn">
+                      Browse Products
+                    </button>
+                  </a>
+                </div>
+              ) : (
+                <ul className="cart-list">
+                  {cartItems.length === 0 ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <p style={{ marginTop: "5px" }}>Your cart is empty.</p>
+                      <a href="/">
+                        <button className="change-btn browse-btn">
+                          Browse Products
+                        </button>
+                      </a>
+                    </div>
+                  ) : (
+                    cartItems.map((item) => {
+                      // Check if image is a stringified array and parse it
+                      const images = Array.isArray(item.prod_img)
+                        ? item.prod_img
+                        : JSON.parse(item.prod_img || "[]"); // Handle if it's a stringified array
 
-                    return (
-                      <li
-                        key={item.id}
-                        className="cart-product d-flex align-items-center"
-                      >
-                        <Link
-                          style={{ textDecoration: "none" }}
-                          to={`/product/${item.id}`}
-                        >
-                          {firstImage ? (
-                            <img
-                              src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
-                              alt={item.prod_name || "Product"}
-                              loading="lazy"
-                              className="cart-product-image"
-                              name="image"
-                            />
-                          ) : (
-                            <div className="placeholder-image">
-                              No image available
-                            </div> // Fallback if no image is available
-                          )}
-                        </Link>
-                        <div
-                          style={{ cursor: "pointer" }}
-                          className="cart-product-details"
-                          key={item.id}
-                          onClick={() => handleProductClick(item.id)}
-                        >
-                          <Link
-                            style={{ textDecoration: "none", color: "#333" }}
-                            to={`/product/${item.id}`}
-                          >
-                            <p className="cart-product-name">
-                              {item.prod_name}
-                            </p>
-                            {/* <p className="cart-product-description">{item.description}</p> */}
-                          </Link>
-                        </div>
-                        <div className="cart-product-price">
-                          <div className="cart-quantity-controls">
-                            <button
-                              onClick={() =>
-                                updateCartItemQuantity(
-                                  item.id,
-                                  item.quantity - 1
-                                )
-                              }
-                            >
-                              -
-                            </button>
-                            <span>{item.quantity}</span>
-                            <button
-                              onClick={() =>
-                                updateCartItemQuantity(
-                                  item.id,
-                                  item.quantity + 1
-                                )
-                              }
-                            >
-                              +
-                            </button>
-                            <FaTrash
-                              className="cart-remove-btn"
-                              onClick={() =>
-                                removeFromCart(
-                                  item.id,
-                                  item.prod_name,
-                                  item.quantity
-                                )
-                              }
-                            />
-                          </div>
-                          <p
-                            style={{
-                              color: "red",
-                              textDecoration: "line-through",
-                              fontSize: "13px",
-                              marginRight: "5px",
-                            }}
-                          >
-                            ₹{item.actual_price * item.quantity}
-                          </p>
-                          <p>
-                            {" "}
-                            ₹
-                            {item.offer_price > 0 && isOfferActive 
-                              ? item.offer_price * item.quantity
-                              : item.prod_price * item.quantity}
-                          </p>
-                          <div>
-                            <label>
-                              <input
-                                style={{ marginLeft: "10px" }}
-                                type="checkbox"
-                                checked={buyLaterItems.includes(item.id)}
-                                onChange={() => handleBuyLaterToggle(item.id)}
-                              />{" "}
-                              {/* Buy Later */}
-                            </label>
-                          </div>
-                        </div>
-                      </li>
-                    );
-                  })
-                )}
-                {cartItems.length > 0 && (
-                  <button
-                    style={{ float: "right", marginRight: "10px" }}
-                    onClick={handleBuyLaterSubmit}
-                    className="Buy-later-btn"
-                  >
-                    Buy Later
-                  </button>
-                )}
-              </ul>
-            </div>
-            {buyLaterProducts.length > 0 && (
-              <div className="cart-product-card">
-                <strong style={{ fontSize: "1.0rem" }}>BUY LATER ITEMS</strong>
-                <div className="cart-list-container">
-                  <ul className="cart-list">
-                    {buyLaterProducts.map((product) => {
-                      const images = Array.isArray(product.prod_img)
-                        ? product.prod_img
-                        : JSON.parse(product.prod_img || "[]");
-                      const firstImage = images.length > 0 ? images[0] : null;
+                      const firstImage = images.length > 0 ? images[0] : null; // Get the first image or fallback to null
 
                       return (
                         <li
-                          key={product.prod_id}
+                          key={item.id}
                           className="cart-product d-flex align-items-center"
                         >
-                          {firstImage ? (
-                            <div
-                              key={product.id}
-                              onClick={() => handleProductClick(product.id)}
-                              style={{ cursor: "pointer" }}
-                            >
+                          <Link
+                            style={{ textDecoration: "none" }}
+                            to={`/product/${item.id}`}
+                          >
+                            {firstImage ? (
                               <img
-                                src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
-                                alt={product.name}
+                                src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
+                                alt={item.prod_name || "Product"}
                                 loading="lazy"
                                 className="cart-product-image"
+                                name="image"
                               />
-                            </div>
-                          ) : (
-                            <div className="placeholder-image">
-                              No image available
-                            </div>
-                          )}
-
+                            ) : (
+                              <div className="placeholder-image">
+                                No image available
+                              </div> // Fallback if no image is available
+                            )}
+                          </Link>
                           <div
                             style={{ cursor: "pointer" }}
                             className="cart-product-details"
-                            key={product.id}
-                            onClick={() => handleProductClick(product.id)}
+                            key={item.id}
+                            onClick={() => handleProductClick(item.id)}
                           >
-                            <p className="cart-product-name">
-                              {product.prod_name}
-                            </p>
-                            <p className="cart-product-description">
-                              {product.prod_features}
-                            </p>
+                            <Link
+                              style={{ textDecoration: "none", color: "#333" }}
+                              to={`/product/${item.id}`}
+                            >
+                              <p className="cart-product-name">
+                                {item.prod_name}
+                              </p>
+                              {/* <p className="cart-product-description">{item.description}</p> */}
+                            </Link>
                           </div>
-
                           <div className="cart-product-price">
                             <div className="cart-quantity-controls">
+                              <button
+                                onClick={() =>
+                                  updateCartItemQuantity(
+                                    item.id,
+                                    item.quantity - 1
+                                  )
+                                }
+                              >
+                                -
+                              </button>
+                              <span>{item.quantity}</span>
+                              <button
+                                onClick={() =>
+                                  updateCartItemQuantity(
+                                    item.id,
+                                    item.quantity + 1
+                                  )
+                                }
+                              >
+                                +
+                              </button>
                               <FaTrash
                                 className="cart-remove-btn"
-                                onClick={() => handleRemoveBuyLater(product.id)}
+                                onClick={() =>
+                                  removeFromCart(
+                                    item.id,
+                                    item.prod_name,
+                                    item.quantity
+                                  )
+                                }
                               />
                             </div>
                             <p
@@ -1069,61 +1032,210 @@ const CartPage = () => {
                                 marginRight: "5px",
                               }}
                             >
-                              ₹{product.actual_price}
+                              ₹{item.actual_price * item.quantity}
                             </p>
                             <p>
+                              {" "}
                               ₹
-                              {product.offer_price > 0 && isOfferActive 
-                                ? product.offer_price
-                                : product.prod_price}
+                              {item.offer_price > 0 && isOfferActive
+                                ? item.offer_price * item.quantity
+                                : item.prod_price * item.quantity}
                             </p>
-
                             <div>
                               <label>
                                 <input
+                                  style={{ marginLeft: "10px" }}
                                   type="checkbox"
-                                  checked={selectedProducts.includes(
-                                    product.id
-                                  )}
-                                  onChange={() =>
-                                    handleCheckboxChange(product.id)
-                                  }
+                                  checked={buyLaterItems.includes(item.id)}
+                                  onChange={() => handleBuyLaterToggle(item.id)}
                                 />{" "}
+                                {/* Buy Later */}
                               </label>
                             </div>
                           </div>
                         </li>
                       );
-                    })}
-                  </ul>
+                    })
+                  )}
+                  {cartItems.length > 0 && (
+                    <button
+                      style={{ float: "right", marginRight: "10px" }}
+                      onClick={handleBuyLaterSubmit}
+                      className="Buy-later-btn"
+                    >
+                      Buy Later
+                    </button>
+                  )}
+                </ul>
+              )}
+              {/* {cartItems.length > 0 && (
+        <button style={{ float: "right", marginRight: "10px" }} onClick={handleBuyLaterSubmit} className="Buy-later-btn">
+          Buy Later
+        </button>
+      )} */}
+            </div>
 
-                  <button
-                    style={{ float: "right", marginRight: "10px" }}
-                    onClick={handleAddToCart}
-                    className="Addtocart-btn"
-                  >
-                    Move To Cart{" "}
-                    <span style={{ marginLeft: "10px" }}>
-                      <FaShoppingBag />
-                    </span>
-                  </button>
-                </div>
+            {isLoading ? (
+              <div className="skeleton-buy-later-card">
+                <div className="buy-later-skeleton skeleton-buy-later-title"></div>
+                {[...Array(3)].map((_, index) => (
+                  <div key={index} className="skeleton-buy-later-item">
+                    <div className="buy-later-skeleton skeleton-buy-later-image"></div>
+                    <div className="skeleton-buy-later-details">
+                      <div className="buy-later-skeleton skeleton-buy-later-name"></div>
+                      <div className="buy-later-skeleton skeleton-buy-later-description"></div>
+                    </div>
+                    <div className="buy-later-skeleton skeleton-buy-later-price"></div>
+                  </div>
+                ))}
+                <div className="buy-later-skeleton skeleton-buy-later-btn"></div>
               </div>
+            ) : (
+              buyLaterProducts.length > 0 && (
+                <div className="cart-product-card">
+                  <strong style={{ fontSize: "1.0rem" }}>
+                    BUY LATER ITEMS
+                  </strong>
+                  <div className="cart-list-container">
+                    <ul className="cart-list">
+                      {buyLaterProducts.map((product) => {
+                        const images = Array.isArray(product.prod_img)
+                          ? product.prod_img
+                          : JSON.parse(product.prod_img || "[]");
+                        const firstImage = images.length > 0 ? images[0] : null;
+
+                        return (
+                          <li
+                            key={product.prod_id}
+                            className="cart-product d-flex align-items-center"
+                          >
+                            {firstImage ? (
+                              <div
+                                key={product.id}
+                                onClick={() => handleProductClick(product.id)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <img
+                                  src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                                  alt={product.name}
+                                  loading="lazy"
+                                  className="cart-product-image"
+                                />
+                              </div>
+                            ) : (
+                              <div className="placeholder-image">
+                                No image available
+                              </div>
+                            )}
+
+                            <div
+                              style={{ cursor: "pointer" }}
+                              className="cart-product-details"
+                              key={product.id}
+                              onClick={() => handleProductClick(product.id)}
+                            >
+                              <p className="cart-product-name">
+                                {product.prod_name}
+                              </p>
+                              <p className="cart-product-description">
+                                {product.prod_features}
+                              </p>
+                            </div>
+
+                            <div className="cart-product-price">
+                              <div className="cart-quantity-controls">
+                                <FaTrash
+                                  className="cart-remove-btn"
+                                  onClick={() =>
+                                    handleRemoveBuyLater(product.id)
+                                  }
+                                />
+                              </div>
+                              <p
+                                style={{
+                                  color: "red",
+                                  textDecoration: "line-through",
+                                  fontSize: "13px",
+                                  marginRight: "5px",
+                                }}
+                              >
+                                ₹{product.actual_price}
+                              </p>
+                              <p>
+                                ₹
+                                {product.offer_price > 0 && isOfferActive
+                                  ? product.offer_price
+                                  : product.prod_price}
+                              </p>
+
+                              <div>
+                                <label>
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedProducts.includes(
+                                      product.id
+                                    )}
+                                    onChange={() =>
+                                      handleCheckboxChange(product.id)
+                                    }
+                                  />{" "}
+                                </label>
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+
+                    <button
+                      style={{ float: "right", marginRight: "10px" }}
+                      onClick={handleAddToCart}
+                      className="Addtocart-btn"
+                    >
+                      Move To Cart{" "}
+                      <span style={{ marginLeft: "10px" }}>
+                        <FaShoppingBag />
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )
             )}
           </div>
+          {isLoading ? (
+  <div className="skeleton-cart-summary">
+    <div className="skeleton skeleton-summary-title"></div>
+    
+    {[...Array(2)].map((_, index) => (
+      <div key={index} className="skeleton-summary-item">
+        <div className="skeleton skeleton-summary-label"></div>
+        <div className="skeleton skeleton-summary-value"></div>
+      </div>
+    ))}
 
+    <hr />
+
+    <div className="skeleton-summary-item">
+      <div className="skeleton skeleton-summary-total-label"></div>
+      <div className="skeleton skeleton-summary-total-value"></div>
+    </div>
+
+    <hr />
+
+    <div className="skeleton skeleton-summary-button"></div>
+  </div>
+) : (
           <div className="cart-summary">
-          <h4 style={{ marginTop: "10px", marginBottom: "5px" }}>
+            <h4 style={{ marginTop: "10px", marginBottom: "5px" }}>
               Price Summary:
             </h4>
             <div className="summary-item">
               <span>
-                Price 
-                {getTotalItemsCount() > 0 && (
-  getTotalItemsCount() === 1 ? " (1 item)" : ` (${getTotalItemsCount()} items)`
-)}
-
-                
+                Price
+                {getTotalItemsCount() > 0 &&
+                  (getTotalItemsCount() === 1
+                    ? " (1 item)"
+                    : ` (${getTotalItemsCount()} items)`)}
               </span>
               <span>₹{calculateSellingPrice()}</span>
             </div>
@@ -1155,11 +1267,11 @@ const CartPage = () => {
             </div>
             <hr />
             <div className="summary-item">
-              {save() > 0 &&
-              <span style={{ color: "green" }}>
-                You will save ₹{save()} on this order
-              </span>}
-              {/* <span>₹10000</span> */}
+              {save() > 0 && (
+                <span style={{ color: "green" }}>
+                  You will save ₹{save()} on this order
+                </span>
+              )}
             </div>
             <button
               className="summary-place-order-btn"
@@ -1223,7 +1335,7 @@ const CartPage = () => {
               </div>
             )}
           </div>
-
+)}
           {/* Address Section */}
         </div>
       </div>
