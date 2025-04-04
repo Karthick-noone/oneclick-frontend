@@ -79,6 +79,7 @@ const handleSubmit = async (e) => {
     Swal.fire({
       icon: "error",
       title: "Oops...",
+      timer:3000,
       html: '<div style="font-size: 2rem;">👎</div> All fields are required!',
       customClass: {
         popup: 'shake-popup',
@@ -120,6 +121,7 @@ const handleSubmit = async (e) => {
         icon: 'success',
         title: '🎉Success!',
         text: 'Login successful! Welcome back!',
+        timer:4000,
         customClass: {
           popup: 'my-popup',
         },

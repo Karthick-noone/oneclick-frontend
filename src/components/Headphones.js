@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ApiUrl } from "./ApiUrl";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // Define a fallback image URL
 // const fallbackImage = require('./img/laptop.jpg'); // Replace with a valid fallback image
@@ -253,7 +254,10 @@ const Headphones = () => {
       localStorage.setItem("Recently-viewed", JSON.stringify(storedProductIds));
   
       // Navigate to product details page
-      navigate(`/product/${product.id}`);
+      const slugify = (name) =>
+        name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+      
+      navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
     } else {
       console.error("Product is undefined or missing ID:", product);
     }
@@ -476,12 +480,12 @@ const Headphones = () => {
   return (
     <div className="computers-page">
       {/* <Header1 /> */}
-      <Header2 category={category} />
+      {/* <Header2 category={category} /> */}
       {/* <Header3 /> */}
       <span style={{ marginLeft: "20px", padding: "10px" }}>
-        <a style={{ textDecoration: "none", color: "black" }} href="/">
+         <Link style={{ textDecoration: "none", color: "black" }} to="/">
           Home{" "}
-        </a>
+        </Link>
         &gt; Headphones
       </span>
       <div className="main-content">

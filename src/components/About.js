@@ -11,7 +11,7 @@ const About = () => {
   return (
     <div className="about-page">
       {/* <Header1 /> */}
-      <Header2 />
+      {/* <Header2 /> */}
       {/* <Header3 /> */}
       <div className="about-content">
         <div className="image-container">

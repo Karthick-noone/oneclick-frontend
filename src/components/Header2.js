@@ -810,7 +810,7 @@ const Header2 = () => {
         className="header2"
       >
         {/* <div className="company-name"> */}
-        <a href="/">
+        <Link to="/">
           <img
             src={logo}
             width={"230px"}
@@ -818,7 +818,7 @@ const Header2 = () => {
             alt="Company Logo"
             // loading="lazy"
           />
-        </a>
+        </Link>
         {/* </div> */}
         <div className="search-box">
           <input
@@ -872,7 +872,8 @@ const Header2 = () => {
 
           {isDropdownOpen && (
             <div className="dropdown-menu" ref={dropdownRef}>
-              <a href="/About">
+              <Link to="/About">
+              {/* <a href="/About"> */}
                 <div
                   className="dropdown-item"
                   onClick={() => handleMenuClick("About")}
@@ -883,8 +884,8 @@ const Header2 = () => {
                   />
                   <span>About</span>
                 </div>
-              </a>
-              <a href="/Contact">
+              </Link>
+              <Link to="/Contact">
                 <div
                   className="dropdown-item"
                   onClick={() => handleMenuClick("Contact")}
@@ -895,8 +896,8 @@ const Header2 = () => {
                   />
                   <span>Contact</span>
                 </div>
-              </a>
-              <a href="/HelpCenter">
+              </Link>
+              <Link to="/HelpCenter">
                 <div
                   className="dropdown-item"
                   onClick={() => handleMenuClick("Help Center")}
@@ -907,7 +908,7 @@ const Header2 = () => {
                   />
                   <span>Help Center</span>
                 </div>
-              </a>
+              </Link>
             </div>
           )}
           {/* <FaHeart
@@ -952,23 +953,23 @@ const Header2 = () => {
             {isDropdownOpen4 && (
               <div ref={dropdownRef} className="dropdownnn-container">
                 <div className="dropdownnn-content">
-                  <a href="/UserAddress">
+                  <Link to="/UserAddress" onClick={() => setIsDropdownOpen4(false)}>
                     <FaAddressBook
                       style={{ color: "#333" }}
                       className="iicon"
                     />{" "}
                     My Addresses
-                  </a>
-                  {/* <a href="/my-subscription"><FaCalendarCheck /> My Subscription</a> */}
-                  <a href="/MyAccount">
+                  </Link>
+                  {/* <a to="/my-subscription"><FaCalendarCheck /> My Subscription</a> */}
+                  <Link to="/MyAccount" onClick={() => setIsDropdownOpen4(false)}>
                     <FaUser style={{ color: "#333" }} className="iicon" /> My
                     Account
-                  </a>
-                  <a href="/MyOrders">
+                  </Link>
+                  <Link to="/MyOrders" onClick={() => setIsDropdownOpen4(false)}>
                     <FaBox style={{ color: "#333" }} className="iicon" /> My
                     Orders
-                  </a>
-                  <a href="/Cart" className="cart-link">
+                  </Link>
+                  <Link to="/Cart" className="cart-link" onClick={() => setIsDropdownOpen4(false)}>
                     <FaShoppingBag
                       style={{ color: "#333" }}
                       className="iicon"
@@ -982,12 +983,12 @@ const Header2 = () => {
                       )}
                       Cart
                     </div>
-                  </a>
+                  </Link>
 
                   <hr />
-                  <a href="#" onClick={handleLogout}>
+                  <Link to="#" onClick={() => { handleLogout(); setIsDropdownOpen4(false); }}>
                     <FaPowerOff style={{ color: "#333" }} /> Logout
-                  </a>
+                  </Link>
                 </div>
               </div>
             )}
@@ -1029,6 +1030,7 @@ const Header2 = () => {
                       <Link
                         style={{ textDecoration: "none" }}
                         to={`/product/${item.id}`}
+                        onClick={() => setIsSidebarOpen(false)}
                       >
                         {firstImage ? (
                           <img
@@ -1046,6 +1048,8 @@ const Header2 = () => {
                         <Link
                           style={{ textDecoration: "none" }}
                           to={`/product/${item.id}`}
+                        onClick={() => setIsSidebarOpen(false)}
+
                         >
                           <h3 className="item-name">{item.prod_name}</h3>
                           <p className="item-features">{item.prod_features}</p>
@@ -1107,9 +1111,10 @@ const Header2 = () => {
             )}
             <div className="cart-total">
               <div className="sidebarcart-footer">
-                <a
+                <Link
                   style={{ textDecoration: "none", color: "black" }}
-                  href="/Cart"
+                  to="/Cart"
+                onClick={() => setIsSidebarOpen(false)}
                 >
                   {/* <button className="change-btn" onClick={handleViewCart}>
                     View Cart <FaShoppingCart />
@@ -1143,7 +1148,7 @@ const Header2 = () => {
                       </svg>
                     </div>
                   </button>
-                </a>
+                </Link>
 
                 <p className="total-prices">₹{calculateTotalPrice()}</p>  
 

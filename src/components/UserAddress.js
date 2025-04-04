@@ -626,7 +626,7 @@ const handleUpdate = async (e) => {
 
   return (
     <>
-      <Header2 />
+      {/* <Header2 /> */}
       <a href="/Checkout"><button className="back-to-cart-button"><FaShoppingCart /> Checkout </button></a>
 
       <div className="address-page-container">

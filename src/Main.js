@@ -18,7 +18,7 @@ const Main = () => {
     return (
         <div>
             {/* <Header1 /> */}
-            <Header2 />
+            {/* <Header2 /> */}
             {/* <Header3 /> */}
             <Homepage />
 

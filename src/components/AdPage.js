@@ -6,6 +6,7 @@ import axios from "axios";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
+import { Link } from "react-router-dom";
 
 // Fetch function for TanStack Query
 const fetchAds = async () => {
@@ -77,14 +78,14 @@ const AdPage = () => {
                     <div className="ad">
                       <div className="ad-image-card">
                         {ad.images.map((img, imgIndex) => (
-                          <a href={`/${ad.category}`} key={imgIndex}>
+                          <Link to={`/${ad.category}`} key={imgIndex}>
                             <img
                               src={`${ApiUrl}/uploads/doubleadpage/${img}`}
                               alt={`Ad ${imgIndex + 1}`}
                               className="add-image"
                               loading="lazy"
                             />
-                          </a>
+                          </Link>
                         ))}
                       </div>
                     </div>
@@ -96,14 +97,14 @@ const AdPage = () => {
                 <div key={ad.id || index} className="ad">
                   <div className="ad-image-card">
                     {ad.images.map((img, imgIndex) => (
-                      <a href={`/${ad.category}`} key={imgIndex}>
+                      <Link to={`/${ad.category}`} key={imgIndex}>
                         <img
                           src={`${ApiUrl}/uploads/doubleadpage/${img}`}
                           alt={`Ad ${imgIndex + 1}`}
                           className="add-image"
                           loading="lazy"
                         />
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </div>

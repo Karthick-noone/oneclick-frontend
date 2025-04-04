@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   FaHome,
   FaLaptop,
@@ -123,17 +123,18 @@ const Header3 = () => {
         {isOpen ? "✖" : "☰"}
       </div>
       <nav className={`nav ${isOpen ? "open" : ""}`}>
-        <NavLink
+        <Link
           to="/"
           exact
           className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
         >
+          
           <FaHome
             className={`fa-icons ${location.pathname === "/" ? "active" : ""}`}
           />{" "}
           {isOpen ? "Home" : ""}
-        </NavLink>
-        <NavLink
+        </Link>
+        <Link
           to="/ComputerAd"
           className={`nav-link ${
             location.pathname.startsWith("/computers") ||
@@ -151,9 +152,9 @@ const Header3 = () => {
             }`}
           />{" "}
           Computers
-        </NavLink>
+        </Link>
 
-        <NavLink
+        <Link
           to="/MobileAd"
           className={`nav-link ${
             location.pathname.startsWith("/mobiles") ||
@@ -171,9 +172,9 @@ const Header3 = () => {
             }`}
           />{" "}
           Mobile
-        </NavLink>
+        </Link>
 
-        <NavLink
+        <Link
           to="/CCTVAd"
           className={`nav-link ${
             location.pathname.startsWith("/cctv") ||
@@ -191,7 +192,7 @@ const Header3 = () => {
             }`}
           />{" "}
           CCTV
-        </NavLink>
+        </Link>
 
         {/* Parent Audio link */}
         <div
@@ -206,7 +207,7 @@ const Header3 = () => {
           </span>
           {showHeadphones && (
             <div className="dropdown">
-              <NavLink
+              <Link
                 to="/Headphones"
                 className={`nav-link ${
                   location.pathname === "/Headphones" ? "active" : ""
@@ -218,8 +219,8 @@ const Header3 = () => {
                   }`}
                 />{" "}
                 Headphones
-              </NavLink>
-              <NavLink
+              </Link>
+              <Link
                 to="/Speakers"
                 className={`nav-link ${
                   location.pathname === "/Speakers" ? "active" : ""
@@ -231,11 +232,11 @@ const Header3 = () => {
                   }`}
                 />{" "}
                 Speakers
-              </NavLink>
+              </Link>
             </div>
           )}
         </div>
-        <NavLink
+        <Link
           to="/TV"
           className={`nav-link ${
             location.pathname === "/TV" ? "active" : ""
@@ -247,8 +248,8 @@ const Header3 = () => {
             }`}
           />{" "}
           T.V & Home Cinema
-        </NavLink>
-        <NavLink
+        </Link>
+        <Link
           to="/Watch"
           className={`nav-link ${
             location.pathname === "/Watch" ? "active" : ""
@@ -260,8 +261,8 @@ const Header3 = () => {
             }`}
           />{" "}
           Wearable Tech
-        </NavLink>
-        <NavLink
+        </Link>
+        <Link
           to="/Printers"
           className={`nav-link ${
             location.pathname === "/Printers" ? "active" : ""
@@ -273,7 +274,7 @@ const Header3 = () => {
             }`}
           />{" "}
           Printers
-        </NavLink>
+        </Link>
 
         {/* Parent Accessories link */}
         <div
@@ -288,7 +289,7 @@ const Header3 = () => {
           </span>
           {showMore && (
             <div className="dropdown">
-              <NavLink
+              <Link
                 to="/ComputerAccessories"
                 className={`nav-link ${
                   isComputerAccessoriesActive ? "active" : ""
@@ -300,8 +301,8 @@ const Header3 = () => {
                   }`}
                 />{" "}
                 Computer Accessories
-              </NavLink>
-              <NavLink
+              </Link>
+              <Link
                 to="/MobileAccessories"
                 className={`nav-link ${
                   isMobileAccessoriesActive ? "active" : ""
@@ -313,8 +314,8 @@ const Header3 = () => {
                   }`}
                 />{" "}
                 Mobile Accessories
-              </NavLink>
-              <NavLink
+              </Link>
+              <Link
                 to="/CCTVAccessories"
                 className={`nav-link ${
                   isCCTVAccessoriesActive ? "active" : ""
@@ -326,8 +327,8 @@ const Header3 = () => {
                   }`}
                 />{" "}
                 CCTV Accessories
-              </NavLink>
-              <NavLink
+              </Link>
+              <Link
                 to="/PrinterAccessories"
                 className={`nav-link ${
                   isPrinterAccessoriesActive ? "active" : ""
@@ -339,11 +340,11 @@ const Header3 = () => {
                   }`}
                 />{" "}
                 Printer Accessories
-              </NavLink>
+              </Link>
             </div>
           )}
         </div>
-        <NavLink
+        <Link
           to="/Secondhandproducts"
           className={`nav-link ${
             location.pathname === "/Secondhandproducts" ? "active" : ""
@@ -355,8 +356,8 @@ const Header3 = () => {
             }`}
           />{" "}
           Refurbish
-        </NavLink>
-        <NavLink
+        </Link>
+        <Link
           to="/About"
           className={`nav-link ${
             location.pathname === "/About" ? "active" : ""
@@ -371,9 +372,9 @@ const Header3 = () => {
             }`}
           />{" "}
           About
-        </NavLink>
+        </Link>
 
-        <NavLink
+        <Link
           to="/Contact"
           className={`nav-link ${
             location.pathname === "/Contact" ? "active" : ""
@@ -388,9 +389,9 @@ const Header3 = () => {
             }`}
           />{" "}
           Contact
-        </NavLink>
+        </Link>
 
-        <NavLink
+        <Link
           to="/HelpCenter"
           className={`nav-link ${
             location.pathname === "/HelpCenter" ? "active" : ""
@@ -405,7 +406,7 @@ const Header3 = () => {
             }`}
           />{" "}
           Help Center
-        </NavLink>
+        </Link>
       </nav>
     </header>
   );

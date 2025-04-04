@@ -198,7 +198,7 @@ const Contact = () => {
   
   return (
     <div>
-      <Header2 />
+      {/* <Header2 /> */}
       <div style={styles.container}>
       <div style={styles.imageContainer}>
     <h2 style={styles.title}>Get in Touch</h2>

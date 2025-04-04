@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useCart } from "../components/CartContext";
 import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const WishlistSidebar = ({
   isOpen,
@@ -20,6 +21,7 @@ const WishlistSidebar = ({
   const [product, setProduct] = useState(null);
   const [isOfferActive, setIsOfferActive] = useState(true);
   const [wishlistLoaded, setWishlistLoaded] = useState(false);
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -181,7 +183,12 @@ const WishlistSidebar = ({
       toast.error('Failed to remove item from wishlist');
     }
   };
-
+  const handleProductClick = (product) => {
+    const slugify = (name) =>
+      name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  
+    navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
+  };
 
   return (
     <div ref={wishlistRef} className={`wishlist-sidebar ${isOpen ? "open" : ""}`}>
@@ -205,7 +212,10 @@ const WishlistSidebar = ({
 
               return (
                 <li key={product.id} className="wishlist-item">
-                  <Link style={{ textDecoration: 'none' }} to={`/product/${product.id}`}>
+                  <div style={{ textDecoration: 'none' }}
+                        onClick={() => {toggleWishlist(false);handleProductClick(product);}}
+                  
+                  >
                     {firstImage ? (
                       <img
                         src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
@@ -217,12 +227,19 @@ const WishlistSidebar = ({
                     ) : (
                       <div className="placeholder-image">No image available</div>
                     )}
-                  </Link>
+                  </div>
                   <div className="item-details">
-                    <Link style={{ textDecoration: 'none' }} to={`/product/${product.id}`}>
-                      <h3 className="item-name">{product.prod_name}</h3>
-                      <p className="item-features">{product.prod_features}</p>
-                    </Link>
+                  <div
+  style={{ textDecoration: 'none', cursor: 'pointer' }}
+  onClick={() => {
+    toggleWishlist(false);
+    handleProductClick(product);
+  }}
+>
+  <h3 className="item-name">{product.prod_name}</h3>
+  <p className="item-features">{product.prod_features}</p>
+</div>
+
                   </div>
                   <div className="item-actions">
                   <p className="item-price" style={{ color: 'red',textDecoration:"line-through", fontSize:'12px' }}>₹{product.actual_price}</p>

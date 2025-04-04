@@ -149,7 +149,7 @@ const MyAccount = () => {
 
   return (
     <>
-    <Header2 />
+    {/* <Header2 /> */}
     <div className="ac-banner-container">
       <img src={fullad} loading="lazy" alt="Banner" className="ac-banner-image" />
       <div className="ac-banner-text-container">

@@ -35,7 +35,7 @@ const AdBanner = () => {
 
   return (
     <>
-      <Header2 />
+      {/* <Header2 /> */}
       <div className="ad-section-container4">
         {/* Banner Images */}
         <div className="box">

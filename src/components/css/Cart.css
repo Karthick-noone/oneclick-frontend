@@ -2,1103 +2,775 @@
 /* From Uiverse.io by fthisilak */ 
 .pay-btn {
 
-    background: #ff5722;
-    color: white;
-    border: none;
-    padding: 10px;
-    width: 100%;
-    cursor: pointer;
-    font-size: 1.1em;
-    height: 50px; /* Set a fixed height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden; /* Prevent extra space */
-  
+  background: #ff5722;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  cursor: pointer;
+  font-size: 1.1em;
+  height: 50px; /* Set a fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Prevent extra space */
+
 }
 
 .pay-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+transform: translateY(-2px);
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
 .icon-container {
-  position: relative;
-  width: 24px;
-  height: 24px;
+position: relative;
+width: 24px;
+height: 24px;
 }
 
 .icon5 {
-  position: absolute;
-  top: 0;
-  left: 10;
-  width: 24px;
-  height: 24px;
-  color: white;
-  opacity: 0;
-  visibility: hidden;
+position: absolute;
+top: 0;
+left: 10;
+width: 24px;
+height: 24px;
+color: white;
+opacity: 0;
+visibility: hidden;
 }
 
 .default-icon {
-  opacity: 1;
-  visibility: visible;
+opacity: 1;
+visibility: visible;
 }
 
 /* Hover animations */
 .pay-btn:hover .icon5 {
-  animation: none;
+animation: none;
 }
 
 .pay-btn:hover .wallet-icon {
-  opacity: 0;
-  visibility: hidden;
+opacity: 0;
+visibility: hidden;
 }
 
 .pay-btn:hover .card-icon {
-  animation: iconRotate 2.5s infinite;
-  animation-delay: 0s;
+animation: iconRotate 2.5s infinite;
+animation-delay: 0s;
 }
 
 .pay-btn:hover .paymentt-icon {
-  animation: iconRotate 2.5s infinite;
-  animation-delay: 0.5s;
+animation: iconRotate 2.5s infinite;
+animation-delay: 0.5s;
 }
 
 .pay-btn:hover .dollar-icon {
-  animation: iconRotate 2.5s infinite;
-  animation-delay: 1s;
+animation: iconRotate 2.5s infinite;
+animation-delay: 1s;
 }
 
 .pay-btn:hover .check-icon {
-  animation: iconRotate 2.5s infinite;
-  animation-delay: 1.5s;
+animation: iconRotate 2.5s infinite;
+animation-delay: 1.5s;
 }
 
 /* Active state - show only checkmark */
 .pay-btn:active .icon5 {
-  animation: none;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
+animation: none;
+opacity: 0;
+visibility: hidden;
+transition: all 0.3s ease;
 }
 
 .pay-btn:active .check-icon {
-  animation: checkmarkAppear 0.6s ease forwards;
-  visibility: visible;
+animation: checkmarkAppear 0.6s ease forwards;
+visibility: visible;
 }
 
 .btn-text {
-  font-weight: 600;
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
+font-weight: 600;
+font-family:
+  system-ui,
+  -apple-system,
+  sans-serif;
 }
 
 @keyframes iconRotate {
-  0% {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(10px) scale(0.5);
-  }
-  5% {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-  }
-  15% {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-  }
-  20% {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px) scale(0.5);
-  }
-  100% {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px) scale(0.5);
-  }
+0% {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px) scale(0.5);
+}
+5% {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+15% {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+20% {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.5);
+}
+100% {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px) scale(0.5);
+}
 }
 
 @keyframes checkmarkAppear {
-  0% {
-    opacity: 0;
-    transform: scale(0.5) rotate(-45deg);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.2) rotate(0deg);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
+0% {
+  opacity: 0;
+  transform: scale(0.5) rotate(-45deg);
+}
+50% {
+  opacity: 0.5;
+  transform: scale(1.2) rotate(0deg);
+}
+100% {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
 }
 
 
 /* General styles */
 .cart-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: auto;
+padding: 20px;
+max-width: 1200px;
+margin: auto;
 }
 
 .discount-message {
-  color: green;
+color: green;
 }
 .browse-btn {
-  float: right !important;
+float: right !important;
 }
 
 .cart-header h1 {
-  margin: 0;
-  font-size: 2em;
+margin: 0;
+font-size: 2em;
 }
 
 .cart-content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
+display: flex;
+flex-wrap: wrap;
+gap: 30px;
 }
 
 .cart-products {
-  width: 67%;
+width: 67%;
 }
 
 .cart-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+list-style: none;
+padding: 0;
+margin: 0;
 }
 
 .cart-product {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px; /* Reduce the bottom margin */
-  padding: 10px; /* Reduce the padding */
-  border-bottom: 1px solid #ddd;
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 10px; /* Reduce the bottom margin */
+padding: 10px; /* Reduce the padding */
+border-bottom: 1px solid #ddd;
 }
 
 .cart-product-image {
-  width: 100px;
-  height: auto;
-  margin-right: 20px;
+width: 100px;
+height: auto;
+margin-right: 20px;
 }
 
 .cart-product-details {
-  flex-grow: 1;
-  padding-right: 10px;
+flex-grow: 1;
+padding-right: 10px;
 }
 
 .cart-product-name {
-  margin: 0;
-  font-size: 1em;
+margin: 0;
+font-size: 1em;
 }
 
 .cart-product-description {
-  margin: 5px 0 0;
-  color: #666;
+margin: 5px 0 0;
+color: #666;
 }
 
 .buy-product-name {
-  margin: 0;
-  font-size: 1em;
+margin: 0;
+font-size: 1em;
 }
 
 .buy-product-description {
-  margin: 5px 0 0;
-  color: #666;
-  width: 30%;
+margin: 5px 0 0;
+color: #666;
+width: 30%;
 }
 .cart-product-description {
-  display: -webkit-box; /* Use a box layout for controlling text lines */
-  -webkit-box-orient: vertical; /* Set orientation to vertical */
-  overflow: hidden; /* Hide any overflowing content */
-  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
-  white-space: normal; /* Allow text to wrap */
+display: -webkit-box; /* Use a box layout for controlling text lines */
+-webkit-box-orient: vertical; /* Set orientation to vertical */
+overflow: hidden; /* Hide any overflowing content */
+text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+white-space: normal; /* Allow text to wrap */
 
-  font-size: 16px; /* Adjust as per your design */
-  line-height: 1.5; /* Set line height */
-  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+font-size: 16px; /* Adjust as per your design */
+line-height: 1.5; /* Set line height */
+max-height: 3em; /* 1.5 * 2 lines = 3em max height */
 }
 
 .buy-product-description {
-  display: -webkit-box; /* Use a box layout for controlling text lines */
-  -webkit-box-orient: vertical; /* Set orientation to vertical */
-  overflow: hidden; /* Hide any overflowing content */
-  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
-  white-space: normal; /* Allow text to wrap */
+display: -webkit-box; /* Use a box layout for controlling text lines */
+-webkit-box-orient: vertical; /* Set orientation to vertical */
+overflow: hidden; /* Hide any overflowing content */
+text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+white-space: normal; /* Allow text to wrap */
 
-  font-size: 16px; /* Adjust as per your design */
-  line-height: 1.5; /* Set line height */
-  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+font-size: 16px; /* Adjust as per your design */
+line-height: 1.5; /* Set line height */
+max-height: 3em; /* 1.5 * 2 lines = 3em max height */
 }
 .cart-product-name {
-  display: -webkit-box; /* Use a box layout for controlling text lines */
-  -webkit-box-orient: vertical; /* Set orientation to vertical */
-  overflow: hidden; /* Hide any overflowing content */
-  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
-  white-space: normal; /* Allow text to wrap */
+display: -webkit-box; /* Use a box layout for controlling text lines */
+-webkit-box-orient: vertical; /* Set orientation to vertical */
+overflow: hidden; /* Hide any overflowing content */
+text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+white-space: normal; /* Allow text to wrap */
 
-  font-size: 16px; /* Adjust as per your design */
-  line-height: 1.5; /* Set line height */
-  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+font-size: 16px; /* Adjust as per your design */
+line-height: 1.5; /* Set line height */
+max-height: 3em; /* 1.5 * 2 lines = 3em max height */
 }
 
 .buy-product-name {
-  display: -webkit-box; /* Use a box layout for controlling text lines */
-  -webkit-box-orient: vertical; /* Set orientation to vertical */
-  overflow: hidden; /* Hide any overflowing content */
-  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
-  white-space: normal; /* Allow text to wrap */
+display: -webkit-box; /* Use a box layout for controlling text lines */
+-webkit-box-orient: vertical; /* Set orientation to vertical */
+overflow: hidden; /* Hide any overflowing content */
+text-overflow: ellipsis; /* Add ellipsis at the end of the text */
+white-space: normal; /* Allow text to wrap */
 
-  font-size: 16px; /* Adjust as per your design */
-  line-height: 1.5; /* Set line height */
-  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+font-size: 16px; /* Adjust as per your design */
+line-height: 1.5; /* Set line height */
+max-height: 3em; /* 1.5 * 2 lines = 3em max height */
 }
 
 .cart-product-price {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 250px;
-  position: relative;
+display: flex;
+align-items: center;
+justify-content: space-between;
+width: 250px;
+position: relative;
 }
 
 .cart-quantity-controls {
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
+display: flex;
+align-items: center;
+margin-right: 10px;
 }
 
 .cart-quantity-controls button {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  cursor: pointer;
+width: 30px;
+height: 30px;
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: #f0f0f0;
+border: 1px solid #ccc;
+cursor: pointer;
 }
 
 .cart-quantity-controls span {
-  margin: 0 10px;
+margin: 0 10px;
 }
 
 .cart-remove-btn {
-  color: black;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 17px;
-  margin-left: 15px;
+color: black;
+border: none;
+background: none;
+cursor: pointer;
+font-size: 17px;
+margin-left: 15px;
 }
 
 .cart-summary {
-  border-top: 1px solid #ddd;
-  padding: 10px;
-  width: 29%;
+border-top: 1px solid #ddd;
+padding: 10px;
+width: 29%;
 }
 
 .summary-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
+display: flex;
+justify-content: space-between;
+padding: 5px 0;
 }
 
 .summary-item input {
-  padding: 5px; /* Add padding for comfort */
-  border: 1px solid #ccc; /* Border color */
-  border-radius: 5px; /* Rounded corners */
-  font-size: 16px; /* Font size */
-  outline: none; /* Remove outline on focus */
-  transition: border-color 0.3s; /* Smooth transition for border color */
+padding: 5px; /* Add padding for comfort */
+border: 1px solid #ccc; /* Border color */
+border-radius: 5px; /* Rounded corners */
+font-size: 16px; /* Font size */
+outline: none; /* Remove outline on focus */
+transition: border-color 0.3s; /* Smooth transition for border color */
 }
 
 .summary-item input:focus {
-  border-color: #0056b3; /* Darker border on focus */
+border-color: #0056b3; /* Darker border on focus */
 }
 
 .summary-item button {
-  padding: 5px 10px; /* Add padding for button */
-  background-color: #007bff; /* Button color */
-  color: white; /* Text color */
-  border: none; /* Remove default border */
-  font-size: 14px; /* Font size */
-  cursor: pointer; /* Cursor pointer on hover */
-  transition: background-color 0.3s; /* Smooth transition for background color */
+padding: 5px 10px; /* Add padding for button */
+background-color: #007bff; /* Button color */
+color: white; /* Text color */
+border: none; /* Remove default border */
+font-size: 14px; /* Font size */
+cursor: pointer; /* Cursor pointer on hover */
+transition: background-color 0.3s; /* Smooth transition for background color */
 }
 
 .summary-item button:hover {
-  background-color: #0056b3; /* Darker button color on hover */
+background-color: #0056b3; /* Darker button color on hover */
 }
 
 .summary-total {
-  font-weight: bold;
-  font-size: 1.2em;
+font-weight: bold;
+font-size: 1.2em;
 }
-
-/* Skeleton Base */
-.skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
-  border-radius: 5px;
-}
-
-/* Skeleton for Cart Summary */
-.skeleton-cart-summary {
-  border-top: 1px solid #ddd;
-  padding: 10px;
-  width: 29%;
-  /* background: #fff; */
-  border-radius: 8px;
-  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
-  height: 250px;
-}
-
-/* Skeleton for Price Summary Title */
-.skeleton-summary-title {
-  width: 150px;
-  height: 20px;
-  margin-bottom: 10px;
-  margin-top: 10px;
-}
-
-/* Skeleton for Summary Items */
-.skeleton-summary-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-/* Skeleton for Labels (Price, Delivery Charge, etc.) */
-.skeleton-summary-label {
-  width: 120px;
-  height: 20px;
-}
-
-/* Skeleton for Values (₹ Amounts) */
-.skeleton-summary-value {
-  width: 60px;
-  height: 20px;
-}
-
-/* Skeleton for Total Amount */
-.skeleton-summary-total-label {
-  width: 130px;
-  height: 18px;
-  font-weight: bold;
-  margin-top: 5px;
-}
-
-.skeleton-summary-total-value {
-  width: 70px;
-  height: 18px;
-  font-weight: bold;
-}
-
-/* Skeleton for Checkout Button */
-.skeleton-summary-button {
-  width: 100%;
-  height: 50px;
-  /* border-radius: 5px; */
-  margin-top: 25px;
-}
-
-/* Shimmer Effect */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-
-/* Skeleton Base */
-.login-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
-  border-radius: 5px;
-}
-
-/* login-Skeleton for Login Section */
-
-/* login-Skeleton for Check Icon */
-.login-skeleton-icon {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-}
-
-/* login-Skeleton for Username */
-.skeleton-title {
-  width: 50px;
-  height: 20px;
-  margin-top: 5px;
-}
-
-
-
-
 
 .summary-place-order-btn {
-  background: #ff5722;
-  color: white;
-  border: none;
-  padding: 10px;
-  width: 100%;
-  cursor: pointer;
-  font-size: 1.1em;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: all 0.3s ease-in-out;
+background: #ff5722;
+color: white;
+border: none;
+padding: 10px;
+width: 100%;
+cursor: pointer;
+font-size: 1.1em;
+height: 50px;
+display: flex;
+align-items: center;
+justify-content: center;
+position: relative;
+transition: all 0.3s ease-in-out;
 }
 
 .summary-place-order-btn:hover {
-  box-shadow: 0 0 15px rgba(255, 87, 34, 0.6);
-  transform: scale(1.05);
+box-shadow: 0 0 15px rgba(255, 87, 34, 0.6);
+transform: scale(1.05);
 }
 
 .summary-place-order-btn img {
-  height: 30px; /* Adjust GIF height */
-  width: auto;
+height: 30px; /* Adjust GIF height */
+width: auto;
 }
 
 .summary-place-order-btn2 {
-  background: #ff5722;
-  color: white;
-  border: none;
-  padding: 10px;
-  width: 300px;
-  cursor: pointer;
-  border-radius: 2px;
-  font-size: 1.1em;
+background: #ff5722;
+color: white;
+border: none;
+padding: 10px;
+width: 300px;
+cursor: pointer;
+border-radius: 2px;
+font-size: 1.1em;
 }
 
 /* Styling for the card container */
 .place-order-card {
-  display: flex;
-  justify-content: right;
-  align-items: right;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 100%;
-  margin: 20px auto;
+display: flex;
+justify-content: right;
+align-items: right;
+border: 1px solid #ddd;
+border-radius: 8px;
+padding: 20px;
+background-color: #f9f9f9;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+max-width: 100%;
+margin: 20px auto;
 }
 
 /* Styling for the content inside the card */
 .place-order-content {
-  text-align: right;
+text-align: right;
 }
 /* Responsive styling */
 @media (max-width: 992px) {
-  .cart-products {
-    width: 100%; /* Full width on medium screens */
-  }
+.cart-products {
+  width: 100%; /* Full width on medium screens */
+}
 
-  .cart-summary {
-    width: 100%; /* Full width on medium screens */
-  }
+.cart-summary {
+  width: 100%; /* Full width on medium screens */
+}
 
-  .cart-content {
-    flex-direction: column; /* Stack items vertically */
-  }
+.cart-content {
+  flex-direction: column; /* Stack items vertically */
+}
 }
 
 @media (max-width: 768px) {
-  .cart-address {
-    height: 100px;
-  }
-  .cart-product {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.cart-address {
+  height: 100px;
+}
+.cart-product {
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-  .cart-product-image {
-    width: 80px;
-    margin-bottom: 10px;
-  }
+.cart-product-image {
+  width: 80px;
+  margin-bottom: 10px;
+}
 
-  .cart-product-price {
-    width: 100%;
-    justify-content: space-between;
-  }
+.cart-product-price {
+  width: 100%;
+  justify-content: space-between;
+}
 
-  .cart-product-details {
-    padding-right: 0;
-  }
+.cart-product-details {
+  padding-right: 0;
+}
 
-  .cart-header h1 {
-    font-size: 1.5em;
-  }
+.cart-header h1 {
+  font-size: 1.5em;
+}
 
-  .modal4-content {
-    max-width: 90%;
-    padding: 15px;
-  }
+.modal4-content {
+  max-width: 90%;
+  padding: 15px;
+}
 
-  .modal4-close-btn {
-    font-size: 20px;
-  }
+.modal4-close-btn {
+  font-size: 20px;
+}
 
-  .modal4-confirm-btn {
-    padding: 10px;
-    font-size: 16px;
-  }
+.modal4-confirm-btn {
+  padding: 10px;
+  font-size: 16px;
+}
 }
 
 @media (max-width: 480px) {
-  .modal4-content {
-    max-width: 95%;
-    padding: 10px;
-  }
+.modal4-content {
+  max-width: 95%;
+  padding: 10px;
+}
 
-  .modal4-close-btn {
-    font-size: 18px;
-  }
+.modal4-close-btn {
+  font-size: 18px;
+}
 
-  .modal4-confirm-btn {
-    padding: 8px;
-    font-size: 14px;
-  }
+.modal4-confirm-btn {
+  padding: 8px;
+  font-size: 14px;
+}
 }
 @media (max-width: 576px) {
-  .cart-container {
-    padding: 10px;
-  }
+.cart-container {
+  padding: 10px;
+}
 
-  .cart-header h1 {
-    font-size: 1.2em;
-  }
+.cart-header h1 {
+  font-size: 1.2em;
+}
 
-  .cart-product {
-    padding: 10px;
-    flex-direction: column;
-  }
+.cart-product {
+  padding: 10px;
+  flex-direction: column;
+}
 
-  .cart-product-image {
-    width: 70px;
-  }
+.cart-product-image {
+  width: 70px;
+}
 
-  .cart-product-name {
-    font-size: 0.9em;
-  }
+.cart-product-name {
+  font-size: 0.9em;
+}
 
-  .cart-product-price {
-    width: 100%;
-  }
+.cart-product-price {
+  width: 100%;
+}
 
-  .summary-place-order-btn {
-    font-size: 1em;
-  }
+.summary-place-order-btn {
+  font-size: 1em;
+}
 }
 
 /* Address Section */
 .cart-address {
-  margin-bottom: 10px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  background-color: #ffffff;
-  width: 100%; /* Takes up full width of its container */
-  max-width: 780px; /* Set a maximum width */
-  height: 95px;
-  margin-left: auto;
-  margin-right: auto; /* Centers the address section */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+margin-bottom: 10px;
+padding: 20px;
+border: 1px solid #ddd;
+background-color: #ffffff;
+width: 100%; /* Takes up full width of its container */
+max-width: 780px; /* Set a maximum width */
+height: 95px;
+margin-left: auto;
+margin-right: auto; /* Centers the address section */
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+border-radius: 8px;
 }
 
 .cart-address span {
-  margin-bottom: 15px;
-  font-size: 1.1em;
+margin-bottom: 15px;
+font-size: 1.1em;
 }
 
 .cart-address ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+list-style-type: none;
+padding: 0;
+margin: 0;
 }
 
 .cart-address li {
-  margin-bottom: 10px;
+margin-bottom: 10px;
 }
 
 .cart-address label {
-  font-size: 1.3em;
-  display: flex;
-  align-items: center;
+font-size: 1.3em;
+display: flex;
+align-items: center;
 }
 
 .cart-address input[type="radio"] {
-  margin-right: 10px;
-}
-
-/* Skeleton Base */
-.address-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
-  border-radius: 5px;
-}
-
-/* "Delivery to" Skeleton */
-.address-skeleton-title {
-  width: 120px;
-  height: 16px;
-  margin-bottom: 8px;
-}
-
-/* Address Text Skeleton */
-.address-skeleton-address {
-  width: 100%;
-  height: 40px;
-  margin-bottom: 8px;
-}
-
-/* Button Skeleton */
-.address-skeleton-btn {
-  width: 80px;
-  height: 30px;
-  border-radius: 5px;
-  float: right;
-  top: -20px;
-}
-
-/* Shimmer Animation */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-
-/* Skeleton Base */
-.list-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
-  border-radius: 5px;
-}
-
-/* Image list-Skeleton */
-.list-skeleton-image {
-  width: 100px;
-  height: 100px;
-  border-radius: 8px;
-  margin-right: 20px;
-}
-
-/* list-Skeleton Container */
-.list-skeleton-container {
-  flex-grow: 1;
-}
-
-/* Product Name list-Skeleton */
-.list-skeleton-title {
-  width: 60%;
-  height: 18px;
-  margin-bottom: 6px;
-}
-
-/* Product Description list-Skeleton */
-.list-skeleton-description {
-  width: 80%;
-  height: 14px;
-  margin-bottom: 10px;
-}
-
-/* Quantity Controls list-Skeleton */
-.list-skeleton-quantity {
-  width: 30px;
-  height: 30px;
-  margin-bottom: 10px;
-}
-
-/* Price list-Skeleton */
-.list-skeleton-price {
-  width: 50px;
-  height: 20px;
-  margin-bottom: 8px;
-  margin-left: 10px;
-}
-
-/* Buy Later Button list-Skeleton */
-.list-skeleton-btn {
-  width: 30px;
-  height: 30px;
-  margin-bottom: 10px;
-  margin-left: 10px;
-
-}
-
-/* Shimmer Animation */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-
-/* Skeleton Base */
-.buy-later-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
-  border-radius: 5px;
-}
-
-/* Buy Later Container Skeleton */
-.skeleton-buy-later-card {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  padding: 15px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Skeleton for "BUY LATER ITEMS" Title */
-.skeleton-buy-later-title {
-  width: 150px;
-  height: 20px;
-  margin-bottom: 10px;
-}
-
-/* Skeleton for Individual Items */
-.skeleton-buy-later-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-/* Skeleton for Product Image */
-.skeleton-buy-later-image {
-  width: 100px;
-  height: 100px;
-  border-radius: 5px;
-}
-
-/* Skeleton for Product Details */
-.skeleton-buy-later-details {
-  flex-grow: 1;
-  padding-right: 10px;
-}
-
-/* Skeleton for Product Name */
-.skeleton-buy-later-name {
-  width: 120px;
-  height: 16px;
-  margin-bottom: 6px;
-}
-
-/* Skeleton for Product Description */
-.skeleton-buy-later-description {
-  width: 180px;
-  height: 12px;
-}
-
-/* Skeleton for Price Section */
-.skeleton-buy-later-price {
-  width: 80px;
-  height: 16px;
-  margin-top: 5px;
-}
-
-/* Skeleton for Move to Cart Button */
-.skeleton-buy-later-btn {
-  width: 140px;
-  height: 35px;
-  border-radius: 5px;
-  margin-top: 10px;
-}
-
-/* Shimmer Effect */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-/* Additional Styles */
-.strikethrough {
-  color: red;
-  text-decoration: line-through;
-  font-size: 13px;
-  margin-right: 5px;
-}
-
-.placeholder-image {
-  width: 100px;
-  height: 100px;
-  background-color: #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #777;
-  font-size: 14px;
-  border-radius: 8px;
+margin-right: 10px;
 }
 
 /* Overlay for the modal4 */
 .modal4-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background: rgba(0, 0, 0, 0.6);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 1000;
 }
 
 /* Address list styling */
 .address-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-height: 200px; /* Limit height for scrollable content */
-  overflow-y: auto; /* Add scroll if content exceeds height */
+list-style: none;
+padding: 0;
+margin: 0;
+max-height: 200px; /* Limit height for scrollable content */
+overflow-y: auto; /* Add scroll if content exceeds height */
 }
 
 /* Address item styling */
 .address-item {
-  padding: 10px;
-  border-bottom: 1px solid #ddd; /* Light border to separate items */
-  display: flex;
-  align-items: center;
-  gap: 10px;
+padding: 10px;
+border-bottom: 1px solid #ddd; /* Light border to separate items */
+display: flex;
+align-items: center;
+gap: 10px;
 }
 
 /* Address item label styling */
 .address-item label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+display: flex;
+align-items: center;
+gap: 10px;
 }
 
 /* Radio button styling */
 .address-item input[type="radio"] {
-  margin-right: 10px; /* Space between radio button and text */
+margin-right: 10px; /* Space between radio button and text */
 }
 /* Content of the modal4 */
 .modal4-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 90%;
-  width: 550px;
-  position: relative;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+background: #fff;
+padding: 20px;
+border-radius: 8px;
+max-width: 90%;
+width: 550px;
+position: relative;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Close button styling */
 .modal4-close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #333;
+position: absolute;
+top: 10px;
+right: 10px;
+background: transparent;
+border: none;
+font-size: 24px;
+cursor: pointer;
+color: #333;
 }
 
 .modal4-confirm-btn {
-  background-color: #4caf50;
-  color: white;
-  padding: 12px;
-  border: none;
-  /* border-radius: 5px; */
-  cursor: pointer;
-  font-size: 1em;
-  margin: 5px 0; /* Margin for spacing between buttons */
-  text-decoration: none;
-  font-family: "calibri", sans-serif;
-  width: 100%; /* Full width for small screens */
+background-color: #4caf50;
+color: white;
+padding: 12px;
+border: none;
+/* border-radius: 5px; */
+cursor: pointer;
+font-size: 1em;
+margin: 5px 0; /* Margin for spacing between buttons */
+text-decoration: none;
+font-family: "calibri", sans-serif;
+width: 100%; /* Full width for small screens */
 }
 
 /* Container for the buttons */
 .modal4c {
-  /* display: flex; */
-  flex-direction: column;
-  align-items: center;
-  /* justify-content: center; */
+/* display: flex; */
+flex-direction: column;
+align-items: center;
+/* justify-content: center; */
 }
 
 /* Media queries for responsiveness */
 @media (min-width: 600px) {
-  /* On screens larger than 600px, place buttons side by side */
-  .modal4-content > div {
-    flex-direction: row;
-    justify-content: center;
-  }
+/* On screens larger than 600px, place buttons side by side */
+.modal4-content > div {
+  flex-direction: row;
+  justify-content: center;
+}
 
-  .modal4-confirm-btn {
-    width: auto; /* Auto width for larger screens */
-    margin-left: 10px; /* Spacing between buttons */
-  }
+.modal4-confirm-btn {
+  width: auto; /* Auto width for larger screens */
+  margin-left: 10px; /* Spacing between buttons */
+}
 }
 .addr-list {
-  list-style-type: none;
-  padding: 0;
-  font-size: 0.7em;
+list-style-type: none;
+padding: 0;
+font-size: 0.7em;
 }
 
 .cart-product-cardd {
-  display: flex;
-  flex-direction: column; /* Arrange the heading and products vertically */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  padding: 15px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+display: flex;
+flex-direction: column; /* Arrange the heading and products vertically */
+border: 1px solid #ddd;
+border-radius: 8px;
+margin-bottom: 15px;
+padding: 15px;
+background-color: #fff;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .cart-product-card {
-  display: flex;
-  flex-direction: column; /* Arrange the heading and products vertically */
-  align-items: flex-start; /* Align the content to the left */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  padding: 15px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+display: flex;
+flex-direction: column; /* Arrange the heading and products vertically */
+align-items: flex-start; /* Align the content to the left */
+border: 1px solid #ddd;
+border-radius: 8px;
+margin-bottom: 15px;
+padding: 15px;
+background-color: #fff;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .cart-product-description {
-  display: -webkit-box; /* Required for WebKit-based browsers */
-  /* display: box;                        */
-  -webkit-box-orient: vertical; /* Required for WebKit-based browsers */
-  box-orient: vertical; /* Fallback for other browsers */
-  overflow: hidden; /* Hide overflow content */
-  -webkit-line-clamp: 2; /* Limit to 2 lines in WebKit-based browsers */
-  line-clamp: 2; /* Future proofing for standard implementation */
-  text-overflow: ellipsis; /* Show ellipsis when text overflows */
+display: -webkit-box; /* Required for WebKit-based browsers */
+/* display: box;                        */
+-webkit-box-orient: vertical; /* Required for WebKit-based browsers */
+box-orient: vertical; /* Fallback for other browsers */
+overflow: hidden; /* Hide overflow content */
+-webkit-line-clamp: 2; /* Limit to 2 lines in WebKit-based browsers */
+line-clamp: 2; /* Future proofing for standard implementation */
+text-overflow: ellipsis; /* Show ellipsis when text overflows */
 }
 
 .cart-product-card > div {
-  width: 100%; /* Ensure the divs inside take full width */
+width: 100%; /* Ensure the divs inside take full width */
 }
 
 .cart-product-card strong {
-  font-size: 1rem;
-  margin-bottom: 10px; /* Space between the heading and the products */
+font-size: 1rem;
+margin-bottom: 10px; /* Space between the heading and the products */
 }
 /* Payment method container */
 .payment-methods {
-  margin: 20px 0;
+margin: 20px 0;
 }
 
 /* Individual payment method styling */
 .summary-item2 {
-  display: flex;
-  align-items: center; /* Vertically center items */
-  padding: 10px;
-  border-bottom: 1px solid #ddd; /* Light border to separate items */
-  gap: 10px; /* Space between icon and text */
-  position: relative; /* To position continue-wrapper absolutely */
-  flex-wrap: wrap; /* Allow items to wrap, especially for the continue button */
+display: flex;
+align-items: center; /* Vertically center items */
+padding: 10px;
+border-bottom: 1px solid #ddd; /* Light border to separate items */
+gap: 10px; /* Space between icon and text */
+position: relative; /* To position continue-wrapper absolutely */
+flex-wrap: wrap; /* Allow items to wrap, especially for the continue button */
 }
 
 /* Payment method icon styling */
 .payment-icon {
-  font-size: 24px; /* Adjust size as needed */
-  color: #333; /* Icon color */
-  margin-right: 10px; /* Space between the icon and the text */
+font-size: 24px; /* Adjust size as needed */
+color: #333; /* Icon color */
+margin-right: 10px; /* Space between the icon and the text */
 }
 
 /* Payment method text styling */
 .summary-item2 .methods {
-  flex: 1; /* Allow text to take available space */
-  text-align: left; /* Align text to the left */
+flex: 1; /* Allow text to take available space */
+text-align: left; /* Align text to the left */
 }
 
 /* Payment method radio button styling */
 .summary-item2 input[type="radio"] {
-  margin-left: 10px; /* Space between text and radio button */
+margin-left: 10px; /* Space between text and radio button */
 }
 
 /* Wrapper for continue button */
 .continue-wrapper {
-  flex-basis: 100%; /* Take full width of the parent */
-  text-align: right; /* Align continue button to the right */
-  margin-top: 10px; /* Space between the radio button and continue button */
+flex-basis: 100%; /* Take full width of the parent */
+text-align: right; /* Align continue button to the right */
+margin-top: 10px; /* Space between the radio button and continue button */
 }
 
 /* Continue button styling */
 .continue-button {
-  background-color: #ff5722; /* Green background */
-  color: white; /* White text */
-  border: none;
-  /* border-radius: 5px; */
-  padding: 10px 16px;
-  cursor: pointer;
-  font-size: 0.9em;
+background-color: #ff5722; /* Green background */
+color: white; /* White text */
+border: none;
+/* border-radius: 5px; */
+padding: 10px 16px;
+cursor: pointer;
+font-size: 0.9em;
 }
 
 .change-btn {
-  background-color: #4caf50; /* Green background */
-  color: white; /* White text */
-  border: none;
-  /* border-radius: 5px; */
-  padding: 8px 16px;
-  cursor: pointer;
-  margin-left: auto; /* Push button to the right */
+background-color: #4caf50; /* Green background */
+color: white; /* White text */
+border: none;
+/* border-radius: 5px; */
+padding: 8px 16px;
+cursor: pointer;
+margin-left: auto; /* Push button to the right */
 }
 
 .Buy-later-btn {
-  background-color: #3c31da; /* Green background */
-  color: white; /* White text */
-  border: none;
-  /* border-radius: 5px; */
-  padding: 8px 16px;
-  cursor: pointer;
-  margin-left: auto; /* Push button to the right */
+background-color: #3c31da; /* Green background */
+color: white; /* White text */
+border: none;
+/* border-radius: 5px; */
+padding: 8px 16px;
+cursor: pointer;
+margin-left: auto; /* Push button to the right */
 }
 
 .Addtocart-btn {
-  background: linear-gradient(145deg, #ff7f50, #d9534f);
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  cursor: pointer;
-  margin-left: auto;
-  /* transition: background 0.3s ease-in-out; */
+background: linear-gradient(145deg, #ff7f50, #d9534f);
+color: white;
+border: none;
+padding: 8px 16px;
+cursor: pointer;
+margin-left: auto;
+/* transition: background 0.3s ease-in-out; */
 }
 
 .Addtocart-btn:hover {
-  background: linear-gradient(145deg, #d9534f, #ff7f50);
+background: linear-gradient(145deg, #d9534f, #ff7f50);
 }

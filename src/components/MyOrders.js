@@ -300,7 +300,7 @@ const MyOrders = () => {
 
   return (
     <>
-      <Header2 />
+      {/* <Header2 /> */}
       <div className="my-orders">
         <h2>My Orders</h2>
         <div className="filters-container">

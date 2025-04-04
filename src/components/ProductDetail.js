@@ -209,11 +209,13 @@ const ProductDetail = ({ accessoryCategory }) => {
   // Log the sorted related products
   // console.log("Sorted Related Products:", sortedFilteredProducts);
 
-  const handleProductClick = (productId) => {
-    // Navigate to the product detail page
-    navigate(`/product/${productId}`);
-    // window.location.reload();
+  const handleProductClick = (product) => {
+    const slugify = (name) =>
+      name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  
+    navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
+  
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
@@ -364,113 +366,7 @@ const ProductDetail = ({ accessoryCategory }) => {
     await handleAddToCart2(selectedAccessories, event);
   };
 
-  // const handleAddToCart = async (product, event) => {
-  //   if (!event) return; // Prevent further execution if event is undefined
-  //   event.stopPropagation();
-
-  //   const email = localStorage.getItem("email");
-  //   const username = localStorage.getItem("username");
-
-  //   if (!email || !username) {
-  //     toast.error("User is not logged in!", {
-  //       position: "top-right",
-  //       autoClose: 2000,
-  //       hideProgressBar: false,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //       progress: undefined,
-  //     });
-  //     window.location.href = "/login";
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await axios.post(`${ApiUrl}/verify-user`, {
-  //       email,
-  //       username,
-  //     });
-
-  //     if (response.data.exists) {
-  //       const cartKey = `${email}-cart`;
-  //       const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
-  //       const currentPrice =
-  //         isOfferActive && product.offer_price > 0 && isOfferActive
-  //           ? product.offer_price // Use offer_price if offer is active
-  //           : product.prod_price;
-  //       // Find existing item by id and category
-  //       const existingItem = cartItems.find(
-  //         (item) => item.id === product.id && item.category === product.category
-  //       );
-
-  //       if (existingItem) {
-  //         // Increase the quantity if the product already exists in the cart
-  //         existingItem.quantity += 1;
-  //         toast.info(
-  //           `Increased quantity of ${product.prod_name} in your cart!`,
-  //           {
-  //             position: "top-right",
-  //             autoClose: 2000,
-  //             hideProgressBar: false,
-  //             closeOnClick: true,
-  //             pauseOnHover: true,
-  //             draggable: true,
-  //             progress: undefined,
-  //           }
-  //         );
-  //       } else {
-  //         // Add new product to the cart
-  //         cartItems.push({
-  //           id: product.id,
-  //           name: product.prod_name,
-  //           price: currentPrice, // Use offer_price if it's valid, otherwise prod_price
-  //           actual_price: product.actual_price,
-  //           image: product.prod_img,
-  //           description: product.prod_features,
-  //           category: product.category,
-  //           deliverycharge: product.deliverycharge,
-  //           product_id: product.prod_id,
-  //           quantity: 1,
-  //         });
-
-  //         toast.success(`${product.prod_name} has been added to your cart!`, {
-  //           position: "top-right",
-  //           autoClose: 2000,
-  //           hideProgressBar: false,
-  //           closeOnClick: true,
-  //           pauseOnHover: true,
-  //           draggable: true,
-  //           progress: undefined,
-  //         });
-  //       }
-
-  //       // Save the updated cart in localStorage
-  //       localStorage.setItem(cartKey, JSON.stringify(cartItems));
-  //     } else {
-  //       toast.error("User not found!", {
-  //         position: "top-right",
-  //         autoClose: 2000,
-  //         hideProgressBar: false,
-  //         closeOnClick: true,
-  //         pauseOnHover: true,
-  //         draggable: true,
-  //         progress: undefined,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error verifying user or updating cart:", error);
-  //     toast.error("An error occurred while adding to cart.", {
-  //       position: "top-right",
-  //       autoClose: 2000,
-  //       hideProgressBar: false,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //       progress: undefined,
-  //     });
-  //   }
-  // };
-
+  
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
 
@@ -880,7 +776,7 @@ const ProductDetail = ({ accessoryCategory }) => {
   // }
   
   if (isLoading || !product) {
-    return <Header2 />; // Show nothing when loading or if the product is not found
+    return null; // Show nothing when loading or if the product is not found
   }
   
   // // Ensure product exists before accessing prod_img
@@ -1108,7 +1004,7 @@ const ProductDetail = ({ accessoryCategory }) => {
 
   return (
     <>
-      <Header2 />
+      {/* <Header2 /> */}
       <div className="main-container">
         {/* <Sidebar /> */}
 
@@ -1949,7 +1845,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                             <div
                               key={relatedProduct.id}
                               onClick={() =>
-                                handleProductClick(relatedProduct.id)
+                                handleProductClick(relatedProduct)
                               }
                               className="related-product-card"
                             >
@@ -2091,7 +1987,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                           <div
                             key={relatedProduct.id}
                             onClick={() =>
-                              handleProductClick(relatedProduct.id)
+                              handleProductClick(relatedProduct)
                             }
                             className="related-product-card"
                           >

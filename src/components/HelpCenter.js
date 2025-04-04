@@ -23,7 +23,7 @@ const HelpCenter = () => {
   return (
     <div>
       {/* <Header1 /> */}
-      <Header2 />
+      {/* <Header2 /> */}
       {/* <Header3 /> */}
       <div style={styles.container}>
         <h2 style={styles.title}>TechShed Help Center</h2>

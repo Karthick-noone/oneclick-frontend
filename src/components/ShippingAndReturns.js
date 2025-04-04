@@ -9,7 +9,7 @@ const ShippingAndReturns = () => {
   return (
     <div style={styles.pageContainer}>
       {/* <Header1 /> */}
-      <Header2 />
+      {/* <Header2 /> */}
       {/* <Header3 /> */}
       <div style={styles.container}>
         <div style={styles.textContainer}>

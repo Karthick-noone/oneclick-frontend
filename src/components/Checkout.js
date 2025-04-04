@@ -28,8 +28,6 @@ import Swal from "sweetalert2";
 import Footer from "./footer";
 import orderTruck from "./img/order-truck.gif";
 import confetti from "canvas-confetti";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css"; // Ensure styles are applied
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -67,11 +65,7 @@ const Checkout = () => {
 
   const location = useLocation();
   const { isOfferActive, product } = location.state || {}; // Ensure it doesn't break if undefined
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    // Simulate loading delay (remove this in real API calls)
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
+
   // useEffect(() => {
   //   if (item && item.offer_end_time) {
   //     const now = new Date();
@@ -1089,11 +1083,13 @@ const Checkout = () => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
 
-  const handleProductClick = (productId) => {
-    // Navigate to the product detail page
-    navigate(`/product/${productId}`);
+  const handleProductClick = (product) => {
+    const slugify = (name) =>
+      name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  
+    navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
-
+  
   const finalAmount =
     newTotalAmount > 0
       ? Number(newTotalAmount) // Convert to number if it's not
@@ -1102,7 +1098,7 @@ const Checkout = () => {
   return (
     <>
       {/* <Header1 /> */}
-      <Header2 />
+      {/* <Header2 /> */}
       <div className="cart-container">
         <div className="cart-header">
           <center>
@@ -1112,23 +1108,10 @@ const Checkout = () => {
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
-              {/* <strong> LOGIN </strong> */}
+              <strong> LOGIN </strong> 
 
-              {isLoading ? (
+              {username ? (
                 <>
-                  <div className="login-skeleton skeleton-title"></div>
-
-                  <div className="login-skeleton">
-                    <div
-                      className="login-skeleton skeleton-text"
-                      style={{ marginTop: "8px" }}
-                    ></div>
-                  </div>
-                </>
-              ) : username ? (
-                <>
-                  <strong> LOGIN </strong>
-
                   <FaCheck style={{ color: "green" }} />
                   <br />
                   <span style={{ fontSize: "14px" }}>
@@ -1137,13 +1120,15 @@ const Checkout = () => {
                 </>
               ) : (
                 <>
-                  <strong> LOGIN </strong>
                   <FaTimes style={{ color: "red" }} />
                   <br />
+                  {/* <span style={{ fontSize: "14px" }}>Guest</span> */}
+                  {/* <br /> */}
                   <a href="/Login">
                     <button
                       className="change-btn"
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: "pointer", float:'right' }}
+                      // onClick={() => console.log("Redirect to login page")} // Replace with actual login logic
                     >
                       Login
                     </button>
@@ -1153,16 +1138,7 @@ const Checkout = () => {
             </div>
             <div className="cart-address">
               {/* <h3>Select a Shipping Address</h3> */}
-              {loading ? (
-                <ul>
-                  <li className="addr-list">
-                    {/* Individual skeletons for each section */}
-                    {/* <div className="address-skeleton address-skeleton-btn"></div> */}
-                    <div className="address-skeleton address-skeleton-title"></div>
-                    <div className="address-skeleton address-skeleton-address"></div>
-                  </li>
-                </ul>
-              ) : addressDetails.length > 0 ? (
+              {addressDetails.length > 0 ? (
                 <ul>
                   {addressDetails.map((address) => (
                     <li
@@ -1204,40 +1180,13 @@ const Checkout = () => {
                   </strong>
                   <br />
                   <a href="/Useraddress">
-                    <button className="change-btn">Add Address</button>
+                    <button style={{float:'right'}} className="change-btn">Add Address</button>
                   </a>
                 </div>
               )}
             </div>{" "}
             <div className="cart-product-card">
-              {isLoading ? (
-                <div className="cart-skeleton">
-                  <div className="skeleton address-skeleton-title"></div>
-                  {/* <div className="skeleton skeleton-text"></div> */}
-                  {/* <div className="skeleton skeleton-btn"></div> */}
-
-                  {/* Skeleton for product list */}
-                  <ul className="cart-list">
-                    {Array.from({ length: 1 }).map((_, index) => (
-                      <li
-                        key={index}
-                        className="cart-product d-flex align-items-center"
-                      >
-                        <div className="skeleton list-skeleton-image"></div>
-                        <div className="cart-product-details">
-                          <div className="skeleton skeleton-text"></div>
-                          <div className="skeleton skeleton-text"></div>
-                        </div>
-                        <div className="cart-product-price">
-                          <div className="skeleton skeleton-btn-small"></div>
-                          <div className="skeleton skeleton-btn-small"></div>
-                          <div className="skeleton skeleton-price"></div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : !isExpanded ? (
+              {!isExpanded ? (
                 <div>
                   <strong style={{ fontSize: "1.0rem" }}>
                     ORDER SUMMARY{" "}
@@ -1306,7 +1255,7 @@ const Checkout = () => {
                           {firstImage ? (
                             <div
                               key={item.id}
-                              onClick={() => handleProductClick(item.id)}
+                              onClick={() => handleProductClick(item)}
                               style={{ cursor: "pointer" }}
                             >
                               <img
@@ -1325,7 +1274,7 @@ const Checkout = () => {
                             style={{ cursor: "pointer" }}
                             className="cart-product-details"
                             key={item.id}
-                            onClick={() => handleProductClick(item.id)}
+                            onClick={() => handleProductClick(item)}
                           >
                             <p className="cart-product-name">
                               {item.prod_name}
@@ -1426,131 +1375,109 @@ const Checkout = () => {
               )}
             </div>
             {/* <div>  */}
-            {isLoading ? (
-              <div className="skeleton-buy-later-card">
-                <div className="buy-later-skeleton skeleton-buy-later-title"></div>
-                {[...Array(3)].map((_, index) => (
-                  <div key={index} className="skeleton-buy-later-item">
-                    <div className="buy-later-skeleton skeleton-buy-later-image"></div>
-                    <div className="skeleton-buy-later-details">
-                      <div className="buy-later-skeleton skeleton-buy-later-name"></div>
-                      <div className="buy-later-skeleton skeleton-buy-later-description"></div>
-                    </div>
-                    <div className="buy-later-skeleton skeleton-buy-later-price"></div>
-                  </div>
-                ))}
-                <div className="buy-later-skeleton skeleton-buy-later-btn"></div>
-              </div>
-            ) : (
-              buyLaterProducts.length > 0 && (
-                <div className="cart-product-card">
-                  <strong style={{ fontSize: "1.0rem" }}>
-                    BUY LATER ITEMS
-                  </strong>
-                  <div className="cart-list-container">
-                    <ul className="cart-list">
-                      {buyLaterProducts.map((product) => {
-                        const images = Array.isArray(product.prod_img)
-                          ? product.prod_img
-                          : JSON.parse(product.prod_img || "[]");
-                        const firstImage = images.length > 0 ? images[0] : null;
+            {buyLaterProducts.length > 0 && (
+              <div className="cart-product-card">
+                <strong style={{ fontSize: "1.0rem" }}>BUY LATER ITEMS</strong>
+                <div className="cart-list-container">
+                  <ul className="cart-list">
+                    {buyLaterProducts.map((product) => {
+                      const images = Array.isArray(product.prod_img)
+                        ? product.prod_img
+                        : JSON.parse(product.prod_img || "[]");
+                      const firstImage = images.length > 0 ? images[0] : null;
 
-                        return (
-                          <li
-                            key={product.prod_id}
-                            className="cart-product d-flex align-items-center"
-                          >
-                            {firstImage ? (
-                              <div
-                                key={product.id}
-                                onClick={() => handleProductClick(product.id)}
-                                style={{ cursor: "pointer" }}
-                              >
-                                <img
-                                  src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
-                                  alt={product.name}
-                                  loading="lazy"
-                                  className="cart-product-image"
-                                />
-                              </div>
-                            ) : (
-                              <div className="placeholder-image">
-                                No image available
-                              </div>
-                            )}
-
+                      return (
+                        <li
+                          key={product.prod_id}
+                          className="cart-product d-flex align-items-center"
+                        >
+                          {firstImage ? (
                             <div
-                              style={{ cursor: "pointer" }}
-                              className="cart-product-details"
                               key={product.id}
-                              onClick={() => handleProductClick(product.id)}
+                              onClick={() => handleProductClick(product)}
+                              style={{ cursor: "pointer" }}
                             >
-                              <p className="cart-product-name">
-                                {product.prod_name}
-                              </p>
-                              <p className="cart-product-description">
-                                {product.prod_features}
-                              </p>
+                              <img
+                                src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                                alt={product.name}
+                                loading="lazy"
+                                className="cart-product-image"
+                              />
                             </div>
+                          ) : (
+                            <div className="placeholder-image">
+                              No image available
+                            </div>
+                          )}
 
-                            <div className="cart-product-price">
-                              <div className="cart-quantity-controls">
-                                <FaTrash
-                                  className="cart-remove-btn"
-                                  onClick={() =>
-                                    handleRemoveBuyLater(product.id)
+                          <div
+                            style={{ cursor: "pointer" }}
+                            className="cart-product-details"
+                            key={product.id}
+                            onClick={() => handleProductClick(product)}
+                          >
+                            <p className="cart-product-name">
+                              {product.prod_name}
+                            </p>
+                            <p className="cart-product-description">
+                              {product.prod_features}
+                            </p>
+                          </div>
+
+                          <div className="cart-product-price">
+                            <div className="cart-quantity-controls">
+                              <FaTrash
+                                className="cart-remove-btn"
+                                onClick={() => handleRemoveBuyLater(product.id)}
+                              />
+                            </div>
+                            <p
+                              style={{
+                                color: "red",
+                                textDecoration: "line-through",
+                                fontSize: "13px",
+                                marginRight: "5px",
+                              }}
+                            >
+                              ₹{product.actual_price}
+                            </p>
+                            <p>
+                              ₹
+                              {product.offer_price > 0 && isOfferActive
+                                ? product.offer_price
+                                : product.prod_price}
+                            </p>
+                            <div>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={selectedProducts.includes(
+                                    product.id
+                                  )}
+                                  onChange={() =>
+                                    handleCheckboxChange(product.id)
                                   }
-                                />
-                              </div>
-                              <p
-                                style={{
-                                  color: "red",
-                                  textDecoration: "line-through",
-                                  fontSize: "13px",
-                                  marginRight: "5px",
-                                }}
-                              >
-                                ₹{product.actual_price}
-                              </p>
-                              <p>
-                                ₹
-                                {product.offer_price > 0 && isOfferActive
-                                  ? product.offer_price
-                                  : product.prod_price}
-                              </p>
-
-                              <div>
-                                <label>
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedProducts.includes(
-                                      product.id
-                                    )}
-                                    onChange={() =>
-                                      handleCheckboxChange(product.id)
-                                    }
-                                  />{" "}
-                                </label>
-                              </div>
+                                />{" "}
+                              </label>
                             </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
 
-                    <button
-                      style={{ float: "right", marginRight: "10px" }}
-                      onClick={handleAddToCart}
-                      className="Addtocart-btn"
-                    >
-                      Move To Cart{" "}
-                      <span style={{ marginLeft: "10px" }}>
-                        <FaShoppingBag />
-                      </span>
-                    </button>
-                  </div>
+                  <button
+                    style={{ float: "right", marginRight: "10px" }}
+                    onClick={handleAddToCart}
+                    className="Addtocart-btn"
+                  >
+                    Move To Cart{" "}
+                    <span style={{ marginLeft: "10px" }}>
+                      <FaShoppingBag />
+                    </span>
+                  </button>
                 </div>
-              )
+              </div>
             )}
             {/* </div> */}
             {/* <div className="place-order-card">
@@ -1565,161 +1492,67 @@ const Checkout = () => {
 </div> */}
           </div>
           <div className="cart-summary">
-            {loading ? (
-              <Skeleton
-                variant="text"
-                height={30}
-                width={200}
-                className="price-summary-skeleton"
-              />
-            ) : (
-              <h4 style={{ marginTop: "10px", marginBottom: "5px" }}>
-                PRICE SUMMARY
-              </h4>
-            )}
-
+            <h4 style={{ marginTop: "10px", marginBottom: "5px" }}>
+              PRICE SUMMARY
+            </h4>
             <div className="summary-item">
               <span>
-                {loading ? (
-                  <Skeleton
-                    variant="text"
-                    width={100}
-                    className="price-label-skeleton"
-                  />
-                ) : (
-                  <>
-                    Price{" "}
-                    {getTotalItemsCount() > 0 &&
-                      (getTotalItemsCount() === 1
-                        ? " (1 item)"
-                        : ` (${getTotalItemsCount()} items)`)}
-                  </>
-                )}
+                Price {getTotalItemsCount() > 0 && (
+  getTotalItemsCount() === 1 ? " (1 item)" : ` (${getTotalItemsCount()} items)`
+)}
               </span>
+              <span>₹{calculateSellingPrice()}</span>
+            </div>
+            {/* <div className="summary-item">
+              <span>Discount</span>
+              <span style={{ color: "green" }}>- ₹0</span>
+            </div> */}
+            {/* <div className="summary-item">
+              <span>Platform fee</span>
+              <span>-</span>
+            </div> */}
+            <div className="summary-item">
+              <span>Delivery Charge</span>
               <span>
-                {loading ? (
-                  <Skeleton
-                    variant="text"
-                    width={50}
-                    className="price-value-skeleton"
-                  />
-                ) : (
-                  `₹${calculateSellingPrice()}`
-                )}
+                {/* <span style={{ textDecoration: "line-through" }}>₹50</span>{" "}
+                <span style={{ color: "green" }}>FREE Delivery</span> */}
+                <span>₹{calculateDeliveryCharge()}</span>
               </span>
             </div>
-
             <div className="summary-item">
-              <span>
-                {loading ? (
-                  <Skeleton
-                    variant="text"
-                    width={100}
-                    className="delivery-label-skeleton"
-                  />
-                ) : (
-                  "Delivery Charge"
-                )}
-              </span>
-              <span>
-                {loading ? (
-                  <Skeleton
-                    variant="text"
-                    width={50}
-                    className="delivery-value-skeleton"
-                  />
-                ) : (
-                  `₹${calculateDeliveryCharge()}`
-                )}
-              </span>
-            </div>
-
-            <div className="summary-item">
-              <span>
-                {loading ? (
-                  <Skeleton
-                    variant="text"
-                    width={120}
-                    className="discount-label-skeleton"
-                  />
-                ) : (
-                  "Coupon Discount"
-                )}
-              </span>
+              <span>Coupon Discount</span>
               <span style={{ color: "green" }}>
-                {loading ? (
-                  <Skeleton
-                    variant="text"
-                    width={50}
-                    className="discount-value-skeleton"
-                  />
-                ) : (
-                  `- ₹${discountAmount.toFixed(2)}`
-                )}
+                - ₹{discountAmount.toFixed(2)}
+                {/* <span style={{ color: "green" }}>FREE Delivery</span> */}
               </span>
             </div>
-
             {parseFloat(calculateTotalPrice()) >= minPurchaseLimit && (
               <div className="summary-item">
                 <span>
-                  {loading ? (
-                    <Skeleton
-                      variant="text"
-                      width={150}
-                      className="coupon-condition-skeleton"
-                    />
-                  ) : (
-                    "(If you have coupon) Extra Discount on Orders Over ₹" +
-                    minPurchaseLimit
-                  )}
+                  (If you have coupon)
+                  <br />
+                  Extra Discount on Orders Over ₹{minPurchaseLimit}
                 </span>
-                <span style={{ color: "green" }}>
-                  {loading ? (
-                    <Skeleton
-                      variant="text"
-                      width={50}
-                      className="coupon-value-skeleton"
-                    />
-                  ) : (
-                    `- ₹${couponValue}`
-                  )}
-                </span>
+                <span style={{ color: "green" }}>- ₹{couponValue}</span>
               </div>
             )}
-
             <div className="summary-item">
-              {loading ? (
-                <Skeleton
-                  variant="rect"
-                  height={35}
-                  width={180}
-                  className="coupon-input-skeleton"
-                />
-              ) : (
-                <input
-                  value={coupon}
-                  onChange={handleCouponChange}
-                  type="text"
-                  placeholder="Enter Coupon code"
-                  disabled={isCouponApplied}
-                />
-              )}
+              {/* Input for coupon code */}
+              <input
+                value={coupon}
+                onChange={handleCouponChange}
+                type="text"
+                placeholder="Enter Coupon code"
+                disabled={isCouponApplied} // Disable input if coupon is applied
+              />
 
-              {loading ? (
-                <Skeleton
-                  variant="rect"
-                  height={35}
-                  width={80}
-                  className="apply-button-skeleton"
-                />
-              ) : (
-                <button
-                  disabled={isCouponApplied}
-                  onClick={() => handleApplyCoupon(coupon)}
-                >
-                  Apply
-                </button>
-              )}
+              {/* Single Apply button for all items */}
+              <button
+                disabled={isCouponApplied}
+                onClick={() => handleApplyCoupon(coupon)}
+              >
+                Apply
+              </button>
             </div>
 
             {message && (
@@ -1730,59 +1563,38 @@ const Checkout = () => {
                       ? "green"
                       : messageType === "error"
                       ? "red"
-                      : "orange",
+                      : "orange", // Orange for warning (if coupon is already applied)
+                  // fontWeight: "bold",
                   marginTop: "5px",
                   marginBottom: "5px",
                   fontSize: "14px",
                 }}
               >
-                {loading ? (
-                  <Skeleton
-                    variant="text"
-                    width={150}
-                    className="message-skeleton"
-                  />
-                ) : (
-                  message
-                )}
+                {message}
               </p>
             )}
-
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
+                // marginTop: "5px",
                 marginBottom: "2px",
                 color: "#555",
                 fontSize: "0.83em",
               }}
             >
-              {isLoading ? (
-                <>
-                  <Skeleton
-                    circle
-                    width={20}
-                    height={20}
-                    style={{ marginRight: "5px" }}
-                  />
-                  <Skeleton width={250} height={15} />
-                </>
-              ) : (
-                <>
-                  <FaInfoCircle
-                    style={{
-                      marginRight: "5px",
-                      marginBottom: "5px",
-                      color: "#ff5722",
-                    }}
-                  />
-                  <span>
-                    If you have multiple coupons, apply the one you prefer.
-                  </span>
-                </>
-              )}
+              <FaInfoCircle
+                style={{
+                  marginRight: "5px",
+                  marginBottom: "5px",
+                  color: "#ff5722",
+                }}
+              />
+              <span>
+                {" "}
+                If you have multiple coupons, apply the one you prefer.
+              </span>
             </div>
-
             {finalAmount > 0 && (
               <div
                 style={{
@@ -1794,95 +1606,70 @@ const Checkout = () => {
                   fontWeight: "bold",
                 }}
               >
-                {isLoading ? (
-                  <>
-                    <Skeleton
-                      circle
-                      width={20}
-                      height={20}
-                      style={{ marginRight: "2px" }}
-                    />
-                    <Skeleton width={180} height={15} />
-                  </>
-                ) : (
-                  <>
-                    <FaTruck style={{ marginRight: "2px" }} /> Delivery by{" "}
-                    {getDeliveryDate()}
-                    {calculateDeliveryCharge() === "0.00" && (
-                      <span style={{ color: "green" }}>&nbsp;• Free</span>
-                    )}
-                  </>
+                <FaTruck style={{ marginRight: "2px" }} /> Delivery by{" "}
+                {getDeliveryDate()}
+                {calculateDeliveryCharge() === "0.00" && (
+                  <span style={{ color: "green" }}>&nbsp;• Free</span>
                 )}
               </div>
             )}
-
+            {" "}
             <hr />
             <div className="summary-item">
-              <strong>
-                {loading ? (
-                  <Skeleton width={120} className="total-label-skeleton" />
-                ) : (
-                  "Total Amount"
-                )}
-              </strong>
+              <strong>Total Amount</strong>
               <span style={{ fontWeight: "bold" }}>
-                {loading ? (
-                  <Skeleton width={70} className="total-value-skeleton" />
-                ) : (
-                  `₹${finalAmount > 0 ? finalAmount.toFixed(2) : "0.00"}`
-                )}
+                {/* ₹{calculateTotalPrice()}₹{newTotalAmount.toFixed(2)} */}₹
+                {/* {newTotalAmount > 0
+                  ? newTotalAmount.toFixed(2)
+                  : calculateTotalPrice()} */}
+                {finalAmount.toFixed(2)}
               </span>
             </div>
             <hr />
-
+            <div>
+              {isCouponApplied && (
+                <p className="discount-message">
+                  You will save up to ₹{couponValue || discountAmount} on this
+                  order!
+                </p>
+              )}
+            </div>
+            {/* <div className="summary-item">
+              <span style={{ color: "green" }}>
+                You will save ₹{discount()} on this order
+              </span> 
+            </div> */}
+            {/* <button
+              className="summary-place-order-btn"
+              onClick={handlePayment}
+              //   onClick={() => navigate("/checkout")}
+            >
+              Place Order
+            </button> */}
             <center>
-              <h4 style={{ marginTop: "10px" }}>
-                {isLoading ? (
-                  <Skeleton width={200} height={20} />
-                ) : (
-                  "Select Payment Method"
-                )}
-              </h4>
+              <h4 style={{ marginTop: "10px" }}>Select Payment Method</h4>
             </center>
             <div className="payment-methods">
-              {/* Cash on Delivery */}
               <div
                 className={`summary-item2 ${
                   selectedPaymentMethod === "cod" ? "selected" : ""
                 }`}
               >
-                {isLoading ? (
-                  <Skeleton width={50} height={50} />
-                ) : (
-                  <FaMoneyBillWave
-                    className="payment-icon"
-                    style={{ color: "green" }}
-                  />
-                )}
-                <span className="methods">
-                  {isLoading ? (
-                    <Skeleton width={150} height={20} />
-                  ) : (
-                    "Cash on Delivery"
-                  )}
-                </span>
+                <FaMoneyBillWave style={{ color: "green" }} className="payment-icon" />
+                <span className="methods">Cash on Delivery</span>
                 <span>
-                  {isLoading ? (
-                    <Skeleton circle width={20} height={20} />
-                  ) : (
-                    <input
-                      type="radio"
-                      name="payment-method"
-                      value="cod"
-                      checked={selectedPaymentMethod === "cod"}
-                      onChange={handlePaymentMethodChange}
-                    />
-                  )}
+                  <input
+                    type="radio"
+                    name="payment-method"
+                    value="cod"
+                    checked={selectedPaymentMethod === "cod"}
+                    onChange={handlePaymentMethodChange}
+                  />
                 </span>
                 {selectedPaymentMethod === "cod" && (
                   <div className="continue-wrapper">
                     <button
-                      onClick={() => handlePlaceOrder("cod")}
+                      onClick={() => handlePlaceOrder("cod")} // Pass "cod" to handlePayment function
                       className="summary-place-order-btn"
                     >
                       {isOrdering ? (
@@ -1891,8 +1678,6 @@ const Checkout = () => {
                           alt="Ordering..."
                           style={{ height: "100px", padding: "1px" }}
                         />
-                      ) : isLoading ? (
-                        <Skeleton width={100} height={40} />
                       ) : (
                         "Order Now"
                       )}
@@ -1901,52 +1686,30 @@ const Checkout = () => {
                 )}
               </div>
 
-              {/* Pay Online */}
               <div
                 className={`summary-item2 ${
                   selectedPaymentMethod === "card" ? "selected" : ""
                 }`}
               >
-                {isLoading ? (
-                  <Skeleton width={50} height={50} />
-                ) : (
-                  <FaCreditCard
-                    className="payment-icon"
-                    style={{ color: "skyblue" }}
-                  />
-                )}
-                <span className="methods">
-                  {isLoading ? (
-                    <Skeleton width={150} height={20} />
-                  ) : (
-                    "Pay Online"
-                  )}
-                </span>
+                <FaCreditCard                               style={{ color: "skyblue" }}
+ className="payment-icon" />
+                <span className="methods">Pay Online</span>
                 <span>
-                  {isLoading ? (
-                    <Skeleton circle width={20} height={20} />
-                  ) : (
-                    <input
-                      type="radio"
-                      name="payment-method"
-                      value="card"
-                      checked={selectedPaymentMethod === "card"}
-                      onChange={handlePaymentMethodChange}
-                    />
-                  )}
+                  <input
+                    type="radio"
+                    name="payment-method"
+                    value="card"
+                    checked={selectedPaymentMethod === "card"}
+                    onChange={handlePaymentMethodChange}
+                  />
                 </span>
                 {selectedPaymentMethod === "card" && (
                   <div className="continue-wrapper">
                     <button
-                      className="pay-btn"
+                      class="pay-btn"
                       onClick={() => handlePayment("Online")}
                     >
-                      {isLoading ? (
-                        <Skeleton width={100} height={40} />
-                      ) : (
-                        "Pay Now"
-                      )}
-
+                      <span class="btn-text">Pay Now</span>
                       <div class="icon-container">
                         <svg viewBox="0 0 24 24" class="icon5 card-icon">
                           <path
@@ -1989,44 +1752,26 @@ const Checkout = () => {
                 )}
               </div>
 
-              {/* Pick Up From Store */}
               <div
                 className={`summary-item2 ${
                   selectedPaymentMethod === "pickup" ? "selected" : ""
                 }`}
               >
-                {isLoading ? (
-                  <Skeleton width={50} height={50} />
-                ) : (
-                  <FaStore
-                    className="payment-icon"
-                    style={{ color: "orange" }}
-                  />
-                )}
-                <span className="methods">
-                  {isLoading ? (
-                    <Skeleton width={200} height={20} />
-                  ) : (
-                    "Pick Up From Store"
-                  )}
-                </span>
+                <FaStore  style={{ color: "orange" }} className="payment-icon" />
+                <span className="methods">Pick Up From Store</span>
                 <span>
-                  {isLoading ? (
-                    <Skeleton circle width={20} height={20} />
-                  ) : (
-                    <input
-                      type="radio"
-                      name="payment-method"
-                      value="pickup"
-                      checked={selectedPaymentMethod === "pickup"}
-                      onChange={handlePaymentMethodChange}
-                    />
-                  )}
+                  <input
+                    type="radio"
+                    name="payment-method"
+                    value="pickup"
+                    checked={selectedPaymentMethod === "pickup"}
+                    onChange={handlePaymentMethodChange}
+                  />
                 </span>
                 {selectedPaymentMethod === "pickup" && (
                   <div className="continue-wrapper">
                     <button
-                      onClick={() => handlePlaceOrder("pickup")}
+                      onClick={() => handlePlaceOrder("pickup")} // Pass "cod" to handlePayment function
                       className="summary-place-order-btn"
                     >
                       {isOrdering ? (
@@ -2035,8 +1780,6 @@ const Checkout = () => {
                           alt="Ordering..."
                           style={{ height: "100px", padding: "1px" }}
                         />
-                      ) : isLoading ? (
-                        <Skeleton width={100} height={40} />
                       ) : (
                         "Order Now"
                       )}
@@ -2044,8 +1787,45 @@ const Checkout = () => {
                   </div>
                 )}
               </div>
-            </div>
 
+              {/* <div className={`summary-item2 ${selectedPaymentMethod === 'net-banking' ? 'selected' : ''}`}>
+          <FaUniversity className="payment-icon" />
+          <span className="methods">Net Banking</span>
+          <span>
+            <input
+              type="radio"
+              name="payment-method"
+              value="net-banking"
+              checked={selectedPaymentMethod === 'net-banking'}
+              onChange={handlePaymentMethodChange}
+            />
+          </span>
+          {selectedPaymentMethod === 'net-banking' && (
+            <div className="continue-wrapper">
+              <button className="continue-button">Continue</button>
+            </div>
+          )}
+        </div>
+        
+        <div className={`summary-item2 ${selectedPaymentMethod === 'paypal' ? 'selected' : ''}`}>
+          <FaPaypal className="payment-icon" />
+          <span className="methods">PayPal</span>
+          <span>
+            <input
+              type="radio"
+              name="payment-method"
+              value="paypal"
+              checked={selectedPaymentMethod === 'paypal'}
+              onChange={handlePaymentMethodChange}
+            />
+          </span>
+          {selectedPaymentMethod === 'paypal' && (
+            <div className="continue-wrapper">
+              <button className="continue-button">Continue</button>
+            </div>
+          )}
+        </div> */}
+            </div>
             {isModalOpen && (
               <div className="modal4-overlay">
                 <div className="modal4-content">
