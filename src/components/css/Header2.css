@@ -173,7 +173,7 @@
 .header2 .iconss {
   display: flex;
   align-items: center;
-  gap:22px;
+  gap:30px;
 }
 
 .header2 .iconss svg {
@@ -276,7 +276,7 @@
 
 .dropdown-menu {
   position: absolute;
-  top: 85px; /* Adjust based on icon size and placement */
+  top: 69px; /* Adjust based on icon size and placement */
   right:1px; /* Aligns the dropdown to the right of the icon */
   background-color: white;
   border: 1px solid #ccc;
@@ -398,7 +398,7 @@
   padding: 0;
   margin: 0;
   flex: 1; /* Allow ul to take available space */
-  margin-bottom: 55px
+  margin-bottom: 80px
 }
 
 /* Footer at the bottom of the sidebar */
@@ -430,7 +430,7 @@
 .sidebarcart-body img {
     width: 80px; /* Adjust size */
     height: 80px; /* Adjust size */
-    object-fit: cover;
+    object-fit: contain;
     margin-right: 10px;
     /* border: 1px solid black; */
 }

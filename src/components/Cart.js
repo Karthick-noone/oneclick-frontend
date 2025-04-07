@@ -895,7 +895,6 @@ const CartPage = () => {
                       <li
                         key={item.id}
                         className="cart-product d-flex align-items-center"
-                        onClick={() => handleProductClick(item)}
                       >
                         {/* <Link
                           style={{ textDecoration: "none" }}
@@ -907,6 +906,8 @@ const CartPage = () => {
                               alt={item.prod_name || "Product"}
                               loading="lazy"
                               className="cart-product-image"
+                        onClick={() => handleProductClick(item)}
+
                               name="image"
                             />
                           ) : (

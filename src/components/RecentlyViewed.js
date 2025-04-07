@@ -66,11 +66,21 @@ const RecentlyViewed = () => {
     }
     const firstImage = productImages.length ? productImages[0] : "";
 
+    const handleProductClick = (product) => {
+      const slugify = (name) =>
+        name
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^\w-]+/g, "");
+  
+      navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
+    };
+
     return (
       <div
         key={product.id}
         className="recently-viewed-card"
-        onClick={() => navigate(`/product/${product.id}`)}
+        onClick={() => handleProductClick(product)}
       >
         <img
           src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}

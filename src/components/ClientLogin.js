@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ApiUrl } from "./ApiUrl";
 import { FaEye, FaEyeSlash , FaSignOutAlt} from "react-icons/fa"; // Import eye icons
 import logo from './img/logo3.png';
@@ -16,7 +16,7 @@ const LoginPage = () => {
 
   const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
   const [backgroundImage, setBackgroundImage] = useState('');
-
+  const location = useLocation();
   // Fetch the background image from the server
   useEffect(() => {
     console.log('Fetching background image from:', `${ApiUrl}/fetchloginbg`); // Log the API URL being used
@@ -70,6 +70,8 @@ React.useEffect(() => {
   injectKeyframes();
 }, []);
 
+
+const from = location.state?.from?.pathname || '/';
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -140,7 +142,7 @@ const handleSubmit = async (e) => {
         showCloseButton: true,
       })
       .then(() => {
-        navigate('/', { state: { user_id } });
+        navigate(-1);
       });
 
     } else {

@@ -18,7 +18,7 @@
     cursor: pointer;
     position: absolute;
     top: -8px;
-    right: 15px;
+    left: 265px;
     color: white;
 }
 
@@ -151,11 +151,11 @@
     .header3 nav {
         position: fixed; /* Fixed positioning to cover the entire page */
         top: 0;
-        right: 0; /* Set left to 0 to align with the screen edge */
+        left: 0; /* Set left to 0 to align with the screen edge */
         right: auto; /* Remove auto width control */
         bottom: 0;
         background-color: #ffffff;
-        width: 380px; /* Define the width of the navigation menu */
+        width: 300px; /* Define the width of the navigation menu */
         flex-direction: column;
         padding: 50px 20px; /* Add some padding for space */
         display: flex;

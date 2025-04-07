@@ -320,8 +320,14 @@ const ProductList = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`); // Navigate to the product details page with the product ID
+  const handleProductClick = (product) => {
+    const slugify = (name) =>
+      name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]+/g, "");
+
+    navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
   const renderCategoryRow = (categoryName, isAccessoryRow = false) => {
     // Combine products for the accessory row (Headphones + Speakers or all Accessories)
@@ -422,107 +428,115 @@ const ProductList = () => {
                   </SwiperSlide>
                 ))
               : combinedProducts.map((product, idx) => {
-              const images = Array.isArray(product.prod_img)
-                ? product.prod_img
-                : JSON.parse(product.prod_img || "[]");
-              const firstImage = images.length > 0 ? images[0] : null;
-              return (
-                <SwiperSlide
-                  key={idx}
-                  className={`product-slide ${
-                    combinedProducts.length > 5 &&
-                    idx === combinedProducts.length - 1
-                      ? "last-product"
-                      : ""
-                  }`}
-                >
-                  <div
-                    onClick={() => handleProductClick(product.id)}
-                    className={`custom-slider-product ${
-                      combinedProducts.length > 5 &&
-                      idx === combinedProducts.length - 1
-                        ? "blurred"
-                        : ""
-                    }`}
-                  >
-                    {product.offer_label && (
-                      <div className="product-label">
-                        {product.offer_label.charAt(0).toUpperCase() +
-                          product.offer_label.slice(1)}
-                      </div>
-                    )}
-                    {firstImage ? (
-                      <img
-                        src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
-                        alt={product.prod_name}
-                        className="custom-slider-image"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div>No image available</div>
-                    )}
-                    <span
-                      title="Add to Wishlist"
-                      className={`favorite-icon ${
-                        favorites[`${product.prod_name}-${product.id}`]
-                          ? "filled"
+                  const images = Array.isArray(product.prod_img)
+                    ? product.prod_img
+                    : JSON.parse(product.prod_img || "[]");
+                  const firstImage = images.length > 0 ? images[0] : null;
+                  return (
+                    <SwiperSlide
+                      key={idx}
+                      className={`product-slide ${
+                        combinedProducts.length > 5 &&
+                        idx === combinedProducts.length - 1
+                          ? "last-product"
                           : ""
                       }`}
-                      onClick={(event) => handleToggleFavorite(product, event)}
                     >
-                      {favorites[`${product.prod_name}-${product.id}`] ? (
-                        <FaHeart />
-                      ) : (
-                        <FaRegHeart />
-                      )}
-                    </span>
-                    <h3 className="custom-slider-name">{product.prod_name}</h3>
-                    {product.subtitle && <span className="custom-slider-subtitle">{product.subtitle}</span>}
-                    <p className="product-actual-price">
-                      <span
-                        className="product-price"
-                        style={{
-                          color: "#27ae60",
-                          fontWeight: "bold",
-                          fontSize: "20px",
-                        }}
+                      <div
+                        onClick={() => handleProductClick(product)}
+                        className={`custom-slider-product ${
+                          combinedProducts.length > 5 &&
+                          idx === combinedProducts.length - 1
+                            ? "blurred"
+                            : ""
+                        }`}
                       >
-                        ₹{product.prod_price}
-                      </span>
-                      <span>
-                        <span
-                          style={{
-                            color: "black",
-                            marginLeft: "5px",
-                            marginRight: "3px",
-                          }}
-                        >
-                          M.R.P
-                        </span>
-                        <span
-                          style={{
-                            textDecoration: "line-through",
-                            color: "red",
-                          }}
-                        >
-                          ₹{product.actual_price}
-                        </span>
-                      </span> 
-                      <br />
-                      <span
-                        className="discount"
-                        style={{ color: "green", marginLeft: "5px" }}
-                      >
-                        (
-                        {Math.round(
-                          ((product.actual_price - product.prod_price) /
-                            product.actual_price) *
-                            100
+                        {product.offer_label && (
+                          <div className="product-label">
+                            {product.offer_label.charAt(0).toUpperCase() +
+                              product.offer_label.slice(1)}
+                          </div>
                         )}
-                        % OFF)
-                      </span>
-                    </p>
-                    {/* {product.status === "unavailable" ? (
+                        {firstImage ? (
+                          <img
+                            src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                            alt={product.prod_name}
+                            className="custom-slider-image"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div>No image available</div>
+                        )}
+                        <span
+                          title="Add to Wishlist"
+                          className={`favorite-icon ${
+                            favorites[`${product.prod_name}-${product.id}`]
+                              ? "filled"
+                              : ""
+                          }`}
+                          onClick={(event) =>
+                            handleToggleFavorite(product, event)
+                          }
+                        >
+                          {favorites[`${product.prod_name}-${product.id}`] ? (
+                            <FaHeart />
+                          ) : (
+                            <FaRegHeart />
+                          )}
+                        </span>
+                        <h3 className="custom-slider-name">
+                          {product.prod_name}
+                        </h3>
+                        {product.subtitle && (
+                          <span className="custom-slider-subtitle">
+                            {product.subtitle}
+                          </span>
+                        )}
+                        <p className="product-actual-price">
+                          <span
+                            className="product-price"
+                            style={{
+                              color: "#27ae60",
+                              fontWeight: "bold",
+                              fontSize: "20px",
+                            }}
+                          >
+                            ₹{product.prod_price}
+                          </span>
+                          <span>
+                            <span
+                              style={{
+                                color: "black",
+                                marginLeft: "5px",
+                                marginRight: "3px",
+                              }}
+                            >
+                              M.R.P
+                            </span>
+                            <span
+                              style={{
+                                textDecoration: "line-through",
+                                color: "red",
+                              }}
+                            >
+                              ₹{product.actual_price}
+                            </span>
+                          </span>
+                          <br />
+                          <span
+                            className="discount"
+                            style={{ color: "green", marginLeft: "5px" }}
+                          >
+                            (
+                            {Math.round(
+                              ((product.actual_price - product.prod_price) /
+                                product.actual_price) *
+                                100
+                            )}
+                            % OFF)
+                          </span>
+                        </p>
+                        {/* {product.status === "unavailable" ? (
             <p 
               style={{
                 color: "red",
@@ -544,13 +558,12 @@ const ProductList = () => {
               Add to cart
             </button>
           )} */}
-          
-                  </div>
+                      </div>
 
-                  {combinedProducts.length > 5 &&
-  idx === combinedProducts.length - 1 && (
-    <div className="see-more-wrapper">
-      {/* <button
+                      {combinedProducts.length > 5 &&
+                        idx === combinedProducts.length - 1 && (
+                          <div className="see-more-wrapper">
+                            {/* <button
         onClick={() => {
           const lastProductCategory =
             combinedProducts[combinedProducts.length - 1].category;
@@ -560,31 +573,37 @@ const ProductList = () => {
       >
         VIEW MORE
       </button> */}
-<button class="animated-button" onClick={() => {
-          const lastProductCategory =
-            combinedProducts[combinedProducts.length - 1].category;
-          navigate(`/${lastProductCategory}`);
-        }}>
-  <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
-    ></path>
-  </svg>
-  <span class="text">View More</span>
-  <span class="circle"></span>
-  <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
-    ></path>
-  </svg>
-</button>
-
-    </div>
-  )}
-
-                </SwiperSlide>
-              );
-            })}
+                            <button
+                              class="animated-button"
+                              onClick={() => {
+                                const lastProductCategory =
+                                  combinedProducts[combinedProducts.length - 1]
+                                    .category;
+                                navigate(`/${lastProductCategory}`);
+                              }}
+                            >
+                              <svg
+                                viewBox="0 0 24 24"
+                                class="arr-2"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                              </svg>
+                              <span class="text">View More</span>
+                              <span class="circle"></span>
+                              <svg
+                                viewBox="0 0 24 24"
+                                class="arr-1"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                    </SwiperSlide>
+                  );
+                })}
           </Swiper>
         </div>
       </div>

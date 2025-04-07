@@ -486,7 +486,7 @@ const CCTVAccessories = () => {
         <Link style={{ textDecoration: "none", color: "black" }} to="/">
           Home{" "}
         </Link>
-        &gt; CCTVAccessories
+        &gt; CCTV Accessories
       </span>
       <div className="main-content">
         <Sidebar />

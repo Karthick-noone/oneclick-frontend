@@ -23,7 +23,8 @@ const Header3 = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showHeadphones, setShowHeadphones] = useState(false);
   const [showMore, setShowMore] = useState(false);
-
+  const headphonesRef = useRef(null);
+  const accessoriesRef = useRef(null);
   const location = useLocation(); // To get the current URL
 
   const headerRef = useRef(null); // Reference to the header
@@ -75,7 +76,24 @@ const Header3 = () => {
         setShowHeadphones(false);
         setShowMore(false);
       }
+
+      if (
+        headphonesRef.current &&
+        !headphonesRef.current.contains(event.target) &&
+        !event.target.closest(".nav-item")
+      ) {
+        setShowHeadphones(false); // close Audio dropdown
+      }
+  
+      if (
+        accessoriesRef.current &&
+        !accessoriesRef.current.contains(event.target) &&
+        !event.target.closest(".nav-item")
+      ) {
+        setShowMore(false); // close Accessories dropdown
+      }
     };
+    
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -104,17 +122,20 @@ const Header3 = () => {
 
   const isComputersActive = location.pathname.startsWith("/Computers"); // Match any path starting with "/Computers"
 
+  const handleLinkClick = () => {
+    setIsOpen(false);
+    setShowHeadphones(false);
+    setShowMore(false);
+  };
+
+  
   return (
-    <header
-      className="header3"
-      ref={headerRef}
-      style={{ position: "sticky", top: "72px", zIndex: 1001 }}
-    >
-      <div
+    <>
+     <div
         style={{
           position: isOpen ? "fixed" : "",
-          right: isOpen ? "" : "-80px",
-          top: !isOpen ? "-20px" : "10px",
+          left: isOpen ? "" : "25px",
+          top: !isOpen ? "125px" : "10px",
           zIndex: isOpen ? "9999" : "",
         }}
         className="hamburger"
@@ -122,10 +143,17 @@ const Header3 = () => {
       >
         {isOpen ? "✖" : "☰"}
       </div>
+    <header
+      className="header3"
+      ref={headerRef}
+      style={{ position: "sticky", top: "68px", zIndex: 1001 }}
+    >
+     
       <nav className={`nav ${isOpen ? "open" : ""}`}>
         <Link
           to="/"
           exact
+          onClick={handleLinkClick}
           className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
         >
           
@@ -136,6 +164,7 @@ const Header3 = () => {
         </Link>
         <Link
           to="/ComputerAd"
+          onClick={handleLinkClick}
           className={`nav-link ${
             location.pathname.startsWith("/computers") ||
             location.pathname.startsWith("/ComputerAd")
@@ -156,6 +185,7 @@ const Header3 = () => {
 
         <Link
           to="/MobileAd"
+          onClick={handleLinkClick}
           className={`nav-link ${
             location.pathname.startsWith("/mobiles") ||
             location.pathname.startsWith("/MobileAd")
@@ -176,6 +206,7 @@ const Header3 = () => {
 
         <Link
           to="/CCTVAd"
+          onClick={handleLinkClick}
           className={`nav-link ${
             location.pathname.startsWith("/cctv") ||
             location.pathname.startsWith("/CCTVAd")
@@ -206,9 +237,10 @@ const Header3 = () => {
             Audio
           </span>
           {showHeadphones && (
-            <div className="dropdown">
+            <div className="dropdown"  ref={headphonesRef}>
               <Link
                 to="/Headphones"
+                onClick={handleLinkClick}
                 className={`nav-link ${
                   location.pathname === "/Headphones" ? "active" : ""
                 }`}
@@ -222,6 +254,7 @@ const Header3 = () => {
               </Link>
               <Link
                 to="/Speakers"
+                onClick={handleLinkClick}
                 className={`nav-link ${
                   location.pathname === "/Speakers" ? "active" : ""
                 }`}
@@ -238,6 +271,7 @@ const Header3 = () => {
         </div>
         <Link
           to="/TV"
+          onClick={handleLinkClick}
           className={`nav-link ${
             location.pathname === "/TV" ? "active" : ""
           }`}
@@ -251,6 +285,7 @@ const Header3 = () => {
         </Link>
         <Link
           to="/Watch"
+          onClick={handleLinkClick}
           className={`nav-link ${
             location.pathname === "/Watch" ? "active" : ""
           }`}
@@ -264,6 +299,7 @@ const Header3 = () => {
         </Link>
         <Link
           to="/Printers"
+          onClick={handleLinkClick}
           className={`nav-link ${
             location.pathname === "/Printers" ? "active" : ""
           }`}
@@ -288,9 +324,10 @@ const Header3 = () => {
             Accessories
           </span>
           {showMore && (
-            <div className="dropdown">
+            <div className="dropdown"  ref={accessoriesRef}>
               <Link
                 to="/ComputerAccessories"
+                onClick={handleLinkClick}
                 className={`nav-link ${
                   isComputerAccessoriesActive ? "active" : ""
                 }`}
@@ -304,6 +341,7 @@ const Header3 = () => {
               </Link>
               <Link
                 to="/MobileAccessories"
+                onClick={handleLinkClick}
                 className={`nav-link ${
                   isMobileAccessoriesActive ? "active" : ""
                 }`}
@@ -317,6 +355,7 @@ const Header3 = () => {
               </Link>
               <Link
                 to="/CCTVAccessories"
+                onClick={handleLinkClick}
                 className={`nav-link ${
                   isCCTVAccessoriesActive ? "active" : ""
                 }`}
@@ -330,6 +369,7 @@ const Header3 = () => {
               </Link>
               <Link
                 to="/PrinterAccessories"
+                onClick={handleLinkClick}
                 className={`nav-link ${
                   isPrinterAccessoriesActive ? "active" : ""
                 }`}
@@ -346,6 +386,7 @@ const Header3 = () => {
         </div>
         <Link
           to="/Secondhandproducts"
+          onClick={handleLinkClick}
           className={`nav-link ${
             location.pathname === "/Secondhandproducts" ? "active" : ""
           }`}
@@ -359,6 +400,7 @@ const Header3 = () => {
         </Link>
         <Link
           to="/About"
+          onClick={handleLinkClick}
           className={`nav-link ${
             location.pathname === "/About" ? "active" : ""
           }`}
@@ -376,6 +418,7 @@ const Header3 = () => {
 
         <Link
           to="/Contact"
+          onClick={handleLinkClick}
           className={`nav-link ${
             location.pathname === "/Contact" ? "active" : ""
           }`}
@@ -393,6 +436,7 @@ const Header3 = () => {
 
         <Link
           to="/HelpCenter"
+          onClick={handleLinkClick}
           className={`nav-link ${
             location.pathname === "/HelpCenter" ? "active" : ""
           }`}
@@ -409,6 +453,7 @@ const Header3 = () => {
         </Link>
       </nav>
     </header>
+    </>
   );
 };
 

@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate,Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { ApiUrl } from "./ApiUrl";
 import "./css/LoginPage.css";
 import logo from "./img/logo3.png";
 import { FaSignOutAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import confetti from "canvas-confetti"; // Import the confetti package
+import axios from 'axios';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [role, setRole] = useState("Admin"); // Added role state
+  const [backgroundImage, setBackgroundImage] = useState('');
 
   const handleRoleChange = (e) => {
     setRole(e.target.value); // Update role based on radio button selection
@@ -204,19 +206,49 @@ const LoginPage = () => {
     },
   };
 
+  // Fetch the background image from the server
+  useEffect(() => {
+    console.log('Fetching background image from:', `${ApiUrl}/fetchloginbg`); // Log the API URL being used
+
+    axios.get(`${ApiUrl}/fetchloginbg`)
+      .then((response) => {
+        console.log('Response data:', response.data); // Log the data received from the server
+        
+        if (response.data.length > 0) {
+          console.log('Background image found:', response.data[0].image); // Log the image being used
+          setBackgroundImage(response.data[0].image); // Only set the filename, base path is handled in style
+        } else {
+          console.log('No background image found, using gradient instead');
+          setBackgroundImage(''); // No image, fallback to gradient
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching background image:', error); // Log any errors that occur
+      });
+  }, []);
+
   return (
     <div className="login-page">
+       {backgroundImage && (
+              <div
+                style={{
+                  ...styles.blurredBackground,
+                  backgroundImage: `url(${ApiUrl}/uploads/singleadpage/${backgroundImage})`,
+                }}
+              />
+            )}
       <div className="login-container">
+    
         <div className="login-header">
-          <a href="/">
-            {" "}
+        <Link to="/">
+        {" "}
             <img src={logo} width={"200px"} loading="lazy" alt="" />
-          </a>
-          <a href="/">
-            <button style={{ color: "white" }} className="close-btn">
+            </Link>
+          <Link to="/">
+            <button className="close-btnn" >
               <FaSignOutAlt />
             </button>
-          </a>
+          </Link>
           <h1>{role} Login</h1>
           <p>Enter your credentials to access your account</p>
         </div>
@@ -309,5 +341,30 @@ const LoginPage = () => {
     </div>
   );
 };
+
+const styles = {
+  background: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    background: 'linear-gradient(to bottom right, #add8e6, #ffffff)',
+    backgroundSize: 'cover',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  blurredBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    filter: 'blur(4px)',
+    zIndex: 1,
+  }
+};
+
 
 export default LoginPage;

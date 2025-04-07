@@ -525,62 +525,7 @@ const ProductDetail = ({ accessoryCategory }) => {
     fetchProducts();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchRelatedAccessories = async () => {
-  //     if (product && product.category) {
-  //       console.log(
-  //         "Fetching related accessories for category:",
-  //         product.category
-  //       );
-  //       const categoryMap = {
-  //         Mobiles: "mobileaccessories",
-  //         Computers: "computeraccessories",
-  //         CCTV: "cctvaccessories",
-  //         Printers: "printeraccessories",
-  //       };
-  //       const accessoryCategory = categoryMap[product.category];
-
-  //       if (accessoryCategory) {
-  //         try {
-  //           const url = `${ApiUrl}/products/accessories/${accessoryCategory}`;
-  //           const response = await axios.get(url);
-  //           console.log(
-  //             "Fetched related accessories successfully:",
-  //             response.data
-  //           );
-
-  //           // Filter accessories based on product name
-  //           const filteredAccessories = response.data.filter(
-  //             (accessory) =>
-  //               accessory.prod_name
-  //                 .toLowerCase()
-  //                 .includes(product.prod_name.toLowerCase()) ||
-  //               product.prod_name
-  //                 .toLowerCase()
-  //                 .includes(accessory.prod_name.toLowerCase())
-  //           );
-
-  //           setRelatedAccessories(filteredAccessories);
-  //           console.log("Filtered related accessories:", filteredAccessories);
-  //         } catch (error) {
-  //           console.error(
-  //             "Error fetching related accessories:",
-  //             error.response ? error.response.data : error.message
-  //           );
-  //         }
-  //       } else {
-  //         console.warn(
-  //           "No matching accessory category found for:",
-  //           product.category
-  //         );
-  //       }
-  //     } else {
-  //       console.warn("Product or product category is undefined");
-  //     }
-  //   };
-
-  //   fetchRelatedAccessories();
-  // }, [product]);
+  
 
   useEffect(() => {
     const fetchRelatedAccessories = async () => {
@@ -755,25 +700,7 @@ const ProductDetail = ({ accessoryCategory }) => {
     // return () => clearInterval(intervalId);
   }, []);
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="spinner-container">
-  //       <div className="spinner" style={{ marginTop: "200px" }}>
-  //         {[...Array(12)].map((_, index) => (
-  //           <div key={index} className="spinner-blade"></div>
-  //         ))}
-  //       </div>
-  //     </div>
-  //   ); // You can replace this with a loading spinner or skeleton screen
-  // }
 
-  // if (!product) {
-  //   return <div>Product not found.</div>;
-  // }
-
-  // if (isLoading || !product) {
-  //   return <Skeleton width={300} height={200} style={{ marginTop: "20px" }} />;
-  // }
   
   if (isLoading || !product) {
     return null; // Show nothing when loading or if the product is not found

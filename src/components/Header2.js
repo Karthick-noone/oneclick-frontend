@@ -20,8 +20,8 @@ import { Link, useNavigate } from "react-router-dom";
 import UserCard from "./UserCard"; // Import UserCard component
 import WishlistSidebar from "./WishlistSidebar"; // Import WishlistSidebar component
 import logo from "./img/logo3.png";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
 import { ApiUrl } from "./ApiUrl";
 import axios from "axios";
 import Header3 from "./Header3";
@@ -30,6 +30,9 @@ import "nprogress/nprogress.css";
 import NProgress from "nprogress";
 // import isOfferActive from './ProductDetail'
 import { IoMdClose } from "react-icons/io"; // Importing close icon
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 import usericon from "./img/user.png";
 import wishlisticon from "./img/wish-list.png";
@@ -600,12 +603,23 @@ const Header2 = () => {
   const handleLogout = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("email");
-    localStorage.removeItem("email-wishlist");
-    localStorage.removeItem("email-cart");
-    localStorage.removeItem("favourites");
     localStorage.removeItem("user_id");
+    localStorage.removeItem("contact_number");
+
     setUser(null);
     setIsUserCardOpen(false);
+
+    toast.success("Logged out successfully!", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+
     navigate("/login");
   };
 
@@ -803,6 +817,15 @@ const Header2 = () => {
     }
   };
 
+  const handleProductClick = (product) => {
+    const slugify = (name) =>
+      name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]+/g, "");
+
+    navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
+  };
   return (
     <>
       <header
@@ -810,15 +833,15 @@ const Header2 = () => {
         className="header2"
       >
         {/* <div className="company-name"> */}
-        <Link to="/">
-          <img
-            src={logo}
-            width={"230px"}
-            style={{ marginLeft: "50px" }}
-            alt="Company Logo"
-            // loading="lazy"
-          />
-        </Link>
+        {/* <Link to="/"> */}
+        <img
+          src={logo}
+          width={"230px"}
+          style={{ marginLeft: "50px" }}
+          alt="Company Logo"
+          // loading="lazy"
+        />
+        {/* </Link> */}
         {/* </div> */}
         <div className="search-box">
           <input
@@ -828,7 +851,7 @@ const Header2 = () => {
             onChange={handleSearchInputChange}
             onKeyPress={handleKeyPress}
             placeholder="Search for products..."
-            autoComplete="off" 
+            autoComplete="off"
           />
           {searchQuery && (
             <IoMdClose
@@ -873,7 +896,7 @@ const Header2 = () => {
           {isDropdownOpen && (
             <div className="dropdown-menu" ref={dropdownRef}>
               <Link to="/About">
-              {/* <a href="/About"> */}
+                {/* <a href="/About"> */}
                 <div
                   className="dropdown-item"
                   onClick={() => handleMenuClick("About")}
@@ -953,7 +976,10 @@ const Header2 = () => {
             {isDropdownOpen4 && (
               <div ref={dropdownRef} className="dropdownnn-container">
                 <div className="dropdownnn-content">
-                  <Link to="/UserAddress" onClick={() => setIsDropdownOpen4(false)}>
+                  <Link
+                    to="/UserAddress"
+                    onClick={() => setIsDropdownOpen4(false)}
+                  >
                     <FaAddressBook
                       style={{ color: "#333" }}
                       className="iicon"
@@ -961,15 +987,25 @@ const Header2 = () => {
                     My Addresses
                   </Link>
                   {/* <a to="/my-subscription"><FaCalendarCheck /> My Subscription</a> */}
-                  <Link to="/MyAccount" onClick={() => setIsDropdownOpen4(false)}>
+                  <Link
+                    to="/MyAccount"
+                    onClick={() => setIsDropdownOpen4(false)}
+                  >
                     <FaUser style={{ color: "#333" }} className="iicon" /> My
                     Account
                   </Link>
-                  <Link to="/MyOrders" onClick={() => setIsDropdownOpen4(false)}>
+                  <Link
+                    to="/MyOrders"
+                    onClick={() => setIsDropdownOpen4(false)}
+                  >
                     <FaBox style={{ color: "#333" }} className="iicon" /> My
                     Orders
                   </Link>
-                  <Link to="/Cart" className="cart-link" onClick={() => setIsDropdownOpen4(false)}>
+                  <Link
+                    to="/Cart"
+                    className="cart-link"
+                    onClick={() => setIsDropdownOpen4(false)}
+                  >
                     <FaShoppingBag
                       style={{ color: "#333" }}
                       className="iicon"
@@ -986,12 +1022,21 @@ const Header2 = () => {
                   </Link>
 
                   <hr />
-                  <Link to="#" onClick={() => { handleLogout(); setIsDropdownOpen4(false); }}>
+                  <Link
+                    to="#"
+                    onClick={() => {
+                      handleLogout();
+                      setIsDropdownOpen4(false);
+                    }}
+                  >
                     <FaPowerOff style={{ color: "#333" }} /> Logout
                   </Link>
                 </div>
               </div>
             )}
+
+
+            
           </div>
           {isMobileView && <Header3 />}
         </div>
@@ -1027,10 +1072,13 @@ const Header2 = () => {
 
                   return (
                     <li key={item.id} className="cart-item">
-                      <Link
-                        style={{ textDecoration: "none" }}
-                        to={`/product/${item.id}`}
-                        onClick={() => setIsSidebarOpen(false)}
+                      <span
+                        style={{ cursor: "pointer" }}
+                        // to={`/product/${item.id}`}
+                        onClick={() => {
+                          setIsSidebarOpen(false);
+                          handleProductClick(item);
+                        }}
                       >
                         {firstImage ? (
                           <img
@@ -1039,21 +1087,23 @@ const Header2 = () => {
                             loading="lazy"
                           />
                         ) : (
-                          <div className="placeholder-image">
+                          <span className="placeholder-image">
                             No image available
-                          </div> // Fallback if no image is available
+                          </span> // Fallback if no image is available
                         )}
-                      </Link>
+                      </span>
                       <div className="item-details">
-                        <Link
-                          style={{ textDecoration: "none" }}
-                          to={`/product/${item.id}`}
-                        onClick={() => setIsSidebarOpen(false)}
-
+                        <span
+                          style={{ cursor: "pointer" }}
+                          // to={`/product/${item.id}`}
+                          onClick={() => {
+                            setIsSidebarOpen(false);
+                            handleProductClick(item);
+                          }}
                         >
                           <h3 className="item-name">{item.prod_name}</h3>
                           <p className="item-features">{item.prod_features}</p>
-                        </Link>
+                        </span>
                       </div>
 
                       <div className="item-price">
@@ -1114,7 +1164,7 @@ const Header2 = () => {
                 <Link
                   style={{ textDecoration: "none", color: "black" }}
                   to="/Cart"
-                onClick={() => setIsSidebarOpen(false)}
+                  onClick={() => setIsSidebarOpen(false)}
                 >
                   {/* <button className="change-btn" onClick={handleViewCart}>
                     View Cart <FaShoppingCart />
@@ -1150,9 +1200,11 @@ const Header2 = () => {
                   </button>
                 </Link>
 
-                <p className="total-prices">₹{calculateTotalPrice()}</p>  
+                {calculateTotalPrice() > 0 && (
+                  <p className="total-prices">₹{calculateTotalPrice()}</p>
+                )}
 
-
+                {/* <ToastContainer position="top-right" autoClose={3000} /> */}
               </div>
             </div>
           </div>
