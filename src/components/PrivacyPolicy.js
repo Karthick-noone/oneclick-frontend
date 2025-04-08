@@ -156,7 +156,7 @@ const TermsAndConditions = () => {
 const styles = {
   pageContainer: {
     // fontFamily: "poppins",
-    backgroundColor: "lightgrey",
+    // backgroundColor: "lightgrey",
     margin: 0,
     padding: 0,
   },
@@ -169,7 +169,9 @@ const styles = {
     margin: "0 auto",
     backgroundColor:"white",
     marginBottom:'10px',
-    marginTop:'10px'
+    marginTop:'10px',
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" // added box shadow
+
   },
   textContainer: {
     width: "100%",

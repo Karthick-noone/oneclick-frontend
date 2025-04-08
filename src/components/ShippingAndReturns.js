@@ -13,7 +13,7 @@ const ShippingAndReturns = () => {
       {/* <Header3 /> */}
       <div style={styles.container}>
         <div style={styles.textContainer}>
-          <h2 style={styles.title}>Shipping</h2>
+          <h2 style={styles.title}>Shipping And Returns</h2>
           <h4 style={styles.subtitle}>What are the delivery charges?</h4>
           <p style={styles.paragraph}>
           Delivery charge varies with each Seller.
@@ -110,7 +110,7 @@ const ShippingAndReturns = () => {
 const styles = {
   pageContainer: {
     // fontFamily: "poppins",
-    backgroundColor: "lightgrey",
+    // backgroundColor: "lightgrey",
     margin: 0,
     padding: 0,
   },
@@ -120,10 +120,12 @@ const styles = {
     alignItems: "center",
     padding: "20px 10px",
     maxWidth: "900px",
-    margin: "0 auto",
+    margin: "0px auto",
     backgroundColor:"white",
     marginBottom:'10px',
-    marginTop:'10px'
+    marginTop:'10px',
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" // added box shadow
+
   },
   textContainer: {
     width: "100%",

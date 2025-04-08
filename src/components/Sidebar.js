@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaTimes, FaHome, FaLaptop, FaHeadphones, FaMobileAlt, FaPrint, FaTv, FaVolumeUp, FaClock, FaVideo, FaRecycle } from 'react-icons/fa';
-import { useLocation } from 'react-router-dom';  // Import useLocation hook
+import { useLocation, Link } from 'react-router-dom';  // Import useLocation hook
 import './css/Sidebar.css';
 
 const Sidebar = () => {
@@ -38,132 +38,132 @@ const Sidebar = () => {
                     <h3>Browse by products</h3>
                     <ul>
                         <li>
-                            <a
-                                href="/"
+                            <Link
+                                to="/"
                                 onClick={() => handleLinkClick('home')}
                                 className={activeLink === 'home' ? 'active' : ''}
                             >
                                 <FaHome /> Home
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/Computers"
+                            <Link
+                                to="/Computers"
                                 onClick={() => handleLinkClick('computers')}
                                 className={activeLink === 'computers' ? 'active' : ''}
                             >
                                 <FaLaptop /> Computers
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/Mobiles"
+                            <Link
+                                to="/Mobiles"
                                 onClick={() => handleLinkClick('mobiles')}
                                 className={activeLink === 'mobiles' ? 'active' : ''}
                             >
                                 <FaMobileAlt /> Mobiles
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/CCTV"
+                            <Link
+                                to="/CCTV"
                                 onClick={() => handleLinkClick('cctv')}
                                 className={activeLink === 'cctv' ? 'active' : ''}
                             >
                                 <FaVideo /> CCTV
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/Headphones"
+                            <Link
+                                to="/Headphones"
                                 onClick={() => handleLinkClick('headphones')}
                                 className={activeLink === 'headphones' ? 'active' : ''}
                             >
                                 <FaHeadphones /> Headphones
-                            </a>
+                            </Link>
                         </li>
                        
                         <li>
-                            <a
-                                href="/Speakers"
+                            <Link
+                                to="/Speakers"
                                 onClick={() => handleLinkClick('speakers')}
                                 className={activeLink === 'speakers' ? 'active' : ''}
                             >
                                 <FaVolumeUp /> Speakers
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/TV"
-                                onClick={() => handleLinkClick('TV')}
-                                className={activeLink === 'TV' ? 'active' : ''}
+                            <Link
+                                to="/TV"
+                                onClick={() => handleLinkClick('tv')}
+                                className={activeLink === 'tv' ? 'active' : ''}
                             >
                                 <FaTv /> TV & Home Cinema
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/Watch"
+                            <Link
+                                to="/Watch"
                                 onClick={() => handleLinkClick('watch')}
                                 className={activeLink === 'watch' ? 'active' : ''} 
                             >
                                 <FaClock /> Wearable Tech
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/Printers"
+                            <Link
+                                to="/Printers"
                                 onClick={() => handleLinkClick('printers')}
                                 className={activeLink === 'printers' ? 'active' : ''}
                             >
                                 <FaPrint /> Printers
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/ComputerAccessories"
+                            <Link
+                                to="/ComputerAccessories"
                                 onClick={() => handleLinkClick('computeraccessories')}
                                 className={activeLink === 'computeraccessories' ? 'active' : ''}
                             >
                                 <FaLaptop /> Computer Accessories
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/MobileAccessories"
+                            <Link
+                                to="/MobileAccessories"
                                 onClick={() => handleLinkClick('mobileaccessories')}
                                 className={activeLink === 'mobileaccessories' ? 'active' : ''}
                             >
                                 <FaMobileAlt /> Mobile Accessories
-                            </a>
+                            </Link>
                         </li>
                      
                         <li>
-                            <a
-                                href="/CCTVAccessories"
+                            <Link
+                                to="/CCTVAccessories"
                                 onClick={() => handleLinkClick('cctvaccessories')}
                                 className={activeLink === 'cctvaccessories' ? 'active' : ''}
                             >
                                 <FaVideo /> CCTV Accessories
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/PrinterAccessories"
+                            <Link
+                                to="/PrinterAccessories"
                                 onClick={() => handleLinkClick('printeraccessories')}
                                 className={activeLink === 'printeraccessories' ? 'active' : ''}
                             >
                                 <FaPrint /> Printer Accessories
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="/Secondhandproducts"
+                            <Link
+                                to="/Secondhandproducts"
                                 onClick={() => handleLinkClick('secondhandproducts')}
                                 className={activeLink === 'secondhandproducts' ? 'active' : ''}
                             >
                                 <FaRecycle /> Refurbish
-                            </a>
+                            </Link>
                         </li>
                     </ul>
                 </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import "./css/ShopByCategory.css"; // Adjust path as needed
+import { Link } from "react-router-dom";
 
 const categories = [
   { name: "Computers", img: "computer.jpg", link: "/ComputerAd" },
@@ -24,7 +25,7 @@ const ShopByCategory = () => {
       <div className="categories">
         {categories.map((category, index) => (
           <div className="category" key={index}>
-            <a href={category.link}>
+            <Link to={category.link}>
               <img
                 loading="lazy"
                 src={images(`./${category.img}`)}
@@ -32,7 +33,7 @@ const ShopByCategory = () => {
                 className="category-image"
               />
               <span className="category-text">{category.name}</span>
-            </a>
+            </Link>
           </div>
         ))}
       </div>

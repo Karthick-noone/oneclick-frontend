@@ -894,40 +894,32 @@ const CartPage = () => {
                     return (
                       <li
                         key={item.id}
-                        className="cart-product d-flex align-items-center"
+                        className="cart-product "
                       >
                         {/* <Link
                           style={{ textDecoration: "none" }}
                           to={`/product/${item.id}`}
                         > */}
-                          {firstImage ? (
-                            <img
-                              src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
-                              alt={item.prod_name || "Product"}
-                              loading="lazy"
-                              className="cart-product-image"
-                        onClick={() => handleProductClick(item)}
-
-                              name="image"
-                            />
-                          ) : (
-                            <div className="placeholder-image">
-                              No image available
-                            </div> // Fallback if no image is available
-                          )}
-                        {/* </Link> */}
-                        <div
-                          style={{ cursor: "pointer" }}
-                          className="cart-product-details"
-                          key={item.id}
-                          onClick={() => handleProductClick(item)}
-                        >
-                         
-                            <p className="cart-product-name">
-                              {item.prod_name}
-                            </p>
-                            {/* <p className="cart-product-description">{item.description}</p> */}
-                        </div>
+                       <div className="cart-product-header">
+  {firstImage ? (
+    <img
+      src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
+      alt={item.prod_name || "Product"}
+      loading="lazy"
+      className="cart-product-image"
+      onClick={() => handleProductClick(item)}
+      name="image"
+    />
+  ) : (
+    <div className="placeholder-image">No image available</div>
+  )}
+  <div
+    className="cart-product-details"
+    onClick={() => handleProductClick(item)}
+  >
+    <p className="cart-product-name">{item.prod_name}</p>
+  </div>
+</div>
                         <div className="cart-product-price">
                           <div className="cart-quantity-controls">
                             <button

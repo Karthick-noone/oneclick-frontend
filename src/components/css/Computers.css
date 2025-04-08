@@ -255,7 +255,7 @@
   width: 100%;
   height: 200px;
   object-fit: contain;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
 }
 
 .product-name {
@@ -347,14 +347,29 @@
         border-bottom: 1px solid #ddd; /* Add border at bottom */
     }
 
-    .product-card {
-        width: calc(50% - 20px); /* Fit 2 cards in a row for small screens */
-    }
+   
 }
 
 @media (max-width: 480px) {
     .product-card {
         width: calc(50% - 10px); /* Fit 1 card in a row for very small screens */
+    }
+
+    .product-image {
+      max-height: 100px;
+      /* margin-bottom: 5px; */
+    }
+    .product-name {
+      font-size: 14px;
+      margin: 3px 0;
+    }
+    .product-subtitle2 {
+      font-size: 11px;
+      margin: 3px 0;
+    }
+    .product-price {
+      font-size: 16px;
+      margin: 3px 0;
     }
     
 }

@@ -1,60 +1,54 @@
-/* Main footer styling with card-like effect */
+/* Main footer styling with card-like effect (for larger screens, using flex) */
 .footer {
     display: flex;
-    flex-wrap: wrap; /* Allows wrapping on smaller screens */
-    justify-content: space-around; /* Distributes space evenly */
+    flex-wrap: wrap;
+    justify-content: space-around;
     padding: 20px;
-    background-color: #001a35; /* White background for the card effect */
-    color: #ddd; /* Black text color */
-    text-align: left;
-    font-family: 'calibri', sans-serif; /* Font family */
-
-    /* Add box-shadow for card effect */
-    box-shadow: 10px 10px 10px 8px rgba(0, 0, 0, 0.3);
-    margin: 0px; /* Optional: Add margin to separate from other content */
+    background-color: #001a35;
+    color: #ddd;
+    font-family: 'calibri', sans-serif;
+    /* box-shadow: 10px 10px 10px 8px rgba(0, 0, 0, 0.3); */
+    margin: 0;
 }
 
-/* Individual sections inside the footer */
 .footer-section {
     flex: 1;
-    min-width: 200px; /* Ensures sections are not too narrow */
+    /* min-width: 200px; */
     margin: 10px;
 }
 
 .footer-section a {
-    text-decoration: none; /* Remove underline */
-    color: #ddd; /* Links also in black */
+    text-decoration: none;
+    color: #ddd;
 }
 
 .footer-section h4 {
     margin-bottom: 10px;
     font-size: 16px;
     font-weight: bold;
-    color: #ddd; /* Headings in black */
+    color: #ddd;
 }
 
 .footer-section p {
     margin: 5px 0;
-    margin-left: 20px;
+    /* margin-left: 20px; */
     font-size: 14px;
-    color: #ddd; /* Regular text in black */
-    text-decoration: none;
-}
-
-/* Ensure each item is displayed on a new line */
-.footer-section p {
+    color: #ddd;
+    text-align: left;
     display: block;
 }
 
-/* Responsive adjustments for smaller screens */
+/* Responsive adjustments using CSS Grid for smaller screens */
 @media (max-width: 768px) {
     .footer {
-        flex-direction: column; /* Stack sections vertically */
-        align-items: center;
-        text-align: center;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Two equal columns */
+        gap: 10px; /* Space between grid items; adjust as needed */
+        padding: 10px;
     }
-
+    
+    /* Optionally remove margins in grid layout if they cause extra spacing */
     .footer-section {
-        margin: 10px 0; /* Space out sections when stacked */
+        margin-left: 10px;
     }
 }

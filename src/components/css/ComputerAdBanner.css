@@ -95,7 +95,7 @@ border-radius: 5px;
   .banner-image {
     width: 100%; /* Full width */
     height: auto; /* Maintain aspect ratio */
-    margin-top: 28px; /* Space at the top */
+    /* margin-top: 28px;  */
     cursor: pointer;
     transition: transform 0.3s ease; /* Smooth transition for scaling */
   

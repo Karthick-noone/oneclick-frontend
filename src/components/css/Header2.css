@@ -333,9 +333,6 @@
       justify-content: center;
   }
 
-  .footer {
-      grid-template-columns: 1fr;
-  }
 
   .dots {
    display: none;

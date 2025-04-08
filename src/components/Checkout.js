@@ -1250,8 +1250,10 @@ const Checkout = () => {
                       return (
                         <li
                           key={item.id}
-                          className="cart-product d-flex align-items-center"
+                          className="cart-product"
                         >
+                       <div className="cart-product-header">
+
                           {firstImage ? (
                             <div
                               key={item.id}
@@ -1282,9 +1284,10 @@ const Checkout = () => {
                             {/* <p className="cart-product-name">
                                 {item.prod_id}
                               </p> */}
-                            <p className="cart-product-description">
+                            {/* <p className="cart-product-description">
                               {item.prod_features}
-                            </p>
+                            </p> */}
+                          </div>
                           </div>
                           <div className="cart-product-price">
                             <div className="cart-quantity-controls">

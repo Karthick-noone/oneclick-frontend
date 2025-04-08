@@ -66,7 +66,7 @@ const AppWrapper = ({ children }) => {
   const path = location.pathname.toLowerCase(); // Convert to lowercase
 
   const isExcluded =
-    path.startsWith("/admin") || path === "/login";
+    path.startsWith("/admin") || path === "/login"|| path === "/signup"|| path === "/forgotpassword";
 
   return (
     <>
