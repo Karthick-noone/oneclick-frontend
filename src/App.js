@@ -50,6 +50,7 @@ import FilterBar from "./components/FilterBar";
 import Secondhandproducts from "./components/Secondhandproducts";
 import AdminMain from "./admin/AdminApp";
 import BuyNow from "./components/BuyNow";
+import NetworkStatus from "./components/NetworkStatus"; // Import the component
 
 const ScrollToTop = () => {
   const location = useLocation();
@@ -81,6 +82,8 @@ const App = () => {
   return (
     <Router>
       <ScrollToTop />
+      <NetworkStatus />  {/* Include NetworkStatus at the root level */}
+
       <AppWrapper>
         <Routes>
           <Route path="/" element={<Main />} />
