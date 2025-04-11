@@ -82,8 +82,7 @@ const App = () => {
   return (
     <Router>
       <ScrollToTop />
-      <NetworkStatus />  {/* Include NetworkStatus at the root level */}
-
+      <NetworkStatus>  {/* Include NetworkStatus at the root level */}
       <AppWrapper>
         <Routes>
           <Route path="/" element={<Main />} />
@@ -132,6 +131,7 @@ const App = () => {
           <Route path="/Admin/*" element={<AdminMain />} />
         </Routes>
       </AppWrapper>
+      </NetworkStatus>
     </Router>
   );
 };

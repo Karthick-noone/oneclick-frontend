@@ -3,7 +3,7 @@ import React from "react";
 import Header2 from "./Header2";
 // import Header3 from "./Header3";
 import Footer from "./footer";
-
+import { Link } from "react-router-dom";
 const TermsAndConditions = () => {
   return (
     <div style={styles.pageContainer}>
@@ -19,7 +19,7 @@ const TermsAndConditions = () => {
 </p>
           <h4 style={styles.subtitle}>PRIVACY POLICY</h4>
           <p style={styles.paragraph}>
-          We value the trust you place in us and recognize the importance of secure transactions and information privacy. This Privacy Policy describes how Oneclick Internet Private Limited and its affiliates (collectively “Oneclick, we, our, us”) collect, use, share or otherwise process your personal data through Oneclick website <a href="https://oneclickteck.com/">https://oneclickteck.com</a>, its mobile application, and m-site (hereinafter referred to as the “Platform”).
+          We value the trust you place in us and recognize the importance of secure transactions and information privacy. This Privacy Policy describes how Oneclick Internet Private Limited and its affiliates (collectively “Oneclick, we, our, us”) collect, use, share or otherwise process your personal data through Oneclick website <Link to="https://oneclickteck.com/">https://oneclickteck.com</Link>, its mobile application, and m-site (hereinafter referred to as the “Platform”).
           </p>
           <p style={styles.paragraph}>
           While you can browse sections of the Platform without the need of sharing any information with us, however, please note we do not offer any product or service under this Platform outside India and your personal data will primarily be stored and processed in India. By visiting this Platform, providing your information or availing out product/service, you expressly agree to be bound by the terms and conditions of this Privacy Policy, the Terms of Use and the applicable service/product terms and conditions, and agree to be governed by the laws of India including but not limited to the laws applicable to data protection and privacy. If you do not agree please do not use or access our Platform.
@@ -144,7 +144,7 @@ const TermsAndConditions = () => {
           <p style={styles.paragraph}>
          If you have a query, concern, or complaint in relation to collection or usage of your personal data under this Privacy Policy, please contact us at enquiryoneclick@gmail.com</p>
           <p style={styles.paragraph}>
-         You can reach our customer support team to address any of your queries or complaints related to product and services by clicking the link, selecting your order and choosing 'Need Help' option: <a href="https://oneclickteck.com/HelpCenter/">https://oneclickteck.com/helpcenter</a> 
+         You can reach our customer support team to address any of your queries or complaints related to product and services by clicking the link, selecting your order and choosing 'Need Help' option: <Link to="https://oneclickteck.com/HelpCenter/">https://oneclickteck.com/helpcenter</Link> 
           </p>  
         </div>
       </div>

@@ -170,11 +170,11 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
         },
       }}
     >
-      {loading ? (
+      {/* {loading ? (
         <div className="spinner-container" style={{ height: "360px" }}>
-          <div className="spinner">{/* Spinner content here */}</div>
+          <div className="spinner"></div>
         </div>
-      ) : (
+      ) : ( */}``
         <>
           <button
             onClick={handleModalClose}
@@ -313,7 +313,7 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
             </button>
           )}
         </>
-      )}
+      {/* )} */}
     </Modal>
   );
 };

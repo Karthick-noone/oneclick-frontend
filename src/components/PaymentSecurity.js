@@ -3,7 +3,7 @@ import React from "react";
 import Header2 from "./Header2";
 // import Header3 from "./Header3";
 import Footer from "./footer";
-
+import { Link } from "react-router-dom";
 const TermsAndConditions = () => {
   return (
     <div style={styles.pageContainer}>
@@ -43,11 +43,11 @@ const TermsAndConditions = () => {
           </p>
           <h4 style={styles.subtitle}>Privacy Policy</h4>
           <p style={styles.paragraph}>
-          https://oneclickteck.com respects your privacy and is committed to protecting it. For more details, please see our <a href="/Privacypolicy">Privacy Policy.</a> 
+          https://oneclickteck.com respects your privacy and is committed to protecting it. For more details, please see our <Link to="/Privacypolicy">Privacy Policy.</Link> 
           </p>
           <h4 style={styles.subtitle}>Contact Us</h4>
           <p style={styles.paragraph}>
-          Couldn't find the information you need? Please <a href="/Contact">Contact Us</a>
+          Couldn't find the information you need? Please <Link to="/Contact">Contact Us</Link>
           </p>
            
         </div>

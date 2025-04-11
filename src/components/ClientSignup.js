@@ -7,7 +7,7 @@ import logo from "./img/logo3.png";
 // import { Zoom } from "react-toastify";
 import confetti from "canvas-confetti"; // Ensure you import confetti
 import axios from "axios";
-
+import { Link } from "react-router-dom";
 const SignupPage = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -283,14 +283,14 @@ const SignupPage = () => {
       )}
       <div style={styles.container}>
         <button style={styles.signOutButton}>
-          <a href="/" style={{ color: "white" }}>
+          <Link to="/" style={{ color: "white" }}>
             <FaSignOutAlt title="Exit"/>
-          </a>
+          </Link>
         </button>
         <center>
-          <a href="/">
+          <Link to="/">
             <img src={logo} width={"200px"}  alt="Logo" />
-          </a>
+          </Link>
         </center>
         <h2 style={styles.title}>SignUp</h2>
         <form style={styles.form} onSubmit={handleSubmit} autoComplete="off">

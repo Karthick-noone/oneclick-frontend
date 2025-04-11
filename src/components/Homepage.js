@@ -6,7 +6,7 @@ import { ApiUrl } from "./ApiUrl";
 import "./css/Homepage.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
+import { Link } from "react-router-dom";
 const fetchHomepageData = async () => {
   const response = await axios.get(`${ApiUrl}/fetchedithomepage`);
   await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating delay
@@ -60,14 +60,14 @@ const Homepage = () => {
           <Slider {...sliderSettings}>
             {data.map((item, index) => (
               <div key={index} className="slider-image-container">
-                <a href={`/${item.category}`} className="shop-button-link">
+                <Link to={`/${item.category}`} className="shop-button-link">
                   <img
                     src={`${ApiUrl}/uploads/edithomepage/${item.image}`}
                     alt={`Ad ${index + 1}`}
                     className="slider-image"
                     // loading="lazy"
                   />
-                </a>
+                </Link>
               </div>
             ))}
           </Slider>

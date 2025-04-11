@@ -1,43 +1,88 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+// import noInternet from './img/no-internet.png';
 
-const NetworkStatus = () => {
-  const [isOnline, setIsOnline] = useState(navigator.onLine); // Initialize with current network status
-
-  const handleOnline = () => setIsOnline(true);  // Set to online when the network is restored
-  const handleOffline = () => setIsOnline(false); // Set to offline when the network is lost
+const NetworkStatus = ({ children }) => {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [checking, setChecking] = useState(false);
 
   useEffect(() => {
-    // Add event listeners for 'online' and 'offline' events
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
-
-    // Cleanup listeners when the component unmounts
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
-  return (
-    <div>
-      {!isOnline && (
-        <div style={{
-          backgroundColor: "#f44336",
-          color: "white",
-          padding: "10px",
-          textAlign: "center",
-          position: "fixed",
-          top: "0",
-          width: "100%",
-          zIndex: "9999",
+  const handleRetry = () => {
+    setChecking(true);
+    setTimeout(() => {
+      setIsOnline(navigator.onLine);
+      setChecking(false);
+    }, 1000); // simulate checking delay
+  };
+
+  if (!isOnline) {
+    return (
+      <div style={{
+        height: "100vh",
+        width: "100vw",
+        backgroundColor: "#fefefe",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: "center",
+        padding: "20px",
+        fontFamily: "Segoe UI, Roboto, sans-serif",
+      }}>
+        <img
+          src="no-internet.png"
+          alt="No Internet"
+          style={{
+            maxWidth: "100px",
+            marginBottom: "25px",
+            filter: "drop-shadow(0 0 5px rgba(0,0,0,0.1))"
+          }}
+        />
+        <h2 style={{ fontSize: "28px", color: "#222", marginBottom: "10px" }}>
+          You're Offline
+        </h2>
+        <p style={{
+          color: "#666",
           fontSize: "16px",
-          fontWeight: "bold",
+          maxWidth: "400px",
+          marginBottom: "25px",
+          lineHeight: "1.5"
         }}>
-          <p>You are currently offline. Please check your connection.</p>
-        </div>
-      )}
-    </div>
-  );
+          Please check your internet connection and try again.
+        </p>
+
+        <button
+          onClick={handleRetry}
+          disabled={checking}
+          style={{
+            backgroundColor: "#007bff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            padding: "10px 20px",
+            fontSize: "16px",
+            cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(0, 123, 255, 0.2)",
+            transition: "background-color 0.3s ease",
+          }}
+        >
+          {checking ? "Checking..." : "Retry"}
+        </button>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
 };
 
 export default NetworkStatus;

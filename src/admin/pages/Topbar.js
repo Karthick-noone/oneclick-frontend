@@ -8,6 +8,7 @@ import 'nprogress/nprogress.css';
 import NProgress from 'nprogress';
 import { ApiUrl } from "../../components/ApiUrl";
 import moment from "moment";  // Moment.js to handle time formatting
+import { Link } from "react-router-dom";
 
 const Topbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -255,11 +256,11 @@ const Topbar = () => {
           <hr />
           {role !== 'Staff' && (
             <>
-          <a style={{ textDecoration: "none" }} href="/admin/ChangePassword">
+          <Link style={{ textDecoration: "none" }} to="/admin/ChangePassword">
             <button className="menu-item" onClick={toggleMenu}>
              <FaUser />  Change Password
             </button>
-          </a>
+          </Link>
         </>)}
           <button
             onClick={() => {

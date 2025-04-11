@@ -16,7 +16,7 @@ import {
   FaTag,
 } from "react-icons/fa";
 import logoImage from "./img/oneclick.png"; // Replace with the path to your image
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import logo2 from "./img/logo3.png";
 
 const Slidebar = () => {
@@ -202,29 +202,29 @@ const Slidebar = () => {
           {userRole !== "Staff" && (
             <>
               <li>
-                <a
-                  href="/Admin/Dashboard"
+                <Link
+                  to="/Admin/Dashboard"
                   className={isActive("/Admin/Dashboard")}
                 >
                   <FaHome className="menu-icon" /> {isOpen && "Dashboard"}
-                </a>
+                </Link>
               </li>
             </>
           )}
           {userRole !== "Staff" && (
             <>
               <li>
-                <a href="/Admin/orders" className={isActive("/Admin/orders")}>
+                <Link to="/Admin/orders" className={isActive("/Admin/orders")}>
                   <FaBox className="menu-icon" /> {isOpen && "Orders"}
-                </a>
+                </Link>
               </li>
             </>
           )}
 
           {/* {userRole !== 'Staff' && ( */}
           <li className={`submenu ${isProductsOpen ? "open" : ""}`}>
-            <a
-              href="#"
+            <Link
+              to="#"
               onClick={toggleProducts}
               className={isProductActive() ? "active" : ""}
             >
@@ -235,110 +235,110 @@ const Slidebar = () => {
                 ) : (
                   <FaChevronRight className="submenu-icon" />
                 ))}
-            </a>
+            </Link>
             {isOpen && isProductsOpen && (
               <ul className="submenu-items">
                 <li>
-                  <a
-                    href="/Admin/Computers"
+                  <Link
+                    to="/Admin/Computers"
                     className={isActive("/Admin/Computers")}
                   >
                     Computers
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/Mobiles"
+                  <Link
+                    to="/Admin/Mobiles"
                     className={isActive("/Admin/Mobiles")}
                   >
                     Mobiles
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/Admin/CCTV" className={isActive("/Admin/CCTV")}>
+                  <Link to="/Admin/CCTV" className={isActive("/Admin/CCTV")}>
                     CCTV
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/Headphones"
+                  <Link
+                    to="/Admin/Headphones"
                     className={isActive("/Admin/Headphones")}
                   >
                     Headphones
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/Speakers"
+                  <Link
+                    to="/Admin/Speakers"
                     className={isActive("/Admin/Speakers")}
                   >
                     Speakers
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/TVHomeCinema"
+                  <Link
+                    to="/Admin/TVHomeCinema"
                     className={isActive("/Admin/TVHomeCinema")}
                   >
                     T.V & Home Cinema
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/WearableTech"
+                  <Link
+                    to="/Admin/WearableTech"
                     className={isActive("/Admin/WearableTech")}
                   >
                     Wearable Tech
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/Printers"
+                  <Link
+                    to="/Admin/Printers"
                     className={isActive("/Admin/Printers")}
                   >
                     Printers
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/ComputerAccessories"
+                  <Link
+                    to="/Admin/ComputerAccessories"
                     className={isActive("/Admin/ComputerAccessories")}
                   >
                     Computer Accessories
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/MobileAccessories"
+                  <Link
+                    to="/Admin/MobileAccessories"
                     className={isActive("/Admin/MobileAccessories")}
                   >
                     Mobile Accessories
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/PrinterAccessories"
+                  <Link
+                    to="/Admin/PrinterAccessories"
                     className={isActive("/Admin/PrinterAccessories")}
                   >
                     Printer Accessories
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/CCTVAccessories"
+                  <Link
+                    to="/Admin/CCTVAccessories"
                     className={isActive("/Admin/CCTVAccessories")}
                   >
                     CCTV Accessories
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/Admin/secondhandproducts"
+                  <Link
+                    to="/Admin/secondhandproducts"
                     className={isActive("/Admin/secondhandproducts")}
                   >
                     {" "}
                     <span>Second hand Products</span>{" "}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             )}
@@ -347,8 +347,8 @@ const Slidebar = () => {
           {userRole !== "Staff" && (
             <>
               <li className={`submenu ${isEditPageOpen ? "open" : ""}`}>
-                <a
-                  href="#"
+                <Link
+                  to="#"
                   onClick={toggleEditPage}
                   className={isEditPageActive() ? "active" : ""}
                 >
@@ -359,55 +359,55 @@ const Slidebar = () => {
                     ) : (
                       <FaChevronRight className="submenu-icon" />
                     ))}
-                </a>
+                </Link>
                 {isOpen && isEditPageOpen && (
                   <ul className="submenu-items">
                     <li>
-                      <a
-                        href="/Admin/EditHomePage"
+                      <Link
+                        to="/Admin/EditHomePage"
                         className={isActive("/Admin/EditHomePage")}
                       >
                         Edit Home Page Slider
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        href="/Admin/EditDoubleImageAd"
+                      <Link
+                        to="/Admin/EditDoubleImageAd"
                         className={isActive("/Admin/EditDoubleImageAd")}
                       >
                         Edit Four Images Ad
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        href="/Admin/EditSingleImageAd"
+                      <Link
+                        to="/Admin/EditSingleImageAd"
                         className={isActive("/Admin/EditSingleImageAd")}
                       >
                         Edit Single Image Ad
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        href="/Admin/EditLoginBackgroundImage"
+                      <Link
+                        to="/Admin/EditLoginBackgroundImage"
                         className={isActive("/Admin/EditLoginBackgroundImage")}
                       >
                         Edit Login Page Background Image
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        href="/Admin/CouponManager"
+                      <Link
+                        to="/Admin/CouponManager"
                         className={isActive("/Admin/CouponManager")}
                       >
                         Edit Common Coupon Code
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 )}
               </li>
               <li className={`submenu ${isOfferPageOpen ? "open" : ""}`}>
-                <a
-                  href="#"
+                <Link
+                  to="#"
                   onClick={toggleOfferPage}
                   className={isOfferPageActive() ? "active" : ""}
                 >
@@ -418,54 +418,54 @@ const Slidebar = () => {
                     ) : (
                       <FaChevronRight className="submenu-icon" />
                     ))}
-                </a>
+                </Link>
                 {isOpen && isOfferPageOpen && (
                   <ul className="submenu-items">
                     <li>
-                      <a
-                        href="/Admin/ComputersAd"
+                      <Link
+                        to="/Admin/ComputersAd"
                         className={isActive("/Admin/ComputersAd")}
                       >
                         Computer Ad Page
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        href="/Admin/MobileAd"
+                      <Link
+                        to="/Admin/MobileAd"
                         className={isActive("/Admin/MobileAd")}
                       >
                         Mobile Ad Page
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        href="/Admin/CCTVAd"
+                      <Link
+                        to="/Admin/CCTVAd"
                         className={isActive("/Admin/CCTVAd")}
                       >
                         CCTV Ad Page
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        href="/Admin/ProductDetailPage"
+                      <Link
+                        to="/Admin/ProductDetailPage"
                         className={isActive("/Admin/ProductDetailPage")}
                       >
                         Product Detail Page Ad
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 )}
               </li>
 
               {/* <li>
-            <a href="/Admin/reports" className={isActive('/Admin/reports')}>
+            <Link to="/Admin/reports" className={isActive('/Admin/reports')}>
               <FaChartLine className="menu-icon" /> {isOpen && 'Reports'}
-            </a>
+            </Link>
           </li> */}
 
               <li className={`submenu ${isReportOpen ? "open" : ""}`}>
-                <a
-                  href="#"
+                <Link
+                  to="#"
                   onClick={toggleReports}
                   className={isReportActive() ? "active" : ""}
                 >
@@ -476,75 +476,75 @@ const Slidebar = () => {
                     ) : (
                       <FaChevronRight className="submenu-icon" />
                     ))}
-                </a>
+                </Link>
                 {isOpen && isReportOpen && (
                   <ul className="submenu-items">
                     <li>
-                      <a
-                        href="/Admin/reports"
+                      <Link
+                        to="/Admin/reports"
                         className={isActive("/Admin/reports")}
                       >
                         Order Report
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        href="/Admin/SalesReport"
+                      <Link
+                        to="/Admin/SalesReport"
                         className={isActive("/Admin/SalesReport")}
                       >
                         Sales Report
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a
-                        href="/Admin/CustomerReports"
+                      <Link
+                        to="/Admin/CustomerReports"
                         className={isActive("/Admin/CustomerReports")}
                       >
                         Customer Reports
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 )}
               </li>
 
               <li>
-                <a
-                  href="/Admin/customers"
+                <Link
+                  to="/Admin/customers"
                   className={isActive("/Admin/customers")}
                 >
                   <FaUsers className="menu-icon" /> {isOpen && "Customers"}
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
-                  href="/Admin/StaffManagement"
+                <Link
+                  to="/Admin/StaffManagement"
                   className={isActive("/Admin/StaffManagement")}
                 >
                   <FaUsers className="menu-icon" />{" "}
                   {isOpen && "Staff Management"}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/Admin/CareersTable"
+                <Link
+                  to="/Admin/CareersTable"
                   className={isActive("/Admin/CareersTable")}
                 >
                   <FaBriefcase className="menu-icon" /> {isOpen && "Careers"}
-                </a>
+                </Link>
               </li>
               {/* <li>
-            <a href="/Admin/Settings" className={isActive('/Admin/Settings')}>
+            <Link to="/Admin/Settings" className={isActive('/Admin/Settings')}>
               <FaCog className="menu-icon" /> {isOpen && 'Settings'}
-            </a>
+            </Link>
           </li> */}
               <li>
-                <a
-                  href="/Admin/ContactsTable"
+                <Link
+                  to="/Admin/ContactsTable"
                   className={isActive("/Admin/ContactsTable")}
                 >
                   <FaEnvelope className="menu-icon" /> {isOpen && "Contact"}
-                </a>
+                </Link>
               </li>
             </>
           )}

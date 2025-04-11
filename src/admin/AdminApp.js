@@ -36,6 +36,7 @@ import StaffManagement from './pages/StaffManagement'; // Example page
 import Secondhandproducts from './pages/AddSecondhandproducts'; // Example page
 import NewProduct from './pages/NewProduct'; // Example page
 import { ThemeProvider } from './ThemeContext'; // Import ThemeProvider
+import NetworkStatus from '../components/NetworkStatus';
 
 function App() {
   // Inline style for body background
@@ -67,6 +68,7 @@ function App() {
   
   return (
     <ThemeProvider>
+      <NetworkStatus>
       <AdminMain>
         <Routes>
           <Route path="/Computers" element={<Computers />} />
@@ -108,6 +110,7 @@ function App() {
           
         </Routes>
       </AdminMain>
+      </NetworkStatus>
     </ThemeProvider>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation,Link } from 'react-router-dom';
 import { ApiUrl } from "./ApiUrl";
 import { FaEye, FaEyeSlash , FaSignOutAlt} from "react-icons/fa"; // Import eye icons
 import logo from './img/logo3.png';
@@ -223,14 +223,14 @@ document.head.appendChild(styleElement);
       {backgroundImage && <div style={styles.blurOverlay} />}
       <div style={styles.container}>
         <button style={styles.signOutButton} className="close-btn">
-          <a href="/" style={styles.signOutLink}>
+          <Link to="/" style={styles.signOutLink}>
             <FaSignOutAlt />
-          </a>
+          </Link>
         </button>
         <center>
-          <a href="/">
+          <Link to="/">
             <img src={logo} width={'200px'}  alt="Logo" />
-          </a>
+          </Link>
         </center>
         <h2 style={styles.title}>User Login</h2>
   
@@ -271,12 +271,12 @@ document.head.appendChild(styleElement);
           </button>
         </form>
         <div style={styles.linksContainer}>
-           {/* <a href="/ForgotPassword" style={styles.link}>
+           {/* <Link to="/ForgotPassword" style={styles.link}>
             Forgot Password? 
-          </a>  */}
-          <a href="/signup" style={styles.link}>
+          </Link>  */}
+          <Link to="/signup" style={styles.link}>
             Don't have an account? Sign Up
-          </a>
+          </Link>
         </div>
       </div>
     </div>

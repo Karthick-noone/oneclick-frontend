@@ -38,6 +38,7 @@
     display: block;
 }
 
+
 /* Responsive adjustments using CSS Grid for smaller screens */
 @media (max-width: 768px) {
     .footer {

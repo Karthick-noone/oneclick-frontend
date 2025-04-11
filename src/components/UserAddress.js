@@ -4,7 +4,7 @@ import Header2 from "./Header2";
 import { ApiUrl } from "./ApiUrl";
 import Swal from "sweetalert2";
 import Footer from "./footer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -627,7 +627,7 @@ const handleUpdate = async (e) => {
   return (
     <>
       {/* <Header2 /> */}
-      <a href="/Checkout"><button className="back-to-cart-button"><FaShoppingCart /> Checkout </button></a>
+      <Link to="/Checkout"><button className="back-to-cart-button"><FaShoppingCart /> Checkout </button></Link>
 
       <div className="address-page-container">
         <div className="address-form-container">

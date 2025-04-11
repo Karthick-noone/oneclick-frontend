@@ -8,6 +8,19 @@
 .staff-input.password-hidden {
   -webkit-text-security: disc; /* Mimic password dots */
 }
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);  /* 2 columns */
+  gap: 10px;  /* space between items */
+}
+
+.item {
+  background: #00bcd4;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
 
 /* Radio button wrapper */
 .radio-wrapper {

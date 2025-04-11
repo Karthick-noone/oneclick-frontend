@@ -1,6 +1,7 @@
 import React from "react";
 import "./css/Footer.css"; // Adjust path as needed
 import PaymentMethods from "./PaymentMethods"; // Import the PaymentMethods page
+import { Link } from "react-router-dom";
 
 // Import icons from react-icons
 import { FaMapMarkerAlt, FaHeadset, FaShareAlt, FaGavel } from "react-icons/fa";
@@ -23,27 +24,27 @@ const Footer = () => {
           <p>Market Road, Marthandam,</p>
           <p>Kanyakumari, 629165</p>
           <p>enquiryoneclick@gmail.com</p>
-          <a href="tel:+9092206677">
+          <Link to="tel:+9092206677">
             <p>+91-9092206677</p>
-          </a>
+          </Link>
         </div>
 
         <div className="footer-section">
           <h4>
             <FaHeadset /> Customer Support
           </h4>
-          <a href="/Contact">
+          <Link to="/Contact">
             <p>Contact Us</p>
-          </a>
-          <a href="/HelpCenter">
+          </Link>
+          <Link to="/HelpCenter">
             <p>Help Center</p>
-          </a>
-          <a href="/About">
+          </Link>
+          <Link to="/About">
             <p>About Us</p>
-          </a>
-          <a href="/About">
+          </Link>
+          <Link to="/About">
             <p>Careers</p>
-          </a>
+          </Link>
         </div>
         <div className="footer-section">
           <h4>
@@ -75,28 +76,29 @@ const Footer = () => {
           <h4>
             <FaGavel /> Policy
           </h4>
-          <a href="/ShippingAndReturns">
+          <Link to="/ShippingAndReturns">
             <p>Shipping & Returns</p>
-          </a>
-          <a href="/Privacypolicy">
+          </Link>
+          <Link to="/Privacypolicy">
             <p>Privacy Policy</p>
-          </a>
-          <a href="/Terms">
+          </Link>
+          <Link to="/Terms">
             <p>Terms Of Use</p>
-          </a>
-          <a href="/PaymentSecurity">
+          </Link>
+          <Link to="/PaymentSecurity">
             <p>Payment Security</p>
-          </a>
-          <a href="/HelpCenter">
+          </Link>
+          <Link to="/HelpCenter">
             <p>FAQ</p>
-          </a>
-          <a href="/Adminlogin">
+          </Link>
+          <Link to="/Adminlogin">
             <p style={{ color: "white", textDecoration: "none" }}>ADMIN</p>
-          </a>
+          </Link>
         </div>
       </footer>
 
       <PaymentMethods />
+      
     </>
   );
 };

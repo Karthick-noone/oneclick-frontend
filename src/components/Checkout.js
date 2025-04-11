@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import "./css/Cart.css";
 import { ApiUrl } from "./ApiUrl";
 // import Header1 from './Header1';
@@ -1124,7 +1124,7 @@ const Checkout = () => {
                   <br />
                   {/* <span style={{ fontSize: "14px" }}>Guest</span> */}
                   {/* <br /> */}
-                  <a href="/Login">
+                  <Link to="/Login">
                     <button
                       className="change-btn"
                       style={{ cursor: "pointer", float:'right' }}
@@ -1132,7 +1132,7 @@ const Checkout = () => {
                     >
                       Login
                     </button>
-                  </a>
+                  </Link>
                 </>
               )}
             </div>
@@ -1179,9 +1179,9 @@ const Checkout = () => {
                     DELIVERY ADDRESS <FaTimes style={{ color: "red" }} />
                   </strong>
                   <br />
-                  <a href="/Useraddress">
+                  <Link to="/Useraddress">
                     <button style={{float:'right'}} className="change-btn">Add Address</button>
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>{" "}
@@ -1201,14 +1201,14 @@ const Checkout = () => {
                   {cartItems.length === 0 ? (
                     <div>
                       <p style={{ marginTop: "5px" }}>Your cart is empty.</p>
-                      <a href="/">
+                      <Link to="/">
                         <button
                           style={{ float: "right" }}
                           className="change-btn browse-btn"
                         >
                           Browse Products
                         </button>
-                      </a>
+                      </Link>
                     </div>
                   ) : (
                     <div>
@@ -1872,14 +1872,14 @@ const Checkout = () => {
                       >
                         Set Address
                       </button>
-                      <a style={{ textDecoration: "none" }} href="/Useraddress">
+                      <Link style={{ textDecoration: "none" }} to="/Useraddress">
                         <button
                           title="Add new address"
                           className="modal4-confirm-btn"
                         >
                           Add New Address
                         </button>
-                      </a>
+                      </Link>
                     </div>
                   </center>
                 </div>

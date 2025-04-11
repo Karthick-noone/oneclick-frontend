@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom"; // Import useParams to get the product ID from the URL
+import { useParams, Link } from "react-router-dom"; // Import useParams to get the product ID from the URL
 import axios from "axios";
 // import { toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
@@ -942,9 +942,9 @@ const ProductDetail = ({ accessoryCategory }) => {
                 className="responsive-navigation"
                 style={{ marginTop: "5px", marginLeft: "5px" }}
               >
-                <a style={{ textDecoration: "none", color: "grey" }} href="/">
+                <Link style={{ textDecoration: "none", color: "grey" }} to="/">
                    Home{" "}
-                </a>{" "}
+                </Link>{" "}
                 <span style={{ color: "grey" }}>&gt; </span>
                 <a
                   style={{ textDecoration: "none", color: "grey" }}

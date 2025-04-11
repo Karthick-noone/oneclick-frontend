@@ -8,6 +8,8 @@ import axios from "axios";
 import Modal from "react-modal"; // Install if needed using `npm install react-modal`
 import { FaTimes } from "react-icons/fa";
 import "./css/MyAccount.css"
+import { Link } from "react-router-dom";
+
 const MyAccount = () => {
   const [user, setUser] = useState({ username: "", email: "" });
   const [orders, setOrders] = useState([]);
@@ -182,9 +184,9 @@ const MyAccount = () => {
             ) : (
               <p className="ac-no-address">No address available</p>
             )}
-            <a href="/UserAddress">
+            <Link to="/UserAddress">
               <button className="ac-button">Change/Add Address</button>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -391,9 +393,9 @@ const MyAccount = () => {
           <p>
             Manage your account, update your profile, and change your password.
           </p>
-          <a href="/ForgotPassword">
+          <Link to="/ForgotPassword">
             <button className="change-btn"> Change Password</button>
-          </a>
+          </Link>
         </div> */}
         
         </div>
