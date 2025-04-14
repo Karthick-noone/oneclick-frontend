@@ -39,7 +39,7 @@ const NetworkStatus = ({ children }) => {
         padding: "20px",
         fontFamily: "Segoe UI, Roboto, sans-serif",
       }}>
-        <img
+        {/* <img
           src="no-internet.png"
           alt="No Internet"
           style={{
@@ -47,7 +47,7 @@ const NetworkStatus = ({ children }) => {
             marginBottom: "25px",
             filter: "drop-shadow(0 0 5px rgba(0,0,0,0.1))"
           }}
-        />
+        /> */}
         <h2 style={{ fontSize: "28px", color: "#222", marginBottom: "10px" }}>
           You're Offline
         </h2>

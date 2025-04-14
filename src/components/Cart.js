@@ -824,11 +824,11 @@ const CartPage = () => {
       {/* <Header1 /> */}
       {/* <Header2 /> */}
       <div className="cart-container">
-        <div className="cart-header">
-          <center>
-            <h1>Your Cart</h1>
-          </center>
-        </div>
+      <div className="cart-header">
+  <h1>
+    <i className="fas fa-shopping-cart"></i> Your Cart
+  </h1>
+</div>
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
@@ -943,16 +943,7 @@ const CartPage = () => {
                             >
                               +
                             </button>
-                            <FaTrash
-                              className="cart-remove-btn"
-                              onClick={() =>
-                                removeFromCart(
-                                  item.id,
-                                  item.prod_name,
-                                  item.quantity
-                                )
-                              }
-                            />
+                            
                           </div>
                           <p
                             style={{
@@ -971,6 +962,17 @@ const CartPage = () => {
                               ? item.offer_price * item.quantity
                               : item.prod_price * item.quantity}
                           </p>
+                          <FaTrash
+                              className="cart-remove-btn"
+                              title="Remove this item from cart"
+                              onClick={() =>
+                                removeFromCart(
+                                  item.id,
+                                  item.prod_name,
+                                  item.quantity
+                                )
+                              }
+                            />
                           <div>
                             <label>
                               <input
@@ -1012,8 +1014,11 @@ const CartPage = () => {
                       return (
                         <li
                           key={product.prod_id}
-                          className="cart-product d-flex align-items-center"
+                          className="cart-product "
                         >
+
+<div className="cart-product-header">
+
                           {firstImage ? (
                             <div
                               key={product.id}
@@ -1046,14 +1051,10 @@ const CartPage = () => {
                               {product.prod_features}
                             </p>
                           </div>
+                          </div>
 
                           <div className="cart-product-price">
-                            <div className="cart-quantity-controls">
-                              <FaTrash
-                                className="cart-remove-btn"
-                                onClick={() => handleRemoveBuyLater(product.id)}
-                              />
-                            </div>
+                           
                             <p
                               style={{
                                 color: "red",
@@ -1064,12 +1065,20 @@ const CartPage = () => {
                             >
                               ₹{product.actual_price}
                             </p>
-                            <p>
+                            <p style={{marginRight:'5px'}}>
                               ₹
                               {product.offer_price > 0 && isOfferActive 
                                 ? product.offer_price
                                 : product.prod_price}
                             </p>
+
+                            <div className="cart-quantity-controls">
+                              <FaTrash
+                              title="Remove this item "
+                                className="cart-remove-btn"
+                                onClick={() => handleRemoveBuyLater(product.id)}
+                              />
+                            </div>
 
                             <div>
                               <label>

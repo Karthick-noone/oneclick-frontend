@@ -28,6 +28,7 @@ import Swal from "sweetalert2";
 import Footer from "./footer";
 import orderTruck from "./img/order-truck.gif";
 import confetti from "canvas-confetti";
+import checkout from "./img/checkout.png"
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -1085,11 +1086,14 @@ const Checkout = () => {
 
   const handleProductClick = (product) => {
     const slugify = (name) =>
-      name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-  
+      name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]+/g, "");
+
     navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
-  
+
   const finalAmount =
     newTotalAmount > 0
       ? Number(newTotalAmount) // Convert to number if it's not
@@ -1100,15 +1104,15 @@ const Checkout = () => {
       {/* <Header1 /> */}
       {/* <Header2 /> */}
       <div className="cart-container">
-        <div className="cart-header">
-          <center>
-            <h1>Checkout</h1>
-          </center>
-        </div>
+      <div className="cart-header">
+  <h1>
+    <img src={checkout} width={'40px'} alt="" /> Checkout
+  </h1>
+</div>
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
-              <strong> LOGIN </strong> 
+              <strong> LOGIN </strong>
 
               {username ? (
                 <>
@@ -1127,7 +1131,7 @@ const Checkout = () => {
                   <Link to="/Login">
                     <button
                       className="change-btn"
-                      style={{ cursor: "pointer", float:'right' }}
+                      style={{ cursor: "pointer", float: "right" }}
                       // onClick={() => console.log("Redirect to login page")} // Replace with actual login logic
                     >
                       Login
@@ -1180,7 +1184,9 @@ const Checkout = () => {
                   </strong>
                   <br />
                   <Link to="/Useraddress">
-                    <button style={{float:'right'}} className="change-btn">Add Address</button>
+                    <button style={{ float: "right" }} className="change-btn">
+                      Add Address
+                    </button>
                   </Link>
                 </div>
               )}
@@ -1248,46 +1254,42 @@ const Checkout = () => {
                       const firstImage = images.length > 0 ? images[0] : null;
 
                       return (
-                        <li
-                          key={item.id}
-                          className="cart-product"
-                        >
-                       <div className="cart-product-header">
-
-                          {firstImage ? (
+                        <li key={item.id} className="cart-product">
+                          <div className="cart-product-header">
+                            {firstImage ? (
+                              <div
+                                key={item.id}
+                                onClick={() => handleProductClick(item)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <img
+                                  src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
+                                  alt={item.name}
+                                  loading="lazy"
+                                  className="cart-product-image"
+                                />
+                              </div>
+                            ) : (
+                              <div className="placeholder-image">
+                                No image available
+                              </div> // Placeholder for missing image
+                            )}
                             <div
+                              style={{ cursor: "pointer" }}
+                              className="cart-product-details"
                               key={item.id}
                               onClick={() => handleProductClick(item)}
-                              style={{ cursor: "pointer" }}
                             >
-                              <img
-                                src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
-                                alt={item.name}
-                                loading="lazy"
-                                className="cart-product-image"
-                              />
-                            </div>
-                          ) : (
-                            <div className="placeholder-image">
-                              No image available
-                            </div> // Placeholder for missing image
-                          )}
-                          <div
-                            style={{ cursor: "pointer" }}
-                            className="cart-product-details"
-                            key={item.id}
-                            onClick={() => handleProductClick(item)}
-                          >
-                            <p className="cart-product-name">
-                              {item.prod_name}
-                            </p>
-                            {/* <p className="cart-product-name">
+                              <p className="cart-product-name">
+                                {item.prod_name}
+                              </p>
+                              {/* <p className="cart-product-name">
                                 {item.prod_id}
                               </p> */}
-                            {/* <p className="cart-product-description">
+                              {/* <p className="cart-product-description">
                               {item.prod_features}
                             </p> */}
-                          </div>
+                            </div>
                           </div>
                           <div className="cart-product-price">
                             <div className="cart-quantity-controls">
@@ -1312,16 +1314,7 @@ const Checkout = () => {
                               >
                                 +
                               </button>
-                              <FaTrash
-                                className="cart-remove-btn"
-                                onClick={() =>
-                                  removeFromCart(
-                                    item.id,
-                                    item.prod_name,
-                                    item.quantity
-                                  )
-                                }
-                              />
+                              
                             </div>
                             <p
                               style={{
@@ -1339,6 +1332,18 @@ const Checkout = () => {
                                 ? item.offer_price * item.quantity
                                 : item.prod_price * item.quantity}
                             </p>
+
+                            <FaTrash
+                                className="cart-remove-btn"
+                                title="Remove this item from cart"
+                                onClick={() =>
+                                  removeFromCart(
+                                    item.id,
+                                    item.prod_name,
+                                    item.quantity
+                                  )
+                                }
+                              />
 
                             <div>
                               <label>
@@ -1390,49 +1395,45 @@ const Checkout = () => {
                       const firstImage = images.length > 0 ? images[0] : null;
 
                       return (
-                        <li
-                          key={product.prod_id}
-                          className="cart-product d-flex align-items-center"
-                        >
-                          {firstImage ? (
+                        <li key={product.prod_id} className="cart-product">
+                          <div className="cart-product-header">
+                            {firstImage ? (
+                              <div
+                                key={product.id}
+                                onClick={() => handleProductClick(product)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <img
+                                  src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                                  alt={product.name}
+                                  loading="lazy"
+                                  className="cart-product-image"
+                                />
+                              </div>
+                            ) : (
+                              <div className="placeholder-image">
+                                No image available
+                              </div>
+                            )}
+
                             <div
+                              style={{ cursor: "pointer" }}
+                              className="cart-product-details"
                               key={product.id}
                               onClick={() => handleProductClick(product)}
-                              style={{ cursor: "pointer" }}
                             >
-                              <img
-                                src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
-                                alt={product.name}
-                                loading="lazy"
-                                className="cart-product-image"
-                              />
+                              <p className="cart-product-name">
+                                {product.prod_name}
+                              </p>
+                              <p className="cart-product-description">
+                                {product.prod_features}
+                              </p>
                             </div>
-                          ) : (
-                            <div className="placeholder-image">
-                              No image available
-                            </div>
-                          )}
-
-                          <div
-                            style={{ cursor: "pointer" }}
-                            className="cart-product-details"
-                            key={product.id}
-                            onClick={() => handleProductClick(product)}
-                          >
-                            <p className="cart-product-name">
-                              {product.prod_name}
-                            </p>
-                            <p className="cart-product-description">
-                              {product.prod_features}
-                            </p>
                           </div>
 
                           <div className="cart-product-price">
                             <div className="cart-quantity-controls">
-                              <FaTrash
-                                className="cart-remove-btn"
-                                onClick={() => handleRemoveBuyLater(product.id)}
-                              />
+                             
                             </div>
                             <p
                               style={{
@@ -1444,12 +1445,18 @@ const Checkout = () => {
                             >
                               ₹{product.actual_price}
                             </p>
-                            <p>
+                            <p >
                               ₹
                               {product.offer_price > 0 && isOfferActive
                                 ? product.offer_price
                                 : product.prod_price}
                             </p>
+                            <FaTrash
+                            style={{marginRight:'5px'}}
+                              title="Remove this item "
+                                className="cart-remove-btn"
+                                onClick={() => handleRemoveBuyLater(product.id)}
+                              />
                             <div>
                               <label>
                                 <input
@@ -1500,9 +1507,11 @@ const Checkout = () => {
             </h4>
             <div className="summary-item">
               <span>
-                Price {getTotalItemsCount() > 0 && (
-  getTotalItemsCount() === 1 ? " (1 item)" : ` (${getTotalItemsCount()} items)`
-)}
+                Price{" "}
+                {getTotalItemsCount() > 0 &&
+                  (getTotalItemsCount() === 1
+                    ? " (1 item)"
+                    : ` (${getTotalItemsCount()} items)`)}
               </span>
               <span>₹{calculateSellingPrice()}</span>
             </div>
@@ -1557,7 +1566,6 @@ const Checkout = () => {
                 Apply
               </button>
             </div>
-
             {message && (
               <p
                 style={{
@@ -1615,8 +1623,7 @@ const Checkout = () => {
                   <span style={{ color: "green" }}>&nbsp;• Free</span>
                 )}
               </div>
-            )}
-            {" "}
+            )}{" "}
             <hr />
             <div className="summary-item">
               <strong>Total Amount</strong>
@@ -1658,7 +1665,10 @@ const Checkout = () => {
                   selectedPaymentMethod === "cod" ? "selected" : ""
                 }`}
               >
-                <FaMoneyBillWave style={{ color: "green" }} className="payment-icon" />
+                <FaMoneyBillWave
+                  style={{ color: "green" }}
+                  className="payment-icon"
+                />
                 <span className="methods">Cash on Delivery</span>
                 <span>
                   <input
@@ -1694,8 +1704,10 @@ const Checkout = () => {
                   selectedPaymentMethod === "card" ? "selected" : ""
                 }`}
               >
-                <FaCreditCard                               style={{ color: "skyblue" }}
- className="payment-icon" />
+                <FaCreditCard
+                  style={{ color: "skyblue" }}
+                  className="payment-icon"
+                />
                 <span className="methods">Pay Online</span>
                 <span>
                   <input
@@ -1760,7 +1772,7 @@ const Checkout = () => {
                   selectedPaymentMethod === "pickup" ? "selected" : ""
                 }`}
               >
-                <FaStore  style={{ color: "orange" }} className="payment-icon" />
+                <FaStore style={{ color: "orange" }} className="payment-icon" />
                 <span className="methods">Pick Up From Store</span>
                 <span>
                   <input
@@ -1872,7 +1884,10 @@ const Checkout = () => {
                       >
                         Set Address
                       </button>
-                      <Link style={{ textDecoration: "none" }} to="/Useraddress">
+                      <Link
+                        style={{ textDecoration: "none" }}
+                        to="/Useraddress"
+                      >
                         <button
                           title="Add new address"
                           className="modal4-confirm-btn"

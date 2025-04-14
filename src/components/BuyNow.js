@@ -22,6 +22,8 @@ import orderTruck from "./img/order-truck.gif";
 import confetti from "canvas-confetti";
 import { Link } from "react-router-dom";
 
+import checkout from "./img/checkout.png"
+
 const BuyNow = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
@@ -131,18 +133,31 @@ const BuyNow = () => {
     if (items.length === 1) {
       const price = parseFloat(items[0].prod_price) || 0;
       const deliveryCharge = parseFloat(items[0].deliverycharge || 0);
-      totalPrice = price * quantity + deliveryCharge;
+
+      // Sum accessory effectiveprices if available
+      const accessoriesTotal =
+        items[0].accessories?.reduce((acc, accessory) => {
+          return acc + (parseFloat(accessory.effectiveprice) || 0);
+        }, 0) || 0;
+
+      totalPrice = price * quantity + deliveryCharge + accessoriesTotal;
     } else {
-      // For multiple products, use each product's quantity
+      // For multiple products
       totalPrice = items.reduce((total, item) => {
         const price = parseFloat(item.prod_price) || 0;
         const itemQuantity = item.quantity || 1;
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
-        return total + price * itemQuantity + deliveryCharge;
-      });
+
+        const accessoriesTotal =
+          item.accessories?.reduce((acc, accessory) => {
+            return acc + (parseFloat(accessory.effectiveprice) || 0);
+          }, 0) || 0;
+
+        return total + price * itemQuantity + deliveryCharge + accessoriesTotal;
+      }, 0);
     }
 
-    return totalPrice; // Return raw total (without coupon discount)
+    return totalPrice;
   };
 
   const getDeliveryDate = () => {
@@ -613,11 +628,12 @@ const BuyNow = () => {
       {/* <Header1 /> */}
       {/* <Header2 /> */}
       <div className="cart-container">
-        <div className="cart-header">
-          <center>
-            <h1>Checkout</h1>
-          </center>
-        </div>
+      <div className="cart-header">
+  <h1>
+   <img src={checkout} width={'40px'} alt="" /> Checkout
+  </h1>
+</div>
+
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
@@ -705,36 +721,35 @@ const BuyNow = () => {
 
               <div className="cart-list-container">
                 <ul className="cart-list">
-                  <li
-                    key={product.id}
-                    className="cart-product d-flex align-items-center"
-                  >
-                    {/* Handle image */}
-                    {firstImage ? (
-                      <div style={{ cursor: "pointer" }}>
-                        <img
-                          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
-                          alt={product.prod_name}
-                          loading="lazy"
-                          className="cart-product-image"
-                        />
-                      </div>
-                    ) : (
-                      <div className="placeholder-image">
-                        No image available
-                      </div>
-                    )}
+                  <li key={product.id} className="cart-product">
+                    <div className="cart-product-header">
+                      {/* Handle image */}
+                      {firstImage ? (
+                        <div style={{ cursor: "pointer" }}>
+                          <img
+                            src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                            alt={product.prod_name}
+                            loading="lazy"
+                            className="cart-product-image"
+                          />
+                        </div>
+                      ) : (
+                        <div className="placeholder-image">
+                          No image available
+                        </div>
+                      )}
 
-                    {/* Product details */}
-                    {/* <div style={{ cursor: "pointer" }} className="cart-product-details"> */}
-                    <p className="buy-product-name">{product.prod_name}</p>
-                    {/* </div> */}
+                      {/* Product details */}
+                      {/* <div style={{ cursor: "pointer" }} className="cart-product-details"> */}
+                      <p className="buy-product-name">{product.prod_name}</p>
+                      {/* </div> */}
 
-                    {product.prod_features && (
-                      <p className="buy-product-description">
-                        {product.prod_features}
-                      </p>
-                    )}
+                      {/* {product.prod_features && (
+                        <p className="buy-product-description">
+                          {product.prod_features}
+                        </p>
+                      )} */}
+                    </div>
 
                     {/* Price and quantity */}
                     <div className="cart-product-price">
@@ -766,6 +781,63 @@ const BuyNow = () => {
                       <p>₹{product.prod_price * quantity}</p>
                     </div>
                   </li>
+                  {product.accessories &&
+                    product.accessories.length > 0 &&
+                    product.accessories.map((accessory, index) => {
+                      const accessoryImage = accessory.prod_img
+                        ? JSON.parse(accessory.prod_img)[0]
+                        : null;
+
+                      return (
+                        <li
+                          key={`accessory-${accessory.id}-${index}`}
+                          className="cart-product "
+                        >
+                          <div className="cart-product-header">
+                            {/* Accessory image */}
+                            {accessoryImage ? (
+                              <div style={{ cursor: "pointer" }}>
+                                <img
+                                  src={`${ApiUrl}/uploads/${accessory.category.toLowerCase()}/${accessoryImage}`}
+                                  alt={accessory.prod_name}
+                                  loading="lazy"
+                                  className="cart-product-image"
+                                />
+                              </div>
+                            ) : (
+                              <div className="placeholder-image">
+                                No image available
+                              </div>
+                            )}
+
+                            {/* Accessory name */}
+                            <p className="buy-product-name">
+                              {accessory.prod_name}
+                            </p>
+                          </div>
+
+                          {/* Price */}
+                          <div className="cart-product-price">
+                            <p
+                              style={{
+                                color: "red",
+                                textDecoration: "line-through",
+                                fontSize: "15px",
+                                marginRight: "10px",
+                                marginLeft: "15px",
+                              }}
+                            >
+                              ₹{accessory.prod_price}
+                            </p>
+                            <p>
+                              {accessory.effectiveprice > 0
+                                ? `₹${accessory.effectiveprice}`
+                                : "Free"}
+                            </p>
+                          </div>
+                        </li>
+                      );
+                    })}
                 </ul>
               </div>
             </div>
@@ -778,10 +850,24 @@ const BuyNow = () => {
             <div className="summary-item">
               <span>
                 Price
-                {quantity > 0 &&
-                  (quantity === 1 ? " (1 item)" : ` (${quantity} items)`)}
+                {quantity > 0 && (
+                  <>
+                    {" ("}
+                    {quantity + (product.accessories?.length || 0)} item
+                    {quantity + (product.accessories?.length || 0) > 1
+                      ? "s"
+                      : ""}
+                    {")"}
+                  </>
+                )}
               </span>
-              <span>₹{product.prod_price * quantity}</span>
+              <span>
+                ₹
+                {product.prod_price * quantity +
+                  (product.accessories?.reduce((acc, accessory) => {
+                    return acc + (accessory.effectiveprice || 0);
+                  }, 0) || 0)}
+              </span>
             </div>
             {/* <div className="summary-item">
               <span>Discount</span>
@@ -919,7 +1005,10 @@ const BuyNow = () => {
                   selectedPaymentMethod === "cod" ? "selected" : ""
                 }`}
               >
-                <FaMoneyBillWave style={{ color: "green" }} className="payment-icon" />
+                <FaMoneyBillWave
+                  style={{ color: "green" }}
+                  className="payment-icon"
+                />
                 <span className="methods">Cash on Delivery</span>
                 <span>
                   <input
@@ -951,70 +1040,72 @@ const BuyNow = () => {
               </div>
 
               <div
-                              className={`summary-item2 ${
-                                selectedPaymentMethod === "card" ? "selected" : ""
-                              }`}
-                            >
-                              <FaCreditCard                               style={{ color: "skyblue" }}
- className="payment-icon" />
-                              <span className="methods">Pay Online</span>
-                              <span>
-                                <input
-                                  type="radio"
-                                  name="payment-method"
-                                  value="card"
-                                  checked={selectedPaymentMethod === "card"}
-                                  onChange={handlePaymentMethodChange}
-                                />
-                              </span>
-                              {selectedPaymentMethod === "card" && (
-                                <div className="continue-wrapper">
-                                  <button
-                                    class="pay-btn"
-                                    onClick={() => handlePayment("Online")}
-                                  >
-                                    <span class="btn-text">Pay Now</span>
-                                    <div class="icon-container">
-                                      <svg viewBox="0 0 24 24" class="icon5 card-icon">
-                                        <path
-                                          d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18C2,19.11 2.89,20 4,20H20C21.11,20 22,19.11 22,18V6C22,4.89 21.11,4 20,4Z"
-                                          fill="currentColor"
-                                        ></path>
-                                      </svg>
-                                      <svg viewBox="0 0 24 24" class="icon5 paymentt-icon">
-                                        <path
-                                          d="M2,17H22V21H2V17M6.25,7H9V6H6V3H18V6H15V7H17.75L19,17H5L6.25,7M9,10H15V8H9V10M9,13H15V11H9V13Z"
-                                          fill="currentColor"
-                                        ></path>
-                                      </svg>
-                                      <svg viewBox="0 0 24 24" class="icon5 dollar-icon">
-                                        <path
-                                          d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"
-                                          fill="currentColor"
-                                        ></path>
-                                      </svg>
-              
-                                      <svg
-                                        viewBox="0 0 24 24"
-                                        class="icon5 wallet-icon default-icon"
-                                      >
-                                        <path
-                                          d="M21,18V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V6H12C10.89,6 10,6.9 10,8V16A2,2 0 0,0 12,18M12,16H22V8H12M16,13.5A1.5,1.5 0 0,1 14.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,12A1.5,1.5 0 0,1 16,13.5Z"
-                                          fill="currentColor"
-                                        ></path>
-                                      </svg>
-              
-                                      <svg viewBox="0 0 24 24" class="icon5 check-icon">
-                                        <path
-                                          d="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z"
-                                          fill="currentColor"
-                                        ></path>
-                                      </svg>
-                                    </div>
-                                  </button>
-                                </div>
-                              )}
-                            </div>
+                className={`summary-item2 ${
+                  selectedPaymentMethod === "card" ? "selected" : ""
+                }`}
+              >
+                <FaCreditCard
+                  style={{ color: "skyblue" }}
+                  className="payment-icon"
+                />
+                <span className="methods">Pay Online</span>
+                <span>
+                  <input
+                    type="radio"
+                    name="payment-method"
+                    value="card"
+                    checked={selectedPaymentMethod === "card"}
+                    onChange={handlePaymentMethodChange}
+                  />
+                </span>
+                {selectedPaymentMethod === "card" && (
+                  <div className="continue-wrapper">
+                    <button
+                      class="pay-btn"
+                      onClick={() => handlePayment("Online")}
+                    >
+                      <span class="btn-text">Pay Now</span>
+                      <div class="icon-container">
+                        <svg viewBox="0 0 24 24" class="icon5 card-icon">
+                          <path
+                            d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18C2,19.11 2.89,20 4,20H20C21.11,20 22,19.11 22,18V6C22,4.89 21.11,4 20,4Z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                        <svg viewBox="0 0 24 24" class="icon5 paymentt-icon">
+                          <path
+                            d="M2,17H22V21H2V17M6.25,7H9V6H6V3H18V6H15V7H17.75L19,17H5L6.25,7M9,10H15V8H9V10M9,13H15V11H9V13Z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                        <svg viewBox="0 0 24 24" class="icon5 dollar-icon">
+                          <path
+                            d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+
+                        <svg
+                          viewBox="0 0 24 24"
+                          class="icon5 wallet-icon default-icon"
+                        >
+                          <path
+                            d="M21,18V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V6H12C10.89,6 10,6.9 10,8V16A2,2 0 0,0 12,18M12,16H22V8H12M16,13.5A1.5,1.5 0 0,1 14.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,12A1.5,1.5 0 0,1 16,13.5Z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+
+                        <svg viewBox="0 0 24 24" class="icon5 check-icon">
+                          <path
+                            d="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
 
               <div
                 className={`summary-item2 ${
@@ -1094,7 +1185,10 @@ const BuyNow = () => {
                       >
                         Set Address
                       </button>
-                      <Link style={{ textDecoration: "none" }} to="/Useraddress">
+                      <Link
+                        style={{ textDecoration: "none" }}
+                        to="/Useraddress"
+                      >
                         <button className="modal4-confirm-btn">
                           Add new address
                         </button>

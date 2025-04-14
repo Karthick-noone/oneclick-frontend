@@ -685,8 +685,8 @@
 
 .suggestions-dropdown {
   position: absolute;
-  top: 75%; /* Push dropdown below the search box */
-  left: 53.3%;
+  top: 79.5%; /* Push dropdown below the search box */
+  left: 52.7%;
   transform: translateX(-50%); /* Center it below the search bar */
   width: 100%; /* Default: Full width of search box */
   max-width: 710px; /* Limit width for large screens */

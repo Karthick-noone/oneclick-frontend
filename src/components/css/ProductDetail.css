@@ -707,14 +707,29 @@
 }
 
 .product-detail-info {
-  /* width: 100%; */
+  position: relative; /* Important to position the icon inside */
   max-width: 450px;
   padding: 20px;
-  /* background-color: white; */
   border-radius: 15px;
-  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* border-right: 1px solid blue; */
 }
+
+/* .product-detail-info::after {
+  content: "+"; 
+  position: absolute;
+  right: -10px; 
+  top: 40%;
+  transform: translateY(-50%);
+  background: white;
+  color: blue;
+  font-weight: bold;
+  font-size: 20px;
+  padding: 1px 8px;
+  border: 1px solid blue;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0,0,255,0.2);
+} */
+
 
 .product-detail-infoo {
   width: 100%;

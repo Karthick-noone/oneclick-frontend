@@ -6,6 +6,104 @@
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 } */
+.product-table {
+  width: 80%;
+  border-collapse: collapse;
+  margin-top: 30px;
+  font-family: "Segoe UI", sans-serif;
+  margin-left: 270px;
+  margin-bottom: 20px;
+}
+
+.product-table td {
+  border: 1px solid #ddd;
+  padding: 5px;
+  text-align: center;
+}
+.product-table th
+{
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  color: white !important;
+  background: black !important;
+}
+
+.product-name-cell {
+  padding: 2px 5px; /* Reduced padding */
+  max-width: 110px; /* Adjusted width */
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap; /* Prevents text from wrapping */
+  font-size: 14px; /* Adjusted font size */
+}
+.action-icon {
+  transition: 0.3s ease;
+}
+.action-icon:hover {
+  transform: scale(1.2);
+}
+
+.product-name-cell, 
+.product-price-cell, 
+.product-actual-price-cell, 
+.product-edit-btn-cell, 
+.product-delete-btn-cell {
+  padding: 1px 1px !important; /* Reduced padding for all td elements */
+}
+
+.product-image-cell {
+  text-align: center;
+  max-width: 70px; /* Adjusted width */
+  /* padding: 10px; */
+
+}
+
+
+
+.product-price-cell, 
+.product-actual-price-cell {
+  font-size: 14px;
+  text-align: center;
+}
+
+.product-edit-btn-cell, 
+.product-delete-btn-cell {
+  text-align: center;
+}
+
+.table-btn {
+  padding: 5px 10px; /* Reduced padding inside buttons */
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+.table-btn.edit {
+  background-color: transparent;
+  color: #007bff !important;
+}
+
+.table-btn.delete {
+  background-color: transparent;
+  color: red !important;
+  margin-left: 5px;
+}
+
+
+.product-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  color: #333;
+}
+
+.table-btn {
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 6px;
+}
+
 
 
 .custom-file-input-wrapper {
@@ -1810,4 +1908,16 @@ display: flex;    margin-top: 10px; /* Space above icons */
     align-items: center; /* Vertically align key and value */
   }
   
+
+  .laptops-product-name {
+    display: -webkit-box; /* Required for multiline clamp */
+    -webkit-line-clamp: 2; /* Limits to exactly 2 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.1em;
+    height: calc(1.1em * 2);
+    word-break: break-word;
+  }
   

@@ -13,6 +13,10 @@ import EditCouponModal from "./EditCouponModal"; // Import the modal component
 
 import leftarrow from "./img/left.png";
 import rightarrow from "./img/right.png";
+
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+
 // Set up the modal root element
 Modal.setAppElement("#root");
 
@@ -72,6 +76,17 @@ const Computers = ({ product }) => {
   const [offerPrice, setOfferPrice] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [modalProductId, setModalProductId] = useState(null);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [lightboxImages, setLightboxImages] = useState([]);
+
+  const handleImageClick = (index, imageArray) => {
+    setPhotoIndex(index); // starting image
+    setLightboxImages(imageArray); // all images of this product
+    setIsOpen(true); // open lightbox
+  };
+  
 
   useEffect(() => {
     setTimeout(() => {
@@ -503,11 +518,11 @@ const Computers = ({ product }) => {
     });
   };
 
- const handleImageUpload = (event) => {
+  const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
       console.log("Selected image for upload:", file);
-  
+
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = (e) => {
@@ -515,42 +530,56 @@ const Computers = ({ product }) => {
         img.src = e.target.result;
         img.onload = () => {
           console.log("Original image dimensions:", img.width, img.height);
-  
+
           const canvas = document.createElement("canvas");
           const MAX_WIDTH = 500; // Define max width
           const scaleSize = MAX_WIDTH / img.width;
           canvas.width = MAX_WIDTH;
           canvas.height = img.height * scaleSize;
-  
+
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
+
           console.log("Resizing image to:", canvas.width, canvas.height);
-  
+
           // Generate unique filename with timestamp
           const timestamp = new Date().toISOString().replace(/[-:.]/g, ""); // Format: YYYYMMDDTHHMMSS
           const fileExtension = file.name.split(".").pop(); // Extract file extension
           const newFileName = `image_${timestamp}.${fileExtension}`;
-  
+
           // Compress image
           canvas.toBlob(
             (blob) => {
-              console.log("Resized image size (KB):", (blob.size / 1024).toFixed(2));
-  
+              console.log(
+                "Resized image size (KB):",
+                (blob.size / 1024).toFixed(2)
+              );
+
               if (blob.size / 1024 < 50) {
                 console.log("Image is under 50 KB, ready for upload.");
                 // 🔥 Convert Blob to File and Set State with new filename
-                const newFile = new File([blob], newFileName, { type: "image/jpeg" });
+                const newFile = new File([blob], newFileName, {
+                  type: "image/jpeg",
+                });
                 setSelectedFile(newFile);
               } else {
-                console.log("Image still above 50 KB, applying further compression.");
+                console.log(
+                  "Image still above 50 KB, applying further compression."
+                );
                 canvas.toBlob(
                   (compressedBlob) => {
-                    console.log("Compressed image size (KB):", (compressedBlob.size / 1024).toFixed(2));
+                    console.log(
+                      "Compressed image size (KB):",
+                      (compressedBlob.size / 1024).toFixed(2)
+                    );
                     // 🔥 Convert Compressed Blob to File with new filename
-                    const compressedFile = new File([compressedBlob], newFileName, { type: "image/jpeg" });
+                    const compressedFile = new File(
+                      [compressedBlob],
+                      newFileName,
+                      { type: "image/jpeg" }
+                    );
                     setSelectedFile(compressedFile);
                   },
                   "image/jpeg",
@@ -1807,6 +1836,7 @@ const Computers = ({ product }) => {
                             src={`${ApiUrl}/uploads/computers/${img}`}
                             alt={product.prod_name}
                             className="laptops-product-image"
+                           
                           />
 
                           <div className="image-actions">
@@ -1828,6 +1858,16 @@ const Computers = ({ product }) => {
                     </Slider>
                   </div>
                 </div>
+                {/* <Lightbox
+  open={isOpen}
+  close={() => setIsOpen(false)} // OR handle via `on.close`
+  index={photoIndex}
+  slides={lightboxImages.map((src) => ({ src }))}
+  on={{
+    view: ({ index }) => setPhotoIndex(index),
+    close: () => setIsOpen(false),
+  }}
+/> */}
 
                 {/* Display product name */}
                 <div className="laptops-product-details">
@@ -2352,7 +2392,167 @@ const Computers = ({ product }) => {
             ))}
         </div>
       </div>
-      {/* Modal for Image Upload */}
+
+      {/* <table className="product-table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>M.R.P</th>
+            <th>View</th>
+            <th>Edit</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+        {products.map((product) => {
+  const images = Array.isArray(product.prod_img)
+    ? product.prod_img
+    : JSON.parse(product.prod_img || "[]");
+
+  const firstImage = images[0];
+
+  return (
+    <tr key={product.id}>
+      <td className="product-image-cell">
+        {firstImage ? (
+          <>
+            <img
+              src={`${ApiUrl}/uploads/computers/${firstImage}`}
+              alt={product.prod_name}
+              onClick={() =>
+                handleImageClick(
+                  0, 
+                  images.map((img) => `${ApiUrl}/uploads/computers/${img}`),
+                  product.id // pass the product ID
+                )
+              }
+              style={{
+                width: "80px",
+                height: "auto",
+                cursor: "pointer",
+              }}
+            />
+           
+          </>
+        ) : (
+          "No Image"
+        )}
+      </td>
+
+                <td className="product-name-cell">
+                  {product.prod_name.split(" ").slice(0, 4).join(" ") +
+                    (product.prod_name.split(" ").length > 4 ? "..." : "")}
+                </td>
+                <td className="product-price-cell">₹{product.prod_price}</td>
+                <td className="product-actual-price-cell">
+                  <span
+                    style={{ textDecoration: "line-through", color: "red" }}
+                  >
+                    ₹{product.actual_price}
+                  </span>
+                </td>
+                <td className="product-edit-btn-cell">
+                  <button
+                    onClick={() => openProductModal(product.id)}
+                    className="table-btn edit"
+                  >
+                    <FaEye />
+                  </button>
+                </td>
+                <td className="product-edit-btn-cell">
+                  <button
+                    onClick={() => handleEditProduct(product)}
+                    className="table-btn edit"
+                  >
+                    <FaEdit />
+                  </button>
+                </td>
+                <td className="product-delete-btn-cell">
+                  <button
+                    onClick={() => handleDeleteProduct(product.id)}
+                    className="table-btn delete"
+                  >
+                    <FaTrash />
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <Lightbox
+  open={isOpen}
+  close={() => setIsOpen(false)}
+  index={photoIndex}
+  slides={lightboxImages.map((src) => ({ src }))}
+  on={{
+    view: ({ index }) => setPhotoIndex(index),
+    close: () => setIsOpen(false),
+  }}
+  carousel={{
+    finite: true,
+    preload: lightboxImages.length > 1 ? 2 : 0,
+    padding: 0,
+    spacing: 0,
+    swipe: lightboxImages.length > 1, // 👈 disable swipe if only one image
+  }}
+  render={{
+    slide: ({ slide }) => (
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "50px",
+            right: "20px",
+            zIndex: 9999,
+            display: "flex",
+            gap: "16px",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            padding: "6px 10px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+          }}
+        >
+          <FaEdit
+            onClick={() => {
+              openModal(currentProductId, photoIndex);
+              setIsOpen(false);
+            }}
+            style={{ cursor: "pointer", fontSize: "22px", color: "#007bff" }}
+          />
+          {lightboxImages.length > 1 && (
+            <FaTrash
+              onClick={() => {
+                handleDeleteImage(currentProductId, photoIndex);
+                setIsOpen(false);
+              }}
+              style={{ cursor: "pointer", fontSize: "22px", color: "#dc3545" }}
+            />
+          )}
+        </div>
+
+        <img
+          src={slide.src}
+          alt=""
+          draggable={false}
+          style={{
+            maxHeight: "90vh",
+            maxWidth: "100%",
+            margin: "0 auto",
+            display: "block",
+            objectFit: "contain",
+            paddingTop: "100px",
+          }}
+        />
+      </div>
+    ),
+  }}
+/> */}
+
+
+
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
@@ -2406,8 +2606,7 @@ const Computers = ({ product }) => {
         </div>
       </Modal>
 
-      {/* Modal for editing a product */}
-      {/* Modal for editing a product */}
+    
       {editingProduct && (
         <Modal
           isOpen={modalIsOpen}

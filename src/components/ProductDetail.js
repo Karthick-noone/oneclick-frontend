@@ -345,8 +345,9 @@ const ProductDetail = ({ accessoryCategory }) => {
     }
   };
 
-  const handleAddToCartWithAccessories = async (selectedAccessories, event) => {
-    // Check if at least one accessory is selected
+  const handleBuyNowWithAccessories = (selectedAccessories, event) => {
+    event.stopPropagation(); // Prevent the event from bubbling up
+
     if (selectedAccessories.length === 0) {
       toast.warn("Please select at least one accessory!", {
         position: "top-right",
@@ -359,13 +360,42 @@ const ProductDetail = ({ accessoryCategory }) => {
       });
       return; // Exit the function if no accessory is selected
     }
-    // Call the main product add to cart function
-    await handleAddToCart(product, event); // Make sure this function is asynchronous
-
-    // Call the function to add selected accessories to the cart
-    await handleAddToCart2(selectedAccessories, event);
+  
+    const email = localStorage.getItem("email");
+    if (!email) {
+      toast.error("User is not logged in!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      window.location.href = "/login";
+      return;
+    }
+  
+    const prod_price =
+      product.offer_price > 0 && isOfferActive
+        ? product.offer_price
+        : product.prod_price;
+  
+    // Get accessory details
+    const selectedAccessoryDetails = relatedAccessories.filter((acc) =>
+      selectedAccessories.includes(acc.id)
+    );
+  
+    // Navigate to purchase page with both product and accessories
+    navigate("/purchase", {
+      state: {
+        product: {
+          ...product,
+          prod_price,
+          accessories: selectedAccessoryDetails, // Embed accessories inside product
+        },
+        email,
+      },
+    });
+  
+    console.log("Navigating with product and accessories", product, selectedAccessoryDetails);
   };
-
+  
   
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
@@ -1393,7 +1423,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                       <div className="product-detail-infooo">
                         <div className="product-detail-infoo">
                           <div className="related-accessories">
-                            <h4>Get An Extra Discount</h4>
+                            <h4>Buy Accessories Together To Get An Extra Off</h4>
                             {relatedAccessories.map((accessory) => {
                               const images = Array.isArray(accessory.prod_img)
                                 ? accessory.prod_img
@@ -1492,7 +1522,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                                           .slice(0, 3)
                                           .join(" ")}
                                     </h5>
-                                    <p
+                                    {/* <p
                                       style={{
                                         marginLeft: "10px",
                                         margin: 0,
@@ -1500,7 +1530,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                                       }}
                                     >
                                       Buy Together for
-                                    </p>
+                                    </p> */}
                                   </div>
                                   <div style={{ flex: 1, textAlign: "right" }}>
                                     <p
@@ -1530,9 +1560,9 @@ const ProductDetail = ({ accessoryCategory }) => {
                             })}
                           </div>
                           <button
-                            title="Add To Cart"
+                            title="Buy Together"
                             onClick={(event) =>
-                              handleAddToCartWithAccessories(
+                              handleBuyNowWithAccessories(
                                 selectedAccessories,
                                 event
                               )
