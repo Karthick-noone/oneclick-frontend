@@ -19,7 +19,7 @@ const MyOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null); // For modal
   const [productDetails, setProductDetails] = useState(null); // To store fetched product details
   const [modalIsOpen, setModalIsOpen] = useState(false); // To open and close modal
-  const [deliveryStatus, ] = useState("");
+  const [deliveryStatus] = useState("");
   const statuses = ["Order Placed", "Shipped", "Out for Delivery", "Delivered"]; // Define the statuses
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState(null); // State for the current order ID
@@ -402,7 +402,7 @@ const MyOrders = () => {
                         order.products.length === 1 && (
                           <span
                             className="product-namee"
-                            style={{ fontWeight: "bold", marginLeft:'10px' }}
+                            style={{ fontWeight: "bold", marginLeft: "10px" }}
                           >
                             {order.products[0].name
                               .split(" ")
@@ -443,15 +443,14 @@ const MyOrders = () => {
                     Track Order
                   </button>
                   {order.delivery_status !== "Cancelled" && (
-                  <button
-                  title="Print Invoice"
-                    className="btn btn-print"
-                    onClick={() => printInvoice(order, productDetails)}
-                  >
-                    <FaPrint style={{ fontSize: "16px" }} />
-                  </button>
+                    <button
+                      title="Print Invoice"
+                      className="btn btn-print"
+                      onClick={() => printInvoice(order, productDetails)}
+                    >
+                      <FaPrint style={{ fontSize: "16px" }} />
+                    </button>
                   )}
-
                 </div>
                 <OrderTrackingModal
                   isOpen={isModalOpen2}
@@ -510,7 +509,13 @@ const MyOrders = () => {
                     <p className="info-row">
                       <span className="info-label">Price</span>
                       <span className="info-value ">
-                        ₹{currentProduct.prod_price}
+                        {" "}
+                        {currentProduct.is_buy_together
+  ? currentProduct.effectiveprice === 0
+    ? "Free"
+    : `₹${currentProduct.effectiveprice}`
+  : `₹${currentProduct.prod_price}`}
+
                       </span>
                     </p>
                     {/* <p className="info-row">

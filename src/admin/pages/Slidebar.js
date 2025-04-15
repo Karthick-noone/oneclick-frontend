@@ -14,6 +14,7 @@ import {
   FaChevronRight,
   FaEdit,
   FaTag,
+  FaProductHunt,
 } from "react-icons/fa";
 import logoImage from "./img/oneclick.png"; // Replace with the path to your image
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -228,7 +229,7 @@ const Slidebar = () => {
               onClick={toggleProducts}
               className={isProductActive() ? "active" : ""}
             >
-              <FaTags className="menu-icon" /> {isOpen && "Products"}
+              <FaProductHunt className="menu-icon" /> {isOpen && "Products"}
               {isOpen &&
                 (isProductsOpen ? (
                   <FaChevronDown className="submenu-icon" />

@@ -2349,7 +2349,7 @@ const Computers = ({ product }) => {
                                                         .join(" ")}
                                                     </span>
                                                     <span className="freq-item-price">
-                                                      ₹{accessory.prod_price}
+                                                      ₹{accessory.effectiveprice}
                                                     </span>
                                                   </div>
                                                   <input

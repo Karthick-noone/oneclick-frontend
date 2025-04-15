@@ -621,6 +621,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                 prod_price: accessory.prod_price,
                 effectiveprice: accessory.effectiveprice,
                 category: accessory.category,
+                prod_id: accessory.prod_id,
                 prod_img: productImages.length > 0 ? productImages[0] : null, // Get the first image
               };
             });
@@ -1077,7 +1078,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                     {/* Breadcrumb Navigation */}
                     <div
                       className="non-responsive-navigation"
-                      style={{ marginBottom: "15px" }}
+                      style={{ marginBottom: "10px" }}
                     >
                       {loading ? (
                         <Skeleton width={150} height={20} />
@@ -1134,6 +1135,8 @@ const ProductDetail = ({ accessoryCategory }) => {
     </p>
   )
 )}
+
+
 
                     {/* Price Section */}
                     <p>
@@ -1522,6 +1525,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                                           .slice(0, 3)
                                           .join(" ")}
                                     </h5>
+
+                                    {/* <span>{accessory.prod_id}</span> */}
                                     {/* <p
                                       style={{
                                         marginLeft: "10px",

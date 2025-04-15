@@ -22,7 +22,7 @@ import orderTruck from "./img/order-truck.gif";
 import confetti from "canvas-confetti";
 import { Link } from "react-router-dom";
 
-import checkout from "./img/checkout.png"
+import checkout from "./img/checkout.png";
 
 const BuyNow = () => {
   const navigate = useNavigate();
@@ -84,7 +84,7 @@ const BuyNow = () => {
     }
   };
 
-  const items = product ? [product] : [];
+  const items = Array.isArray(product) ? product : product ? [product] : [];
 
   const fetchCoupons = async () => {
     try {
@@ -492,20 +492,37 @@ const BuyNow = () => {
     }
 
     console.log("Product details:", product);
+    const enrichedCartItems = [];
 
-    // Create enrichedCartItems using product details
-    const enrichedCartItems = [
-      {
-        id: product.id,
-        quantity: 1, // Defaulting quantity to 1
-        prod_price: product.prod_price,
-        prod_name: product.prod_name,
-        prod_img: product.prod_img,
-        prod_description: product.prod_description,
-        prod_id: product.prod_id,
-        prod_category: product.category,
-      },
-    ];
+    // Add main product details
+    enrichedCartItems.push({
+      id: product.id,
+      quantity: quantity, // Using the quantity selected for the main product
+      prod_price: product.prod_price,
+      prod_name: product.prod_name,
+      prod_img: product.prod_img,
+      prod_description: product.prod_description,
+      prod_id: product.prod_id,
+      prod_category: product.category,
+      is_buy_together: false,
+    });
+
+    // Check if any accessories exist
+    if (product.accessories && product.accessories.length > 0) {
+      product.accessories.forEach((accessory) => {
+        enrichedCartItems.push({
+          id: accessory.id,
+          quantity: 1, // Or adjust the quantity logic if accessories are allowed in multiples
+          prod_price: accessory.effectiveprice,
+          prod_name: accessory.prod_name,
+          prod_img: accessory.prod_img, // You can parse accessory image if needed
+          prod_description: accessory.prod_description || "",
+          prod_id: accessory.prod_id, // Use an identifier appropriate for the accessory
+          prod_category: accessory.category,
+          is_buy_together: true,
+        });
+      });
+    }
 
     console.log("enrichedCartItems:", enrichedCartItems);
 
@@ -628,11 +645,11 @@ const BuyNow = () => {
       {/* <Header1 /> */}
       {/* <Header2 /> */}
       <div className="cart-container">
-      <div className="cart-header">
-  <h1>
-   <img src={checkout} width={'40px'} alt="" /> Checkout
-  </h1>
-</div>
+        <div className="cart-header">
+          <h1>
+            <img src={checkout} width={"40px"} alt="" /> Checkout
+          </h1>
+        </div>
 
         <div className="cart-content row">
           <div className="cart-products">

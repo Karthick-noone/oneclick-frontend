@@ -985,6 +985,7 @@ const Checkout = () => {
       prod_description: item.prod_description, // Map 'prod_description' to 'prod_description'
       prod_id: item.prod_id,
       prod_category: item.category, // Map 'prod_category' to 'category'
+      is_buy_together: false,
     }));
 
     console.log("enrichedCartItems", enrichedCartItems);
