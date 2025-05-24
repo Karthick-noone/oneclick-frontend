@@ -20,7 +20,7 @@ import "yet-another-react-lightbox/styles.css";
 // Set up the modal root element
 Modal.setAppElement("#root");
 
-const Computers = ({ product }) => {
+const Computers = () => {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -76,10 +76,13 @@ const Computers = ({ product }) => {
   const [offerPrice, setOfferPrice] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [modalProductId, setModalProductId] = useState(null);
+  const [isOfferActive, setIsOfferActive] = useState(true);
 
   const [isOpen, setIsOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [lightboxImages, setLightboxImages] = useState([]);
+      const [, setProduct] = useState(null);
+  
 
   const handleImageClick = (index, imageArray) => {
     setPhotoIndex(index); // starting image
@@ -87,6 +90,37 @@ const Computers = ({ product }) => {
     setIsOpen(true); // open lightbox
   };
   
+   useEffect(() => {
+          const now = new Date();
+          // console.log("Current Time:", now.toLocaleString());
+        
+          const activeProduct = products.find((item) => {
+            if (!item.offer_start_time || !item.offer_end_time) {
+              // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
+              return false;
+            }
+        
+            const offerStartTime = new Date(item.offer_start_time);
+            const offerEndTime = new Date(item.offer_end_time);
+        
+            // console.log(
+            //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
+            // );
+        
+            return offerStartTime <= now && offerEndTime > now;
+          });
+        
+          if (activeProduct) {
+            // console.log("Active Product Found:", activeProduct);
+          } else {
+            // console.log("No active product with a valid offer.");
+          }
+        
+          setProduct(activeProduct || null);
+          setIsOfferActive(!!activeProduct);
+        
+          // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
+        }, [products]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -1894,10 +1928,9 @@ const Computers = ({ product }) => {
                     ₹{product.actual_price}
                   </span>{" "}
                   <span style={{ color: "green", marginLeft: "5px" }}>
-                    ₹
-                    {product.offer_price > 0
-                      ? product.offer_price
-                      : product.prod_price}
+                    
+                                            ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
+
                   </span>
                 </div>
                 {/* {product.offer_price > 0 && (
@@ -2394,7 +2427,7 @@ const Computers = ({ product }) => {
       </div>
 
       {/* <table className="product-table">
-        <thead>
+        <thead> 
           <tr>
             <th>Image</th>
             <th>Name</th>

@@ -62,39 +62,49 @@ const Header2 = () => {
   const [cartLoaded, setCartLoaded] = useState(false);
   const [query, setQuery] = useState(""); // ✅ Fix: Declare query state
 
-  useEffect(() => {
-    if (cartItems.length === 0) {
-      console.log("Cart is empty, no offer status to check.");
-      setProduct(null);
-      return;
-    }
+  //  useEffect(() => {
+  //         const now = new Date();
+  //         // console.log("Current Time:", now.toLocaleString());
+        
+  //         const activeProduct = cartItems.find((item) => {
+  //           if (!item.offer_start_time || !item.offer_end_time) {
+  //             // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
+  //             return false;
+  //           }
+        
+  //           const offerStartTime = new Date(item.offer_start_time);
+  //           const offerEndTime = new Date(item.offer_end_time);
+        
+  //           // console.log(
+  //           //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
+  //           // );
+        
+  //           return offerStartTime <= now && offerEndTime > now;
+  //         });
+        
+  //         if (activeProduct) {
+  //           // console.log("Active Product Found:", activeProduct);
+  //         } else {
+  //           // console.log("No active product with a valid offer.");
+  //         }
+        
+  //         setProduct(activeProduct || null);
+  //         setIsOfferActive(!!activeProduct);
+        
+  //         // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
+  //       }, [cartItems]);
 
-    let activeOffer = false;
-    let bestProduct = null;
+        const isOfferValid = (item) => {
+  if (!item.offer_start_time || !item.offer_end_time) return false;
 
-    cartItems.forEach((item) => {
-      if (item.offer_end_time) {
-        const now = new Date();
-        const offerEndTime = new Date(item.offer_end_time);
+  const now = new Date();
+  const start = new Date(item.offer_start_time);
+  const end = new Date(item.offer_end_time);
 
-        console.log(
-          `Checking offer for ${item.prod_name}:`,
-          offerEndTime.toLocaleString()
-        );
+  return start <= now && now < end;
+};
 
-        if (offerEndTime > now) {
-          activeOffer = true;
-          bestProduct = item; // Assign the first item with an active offer
-        }
-      }
-    });
-
-    setIsOfferActive(activeOffer);
-    setProduct(bestProduct); // Assign the product with the active offer (or null if none)
-
-    console.log(`Final Offer Status: ${activeOffer ? "Yes" : "No"}`);
-    console.log("Assigned product for offer tracking:", bestProduct);
-  }, [cartItems]);
+  
 
   useEffect(() => {
     NProgress.configure({ showSpinner: false }); // Disable spinner
@@ -471,13 +481,13 @@ const Header2 = () => {
     if (newQuantity <= 0) return; // Prevent reducing quantity below 1
 
     const email = localStorage.getItem("email"); // Ensure email is fetched properly
-    if (!email) {
-      toast.error("User is not logged in!", {
-        position: "top-right",
-        autoClose: 2000,
-      });
-      return;
-    }
+    // if (!email) {
+    //   toast.error("User is not logged in!", {
+    //     position: "top-right",
+    //     autoClose: 2000,
+    //   });
+    //   return;
+    // }
 
     try {
       // Send the updated quantity to the server
@@ -1034,9 +1044,6 @@ const Header2 = () => {
                 </div>
               </div>
             )}
-
-
-            
           </div>
           {isMobileView && <Header3 />}
         </div>
@@ -1119,9 +1126,10 @@ const Header2 = () => {
                         <p style={{ color: "#27ae60" }}>
                           {" "}
                           {/* ₹{item.prod_price * item.quantity} */}₹
-                          {item.offer_price > 0 && isOfferActive
-                            ? item.offer_price * item.quantity
-                            : item.prod_price * item.quantity}
+                       {item.offer_price > 0 && isOfferValid(item)
+  ? item.offer_price
+  : item.prod_price}
+
                         </p>
 
                         <div className="quantity-controls">

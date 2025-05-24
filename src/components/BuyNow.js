@@ -119,7 +119,7 @@ const BuyNow = () => {
   // Allow only valid characters in coupon input
   const handleCouponChange = (event) => {
     const inputValue = event.target.value;
-    const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+    const validCharacters = /^[a-zA-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
     if (validCharacters.test(inputValue)) {
       setCoupon(inputValue);
     }
@@ -174,13 +174,13 @@ const BuyNow = () => {
     if (!couponCode.trim()) {
       setMessage("Please enter a coupon code.");
       setMessageType("error");
-      setTimeout(() => setMessage(""), 3000);
+      setTimeout(() => setMessage(""), 5000);
       return;
     }
     if (isCouponApplied) {
       setMessage("Coupon has already been applied!");
       setMessageType("warning");
-      setTimeout(() => setMessage(""), 3000);
+      setTimeout(() => setMessage(""), 5000);
       return;
     }
 
@@ -208,17 +208,17 @@ const BuyNow = () => {
           calculateTotalPrice() < data.min_purchase_limit
         ) {
           setMessage(
-            `Minimum purchase of ₹${data.min_purchase_limit} required.`
+            `Minimum purchase of ₹${data.min_purchase_limit} required to use this coupon.`
           );
           setMessageType("error");
-          setTimeout(() => setMessage(""), 3000);
+          setTimeout(() => setMessage(""), 5000);
           return;
         }
 
         // Save coupon details (for potential future use or display)
         setDiscountAmount(data.discount2 ?? 0);
         setCouponValue(data.discount1 ?? 0);
-        setMinPurchaseLimit(data.min_purchase_limit ?? 0);
+        // setMinPurchaseLimit(data.min_purchase_limit ?? 0);
 
         // Subtract the discount from the raw total price
         const rawTotal = calculateTotalPrice();
@@ -230,11 +230,11 @@ const BuyNow = () => {
         setMessageType("success");
         setCoupon("");
 
-        setTimeout(() => setMessage(""), 3000);
+        setTimeout(() => setMessage(""), 5000);
       } else {
         setMessage(data.message || "Failed to apply coupon.");
         setMessageType("error");
-        setTimeout(() => setMessage(""), 3000);
+        setTimeout(() => setMessage(""), 5000);
       }
     } catch (error) {
       console.error("Error applying coupon:", error);
@@ -244,7 +244,7 @@ const BuyNow = () => {
           : "Invalid or expired coupon."
       );
       setMessageType("error");
-      setTimeout(() => setMessage(""), 3000);
+      setTimeout(() => setMessage(""), 5000);
     }
   };
 
@@ -937,6 +937,24 @@ const BuyNow = () => {
                 Apply
               </button>
             </div>
+              {message && (
+              <p
+                style={{
+                  color:
+                    messageType === "success"
+                      ? "green"
+                      : messageType === "error"
+                      ? "red"
+                      : "orange", // Orange for warning (if coupon is already applied)
+                  // fontWeight: "bold",
+                  marginTop: "5px",
+                  marginBottom: "5px",
+                  fontSize: "14px",
+                }}
+              >
+                {message}
+              </p>
+            )}{" "}
             <div
               style={{
                 display: "flex",
@@ -954,6 +972,7 @@ const BuyNow = () => {
                   color: "#ff5722",
                 }}
               />
+              
               <span>
                 {" "}
                 If you have multiple coupons, apply the one you prefer.
@@ -977,23 +996,7 @@ const BuyNow = () => {
                 )}
               </div>
             )}
-            {message && (
-              <p
-                style={{
-                  color:
-                    messageType === "success"
-                      ? "green"
-                      : messageType === "error"
-                      ? "red"
-                      : "orange", // Orange for warning (if coupon is already applied)
-                  // fontWeight: "bold",
-                  marginTop: "5px",
-                  fontSize: "14px",
-                }}
-              >
-                {message}
-              </p>
-            )}{" "}
+          
             <hr />
             <div className="summary-item">
               <strong>Total Amount</strong>

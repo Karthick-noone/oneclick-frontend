@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { ApiUrl } from "./ApiUrl";
-import { useNavigate } from "react-router-dom"; // Import useNavigate hook
+import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate hook
 import { FaEye, FaEyeSlash, FaInfoCircle, FaSignOutAlt } from "react-icons/fa"; // Import eye icons
 import logo from "./img/logo3.png";
 // import { Zoom } from "react-toastify";
@@ -22,6 +22,7 @@ const SignupPage = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate(); // Initialize navigate function
   const [backgroundImage, setBackgroundImage] = useState("");
+  const location = useLocation();
 
   // Fetch the background image from the server
   useEffect(() => {
@@ -182,7 +183,8 @@ const SignupPage = () => {
           },
           confirmButtonText: "OK",
         }).then(() => {
-          navigate("/login"); // Redirect to login page
+// Example: redirecting user to login page from somewhere else
+navigate('/login', { state: { from: location.pathname } });
         });
 
         // Reset form data after success

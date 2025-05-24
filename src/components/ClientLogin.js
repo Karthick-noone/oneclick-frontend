@@ -142,7 +142,14 @@ const handleSubmit = async (e) => {
         showCloseButton: true,
       })
       .then(() => {
+        //  REDIRECTION LOGIC
+      const from = location.state?.from || "/";
+
+       if (from === "/signup") {
+        navigate("/");
+      } else {
         navigate(-1);
+      }
       });
 
     } else {

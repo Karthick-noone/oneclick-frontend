@@ -116,7 +116,7 @@ const Checkout = () => {
     const inputValue = event.target.value;
 
     // Use a regular expression to allow only alphanumeric characters (A-Z, a-z, 0-9)
-    const validCharacters = /^[a-zA-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+    const validCharacters = /^[a-zA-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
 
     // Check if the input value matches the regex
     if (validCharacters.test(inputValue)) {
@@ -153,29 +153,31 @@ const Checkout = () => {
       const { data } = await axios.post(`${ApiUrl}/api/apply-coupon`, {
         couponCode,
         product_ids: productIds,
+         cart_total: calculateTotalPrice(),
       });
       console.log("Response from server:", data);
 
       if (data.success) {
-        const discount = data.discount1 ?? data.discount2 ?? 0;
+const discount = data.discount1 ?? data.discount2 ?? 0;
 
         // Check if discount1 applies but the total doesn't meet the min purchase limit.
-        if (
-          data.discount1 !== undefined &&
-          calculateTotalPrice() < data.min_purchase_limit
-        ) {
-          setMessage(
-            `Minimum purchase of ₹${data.min_purchase_limit} required.`
-          );
-          setMessageType("error");
-          setTimeout(() => setMessage(""), 3000);
-          return;
-        }
+        // if (
+        //   data.discount1 !== undefined &&
+        //   calculateTotalPrice() < data.min_purchase_limit
+        // ) {
+        //   setMessage(
+        //     `Minimum purchase of ₹${data.min_purchase_limit} required.`
+        //   );
+        //   setMessageType("error");
+        //   setTimeout(() => setMessage(""), 3000);
+        //   return;
+        // }
+        
 
         // Save coupon details.
         setDiscountAmount(data.discount2 ?? 0);
         setCouponValue(data.discount1 ?? 0);
-        setMinPurchaseLimit(data.min_purchase_limit ?? 0);
+        // setMinPurchaseLimit(data.min_purchase_limit ?? 0);
 
         const newAmount = Math.max(0, calculateTotalPrice() - discount);
         setTotalAmount(newAmount);
@@ -213,18 +215,23 @@ const Checkout = () => {
       } else {
         setMessage(data.message || "Failed to apply coupon.");
         setMessageType("error");
-        setTimeout(() => setMessage(""), 3000);
+        setTimeout(() => setMessage(""), 5000);
       }
-    } catch (error) {
-      console.error("Error applying coupon:", error);
-      setMessage(
-        error.response?.data?.error === "Coupon has expired."
-          ? "This coupon has expired."
-          : "Invalid or expired coupon."
-      );
-      setMessageType("error");
-      setTimeout(() => setMessage(""), 3000);
-    }
+   } catch (error) {
+  console.error("Error applying coupon:", error);
+
+  const serverMessage = error.response?.data?.error;
+
+  if (serverMessage) {
+    setMessage(serverMessage); //  Backend message (like minimum purchase limit)
+  } else {
+    setMessage("Invalid or expired coupon.");
+  }
+
+  setMessageType("error");
+  setTimeout(() => setMessage(""), 5000);
+}
+
   };
 
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -252,7 +259,7 @@ const Checkout = () => {
     console.log("User Email:", email);
 
     if (!email) {
-      console.warn("User is not logged in!");
+      
       Swal.fire({
         icon: "error",
         title: "Login Required",
@@ -1539,7 +1546,7 @@ const Checkout = () => {
                 {/* <span style={{ color: "green" }}>FREE Delivery</span> */}
               </span>
             </div>
-            {parseFloat(calculateTotalPrice()) >= minPurchaseLimit && (
+            {minPurchaseLimit && (
               <div className="summary-item">
                 <span>
                   (If you have coupon)

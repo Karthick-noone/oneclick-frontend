@@ -276,7 +276,7 @@ const ProductDetail = ({ accessoryCategory }) => {
         }
       } catch (error) {
         console.error("Error fetching product details:", error);
-        toast.error("Error fetching product details.");
+        // toast.error("Error fetching product details.");
       } finally {
         setIsLoading(false);
       }
@@ -403,7 +403,7 @@ const ProductDetail = ({ accessoryCategory }) => {
     const email = localStorage.getItem("email");
 
     // Check if the user is logged in
-    if (!email) {
+     if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -453,7 +453,7 @@ const ProductDetail = ({ accessoryCategory }) => {
 
     // Check if the user is logged in
     const email = localStorage.getItem("email");
-    if (!email) {
+     if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -511,6 +511,7 @@ const ProductDetail = ({ accessoryCategory }) => {
           email,
           productId: product.id,
         });
+        window.dispatchEvent(new Event("wishlist-updated"));
         toast.info(`${product.prod_name} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
@@ -523,6 +524,7 @@ const ProductDetail = ({ accessoryCategory }) => {
           action: "add",
           prod_id: product.id,
         });
+        window.dispatchEvent(new Event("wishlist-updated"));
         toast.success(`${product.prod_name} added to your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
@@ -697,10 +699,11 @@ const ProductDetail = ({ accessoryCategory }) => {
       const email = localStorage.getItem("email");
       const username = localStorage.getItem("username");
 
-      if (!email || !username) {
-        console.log("User not logged in");
-        return;
-      }
+      // if (!email || !username) {
+      //   console.log("User not logged in");
+      //   return;
+      // }
+
 
       try {
         const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
@@ -1127,7 +1130,7 @@ const ProductDetail = ({ accessoryCategory }) => {
       className="coupon-discount-label"
       style={{
         marginTop: "10px",
-        // marginBottom: "10px",
+        marginBottom: "10px",
         fontSize: "12px",
       }}
     >
@@ -1186,6 +1189,29 @@ const ProductDetail = ({ accessoryCategory }) => {
                                   ? product.offer_price
                                   : product.prod_price)}
                             </span>
+
+                                    {product.offer_price > 0 &&
+                          isOfferActive &&
+                          product.offer_price &&
+                          remainingTime && (
+                            <div className="offer-timer">
+                              {remainingTime.days ? (
+                                <p style={{ color: "red" }}>
+                                  {remainingTime.days} day(s) left for this
+                                  offer
+                                </p>
+                              ) : (
+                                <p>
+                                  Deals end in{" "}
+                                  <span className="timer-tag">
+                                    {remainingTime.hours}h :{" "}
+                                    {remainingTime.minutes}m :{" "}
+                                    {remainingTime.seconds}s
+                                  </span>
+                                </p>
+                              )}
+                            </div>
+                          )}
                           </span>
                         )}
 

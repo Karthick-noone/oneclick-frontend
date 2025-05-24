@@ -568,7 +568,7 @@ const Speakers = () => {
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
+                        ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
@@ -700,7 +700,7 @@ const Speakers = () => {
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
+                        ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P

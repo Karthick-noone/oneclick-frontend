@@ -370,7 +370,7 @@ const EditFourImagesAd = () => {
               <option value="Mobiles">Mobile</option>
               <option value="Printers">Printers</option>
               <option value="Headphones">Headphone</option>
-              <option value="Speaker">Speaker</option>
+              <option value="Speakers">Speaker</option>
               <option value="CCTV">CCTV</option>
               <option value="TV">TV</option>
               <option value="Watch">Watch</option>
@@ -489,7 +489,7 @@ const EditFourImagesAd = () => {
             <option value="Mobiles">Mobile</option>
             <option value="Printers">Printers</option>
             <option value="Headphones">Headphone</option>
-            <option value="Speaker">Speaker</option>
+            <option value="Speakers">Speaker</option>
             <option value="CCTV">CCTV</option>
             <option value="TV">TV</option>
             <option value="Watch">Watch</option>

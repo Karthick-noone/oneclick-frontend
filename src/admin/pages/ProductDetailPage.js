@@ -647,7 +647,7 @@ return (
       <option value="mobiles">Mobile</option>
       <option value="printers">Printers</option>
       <option value="headphones">Headphone</option>
-      <option value="speaker">Speaker</option>
+      <option value="Speakers">Speaker</option>
       <option value="cctv">CCTV</option>
       <option value="tv">TV</option>
       <option value="watch">Watch</option>
@@ -766,7 +766,7 @@ return (
       <option value="mobiles">Mobile</option>
       <option value="printers">Printers</option>
       <option value="headphones">Headphone</option>
-      <option value="speaker">Speaker</option>
+      <option value="Speakers">Speaker</option>
       <option value="cctv">CCTV</option>
       <option value="tv">TV</option>
       <option value="watch">Watch</option>

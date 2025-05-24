@@ -4,10 +4,10 @@ import { FaBell, FaUserCircle, FaPowerOff, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import user from "./img/user.jpg";
 import axios from "axios";
-import 'nprogress/nprogress.css';
-import NProgress from 'nprogress';
+import "nprogress/nprogress.css";
+import NProgress from "nprogress";
 import { ApiUrl } from "../../components/ApiUrl";
-import moment from "moment";  // Moment.js to handle time formatting
+import moment from "moment"; // Moment.js to handle time formatting
 import { Link } from "react-router-dom";
 
 const Topbar = () => {
@@ -33,35 +33,38 @@ const Topbar = () => {
   useEffect(() => {
     fetchNotifications();
     // Set an interval to delete notifications older than 15 days every hour
-    const deleteOldNotificationsInterval = setInterval(deleteOldNotifications, 3600000); // 1 hour
+    const deleteOldNotificationsInterval = setInterval(
+      deleteOldNotifications,
+      3600000
+    ); // 1 hour
     return () => clearInterval(deleteOldNotificationsInterval);
   }, []);
 
   useEffect(() => {
-      const handleScroll = () => {
-        if (isNotificationOpen) {
-          setIsNotificationOpen(false);
-        }
-      };
-  
-      window.addEventListener("scroll", handleScroll);
-      return () => {
-        window.removeEventListener("scroll", handleScroll);
-      };
-    }, [isNotificationOpen]);
+    const handleScroll = () => {
+      if (isNotificationOpen) {
+        setIsNotificationOpen(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isNotificationOpen]);
 
   useEffect(() => {
-      const handleScroll = () => {
-        if (isMenuOpen) {
-          setIsMenuOpen(false);
-        }
-      };
-  
-      window.addEventListener("scroll", handleScroll);
-      return () => {
-        window.removeEventListener("scroll", handleScroll);
-      };
-    }, [isMenuOpen]);
+    const handleScroll = () => {
+      if (isMenuOpen) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isMenuOpen]);
 
   const fetchNotifications = async () => {
     setLoadingNotifications(true);
@@ -69,8 +72,8 @@ const Topbar = () => {
       const response = await axios.get(`${ApiUrl}/notifications`);
       const fetchedNotifications = response.data;
 
-      console.log("fetchedNotifications",fetchedNotifications)
-  
+      console.log("fetchedNotifications", fetchedNotifications);
+
       // Mark any notification as 'read' if it has been marked as read in the backend
       setNotifications(
         fetchedNotifications.map((notification) => ({
@@ -84,14 +87,15 @@ const Topbar = () => {
       setLoadingNotifications(false);
     }
   };
-  
 
   const markAsRead = async (id) => {
     try {
       await axios.patch(`${ApiUrl}/notifications/${id}/read`);
       setNotifications((prev) =>
         prev.map((notification) =>
-          notification.id === id ? { ...notification, read: true } : notification
+          notification.id === id
+            ? { ...notification, read: true }
+            : notification
         )
       );
     } catch (error) {
@@ -128,7 +132,7 @@ const Topbar = () => {
       }
     });
   };
-  
+
   const toggleNotification = () => {
     setIsNotificationOpen((prevState) => {
       if (prevState) {
@@ -139,7 +143,7 @@ const Topbar = () => {
       }
     });
   };
-  
+
   const handleClickOutside = (event) => {
     if (
       menuRef.current &&
@@ -156,14 +160,13 @@ const Topbar = () => {
       setIsNotificationOpen(false);
     }
   };
-  
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
@@ -173,34 +176,44 @@ const Topbar = () => {
   // Function to format time for notifications
   const formatTimeAgo = (date) => {
     const now = moment();
-    const diff = now.diff(moment(date), 'minutes');
-    
+    const diff = now.diff(moment(date), "minutes");
+
     if (diff < 60) {
       return `${diff} minutes ago`;
-    } else if (diff < 1440) {  // 24 hours * 60 minutes
+    } else if (diff < 1440) {
+      // 24 hours * 60 minutes
       return `${Math.floor(diff / 60)} hours ago`;
     } else {
-      return moment(date).format('hh:mm A DD MMM YY');
+      return moment(date).format("hh:mm A DD MMM YY");
     }
   };
 
-  const username = localStorage.getItem("staffname")
-  const role = localStorage.getItem("userRole")
+  const username = localStorage.getItem("staffname");
+  const role = localStorage.getItem("userRole");
   // const UserName = username+username.slice(1)
 
   return (
     <div className="topbar">
       <div className="topbar-content">
         <button className="action-btn bell-btn" onClick={toggleNotification}>
-          {notifications.filter((notification) => !notification.read).length > 0 && (
-        <span className="notification-count">
-          {notifications.filter((notification) => !notification.read).length}
-        </span>
-      )}
-          <FaBell style={{ fontSize: "24px", color: "white" }} />
+          {notifications.filter((notification) => !notification.read).length >
+            0 && (
+            <span className="notification-count">
+              {
+                notifications.filter((notification) => !notification.read)
+                  .length
+              }
+            </span>
+          )}
+          <FaBell
+            style={{ fontSize: "24px", color: "white"}}
+          />
         </button>
         <button className="action-btn">
-          <FaUserCircle onClick={toggleMenu} style={{ fontSize: "24px", color: "white" }} />
+          <FaUserCircle
+            onClick={toggleMenu}
+            style={{ fontSize: "24px", color: "white" }}
+          />
         </button>
       </div>
 
@@ -208,11 +221,11 @@ const Topbar = () => {
       {isNotificationOpen && (
         <div className="notification-box" ref={notificationRef}>
           <div className="notification-header">
-  <h4>Notifications</h4>
-  <span className="mark-all-btn" onClick={markAllAsRead}>
-    Mark All as Read
-  </span>
-</div>
+            <h4>Notifications</h4>
+            <span className="mark-all-btn" onClick={markAllAsRead}>
+              Mark All as Read
+            </span>
+          </div>
 
           {loadingNotifications ? (
             <p>Loading...</p>
@@ -220,48 +233,60 @@ const Topbar = () => {
             <p className="no-notify">No new notifications</p>
           ) : (
             <ul>
-            {notifications.map((notification) => (
-              <li key={notification.id} onClick={() => markAsRead(notification.id)}>
-              <div className={`notification-item ${!notification.read ? "new" : ""}`}>
-  <div className="notification-row">
-    <span>{notification.message}</span>
-    <div className="circle-btn-wrapper">
-      <button
-        className={`circle-btn ${notification.read ? "read" : "unread"}`}
-        disabled // Disable the button to prevent clicking it
-      ></button>
-    </div>
-  </div>
-  <span className="notification-time">
-    {formatTimeAgo(notification.created_at)}
-  </span>
-</div>
-
-
-              </li>
-            ))}
-          </ul>
-          
+              {notifications.map((notification) => (
+                <li
+                  key={notification.id}
+                  onClick={() => markAsRead(notification.id)}
+                >
+                  <div
+                    className={`notification-item ${
+                      !notification.read ? "new" : ""
+                    }`}
+                  >
+                    <div className="notification-row">
+                      <span>{notification.message}</span>
+                      <div className="circle-btn-wrapper">
+                        <button
+                          className={`circle-btn ${
+                            notification.read ? "read" : "unread"
+                          }`}
+                          disabled // Disable the button to prevent clicking it
+                        ></button>
+                      </div>
+                    </div>
+                    <span className="notification-time">
+                      {formatTimeAgo(notification.created_at)}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       )}
- 
+
       {/* User Menu */}
       {isMenuOpen && (
         <div className="topbar-menu" ref={menuRef}>
           <div className="profile-section">
             <img src={user} alt="Profile" className="profile-imagee" />
-            <h3 style={{ color: "black" }} className="profile-username">{role === 'Staff' ? username : role}</h3>
+            <h3 style={{ color: "black" }} className="profile-username">
+              {role === "Staff" ? username : role}
+            </h3>
           </div>
           <hr />
-          {role !== 'Staff' && (
+          {role !== "Staff" && (
             <>
-          <Link style={{ textDecoration: "none" }} to="/admin/ChangePassword">
-            <button className="menu-item" onClick={toggleMenu}>
-             <FaUser />  Change Password
-            </button>
-          </Link>
-        </>)}
+              <Link
+                style={{ textDecoration: "none" }}
+                to="/admin/ChangePassword"
+              >
+                <button className="menu-item" onClick={toggleMenu}>
+                  <FaUser /> Change Password
+                </button>
+              </Link>
+            </>
+          )}
           <button
             onClick={() => {
               handleLogout();
@@ -272,8 +297,6 @@ const Topbar = () => {
             <FaPowerOff /> Logout
           </button>
         </div>
-
-      
       )}
     </div>
   );

@@ -185,6 +185,7 @@ const CCTV = ({ isOpen, onClose }) => {
           ...offerData,
           productId,
         });
+
         Swal.fire("Success!", "Offer added successfully!", "success");
       }
       handleCloseOfferModal(); // Close the modal after successful submission
@@ -1646,10 +1647,7 @@ const CCTV = ({ isOpen, onClose }) => {
                   <span style={{ color: "green", marginLeft: "5px" }}>
                     ₹{product.prod_price}
                   </span>
-                  {product.offer_price && 
-                  <span style={{ color: "green", marginLeft: "5px" }}>
-                    ₹{product.offer_price}
-                  </span>}
+              
                 </div>
                 <button
                   className="view-details-btn"

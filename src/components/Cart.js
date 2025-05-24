@@ -623,7 +623,7 @@ const CartPage = () => {
     console.log("User Email:", email);
 
     if (!email) {
-      console.warn("User is not logged in!");
+      
       Swal.fire({
         icon: "error",
         title: "Login Required",

@@ -72,6 +72,8 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
   const [offerPrice, setOfferPrice] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
 
+  const [isOfferActive, setIsOfferActive] = useState(true);
+    const [product, setProduct] = useState(null);
 
   
   const [isModalOpen2, setIsModalOpen2] = useState(false);
@@ -85,6 +87,38 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
       }
     }, 100);
   }, []);
+
+   useEffect(() => {
+        const now = new Date();
+        // console.log("Current Time:", now.toLocaleString());
+      
+        const activeProduct = products.find((item) => {
+          if (!item.offer_start_time || !item.offer_end_time) {
+            // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
+            return false;
+          }
+      
+          const offerStartTime = new Date(item.offer_start_time);
+          const offerEndTime = new Date(item.offer_end_time);
+      
+          // console.log(
+          //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
+          // );
+      
+          return offerStartTime <= now && offerEndTime > now;
+        });
+      
+        if (activeProduct) {
+          // console.log("Active Product Found:", activeProduct);
+        } else {
+          // console.log("No active product with a valid offer.");
+        }
+      
+        setProduct(activeProduct || null);
+        setIsOfferActive(!!activeProduct);
+      
+        // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
+      }, [products]);
   
     // Handle opening modal and passing productId
   
@@ -1863,7 +1897,8 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                  
                 </div>
                 <div>
-                  <span style={{textDecoration:"line-through", color:'red', fontSize:'14px'}}>₹{product.actual_price}</span>  <span style={{color:'green',marginLeft:'5px'}}>₹{product.prod_price}</span>
+                 M.R.P <span style={{textDecoration:"line-through", color:'red', fontSize:'14px'}}>₹{product.actual_price}</span> 
+                  <span style={{color:'green',marginLeft:'5px'}}>  ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}</span>
                 </div>
                 <button
                     className="view-details-btn"

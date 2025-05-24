@@ -23,106 +23,100 @@ const WishlistSidebar = ({
   const [wishlistLoaded, setWishlistLoaded] = useState(false);
   const navigate = useNavigate();
 
+  const isOfferValid = (item) => {
+    if (!item.offer_start_time || !item.offer_end_time) return false;
 
-  useEffect(() => {
-  
-    if (!product) {
-      return;
-    }
-  
-    if (!product.offer_end_time) {
-      console.log("Product has no offer_end_time.");
-      return;
-    }
-  
     const now = new Date();
-    const offerEndTime = new Date(product.offer_end_time);
-  
-  
-    const isActive = offerEndTime > now;
-    setIsOfferActive(isActive);
-  
-  }, [product]);
-  
+    const start = new Date(item.offer_start_time);
+    const end = new Date(item.offer_end_time);
 
-  
+    return start <= now && now < end;
+  };
+
   useEffect(() => {
     if (wishlistItems.length === 0) {
       console.log("Wishlist is empty, no offer status to check.");
       return;
     }
-  
+
     let activeOffer = false;
-  
+
     wishlistItems.forEach((item) => {
       if (item.offer_end_time) {
         const now = new Date();
         const offerEndTime = new Date(item.offer_end_time);
-  
-        console.log(`Checking offer for ${item.prod_name}:`, offerEndTime.toLocaleString());
-  
+
+        console.log(
+          `Checking offer for ${item.prod_name}:`,
+          offerEndTime.toLocaleString()
+        );
+
         if (offerEndTime > now) {
           activeOffer = true; // If at least one product has an active offer, set true
         }
       }
     });
-  
+
     setIsOfferActive(activeOffer);
     console.log(`Final Offer Status: ${activeOffer ? "Yes" : "No"}`);
   }, [wishlistItems]);
-  
-  useEffect(() => {
-    const fetchWishlist = async () => {
-      const email = localStorage.getItem("email");
-      const username = localStorage.getItem("username");
-  
-      if (!email || !username) {
-        toast.error("User is not logged in!", {
-          position: "top-right",
-          autoClose: 2000,
-        });
-        return;
-      }
-  
-      try {
-        const response = await axios.post(`${ApiUrl}/fetch-wishlist`, {
-          email,
-          username,
-        });
-  
-        const fetchedWishlist = response.data.products || [];
-        setWishlistItems(fetchedWishlist);
-        setWishlistLoaded(true);
-  
-        console.log("Fetched wishlist items:", fetchedWishlist);
-      } catch (error) {
-        console.error("Error fetching wishlist:", error);
-      }
-    };
-  
-    if (isOpen && !wishlistLoaded) {
-      fetchWishlist();
+
+  const fetchWishlist = async () => {
+    const email = localStorage.getItem("email");
+    const username = localStorage.getItem("username");
+
+    // if (!email || !username) {
+    //   toast.error("User is not logged in!", {
+    //     position: "top-right",
+    //     autoClose: 2000,
+    //   });
+    //   return;
+    // }
+
+    try {
+      const response = await axios.post(`${ApiUrl}/fetch-wishlist`, {
+        email,
+        username,
+      });
+
+      const fetchedWishlist = response.data.products || [];
+      setWishlistItems(fetchedWishlist);
+      setWishlistLoaded(true);
+      console.log("Fetched wishlist items:", fetchedWishlist);
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
     }
-  }, [isOpen, wishlistLoaded]);
-  
+  };
+  useEffect(() => {
+    // Fetch wishlist initially
+    fetchWishlist();
+
+    // Set up interval to fetch wishlist every 5 seconds
+    const intervalId = setInterval(() => {
+      fetchWishlist();
+    }, 5000);
+
+    // Also listen for wishlist-updated events to refresh immediately
+    const handleWishlistUpdate = () => {
+      fetchWishlist();
+    };
+
+    window.addEventListener("wishlist-updated", handleWishlistUpdate);
+
+    // Cleanup function to clear interval and remove event listener
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("wishlist-updated", handleWishlistUpdate);
+    };
+  }, []);
 
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
 
     const email = localStorage.getItem("email");
 
-
     // Check if the user is logged in
     if (!email) {
-      toast.error("User is not logged in!", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
       window.location.href = "/login";
       return;
     }
@@ -156,43 +150,54 @@ const WishlistSidebar = ({
     }
   };
 
-
   const handleRemoveFromWishlist = async (productId) => {
-    const email = localStorage.getItem('email');
-  
-    if (!email) {
-      toast.error("User is not logged in!");
-      return;
-    }
-  
+    const email = localStorage.getItem("email");
+
+    // if (!email) {
+    //   toast.error("User is not logged in!");
+    //   return;
+    // }
+
     try {
       const response = await axios.post(`${ApiUrl}/remove-from-wishlist`, {
         email,
         productId,
       });
-  
+
       if (response.status === 200) {
         toast.success(`Item removed from wishlist`, {
           position: "top-right",
           autoClose: 2000,
-        });        // Update the wishlist in the state
-        setWishlistItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+        }); // Update the wishlist in the state
+        setWishlistItems((prevItems) =>
+          prevItems.filter((item) => item.id !== productId)
+        );
       }
     } catch (error) {
       console.error("Error removing item from wishlist:", error);
-      toast.error('Failed to remove item from wishlist');
+      toast.error("Failed to remove item from wishlist");
     }
   };
   const handleProductClick = (product) => {
     const slugify = (name) =>
-      name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-  
+      name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]+/g, "");
+
     navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
 
   return (
-    <div ref={wishlistRef} className={`wishlist-sidebar ${isOpen ? "open" : ""}`}>
-      <button style={{color:'black'}} className="close-btn" onClick={toggleWishlist}>
+    <div
+      ref={wishlistRef}
+      className={`wishlist-sidebar ${isOpen ? "open" : ""}`}
+    >
+      <button
+        style={{ color: "black" }}
+        className="close-btn"
+        onClick={toggleWishlist}
+      >
         <FaTimes />
       </button>
       <div className="wishlist-sidebar-header">
@@ -212,38 +217,55 @@ const WishlistSidebar = ({
 
               return (
                 <li key={product.id} className="wishlist-item">
-                  <div style={{ textDecoration: 'none' }}
-                        onClick={() => {toggleWishlist(false);handleProductClick(product);}}
-                  
+                  <div
+                    style={{ textDecoration: "none" }}
+                    onClick={() => {
+                      toggleWishlist(false);
+                      handleProductClick(product);
+                    }}
                   >
                     {firstImage ? (
                       <img
                         src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
                         alt={product.prod_name}
                         className="item-image"
-                    loading="lazy"
-
+                        loading="lazy"
                       />
                     ) : (
-                      <div className="placeholder-image">No image available</div>
+                      <div className="placeholder-image">
+                        No image available
+                      </div>
                     )}
                   </div>
                   <div className="item-details">
-                  <div
-  style={{ textDecoration: 'none', cursor: 'pointer' }}
-  onClick={() => {
-    toggleWishlist(false);
-    handleProductClick(product);
-  }}
->
-  <h3 className="item-name">{product.prod_name}</h3>
-  <p className="item-features">{product.prod_features}</p>
-</div>
-
+                    <div
+                      style={{ textDecoration: "none", cursor: "pointer" }}
+                      onClick={() => {
+                        toggleWishlist(false);
+                        handleProductClick(product);
+                      }}
+                    >
+                      <h3 className="item-name">{product.prod_name}</h3>
+                      <p className="item-features">{product.prod_features}</p>
+                    </div>
                   </div>
                   <div className="item-actions">
-                  <p className="item-price" style={{ color: 'red',textDecoration:"line-through", fontSize:'12px' }}>₹{product.actual_price}</p>
-                    <p className="item-price">₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}</p>
+                    <p
+                      className="item-price"
+                      style={{
+                        color: "red",
+                        textDecoration: "line-through",
+                        fontSize: "12px",
+                      }}
+                    >
+                      ₹{product.actual_price}
+                    </p>
+                    <p className="item-price">
+                      ₹
+                      {product.offer_price > 0 && isOfferValid(product)
+                        ? product.offer_price
+                        : product.prod_price}
+                    </p>
                     {product.status === "unavailable" ? (
                       <p className="out-of-stock">Out of Stock</p>
                     ) : (
@@ -258,7 +280,6 @@ const WishlistSidebar = ({
                     <button
                       // onClick={() => removeFromWishlist(product.id, product.category)}
                       onClick={() => handleRemoveFromWishlist(product.id)}
-
                       className="remove-btn"
                     >
                       Remove

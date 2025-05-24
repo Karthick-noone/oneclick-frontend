@@ -168,7 +168,7 @@ const CCTV = () => {
 
     // Check if the user is logged in
     const email = localStorage.getItem("email");
-    if (!email) {
+     if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -295,7 +295,7 @@ const CCTV = () => {
     const email = localStorage.getItem("email");
 
     // Check if the user is logged in
-    if (!email) {
+     if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -370,6 +370,7 @@ const CCTV = () => {
         console.log(
           `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
         );
+        window.dispatchEvent(new Event("wishlist-updated"));
         toast.info(`${product.prod_name} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
@@ -390,6 +391,7 @@ const CCTV = () => {
         console.log(
           `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
         );
+        window.dispatchEvent(new Event("wishlist-updated"));
         toast.success(`${product.prod_name} added to your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
@@ -409,10 +411,11 @@ const CCTV = () => {
       const email = localStorage.getItem("email");
       const username = localStorage.getItem("username");
 
-      if (!email || !username) {
-        console.log("User not logged in");
-        return;
-      }
+      // if (!email || !username) {
+      //   console.log("User not logged in");
+      //   return;
+      // }
+
 
       try {
         const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
@@ -448,30 +451,7 @@ const CCTV = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  const handleRemoveFromWishlist = async (productId) => {
-    const email = localStorage.getItem("email");
-
-    if (!email) {
-      toast.error("User is not logged in!");
-      return;
-    }
-
-    try {
-      const response = await axios.post(`${ApiUrl}/remove-from-wishlist`, {
-        email,
-        productId,
-      });
-
-      if (response.status === 200) {
-        toast.success("Item removed from wishlist");
-        // Update the wishlist in the state
-        // setWishlistItems((prevItems) => prevItems.filter((item) => item.id !== productId));
-      }
-    } catch (error) {
-      console.error("Error removing item from wishlist:", error);
-      toast.error("Failed to remove item from wishlist");
-    }
-  };
+  
 
   // Define the category variable
   const category = "cctv";
@@ -568,7 +548,7 @@ const CCTV = () => {
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
+                        ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
@@ -700,7 +680,7 @@ const CCTV = () => {
                   <p>
                     <span>
                       <span className="product-price">
-                        ₹{product.offer_price > 0 ? product.offer_price : product.prod_price}
+                        ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
                       </span>
                       <span style={{ marginRight: "5px", fontSize: "15px" }}>
                         M.R.P
