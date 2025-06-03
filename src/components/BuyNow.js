@@ -119,7 +119,8 @@ const BuyNow = () => {
   // Allow only valid characters in coupon input
   const handleCouponChange = (event) => {
     const inputValue = event.target.value;
-    const validCharacters = /^[a-zA-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
+    const validCharacters =
+      /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
     if (validCharacters.test(inputValue)) {
       setCoupon(inputValue);
     }
@@ -937,7 +938,7 @@ const BuyNow = () => {
                 Apply
               </button>
             </div>
-              {message && (
+            {message && (
               <p
                 style={{
                   color:
@@ -972,7 +973,7 @@ const BuyNow = () => {
                   color: "#ff5722",
                 }}
               />
-              
+
               <span>
                 {" "}
                 If you have multiple coupons, apply the one you prefer.
@@ -996,7 +997,6 @@ const BuyNow = () => {
                 )}
               </div>
             )}
-          
             <hr />
             <div className="summary-item">
               <strong>Total Amount</strong>

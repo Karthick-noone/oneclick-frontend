@@ -850,6 +850,7 @@ const Header2 = () => {
           style={{ marginLeft: "50px" }}
           alt="Company Logo"
           // loading="lazy"
+           loading="eager"
         />
         {/* </Link> */}
         {/* </div> */}

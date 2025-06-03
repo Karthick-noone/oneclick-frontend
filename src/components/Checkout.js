@@ -116,7 +116,7 @@ const Checkout = () => {
     const inputValue = event.target.value;
 
     // Use a regular expression to allow only alphanumeric characters (A-Z, a-z, 0-9)
-    const validCharacters = /^[a-zA-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
+const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
 
     // Check if the input value matches the regex
     if (validCharacters.test(inputValue)) {

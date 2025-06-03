@@ -318,7 +318,7 @@ const ProductList = () => {
     const combinedProducts =
       categoryName === "HeadphonesAndSpeakers"
         ? [
-            ...(productsByCategory["Headphones"] || []),
+            ...(productsByCategory["headphones"] || []),
             ...(productsByCategory["Speakers"] || []),
           ]
         : categoryName === "Accessories"
@@ -329,6 +329,9 @@ const ProductList = () => {
             ...(productsByCategory["PrinterAccessories"] || []),
           ]
         : productsByCategory[categoryName] || [];
+        
+          if (!loading && combinedProducts.length === 0) return null;
+
 
     return (
       <div key={categoryName} className="product-list-container">
