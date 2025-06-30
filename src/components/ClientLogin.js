@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
-import { useNavigate, useLocation,Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { ApiUrl } from "./ApiUrl";
-import { FaEye, FaEyeSlash , FaSignOutAlt} from "react-icons/fa"; // Import eye icons
+import { FaEye, FaEyeSlash, FaSignOutAlt } from "react-icons/fa"; // Import eye icons
 import logo from './img/logo3.png';
 import confetti from 'canvas-confetti'; // Import the confetti package
 import axios from 'axios';
@@ -15,27 +15,47 @@ const LoginPage = () => {
   });
 
   const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
-  const [backgroundImage, setBackgroundImage] = useState('');
-  const location = useLocation();
-  // Fetch the background image from the server
-  useEffect(() => {
-    console.log('Fetching background image from:', `${ApiUrl}/fetchloginbg`); // Log the API URL being used
+  
+  // const location = useLocation();
 
-    axios.get(`${ApiUrl}/fetchloginbg`)
-      .then((response) => {
-        console.log('Response data:', response.data); // Log the data received from the server
-        
+  const preloadImage = (src) => {
+    const img = new Image();
+    img.src = src;
+  };
+  const [backgroundImage, setBackgroundImage] = useState(() => {
+    const cachedImage = localStorage.getItem("cachedLoginBg");
+    if (cachedImage) {
+      preloadImage(`${ApiUrl}/uploads/singleadpage/${cachedImage}`);
+    }
+    return cachedImage || "";
+  });
+
+  useEffect(() => {
+    const fetchAndCacheBackgroundImage = async () => {
+      try {
+        const response = await axios.get(`${ApiUrl}/fetchloginbg`);
         if (response.data.length > 0) {
-          console.log('Background image found:', response.data[0].image); // Log the image being used
-          setBackgroundImage(response.data[0].image); // Only set the filename, base path is handled in style
+          const image = response.data[0].image;
+
+          // If image is new or different
+          if (image !== localStorage.getItem("cachedLoginBg")) {
+            const img = new Image();
+            img.src = `${ApiUrl}/uploads/singleadpage/${image}`;
+            img.onload = () => {
+              localStorage.setItem("cachedLoginBg", image);
+              setBackgroundImage(image);
+            };
+          }
         } else {
-          console.log('No background image found, using gradient instead');
-          setBackgroundImage(''); // No image, fallback to gradient
+          localStorage.removeItem("cachedLoginBg");
+          setBackgroundImage("");
         }
-      })
-      .catch((error) => {
-        console.error('Error fetching background image:', error); // Log any errors that occur
-      });
+      } catch (error) {
+        console.error("Error fetching background image:", error);
+      }
+    };
+
+    fetchAndCacheBackgroundImage();
   }, []);
 
 
@@ -44,8 +64,8 @@ const LoginPage = () => {
     // setFormData({ ...formData, [e.target.name]: e.target.value });
     const { name, value } = e.target;
 
-     // Validation for contact number
-     if (name === "contact_number") {
+    // Validation for contact number
+    if (name === "contact_number") {
       // Check if the value is empty or if it starts with 6-9 and is exactly 10 digits long
       if (value === "" || /^[6-9]\d{0,9}$/.test(value)) {
         setFormData({ ...formData, [name]: value });
@@ -56,32 +76,31 @@ const LoginPage = () => {
       setFormData({ ...formData, [name]: value });
     }
 
-    
+
   };
   const navigate = useNavigate();
-// Function to inject keyframes
-const injectKeyframes = () => {
-  const styleSheet = document.styleSheets[0];
-  styleSheet.insertRule(bounceKeyframes, styleSheet.cssRules.length);
-};
+  // Function to inject keyframes
+  const injectKeyframes = () => {
+    const styleSheet = document.styleSheets[0];
+    styleSheet.insertRule(bounceKeyframes, styleSheet.cssRules.length);
+  };
 
-// Call the function to inject the keyframes when the component mounts
-React.useEffect(() => {
-  injectKeyframes();
-}, []);
+  // Call the function to inject the keyframes when the component mounts
+  React.useEffect(() => {
+    injectKeyframes();
+  }, []);
 
 
-const from = location.state?.from?.pathname || '/';
+  // const from = location.state?.from?.pathname || '/';
 
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  // Basic frontend validation
   if (formData.contact_number === "" || formData.password === "") {
     Swal.fire({
       icon: "error",
       title: "Oops...",
-      timer:3000,
+      timer: 3000,
       html: '<div style="font-size: 2rem;">👎</div> All fields are required!',
       customClass: {
         popup: 'shake-popup',
@@ -104,18 +123,16 @@ const handleSubmit = async (e) => {
     if (response.ok) {
       const { contact_number, email, user_id, username } = result;
 
-      // Store user details in localStorage
       localStorage.setItem('contact_number', contact_number);
       localStorage.setItem('username', username);
       localStorage.setItem('email', email);
-      localStorage.setItem('user_id', user_id); // Store user_id in localStorage
+      localStorage.setItem('user_id', user_id);
 
-      // Fire confetti burst for success
       confetti({
         particleCount: 150,
         spread: 100,
         startVelocity: 30,
-        zIndex: 9999, // Ensure confetti is on top
+        zIndex: 9999,
         origin: { y: 0.5 },
       });
 
@@ -123,96 +140,83 @@ const handleSubmit = async (e) => {
         icon: 'success',
         title: '🎉Success!',
         text: 'Login successful! Welcome back!',
-        timer:4000,
-        customClass: {
-          popup: 'my-popup',
-        },
+        timer: 4000,
+        customClass: { popup: 'my-popup' },
         willOpen: () => {
           const popupElement = Swal.getPopup();
           Object.assign(popupElement.style, swalStyles.popup);
           const titleElement = popupElement.querySelector('.swal2-title');
-          if (titleElement) {
-            Object.assign(titleElement.style, swalStyles.title);
-          }
+          if (titleElement) Object.assign(titleElement.style, swalStyles.title);
           const textElement = popupElement.querySelector('.swal2-content');
-          if (textElement) {
-            Object.assign(textElement.style, swalStyles.text);
-          }
+          if (textElement) Object.assign(textElement.style, swalStyles.text);
         },
         showCloseButton: true,
-      })
-      .then(() => {
-        //  REDIRECTION LOGIC
-      const from = location.state?.from || "/";
+      }).then(() => {
+        const referrer = document.referrer;
+        const isFromSignup = referrer.includes("/signup");
+        const isFromForgetPassword = referrer.includes("/ForgotPassword");
 
-       if (from === "/signup") {
-        navigate("/");
-      } else {
-        navigate(-1);
-      }
+        if (!referrer || isFromSignup || isFromForgetPassword) {
+          navigate("/");
+        } else {
+          const url = new URL(referrer);
+          if (url.origin === window.location.origin) {
+            navigate(url.pathname + url.search);
+          } else {
+            navigate("/");
+          }
+        }
       });
 
     } else {
-      // Error feedback with thumbs down icon and shake effect
       Swal.fire({
         icon: "error",
         title: "Login failed 👎",
         html: '<div style="font-size: 2rem;"></div> Invalid credentials!',
-        customClass: {
-          popup: 'shake-popup', // Custom shake animation class
-        },
+        customClass: { popup: 'shake-popup' },
         willOpen: () => {
           const popupElement = Swal.getPopup();
           Object.assign(popupElement.style, swalErrorStyles.popup);
-
           const titleElement = popupElement.querySelector('.swal2-title');
-          if (titleElement) {
-            Object.assign(titleElement.style, swalErrorStyles.title);
-          }
-          
-          // Apply text styles
+          if (titleElement) Object.assign(titleElement.style, swalErrorStyles.title);
           const textElement = popupElement.querySelector('.swal2-content');
-          if (textElement) {
-            Object.assign(textElement.style, swalErrorStyles.text);
-          }
+          if (textElement) Object.assign(textElement.style, swalErrorStyles.text);
         },
       });
     }
   } catch (error) {
-    // Network or server error feedback
     Swal.fire({
       icon: "error",
       title: "Oops...",
       html: '<div style="font-size: 2rem;">👎</div> Something went wrong. Please try again later.',
-      customClass: {
-        popup: 'shake-popup',
-      },
+      customClass: { popup: 'shake-popup' },
     });
   }
 };
 
 
-// Add styles for shake animation and error popup
-const swalErrorStyles = {
-  popup: {
-    background: 'rgba(255, 255, 255, 0.9)', 
-    border: 'none',
-    boxShadow: '0 0 15px rgba(255, 0, 0, 0.9)', // Red shadow for error
-    width:'500px'
-  },
-  title: {
-    color: '#FF0000', // Red title color
-    fontWeight: 'bold', 
-  },
-  text: {
-    color: '#333', // Darker text for message
-  },
-};
 
-// Inject the shake styles into the head of the document
-const styleElement = document.createElement('style');
-styleElement.innerHTML = styles;
-document.head.appendChild(styleElement);
+  // Add styles for shake animation and error popup
+  const swalErrorStyles = {
+    popup: {
+      background: 'rgba(255, 255, 255, 0.9)',
+      border: 'none',
+      boxShadow: '0 0 15px rgba(255, 0, 0, 0.9)', // Red shadow for error
+      width: '500px'
+    },
+    title: {
+      color: '#FF0000', // Red title color
+      fontWeight: 'bold',
+    },
+    text: {
+      color: '#333', // Darker text for message
+    },
+  };
+
+  // Inject the shake styles into the head of the document
+  const styleElement = document.createElement('style');
+  styleElement.innerHTML = styles;
+  document.head.appendChild(styleElement);
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible); // Toggle password visibility
@@ -236,11 +240,11 @@ document.head.appendChild(styleElement);
         </button>
         <center>
           <Link to="/">
-            <img src={logo} width={'200px'}  alt="Logo" />
+            <img src={logo} width={'200px'} alt="Logo" />
           </Link>
         </center>
         <h2 style={styles.title}>User Login</h2>
-  
+
         <form style={styles.form} onSubmit={handleSubmit} autoComplete="off">
           <label style={styles.label} htmlFor="name">WhatsApp Number</label>
           <input
@@ -270,17 +274,17 @@ document.head.appendChild(styleElement);
               {passwordVisible ? <FaEye /> : <FaEyeSlash />}
             </span> */}
             <span onClick={togglePasswordVisibility} style={styles.eyeIcon} className="eye-icon">
-                            {passwordVisible ? <FaEye /> : <FaEyeSlash />}
-                          </span>
+              {passwordVisible ? <FaEye /> : <FaEyeSlash />}
+            </span>
           </div>
           <button type="submit" style={styles.button}>
             Login
           </button>
         </form>
         <div style={styles.linksContainer}>
-           {/* <Link to="/ForgotPassword" style={styles.link}>
-            Forgot Password? 
-          </Link>  */}
+          <Link to="/ForgotPassword" style={styles.link}>
+            Forgot Password?
+          </Link>
           <Link to="/signup" style={styles.link}>
             Don't have an account? Sign Up
           </Link>
@@ -294,14 +298,14 @@ document.head.appendChild(styleElement);
 
 const swalStyles = {
   popup: {
-    background: 'rgba(255, 255, 255, 0.9)', 
+    background: 'rgba(255, 255, 255, 0.9)',
     border: 'none',
     boxShadow: '0 0 15px rgba(76, 175, 80, 0.7)', // Green shadow with some transparency
     width: '500px',
   },
   title: {
     color: '#4CAF50', // Green color for title
-    fontWeight: 'bold', 
+    fontWeight: 'bold',
   },
   text: {
     color: '#333', // Darker text color for content
@@ -350,7 +354,7 @@ const styles = {
   },
   container: {
     maxWidth: "400px",
-    width:'350px',
+    width: '350px',
     margin: "30px auto",
     padding: "15px",
     borderRadius: "10px",
@@ -415,7 +419,7 @@ const styles = {
   eyeIcon: {
     position: "absolute",
     right: "15px",
-    top: "60%",
+    top: "65%",
     transform: "translateY(-50%)",
     cursor: "pointer",
     color: 'white',
@@ -441,8 +445,8 @@ const styles = {
     textDecoration: "none",
     marginLeft: "5px",
   },
-  label:{
-    color:'white'
+  label: {
+    color: 'white'
   }
 };
 

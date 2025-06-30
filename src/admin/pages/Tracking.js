@@ -12,7 +12,7 @@ const ShipmentTracker = () => {
 
         if (!trackingNumber) {
             setError('Please enter a waybill or order ID');
-            console.error('Validation error: No tracking number provided');
+            console.error('Invalid Input: No tracking number provided');
             return;
         }
 

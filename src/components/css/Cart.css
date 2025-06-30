@@ -1,3 +1,40 @@
+/* Custom Checkbox Style - Smaller Version */
+.checkbox-container {
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 5px;
+}
+
+.checkbox-container input {
+  display: none;
+}
+
+.checkbox-container svg {
+  overflow: visible;
+  width: 1em;   
+  height: 1em;  
+}
+
+.path {
+  fill: none;
+  stroke: black;
+  stroke-width: 4;  
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease;
+  stroke-dasharray: 241 9999999;
+  stroke-dashoffset: 0;
+}
+
+.checkbox-container input:checked ~ svg .path {
+  stroke-dasharray: 70.5096664428711 9999999;
+  stroke-dashoffset: -262.2723388671875;
+  stroke: green;
+  stroke-width: 10;  
+
+}
+
+
 
 /* From Uiverse.io by fthisilak */ 
 .pay-btn {
@@ -211,19 +248,6 @@ float: right !important;
 /* color: linear-gradient(to right, #007bff, #00c6ff); */
 
 
-.cart-header h1:hover::after {
-  width: 80px;
-}
-.cart-header {
-  animation: fadeIn 0.6s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-
 .cart-content {
 display: flex;
 flex-wrap: wrap;
@@ -247,6 +271,11 @@ justify-content: space-between;
 margin-bottom: 10px; /* Reduce the bottom margin */
 padding: 10px; /* Reduce the padding */
 border-bottom: 1px solid #ddd;
+}
+.out-of-stock-label {
+  color: red;
+  font-size: 15px;
+  margin-top: 4px;
 }
 
 .cart-product-image {
@@ -363,6 +392,7 @@ background: none;
 cursor: pointer;
 font-size: 17px;
 margin-left: 15px;
+margin-right: 10px;
 }
 
 .cart-summary {
@@ -480,46 +510,51 @@ text-align: right;
 }
 
 @media (max-width: 768px) {
-.cart-address {
-  height: 100px;
-}
-.cart-product {
-  flex-direction: column;
-  align-items: flex-start;
+  .cart-product-price {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1px;
+    width: 100%;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    overflow-x: auto; /* optional: scroll horizontally if needed */
+  }
+  .cart-product-cardd{
+    padding: 8px;
+  }
+
+  .cart-quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+  }
+  .checkbox-container svg {
+  overflow: visible;
+  width: .8em;   
+  height: .8em;  
 }
 
-.cart-product-image {
-  width: 80px;
-  margin-bottom: 10px;
+  .cart-remove-btn {
+    font-size: 15px;
+    color: black;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .checkbox-container {
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+  }
+
+  .cart-product-price p {
+    margin: 0;
+    white-space: nowrap;
+  }
 }
 
-.cart-product-price {
-  width: 100%;
-  justify-content: space-between;
-}
-
-.cart-product-details {
-  padding-right: 0;
-}
-
-.cart-header h1 {
-  font-size: 1.5em;
-}
-
-.modal4-content {
-  max-width: 90%;
-  padding: 15px;
-}
-
-.modal4-close-btn {
-  font-size: 20px;
-}
-
-.modal4-confirm-btn {
-  padding: 10px;
-  font-size: 16px;
-}
-}
 
 @media (max-width: 480px) {
 .modal4-content {
@@ -538,7 +573,7 @@ text-align: right;
 }
 @media (max-width: 576px) {
 .cart-container {
-  padding: 10px;
+  padding: 5px;
 }
 
 .cart-header h1 {
@@ -546,7 +581,7 @@ text-align: right;
 }
 
 .cart-product {
-  padding: 10px;
+  padding: 5px;
   flex-direction: column;
 }
 
@@ -556,11 +591,9 @@ text-align: right;
 
 .cart-product-name {
   font-size: 0.9em;
+  text-align: justify;
 }
 
-.cart-product-price {
-  width: 25%;
-}
 
 .summary-place-order-btn {
   font-size: 1em;
@@ -730,6 +763,8 @@ margin-bottom: 15px;
 padding: 15px;
 background-color: #fff;
 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+max-height: 400px;
+overflow-y: auto;
 }
 
 .cart-product-card {
@@ -742,6 +777,8 @@ margin-bottom: 15px;
 padding: 15px;
 background-color: #fff;
 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+max-height: 400px;
+overflow-y: auto;
 }
 .cart-product-description {
 display: -webkit-box; /* Required for WebKit-based browsers */

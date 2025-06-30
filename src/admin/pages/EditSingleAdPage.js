@@ -18,6 +18,10 @@ const EditSingleImageAd = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [category, setCategory] = useState(""); // Add a new state to track the selected category
+ const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+const [isUpdating, setIsUpdating] = useState(false);
+const [updateProgress, setUpdateProgress] = useState(0); // optional if needed
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value); // Update category value when a new category is selected
@@ -89,86 +93,26 @@ const EditSingleImageAd = () => {
     });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      console.log("Selected image:", file);
+ const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    console.log("Selected image:", file);
 
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          console.log("Original image dimensions:", img.width, img.height);
-
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 800; // Maintain width
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          console.log("Resizing image to:", canvas.width, canvas.height);
-
-          const compressImage = (minQuality, maxQuality) => {
-            return new Promise((resolve) => {
-              const tryCompression = (quality) => {
-                canvas.toBlob(
-                  (blob) => {
-                    const sizeInKB = blob.size / 1024;
-                    console.log(
-                      `Compressed image at quality ${quality} has size: ${sizeInKB.toFixed(
-                        2
-                      )} KB`
-                    );
-
-                    if (sizeInKB > 500 && quality > minQuality) {
-                      // Change to 500 KB
-                      // If over 500 KB, lower quality and try again
-                      tryCompression(quality - 0.05);
-                    } else if (sizeInKB < 500 && quality < maxQuality) {
-                      // If under 500 KB, slightly increase quality to get as close as possible
-                      tryCompression(quality + 0.02);
-                    } else {
-                      // Final image close to 500 KB or within acceptable range
-                      resolve(blob);
-                    }
-                  },
-                  "image/jpeg",
-                  quality
-                );
-              };
-              // Start compression attempt only if size is above 500 KB
-              if (file.size / 1024 > 500) {
-                tryCompression(maxQuality);
-              } else {
-                // No compression needed, resolve with original file
-                resolve(file);
-              }
-            });
-          };
-
-          // Compressing with quality range between 0.5 and 0.95
-          compressImage(0.5, 0.95).then((finalBlob) => {
-            const compressedFile = new File([finalBlob], file.name, {
-              type: file.type,
-            });
-            setNewImage(compressedFile); // Set the compressed image in state
-            console.log(
-              "Compressed single image size for setNewImage:",
-              (compressedFile.size / 1024).toFixed(2),
-              "KB"
-            );
-          });
-        };
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        console.log("Original image dimensions:", img.width, img.height);
+        setNewImage(file); // Directly set the original file
       };
-    }
-  };
+    };
+  }
+};
 
-  const handleAddProduct = async () => {
+
+ const handleAddProduct = async () => {
     if (!newImage || !category) {
       Swal.fire({
         icon: "error",
@@ -180,38 +124,50 @@ const EditSingleImageAd = () => {
 
     const formData = new FormData();
     formData.append("image", newImage);
-    formData.append("category", category); // Include category in the form data
+    formData.append("category", category);
+
+    setIsUploading(true); // Start loader
 
     try {
       await axios.post(`${ApiUrl}/singleadpage`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percent);
+        },
       });
 
-      Swal.fire({
+      await Swal.fire({
         icon: "success",
         title: "Image Added",
         text: "The image has been uploaded successfully!",
-      })
-        .then(() => {
-          return axios.get(`${ApiUrl}/fetchsingleadpage`);
-        })
-        .then((productsResponse) => {
-          setProducts(productsResponse.data);
-          setNewImage(null);
-          setCategory(""); // Clear the category
-          document.querySelector('input[type="file"]').value = ""; // Clear the input field
-        });
+        timer: 3000,
+      }).then(() => {
+        setIsUploading(false); //  Stop loader immediately
+        setUploadProgress(0);
+        // return axios.get(`${ApiUrl}/fetchsingleadpage`);
+      });
+
+      const res = await axios.get(`${ApiUrl}/fetchsingleadpage`);
+      setProducts(res.data);
+      setNewImage(null);
+      setCategory("");
+      document.querySelector('input[type="file"]').value = "";
     } catch (error) {
-      console.error("Error adding image:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
         text: "There was an error uploading the image. Please try again.",
       });
+    } finally {
+      setIsUploading(false); // Stop loader
     }
   };
+
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
@@ -257,162 +213,86 @@ const EditSingleImageAd = () => {
     }
   };
 
-  const handleUpdateImage = async () => {
-    // Check if both selectedFile and category are not set
-    if (!selectedFile && !editingProduct.category) {
-      Swal.fire({
-        icon: "error",
-        title: "No Changes Detected",
-        text: "Please select an image or a category to update.",
-      });
-      return;
-    }
+const handleUpdateImage = async () => {
+  if (!selectedFile && !editingProduct.category) {
+    Swal.fire({
+      icon: "error",
+      title: "No Changes Detected",
+      text: "Please select an image or a category to update.",
+    });
+    return;
+  }
 
-    const formData = new FormData();
+  const formData = new FormData();
+  if (selectedFile) formData.append("image", selectedFile);
+  if (editingProduct.category) formData.append("category", editingProduct.category);
 
-    // Append selected file if it exists
-    if (selectedFile) {
-      formData.append("image", selectedFile);
-    }
+  try {
+    setIsUpdating(true);
 
-    // Append category only if it has changed
-    if (editingProduct.category) {
-      formData.append("category", editingProduct.category);
-    }
-
-    try {
-      const response = await axios.put(
-        `${ApiUrl}/updatesingleadpageimage/${editingProduct.id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+    const response = await axios.put(
+      `${ApiUrl}/updatesingleadpageimage/${editingProduct.id}`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUpdateProgress(percentCompleted);
         }
-      );
+      }
+    );
 
-      Swal.fire({
-        icon: "success",
-        title: "Product Updated",
-        text: "The product has been updated successfully!",
-      });
+    Swal.fire({
+      icon: "success",
+      title: "Product Updated",
+      text: "The product has been updated successfully!",
+    });
 
-      // Update the product in the state with the new image or category if they were updated
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === editingProduct.id
-            ? {
-                ...product,
-                image: selectedFile
-                  ? response.data.updatedImage
-                  : product.image, // Update image only if selectedFile is present
-                category:
-                  editingProduct.category !== product.category
-                    ? editingProduct.category
-                    : product.category, // Update category only if it's changed
-              }
-            : product
-        )
-      );
-
-      setModalIsOpen(false); // Close the modal after successful update
-    } catch (error) {
-      console.error("Error updating product:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Update Failed",
-        text: "There was an error updating the product. Please try again.",
-      });
-    }
-  };
-
-  const onChangeCompressedImage = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      console.log("Selected image:", file);
-
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          console.log("Original image dimensions:", img.width, img.height);
-
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 800; // Maintain width
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          console.log("Resizing image to:", canvas.width, canvas.height);
-
-          const compressImage = (minQuality, maxQuality) => {
-            return new Promise((resolve) => {
-              const tryCompression = (quality) => {
-                canvas.toBlob(
-                  (blob) => {
-                    const sizeInKB = blob.size / 1024;
-                    console.log(
-                      `Compressed image at quality ${quality} has size: ${sizeInKB.toFixed(
-                        2
-                      )} KB`
-                    );
-
-                    if (sizeInKB > 500 && quality > minQuality) {
-                      // If over 500 KB, lower quality and try again
-                      tryCompression(quality - 0.05);
-                    } else if (sizeInKB < 500 && quality < maxQuality) {
-                      // If under 500 KB, slightly increase quality to get as close as possible
-                      tryCompression(quality + 0.02);
-                    } else {
-                      // Final image close to 500 KB or within acceptable range
-                      resolve(blob);
-                    }
-                  },
-                  "image/jpeg",
-                  quality
-                );
-              };
-
-              // Start compression attempt only if size is above 500 KB
-              if (file.size / 1024 > 500) {
-                tryCompression(maxQuality);
-              } else {
-                // No compression needed, resolve with original file
-                resolve(file);
-              }
-            });
-          };
-
-          // Compressing with quality range between 0.5 and 0.95
-          compressImage(0.5, 0.95).then((compressedBlob) => {
-            const compressedFile = new File([compressedBlob], file.name, {
-              type: file.type,
-            });
-
-            // Check the compressed file size
-            if (compressedFile.size <= 500 * 1024) {
-              // 500 KB limit
-              setSelectedFile(compressedFile); // Update state with the compressed image
-              console.log(
-                "Compressed image size:",
-                (compressedFile.size / 1024).toFixed(2),
-                "KB"
-              );
-            } else {
-              console.error(
-                "Image compression failed to reduce size under 500 KB"
-              );
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === editingProduct.id
+          ? {
+              ...product,
+              image: selectedFile ? response.data.updatedImage : product.image,
+              category: editingProduct.category !== product.category
+                ? editingProduct.category
+                : product.category,
             }
-          });
-        };
+          : product
+      )
+    );
+    setModalIsOpen(false);
+  } catch (error) {
+    console.error("Error updating product:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Update Failed",
+      text: "There was an error updating the product. Please try again.",
+    });
+  } finally {
+    setIsUpdating(false);
+    setUpdateProgress(0);
+  }
+};
+
+const handleImageSelection = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    console.log("Selected image:", file);
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        console.log("Original image dimensions:", img.width, img.height);
+        setSelectedFile(file); // Directly set the original file
       };
-    }
-  };
+    };
+  }
+};
+
 
   return (
     <div className="laptops-page">
@@ -420,7 +300,12 @@ const EditSingleImageAd = () => {
         <h2 className="laptops-page-title">Edit Single Image Ad Page</h2>
         <div className="laptops-card">
           <div className="laptops-card-header">
-            <div className="laptops-card-item">Image(2000 X 600)</div>
+            <div className="laptops-card-item">Image(2000 X 600) 
+              <FaInfoCircle
+              style={{ cursor: "pointer", fontSize: "16px", marginLeft: '5px', marginTop: '2px' }}
+              title="Add banner size image for better view (2000 x 600)"
+            />
+            </div>
           </div>
           <div className="ad-product-form">
             <input
@@ -429,7 +314,7 @@ const EditSingleImageAd = () => {
               name="images"
               onChange={handleImageChange}
               className="ad-form-input"
-              accept="image/jpeg, image/png" // This allows all image types
+              accept="image/jpeg, image/png, image/webp" // This allows all image types
             />
 
             <select
@@ -455,14 +340,38 @@ const EditSingleImageAd = () => {
               <option value="CCTVAccessories">CCTV Accessories</option>
             </select>
 
-            <button onClick={handleAddProduct} className="ad-form-btn">
-              Add
-            </button>
+              <div className="action-row">
+              <button onClick={handleAddProduct} className="add-btn" disabled={isUploading}>
+                Add
+              </button>
 
-            <FaInfoCircle
-              style={{ cursor: "pointer", fontSize: "18px" }}
-              title="Add banner size image for better view (2000 X 600)"
-            />
+              {isUploading && (
+                <div className="circular-progress-wrapper">
+                  <svg className="circular-progress" viewBox="0 0 36 36">
+                    <g transform="rotate(-0 18 18)">
+                      <path
+                        className="circle-bg"
+                        d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="circle"
+                        strokeDasharray={`${uploadProgress}, 100`}
+                        d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </g>
+                    <text x="18" y="20.35" className="percentage-text">
+                      {uploadProgress}%
+                    </text>
+                  </svg>
+                </div>
+              )}
+            </div>
+
+           
           </div>
         </div>
 
@@ -500,8 +409,7 @@ const EditSingleImageAd = () => {
           )}
         </div>
       </div>
-
-      {editingProduct && (
+{editingProduct && (
   <Modal
     isOpen={modalIsOpen}
     onRequestClose={() => setModalIsOpen(false)}
@@ -509,6 +417,35 @@ const EditSingleImageAd = () => {
     className="adminmodal"
     overlayClassName="adminmodal-overlay"
   >
+    {/* Overlay progress inside Modal */}
+    {isUpdating && (
+      <div className="modal-upload-overlay">
+        <div className="circular-progress-wrapper">
+          <svg className="circular-progress" viewBox="0 0 36 36">
+            <g transform="rotate(-90 18 18)">
+              <path
+                className="circle-bg"
+                d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+              <path
+                className="circle"
+                strokeDasharray={`${updateProgress}, 100`}
+                d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+            </g>
+            <text x="18" y="20.35" className="percentage-text">
+              {updateProgress}%
+            </text>
+          </svg>
+        </div>
+      </div>
+    )}
+
+    {/* Modal content */}
     <div className="adminmodal-header">
       <h2>Edit Image and Category</h2>
       <button onClick={() => setModalIsOpen(false)} className="adminmodal-close-btn">
@@ -516,19 +453,19 @@ const EditSingleImageAd = () => {
       </button>
     </div>
 
-    {/* Input for Image Upload */}
     <input
       type="file"
-      onChange={onChangeCompressedImage}
+      onChange={handleImageSelection}
       className="adminmodal-input"
-      accept="image/jpeg, image/png"
+      accept="image/jpeg, image/png, image/webp"
     />
 
-    {/* Dropdown for Category Selection */}
     <select
       name="category"
-      value={editingProduct.category || ''}
-      onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+      value={editingProduct.category || ""}
+      onChange={(e) =>
+        setEditingProduct({ ...editingProduct, category: e.target.value })
+      }
       className="adminmodal-input"
     >
       <option value="">Select Category</option>
@@ -546,10 +483,12 @@ const EditSingleImageAd = () => {
       <option value="CCTVAccessories">CCTV Accessories</option>
     </select>
 
-    {/* Update and Cancel Buttons */}
-    <button onClick={handleUpdateImage} className="adminmodal-update-btn">Update</button>
-    {/* <button onClick={() => setModalIsOpen(false)} className="adminmodal-cancel-btn">Cancel</button> */}
-    <button onClick={() => handleDeleteImage(editingProduct)} className="adminmodal-cancel-btn">Delete</button>
+    <button onClick={handleUpdateImage} className="adminmodal-update-btn">
+      Update
+    </button>
+    <button onClick={() => handleDeleteImage(editingProduct)} className="adminmodal-cancel-btn">
+      Delete
+    </button>
   </Modal>
 )}
     </div>

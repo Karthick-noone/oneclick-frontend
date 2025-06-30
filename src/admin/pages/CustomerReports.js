@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './css/Reports.css';  // Import external CSS
 import { ApiUrl } from '../../components/ApiUrl';
+import { SearchIcon } from "lucide-react";
 
 const Reports = () => {
   const navigate = useNavigate();
   const [salesReport, setSalesReport] = useState([]);
   const [ordersReport, setOrdersReport] = useState([]);
   const [customersReport, setCustomersReport] = useState([]);
-  
+
   // Pagination States
   const [currentPageOrders, setCurrentPageOrders] = useState(1);
   const [currentPageSales, setCurrentPageSales] = useState(1);
@@ -17,6 +18,27 @@ const Reports = () => {
 
   const [itemsPerPage] = useState(10); // Number of items per page
   const [searchQuery, setSearchQuery] = useState(""); // Search filter for customers
+  const [selectedCustomerOrders, setSelectedCustomerOrders] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+
+  const fetchCustomerOrders = async (mobile) => {
+    try {
+      const res = await axios.get(`${ApiUrl}/customer-orders-by-mobile/${mobile}`);
+      setSelectedCustomerOrders(res.data);
+      setShowModal(true);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
 
   // Fetching data functions
   const fetchSalesReport = async () => {
@@ -64,7 +86,7 @@ const Reports = () => {
   const currentCustomers = customersReport.slice(indexOfFirstCustomerItem, indexOfLastCustomerItem);
 
   // Filter customers based on search query
-  const filteredCustomers = currentCustomers.filter(customer => 
+  const filteredCustomers = currentCustomers.filter(customer =>
     customer.user_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -123,14 +145,30 @@ const Reports = () => {
         </div>
 
         {/* Search Box for Filtering Customers */}
-        <div className="filters">
-          <input
-            type="text"
-            placeholder="Search by User Name"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+          <div className="filters-section">
+  <div className="product-search-wrapper">
+    <span className="product-search-icon">
+
+ <SearchIcon width={'18px'} className="search-icon-btn" />
+    </span>
+    <input
+      type="text"
+      placeholder="Search by Name"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="product-search-input"
+    />
+    {searchQuery && (
+      <button
+        className="product-clear-btn"
+        onClick={() => setSearchQuery("")}
+        aria-label="Clear search"
+      >
+        ×
+      </button>
+    )}
+  </div>
+</div>
 
         {/* Table with Data */}
         <div className="table-wrapper">
@@ -149,7 +187,16 @@ const Reports = () => {
                   <tr key={index}>
                     <td>{index + 1}</td>
                     <td>{customer.user_name}</td>
-                    <td>{customer.total_orders}</td>
+                    <td>
+                      {customer.total_orders}{" "}
+                      <button
+                        className="view-orders-btn"
+                        onClick={() => fetchCustomerOrders(customer.contact_number)}
+                      >
+                        View
+                      </button>
+                    </td>
+
                     <td>{customer.total_spent}</td>
                   </tr>
                 ))
@@ -161,6 +208,42 @@ const Reports = () => {
             </tbody>
           </table>
         </div>
+
+        {showModal && (
+          <div className="order-modal-overlay">
+            <div className="order-modal-content">
+              <h3>Order Details</h3>
+              <button className="close-button" onClick={() => setShowModal(false)}>X</button>
+              {selectedCustomerOrders.length > 0 ? (
+                <table className="styled-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Order ID</th>
+                      <th>Total Amount</th>
+                      <th>Status</th>
+                      <th>Order Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedCustomerOrders.map((order, idx) => (
+                      <tr key={idx}>
+                        <td>{idx + 1}</td>
+                        <td>#{order.unique_id}</td>
+                        <td>₹{order.total_amount}</td>
+                        <td>{order.status}</td>
+                        <td>{formatDate(order.order_date)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p>No orders found.</p>
+              )}
+            </div>
+          </div>
+        )}
+
 
         {/* Pagination Controls */}
         <div className="pagination-controls">
@@ -179,7 +262,11 @@ const Reports = () => {
           </button>
         </div>
       </section>
+
+
     </div>
+
+
   );
 };
 

@@ -6,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { ApiUrl } from "../../components/ApiUrl";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-// import './css/AddComputers.css';
+// import './css/Addcomputers.css';
 import "./css/ComputerAdpage.css";
 // import { FaInfoCircle } from "react-icons/fa";
 // import offerAd from './img/design.png';
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 
 Modal.setAppElement("#root");
 
@@ -17,7 +19,9 @@ const ComputersAd = () => {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     title: "",
-    brand_name: "",
+    medium: { brand_name: "" },
+    banner: { brand_name: "" },
+    portrait: { brand_name: "" },
     description: "",
     offer: "",
     images: [],
@@ -36,6 +40,24 @@ const ComputersAd = () => {
   const [portraitImageName, setportraitImageName] = useState(null);
   const [portraitKeyword, setportraitKeyword] = useState(""); // Define state for portraitKeyword
   const [isportraitEdit, setIsportraitEdit] = useState(false); // Track if the edit is for the banner
+  const [isOpen, setIsOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [lightboxImages, setLightboxImages] = useState([]);
+
+  const [uploadStatus, setUploadStatus] = useState({
+    medium: { isUploading: false, progress: 0 },
+    banner: { isUploading: false, progress: 0 },
+    portrait: { isUploading: false, progress: 0 },
+  }); 
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateProgress, setUpdateProgress] = useState(0); // optional if needed
+
+  const handleImageClick = (index, imageList) => {
+    setPhotoIndex(index);
+    setLightboxImages(imageList);
+    setIsOpen(true);
+  };
 
   const navigate = useNavigate();
 
@@ -74,398 +96,277 @@ const ComputersAd = () => {
     fetchProducts();
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e, type) => {
     const { name, value } = e.target;
-    setNewProduct({
-      ...newProduct,
-      [name]: value,
-    });
+
+    setNewProduct((prev) => ({
+      ...prev,
+      [type]: {
+        ...prev[type],
+        [name]: value,
+      },
+    }));
   };
 
-  const compressImage = (file, maxSizeKB = 500) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500;
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
 
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          const compress = (quality) => {
-            return new Promise((resolveInner) => {
-              canvas.toBlob(
-                (blob) => {
-                  if (blob.size / 1024 <= maxSizeKB) {
-                    resolveInner(blob);
-                  } else {
-                    // Retry with lower quality
-                    resolveInner(compress(quality - 0.1));
-                  }
-                },
-                "image/jpeg",
-                quality
-              );
-            });
-          };
-
-          compress(0.8).then(resolve);
-        };
-      };
-    });
-  };
-
-  const handleImageChange = (e, isBanner = false) => {
+  const handleImageChange = (e, type = "") => {
     const files = Array.from(e.target.files);
     const validExtensions = ["jpg", "jpeg", "png", "jfif"];
     let processedFiles = [];
-  
+
     files.forEach((file) => {
       const fileName = file.name;
       const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]+/g, "_");
       const sanitizedFile = new File([file], sanitizedFileName, {
         type: file.type,
       });
-  
+
       const fileExtension = sanitizedFile.name.split(".").pop().toLowerCase();
-  
+
       if (!validExtensions.includes(fileExtension)) {
         console.error(`${sanitizedFileName} is not a valid image format.`);
         return;
       }
-  
-      const reader = new FileReader();
-      reader.readAsDataURL(sanitizedFile);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 800;
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
-          const compressImage = (minQuality, maxQuality) => {
-            return new Promise((resolve) => {
-              canvas.toBlob(
-                (blob) => resolve(blob || sanitizedFile),
-                "image/jpeg",
-                0.8
-              );
-            });
-          };
-  
-          compressImage(0.5, 0.95).then((compressedBlob) => {
-            const finalFileName = isBanner
-              ? `banner_${sanitizedFileName}`
-              : sanitizedFileName;
-            const finalFile = new File([compressedBlob], finalFileName, {
-              type: sanitizedFile.type,
-            });
-  
-            processedFiles.push(finalFile);
-  
-            if (processedFiles.length === files.length) {
-              setNewProduct((prev) => ({
-                ...prev,
-                images: [...prev.images, ...processedFiles],
-                title: isBanner ? "banner" : prev.title, // ✅ Set title if it's a banner
-              }));
-            }
-          });
-        };
-      };
-    });
-  };
-  
 
-  const handleImageChange2 = (e, isportrait = false) => {
-    const files = Array.from(e.target.files);
-    const validExtensions = ["jpg", "jpeg", "png", "jfif"];
-    let processedFiles = [];
-  
-    files.forEach((file) => {
-      const fileName = file.name;
-      const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]+/g, "_");
-      const sanitizedFile = new File([file], sanitizedFileName, {
-        type: file.type,
-      });
-  
-      const fileExtension = sanitizedFile.name.split(".").pop().toLowerCase();
-  
-      if (!validExtensions.includes(fileExtension)) {
-        console.error(`${sanitizedFileName} is not a valid image format.`);
-        return;
-      }
-  
       const reader = new FileReader();
       reader.readAsDataURL(sanitizedFile);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 800;
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
-          const compressImage = (minQuality, maxQuality) => {
-            return new Promise((resolve) => {
-              canvas.toBlob(
-                (blob) => resolve(blob || sanitizedFile),
-                "image/jpeg",
-                0.8
-              );
-            });
-          };
-  
-          compressImage(0.5, 0.95).then((compressedBlob) => {
-            const finalFileName = isportrait
-              ? `portrait_${sanitizedFileName}`
-              : sanitizedFileName;
-            const finalFile = new File([compressedBlob], finalFileName, {
-              type: sanitizedFile.type,
-            });
-  
-            processedFiles.push(finalFile);
-  
-            if (processedFiles.length === files.length) {
-              setNewProduct((prev) => ({
-                ...prev,
-                images: [...prev.images, ...processedFiles],
-                title: isportrait ? "portrait" : prev.title, // ✅ Set title if it's a banner
-              }));
-            }
-          });
-        };
+      reader.onload = () => {
+        let finalFileName;
+
+        if (type === "banner") {
+          finalFileName = `banner_${sanitizedFileName}`;
+        } else if (type === "portrait") {
+          finalFileName = `portrait_${sanitizedFileName}`;
+        } else {
+          finalFileName = sanitizedFileName;
+        }
+
+        const finalFile = new File([sanitizedFile], finalFileName, {
+          type: sanitizedFile.type,
+        });
+
+        processedFiles.push(finalFile);
+
+        if (processedFiles.length === files.length) {
+          setNewProduct((prev) => ({
+            ...prev,
+            [type]: {
+              ...prev[type],
+              images: [...(prev[type]?.images || []), ...processedFiles],
+              title: type, // optional: only if your backend expects this
+            },
+          }));
+        }
       };
     });
   };
 
-  const handleAddProduct = async () => {
-    if (!newProduct.brand_name) {
+
+
+
+  const handleAddProduct = async (type) => {
+    const product = newProduct[type];
+
+    if (!product.brand_name || product.images.length === 0) {
       Swal.fire({
         icon: "warning",
         title: "Missing Fields",
-        text: "Please fill in all required fields.",
-        timer:3000,
+        text: "Please fill in all required fields and upload at least one image.",
+        timer: 3000,
       });
       return;
     }
-  
-    if (newProduct.images.length === 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "No Images",
-        text: "Please select at least one image.",
-        timer:3000,
-      });
-      return;
-    }
-  
+
     const formData = new FormData();
-    formData.append("title", newProduct.title || "banner"); // ✅ Default to 'banner' if not set
-    formData.append("description", newProduct.description);
-    formData.append("offer", newProduct.offer);
-    formData.append("brand_name", newProduct.brand_name);
-  
-    newProduct.images.forEach((image) => {
+    formData.append("title", product.title || type);
+    formData.append("description", product.description || "");
+    formData.append("offer", product.offer || "");
+    formData.append("brand_name", product.brand_name);
+    product.images.forEach((image) => {
       formData.append("images", image);
     });
-  
+
+    // ✅ Start progress for only this type
+    setUploadStatus((prev) => ({
+      ...prev,
+      [type]: { isUploading: true, progress: 0 },
+    }));
+
     try {
       await axios.post(`${ApiUrl}/computersofferspage`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadStatus((prev) => ({
+            ...prev,
+            [type]: { ...prev[type], progress: percent },
+          }));
+        },
       });
-  
+
       Swal.fire({
         icon: "success",
         title: "Product Added",
         text: "The product has been added successfully!",
-        timer:3000,
-      }).then(() => axios.get(`${ApiUrl}/fetchcomputersofferspage`))
-        .then((productsResponse) => {
-          setProducts(productsResponse.data);
-          setNewProduct({
-            title: "", // ✅ Reset title
-            description: "",
-            brand_name: "",
-            images: [],
-          });
-          window.location.reload()
+        timer: 3000,
+      });
 
-        });
-  
-      document.querySelector('input[type="file"]').value = "";
+      const productsResponse = await axios.get(`${ApiUrl}/fetchcomputersofferspage`);
+      setProducts(productsResponse.data);
+
+      setNewProduct((prev) => ({
+        ...prev,
+        [type]: {
+          title: "",
+          description: "",
+          offer: "",
+          brand_name: "",
+          images: [],
+        },
+      }));
+
+      document.querySelectorAll(`input[type="file"]`).forEach((input) => {
+        input.value = "";
+      });
+
     } catch (error) {
       console.error("Error adding product:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
         text: "There was an error adding the product. Please try again.",
-        timer:3000,
+        timer: 3000,
       });
+    } finally {
+      setUploadStatus((prev) => ({
+        ...prev,
+        [type]: { isUploading: false, progress: 0 },
+      }));
     }
   };
-      
-  
- const handleUpdateProduct = async () => {
-  console.log("Updating product:", editingProduct); // Log the current state of the editing product
 
-  if (!editingProduct.id) {
-    console.error("Error: Product ID is missing.");
-    return;
-  }
 
-  if (!editingProduct.brand_name) {
-    console.warn("Warning: Brand name is missing.");
-    Swal.fire({
-      icon: "warning",
-      title: "Missing Fields",
-      text: "Please fill in all required fields.",
-      timer:3000,
+
+
+  const handleEditProduct = (product, isBanner = false, isportrait = false) => {
+    console.log("Editing product:", product);
+
+    setEditingProduct({
+      id: product.id,
+      brand_name: product.brand_name,
+      images: [],
     });
-    return;
-  }
 
-  const formData = new FormData();
-  formData.append("brand_name", editingProduct.brand_name);
+    setIsBannerEdit(isBanner);
+    setIsportraitEdit(isportrait);
+    setModalIsOpen(true);
+  };
 
-  editingProduct.images.forEach((image) => {
-    console.log("Appending image:", image); // Log each image being appended
-    formData.append("images", image);
-  });
 
-  try {
-    // First, handle the image update
-    if (selectedFiles) {
-      let imageNamePrefix = "";
+  const handleUpdateProduct = async () => {
+    console.log("Updating product:", editingProduct);
 
-      // Check if it's a normal, banner, or portrait image
-      if (isBannerEdit) {
-        imageNamePrefix = `banner_${selectedFiles.name}`; // Prefix for banner images
-      } else if (isportraitEdit) {
-        imageNamePrefix = `portrait_${selectedFiles.name}`; // Prefix for portrait images
-      } else {
-        imageNamePrefix = selectedFiles.name; // No prefix for normal images
+    if (!editingProduct.id) {
+      console.error("Error: Product ID is missing.");
+      return;
+    }
+
+    if (!editingProduct.brand_name) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "Please fill in all required fields.",
+        timer: 3000,
+      });
+      return;
+    }
+
+    let imageTitle = "medium";
+    if (isBannerEdit) imageTitle = "banner";
+    else if (isportraitEdit) imageTitle = "portrait";
+
+    const formData = new FormData();
+    formData.append("brand_name", editingProduct.brand_name);
+    formData.append("title", imageTitle);
+
+    editingProduct.images.forEach((image) => {
+      formData.append("images", image);
+    });
+
+    setIsUpdating(true); //  Start loader
+    setUpdateProgress(0); //  Reset progress
+
+    try {
+      //  Upload new image if selected
+      if (selectedFiles) {
+        const imageFormData = new FormData();
+        const prefixedName = `${imageTitle}_${selectedFiles.name}`;
+        const renamedFile = new File([selectedFiles], prefixedName, {
+          type: selectedFiles.type,
+        });
+
+        imageFormData.append("image", renamedFile);
+        imageFormData.append("title", imageTitle);
+
+        await axios.put(
+          `${ApiUrl}/updatecomputersofferspageimage/${editingProduct.id}`,
+          imageFormData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              setUpdateProgress(percentCompleted);
+            },
+          }
+        );
       }
 
-      const imageFormData = new FormData();
-      imageFormData.append("image", new File([selectedFiles], imageNamePrefix)); // Create a new File object with the prefixed name
-
-      // Update the image
+      //  Update other product details
       await axios.put(
-        `${ApiUrl}/updatecomputersofferspageimage/${editingProduct.id}`,
-        imageFormData,
+        `${ApiUrl}/computersupdateofferspage/${editingProduct.id}`,
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         }
       );
-      console.log("Image updated successfully!");
-    }
 
-    // Proceed with updating the product data
-    await axios.put(
-      `${ApiUrl}/computersupdateofferspage/${editingProduct.id}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    // If both operations are successful, show the success alert
-    Swal.fire({
-      icon: "success",
-      title: "Product and Image Updated",
-      text: "The product and image have been updated successfully!",
-      timer:3000,
-    })
-      .then(() => {
-        return axios.get(`${ApiUrl}/fetchcomputersofferspage`);
-      })
-      .then((fetchResponse) => {
-        console.log("Updated product list:", fetchResponse.data); // Log the updated product list
-        setProducts(fetchResponse.data);
-        setEditingProduct(null);
-        setModalIsOpen(false);
+      Swal.fire({
+        icon: "success",
+        title: "Product and Image Updated",
+        text: "The product and image have been updated successfully!",
+        timer: 3000,
       });
-  } catch (error) {
-    console.error("Error updating product or image:", error); // Log any errors
-    Swal.fire({
-      icon: "error",
-      title: "Update Failed",
-      text: "There was an error updating the product and/or image. Please try again.",
-      timer:3000,
 
-    });
-  }
-};
+      //  Refresh product list
+      const fetchResponse = await axios.get(`${ApiUrl}/fetchcomputersofferspage`);
+      setProducts(fetchResponse.data);
+      setEditingProduct(null);
+      setModalIsOpen(false);
 
-  
-  
-  
-  
-
-  const handleEditProduct = (product, isBanner = false, isportrait = false) => {
-    console.log("Editing product:", product); // Log the product being edited
-  
-    setEditingProduct({
-      id: product.id,
-      brand_name: product.brand_name,
-      images: [], // Reset images, the user has to select new ones if desired
-    });
-  
-    // Set the flags based on whether it's a banner or portrait image
-    setIsBannerEdit(isBanner);
-    setIsportraitEdit(isportrait); // Set the flag for portrait image
-  
-    setModalIsOpen(true);
-  };
-  
-  
-  const handleEditImage = (product, index) => {
-    console.log(
-      `Editing image for product ID: ${product.id} at index: ${index}`
-    );
-
-    setEditingProduct(product);
-    setEditingImageIndex(index);
-    setModalIsOpen2(true);
+    } catch (error) {
+      console.error("Error updating product or image:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: "There was an error updating the product and/or image. Please try again.",
+        timer: 3000,
+      });
+    } finally {
+      setIsUpdating(false); //  Always stop loader
+      setUpdateProgress(0);
+    }
   };
 
-  const handleSecondEditIcon = (product, index, bannerKeyword) => {
-    console.log(
-      `Second editing option for product ID: ${product.id} at index: ${index} with banner keyword: ${bannerKeyword}`
-    );
 
-    // Set flag to indicate that this is a banner image edit
-    setIsBannerEdit(true);
 
-    setEditingProduct(product);
-    setEditingImageIndex(index);
 
-    // Save the banner keyword in the state if needed
-    setBannerKeyword(bannerKeyword); // This will now correctly reference the state variable
-
-    setModalIsOpen2(true); // Use the correct modal state
-  };
 
   const handleDeleteProduct = async () => {
     Swal.fire({
@@ -492,169 +393,71 @@ const ComputersAd = () => {
               title: "Deleted!",
               text: "Your product has been deleted.",
               icon: "success",
-              timer: 3000, // Set timeout for 3 seconds (3000 ms)
-              timerProgressBar: true, // Optional: show progress bar during the countdown
-            }).then(() => {
-              // Optionally close the modal
-              setModalIsOpen(false); // Close modal
-
-              // Refresh the page after a successful deletion
-              window.location.reload(); // Refresh the page
+              timer: 3000,
+              timerProgressBar: true,
             });
+
+            // Close modal
+            setModalIsOpen(false);
+
+            // Fetch updated products
+            const updatedResponse = await axios.get(`${ApiUrl}/fetchcomputersofferspage`);
+            setProducts(updatedResponse.data);
+
+            // Optionally re-extract banner and portrait images
+            const bannerImage = updatedResponse.data.find(p => p.image?.startsWith("banner"));
+            const portraitImage = updatedResponse.data.find(p => p.image?.startsWith("portrait"));
+
+            setBannerImageName(bannerImage?.image || "");
+            setportraitImageName(portraitImage?.image || "");
+
           } else {
             Swal.fire("Error", "Failed to delete product", "error");
           }
         } catch (error) {
           console.error("Error deleting product:", error);
-          Swal.fire(
-            "Error",
-            "An error occurred while deleting the product",
-            "error"
-          );
+          Swal.fire("Error", "An error occurred while deleting the product", "error");
         }
       }
     });
   };
 
-  const handleDeleteImage = async (product, imageIndex) => {
-    // Split the image list by comma, handle edge cases like empty strings
-    const imageArray = product.image ? product.image.split(",") : [];
-    // Filter out the image to be deleted
-    const updatedImages = imageArray.filter((_, index) => index !== imageIndex);
 
-    // Confirm deletion with the user
-    const confirmResult = await Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to delete this image? This action cannot be undone!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    });
 
-    if (confirmResult.isConfirmed) {
-      try {
-        // Send updated image list to the server
-        await axios.put(
-          `${ApiUrl}/deletecomputersofferspageimage/${product.id}`,
-          {
-            images: updatedImages.join(","),
-          }
-        );
-
-        // Provide success feedback
-        Swal.fire({
-          icon: "success",
-          title: "Image Deleted",
-          text: "The image has been deleted successfully!",
-          timer:3000,
-        });
-
-        // Update the state to reflect the change
-        setProducts((prevProducts) =>
-          prevProducts.map((p) =>
-            p.id === product.id ? { ...p, image: updatedImages.join(",") } : p
-          )
-        );
-      } catch (error) {
-        console.error("Error deleting image:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Deletion Failed",
-          text: "There was an error deleting the image. Please try again.",
-          timer:3000,
-        });
-      }
-    } else {
-      console.log("Image deletion was cancelled by the user.");
-    }
-  };
-
-  const handleUpdateImage = async () => {
-    if (!selectedFiles) {
-      Swal.fire({
-        icon: "error",
-        title: "No File Selected",
-        text: "Please select an image to update.",
-        timer:3000,
-      });
-      return;
-    }
-
-    const formData = new FormData();
-    const imageNamePrefix = isBannerEdit
-      ? `${bannerKeyword}${selectedFiles.name}`
-      : selectedFiles.name; // Use the banner keyword if applicable
-    formData.append("image", new File([selectedFiles], imageNamePrefix)); // Create a new File object with the prefixed name
-
-    try {
-      const response = await axios.put(
-        `${ApiUrl}/updatecomputersofferspageimage/${editingProduct.id}`, // Update the endpoint to only include the product ID
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      Swal.fire({
-        icon: "success",
-        title: "Image Updated",
-        text: "The image has been updated successfully!",
-        timer:3000,
-      });
-
-      // Update the product images after a successful update
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === editingProduct.id
-            ? { ...product, image: response.data.updatedImages } // Adjust how you set the image data
-            : product
-        )
-      );
-
-      // Optionally, reset the state
-      setSelectedFiles(null);
-      setEditingProduct(null);
-      // Close the modal if you have one
-    } catch (error) {
-      console.error("Error updating image:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Update Failed",
-        text: "There was an error updating the image. Please try again.",
-        timer:3000,
-      });
-    }
-  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
+      const validExtensions = ["jpg", "jpeg", "png", "jfif"];
+      const fileExtension = sanitizedFileName.split(".").pop().toLowerCase();
+
+      if (!validExtensions.includes(fileExtension)) {
+        console.error(`${sanitizedFileName} is not a valid image format.`);
+        return;
+      }
+
       const sanitizedFile = new File([file], sanitizedFileName, {
         type: file.type,
       });
 
-      const validExtensions = ["jpg", "jpeg", "png", "jfif"];
-      const fileExtension = sanitizedFile.name.split(".").pop().toLowerCase();
-
-      if (validExtensions.includes(fileExtension)) {
-        compressImage(sanitizedFile).then((compressedBlob) => {
-          const finalFile = new File([compressedBlob], sanitizedFileName, {
-            type: sanitizedFile.type,
-          });
-          setSelectedFiles(finalFile);
-        });
-      } else {
-        console.error(
-          `${sanitizedFileName} is not a valid image format (jpg, jpeg, png, jfif)`
-        );
+      // Determine title based on filename
+      let title = "";
+      if (sanitizedFileName.startsWith("banner")) {
+        title = "banner";
+      } else if (sanitizedFileName.startsWith("portrait")) {
+        title = "portrait";
       }
+
+      setSelectedFiles(sanitizedFile);
+
+      setEditingProduct((prev) => ({
+        ...prev,
+        title: title, // update title
+      }));
     }
   };
+
 
   return (
     <div className="laptops-page">
@@ -673,77 +476,101 @@ const ComputersAd = () => {
               type="file"
               multiple
               name="images"
-              onChange={handleImageChange}
+              onChange={(e) => handleImageChange(e, "medium")} // explicitly pass empty string
               className="ad-form-input"
-              accept="image/jpeg, image/png" // This allows all image types
+              accept="image/jpeg, image/png, image/webp" // This allows all image types
             />
 
             <input
               type="text"
               name="brand_name"
-              value={newProduct.brand_name}
-              onChange={handleChange}
+              value={newProduct.medium.brand_name}
+              onChange={(e) => handleChange(e, "medium")}
               placeholder="Enter brand name"
               className="laptops-card-input"
             />
 
-            <button onClick={handleAddProduct} className="ad-form-btn">
-              Add
-            </button>
+            {/* <button onClick={() => handleAddProduct("medium")} className="ad-form-btn">Add</button> */}
 
-            
+            <div className="action-row">
+              <button onClick={() => handleAddProduct("medium")} className="add-btn" disabled={uploadStatus.medium.isUploading}>
+                Add
+              </button>
+
+              {uploadStatus.medium.isUploading && (
+                <div className="circular-progress-wrapper">
+                  <svg className="circular-progress" viewBox="0 0 36 36">
+                    <g transform="rotate(-0 18 18)">
+                      <path
+                        className="circle-bg"
+                        d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="circle"
+                        strokeDasharray={`${uploadStatus.medium.progress}, 100`}
+                        d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </g>
+                    <text x="18" y="20.35" className="percentage-text">
+                      {uploadStatus.medium.progress}%
+                    </text>
+                  </svg>
+                </div>
+              )}
+            </div>
+
+
           </div>
         </div>
 
         <div className="offer-ad-container">
 
 
-        {products && products.length > 0 ? (
-  products.map((product, index) => {
-    // Check if the first image name starts with 'banner' or 'portrait'
-    const firstImage = product.image
-      ? product.image.split(",")[0]
-      : "";
-    if (
-      firstImage.startsWith("banner") ||
-      firstImage.startsWith("portrait")
-    ) {
-      return null; // Skip rendering this product
-    }
+          {products && products.length > 0 ? (
+            products.map((product, index) => {
+              const firstImage = product.image
+                ? product.image.split(",")[0]
+                : "";
 
-    return (
-      <div key={product.id} className="pc-product-container">
-        {/* Image Wrapper for the Product Image */}
-        <div className="pc-product-image-wrapper">
-          {/* Product Image */}
-          {product.image && product.image.length > 0 ? (
-            <div className="pc-image-card">
-              {/* Wrapper for positioning */}
-              <p className="pc-product-brand">{product.brand_name}</p>
-              <img
-                src={`${ApiUrl}/uploads/offerspage/${firstImage}`} // Displaying the first product image
-                alt="Product"
-                className="pc-product-image"
-              />
-              {/* Edit Button */}
-              <button
-                onClick={() => handleEditProduct(product, index)}
-                className="pc-edit-image-btn"
-              >
-                Edit
-              </button>
-            </div>
+              //  Only show products with title = 'medium'
+              if (product.title !== "medium") {
+                return null;
+              }
+
+              return (
+                <div key={product.id} className="pc-product-container">
+                  <div className="pc-product-image-wrapper">
+                    {product.image && product.image.length > 0 ? (
+                      <div className="pc-image-card">
+                        <p className="pc-product-brand">{product.brand_name}</p>
+                        <img
+                          src={`${ApiUrl}/uploads/offerspage/${firstImage}`}
+                          alt="Product"
+                          className="pc-product-image"
+                          onClick={() => handleImageClick(index, products.map(p => `${ApiUrl}/uploads/offerspage/${p.image}`))}
+
+                        />
+                        <button
+                          onClick={() => handleEditProduct(product, false, false)}
+                          className="pc-edit-image-btn"
+                        >
+                          Edit
+                        </button>
+                      </div>
+                    ) : (
+                      <p>No images available</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })
           ) : (
-            <p>No images available</p>
+            <p style={{ color: "white" }}>No products available.</p>
           )}
-        </div>
-      </div>
-    );
-  })
-) : (
-  <p style={{ color: "white" }}>No products available.</p>
-)}
-
 
 
 
@@ -756,212 +583,296 @@ const ComputersAd = () => {
                 <input
                   type="text"
                   name="brand_name"
-                  value={newProduct.brand_name}
-                  onChange={handleChange}
+                  value={newProduct.banner.brand_name}
+                  onChange={(e) => handleChange(e, "banner")}
                   placeholder="Enter brand name"
                   className="laptops-cardd-input"
                 />
                 <input
                   type="file"
-                  accept="image/jpeg, image/png"
+                  accept="image/jpeg, image/png, image/webp"
 
-                  onChange={(e) => handleImageChange(e, true)} // Pass true to indicate it's a banner image
+                  onChange={(e) => handleImageChange(e, "banner")} // Pass true to indicate it's a banner image
                   className="filee-input" // Unique class for file input
                 />
-                <button onClick={handleAddProduct} className="laptops-add-btn">
-                  Add
-                </button>
+                <div className="action-row">
+                  <button onClick={() => handleAddProduct("banner")} className="add-btn" disabled={uploadStatus.banner.isUploading}>
+                    Add
+                  </button>
+
+                  {uploadStatus.banner.isUploading && (
+                    <div className="circular-progress-wrapper">
+                      <svg className="circular-progress" viewBox="0 0 36 36">
+                        <g transform="rotate(-0 18 18)">
+                          <path
+                            className="circle-bg"
+                            d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <path
+                            className="circle"
+                            strokeDasharray={`${uploadStatus.banner.progress}, 100`}
+                            d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                        </g>
+                        <text x="18" y="20.35" className="percentage-text">
+                          {uploadStatus.banner.progress}%
+                        </text>
+                      </svg>
+                    </div>
+                  )}
+                </div>
               </div>
             </>
           </div>
 
           <div className="images-below-banner" style={{ marginTop: "20px" }}>
-  {products.length > 0 &&
-  products.some(
-    (product) => product.image && product.image.startsWith("banner")
-  ) ? (
-    // Filter for products with banner images and map to display them
-    products
-      .filter(
-        (product) =>
-          product.image && product.image.startsWith("banner")
-      ) // Filter for banner images
-      .slice(0, 4) // Limit to the first 4 images
-      .map((product, index) => (
-        <div
-          key={index}
-          className="banner-image-display"
-          style={{ position: "relative", marginBottom: "20px" }}
-        >
-          <div style={{ textAlign: "center", marginTop: "10px" }}>
-            <span style={{ fontWeight: "bold" }}>
-              Banner Image {index + 1}
-            </span>
-          </div>
-          <p style={{ marginTop: "30px" }} className="pc-product-brand">
-            {product.brand_name}
-          </p>{" "}
-          {/* Display brand name */}
-          <img
-            src={`${ApiUrl}/uploads/offerspage/${product.image}`} // Construct the image URL for the product
-            alt={`Banner for ${product.brand_name}`} // Alt text for accessibility
-            className="banner-image7" // Class for styling
-          />
-          <button
-  onClick={() => handleEditProduct(product, true)} // Pass 'true' for banner images
-  className="laptops-edit-btnn"
->
-  Edit
-</button>
+            {products.length > 0 && products.some(p => p.title === "banner") ? (
+              products
+                .filter(p => p.title === "banner")   // ← use title, not filename
+                .slice(0, 4)
+                .map((product, index) => (
+                  <div
+                    key={product.id}
+                    className="banner-image-display"
+                    style={{ position: "relative", marginBottom: "20px" }}
+                  >
+                    <div style={{ textAlign: "center", marginTop: "10px" }}>
+                      <span style={{ fontWeight: "bold" }}>
+                        Banner Image {index + 1}
+                      </span>
+                    </div>
+                    <p style={{ marginTop: "30px" }} className="pc-product-brand">
+                      {product.brand_name}
+                    </p>
+                    <img
+                      src={`${ApiUrl}/uploads/offerspage/${product.image}`}
+                      alt={`Banner for ${product.brand_name}`}
+                      className="banner-image7"
+                      onClick={() => handleImageClick(index, products.map(p => `${ApiUrl}/uploads/offerspage/${p.image}`))}
 
-        </div>
-      ))
-  ) : (
-    <p></p> // Fallback message when no banner images are present
-  )}
-</div>
+                    />
+                    <button
+                      onClick={() => handleEditProduct(product, true, false)}
+                      className="laptops-edit-btnn"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                ))
+            ) : (
+              <p></p>
+            )}
+          </div>
+
 
 
 
           <div className="portrait-container">
             <>
-              <h4 className="banner-title">portrait image (4000 x 6000)</h4>
+              <h4 className="banner-title">Portrait image (4000 x 6000)</h4>
               <div className="input-grouppp">
                 {/* Display input fields when there are no images */}
                 {/* <p className="banner-title">banner</p> */}
                 <input
                   type="text"
                   name="brand_name"
-                  value={newProduct.brand_name}
-                  onChange={handleChange}
+                  value={newProduct.portrait.brand_name}
+                  onChange={(e) => handleChange(e, "portrait")}
                   placeholder="Enter product name"
                   className="laptops-cardd-input"
                 />
                 <input
                   type="file"
-                  accept="image/jpeg, image/png"
+                  accept="image/jpeg, image/png, image/webp"
 
-                  onChange={(e) => handleImageChange2(e, true)} // Pass true to indicate it's a banner image
+                  onChange={(e) => handleImageChange(e, "portrait")} // Pass true to indicate it's a banner image
                   className="filee-inputt" // Unique class for file input
                 />
-                <button onClick={handleAddProduct} className="laptops-add-btn">
+                {/* <div className="action-row"> */}
+                <button onClick={() => handleAddProduct("portrait")} className="laptops-add-button" disabled={uploadStatus.portrait.isUploading}>
                   Add
                 </button>
+
+                {uploadStatus.portrait.isUploading && (
+
+                  <div className="circular-progress-wrapper" >
+                    <svg className="circular-progress" viewBox="0 0 36 36">
+                      <g transform="rotate(-0 18 18)">
+                        <path
+                          className="circle-bg"
+                          d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        <path
+                          className="circle"
+                          strokeDasharray={`${uploadStatus.portrait.progress}, 100`}
+                          d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                      </g>
+                      <text x="18" y="20.35" className="percentage-text">
+                        {uploadStatus.portrait.progress}%
+                      </text>
+                    </svg>
+                  </div>
+
+                )}
               </div>
+              {/* </div> */}
             </>
           </div>
         </div>
 
 
         <div
-  className="images-below-banner"
-  style={{
-    marginTop: "20px",
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    marginLeft: "50px",
-  }}
->
-  {products.length > 0 &&
-  products.some(
-    (product) => product.image && product.image.startsWith("portrait")
-  ) ? (
-    // Filter for products with portrait images and map to display them
-    products
-      .filter(
-        (product) =>
-          product.image && product.image.startsWith("portrait")
-      ) // Filter for portrait images
-      .map((product, index) => (
-        <div
-          key={index}
-          className="banner-image-display"
+          className="images-below-banner"
           style={{
-            position: "relative",
-            marginBottom: "20px",
-            marginRight: index % 4 === 3 ? "0" : "20px",
+            marginTop: "20px",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "flex-start",
+            marginLeft: "50px",
           }}
         >
-          <div style={{ textAlign: "center", marginTop: "10px" }}>
-            <span style={{ fontWeight: "bold" }}>
-              portrait Image {index + 1}
-            </span>
-          </div>
-          <p style={{ marginTop: "30px" }} className="pc-product-brand">
-            {product.brand_name}
-          </p>{" "}
+          {products.length > 0 && products.some(p => p.title === "portrait") ? (
+            products
+              .filter(p => p.title === "portrait")  // ← filter by title
+              .map((product, index) => (
+                <div
+                  key={product.id}
+                  className="banner-image-display"
+                  style={{
+                    position: "relative",
+                    marginBottom: "20px",
+                    marginRight: index % 4 === 3 ? "0" : "20px",
+                  }}
+                >
+                  <div style={{ textAlign: "center", marginTop: "10px" }}>
+                    <span style={{ fontWeight: "bold" }}>
+                      Portrait Image {index + 1}
+                    </span>
+                  </div>
+                  <p style={{ marginTop: "30px" }} className="pc-product-brand">
+                    {product.brand_name}
+                  </p>
+                  <img
+                    src={`${ApiUrl}/uploads/offerspage/${product.image}`}
+                    alt={`Portrait for ${product.brand_name}`}
+                    className="portrait-imagee"
+                    onClick={() => handleImageClick(index, products.map(p => `${ApiUrl}/uploads/offerspage/${p.image}`))}
 
-          <img
-            src={`${ApiUrl}/uploads/offerspage/${product.image}`} // Construct the image URL for the product
-            alt={`portrait for ${product.brand_name}`} // Alt text for accessibility
-            className="portrait-imagee" // Class for styling
-          />
-
-          <button
-            onClick={() => handleEditProduct(product, false, true)} // Pass 'true' for portrait images
-            className="laptops-edit-btnn"
-          >
-            Edit
-          </button>
+                  />
+                  <button
+                    onClick={() => handleEditProduct(product, false, true)}
+                    className="laptops-edit-btnn"
+                  >
+                    Edit
+                  </button>
+                </div>
+              ))
+          ) : (
+            <p></p>
+          )}
         </div>
-      ))
-  ) : (
-    <p></p> // Fallback message when no portrait images are present
-  )}
-</div>
+
 
 
       </div>
 
+      {isOpen && (
+        // Sample usage
+        <Lightbox
+          open={isOpen}
+          close={() => setIsOpen(false)}
+          slides={lightboxImages.map((src) => ({ src }))}
+          index={photoIndex}
+          on={{ view: ({ index }) => setPhotoIndex(index) }}
+          carousel={{ finite: true }}
+        />
+      )}
+
       {/* Modal for editing a product */}
       {editingProduct && (
-       <Modal
-         isOpen={modalIsOpen}
-         onRequestClose={() => setModalIsOpen(false)}
-         contentLabel="Edit Product"
-         className="adminmodal"
-         overlayClassName="adminmodal-overlay"
-       >
-         <div className="adminmodal-header">
-           <h2>Edit Image and Brand Name</h2>
-         </div>
-     
-         <button className="close-button" onClick={() => setModalIsOpen(false)}>
-           &times;
-         </button>
-     
-         <input
-           type="file"
-           onChange={(e) => handleFileChange(e)}
-           className="adminmodal-input"
-           accept="image/jpeg, image/png"
-         />
-     
-         <input
-           type="text"
-           name="brand_name"
-           value={editingProduct.brand_name}
-           onChange={(e) =>
-             setEditingProduct({
-               ...editingProduct,
-               brand_name: e.target.value,
-             })
-           }
-           placeholder="Enter brand name"
-           className="adminmodal-input"
-         />
-     
-         <button onClick={handleUpdateProduct} className="adminmodal-update-btn">
-           Update
-         </button>
-         <button onClick={handleDeleteProduct} className="adminmodal-cancel-btn">
-           Delete
-         </button>
-       </Modal>
-     )}
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={() => setModalIsOpen(false)}
+          contentLabel="Edit Product"
+          className="adminmodal"
+          overlayClassName="adminmodal-overlay"
+        >
 
-     
+          {isUpdating && (
+            <div className="modal-upload-overlay">
+              <div className="circular-progress-wrapper">
+                <svg className="circular-progress" viewBox="0 0 36 36">
+                  <g transform="rotate(-90 18 18)">
+                    <path
+                      className="circle-bg"
+                      d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      className="circle"
+                      strokeDasharray={`${updateProgress}, 100`}
+                      d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </g>
+                  <text x="18" y="20.35" className="percentage-text">
+                    {updateProgress}%
+                  </text>
+                </svg>
+              </div>
+            </div>
+          )}
+
+          <div className="adminmodal-header">
+            <h2>Edit Image and Brand Name</h2>
+          </div>
+
+          <button className="close-button" onClick={() => setModalIsOpen(false)}>
+            &times;
+          </button>
+
+          <input
+            type="file"
+            onChange={(e) => handleFileChange(e)}
+            className="adminmodal-input"
+            accept="image/jpeg, image/png, image/webp"
+          />
+
+          <input
+            type="text"
+            name="brand_name"
+            value={editingProduct.brand_name}
+            onChange={(e) =>
+              setEditingProduct({
+                ...editingProduct,
+                brand_name: e.target.value,
+              })
+            }
+            placeholder="Enter brand name"
+            className="adminmodal-input"
+          />
+
+          <button onClick={handleUpdateProduct} className="adminmodal-update-btn">
+            Update
+          </button>
+          <button onClick={handleDeleteProduct} className="adminmodal-cancel-btn">
+            Delete
+          </button>
+        </Modal>
+      )}
+
+
     </div>
   );
 };

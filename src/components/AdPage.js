@@ -8,40 +8,53 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Link } from "react-router-dom";
 
-// Fetch function for TanStack Query
+// Fetch ads with cache
 const fetchAds = async () => {
-  const response = await axios.get(`${ApiUrl}/fetchdoubleadpage`);
-  return response.data || [];
+  const { data } = await axios.get(`${ApiUrl}/fetchdoubleadpage`, {
+    headers: { "Cache-Control": "max-age=300" },
+  });
+  return data || [];
 };
+
+// Skeleton loader component
+const AdSkeleton = () => (
+  <div className="skeleton-container">
+    {[...Array(4)].map((_, index) => (
+      <div key={index} className="skeleton-ad">
+        <div className="skeleton-image"></div>
+      </div>
+    ))}
+  </div>
+);
 
 const AdPage = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const swiperRef = useRef(null);
 
-  // Use TanStack Query for data fetching
-  const { data: ads = [], isLoading, isError } = useQuery({
+  const {
+    data: ads = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["doubleAdPage"],
     queryFn: fetchAds,
-    staleTime: Infinity,
-    cacheTime: 300000,
+    staleTime: 1000 * 60 * 5,
+    cacheTime: 1000 * 60 * 10,
     refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
+    let resizeTimer;
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
     const debounceResize = () => {
-      clearTimeout(window.resizeTimer);
-      window.resizeTimer = setTimeout(handleResize, 200);
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(handleResize, 150);
     };
-
     window.addEventListener("resize", debounceResize);
     return () => window.removeEventListener("resize", debounceResize);
   }, []);
 
-  // Preprocess images to avoid repeated operations
   const processedAds = useMemo(() => {
     return ads.map((ad) => ({
       ...ad,
@@ -51,19 +64,13 @@ const AdPage = () => {
 
   return (
     <section className="ad-page">
-      <div className="ad-first-page">
+      {/* <div className="ad-first-page"> */}
         <div className="ad-second-page">
           <h2 className="text-center offer-heading">Exclusive Offers For You!</h2>
 
           <div className="ads-container">
             {isLoading ? (
-              <div className="skeleton-container">
-                {[...Array(4)].map((_, index) => (
-                  <div key={index} className="skeleton-ad">
-                    <div className="skeleton-image"></div>
-                  </div>
-                ))}
-              </div>
+              <AdSkeleton />
             ) : isError ? (
               <div className="error-message">Failed to load ads</div>
             ) : isMobile ? (
@@ -87,6 +94,12 @@ const AdPage = () => {
                             />
                           </Link>
                         ))}
+
+                        <div className="ad-bottom">
+                          <span className="ad-category">{ad.category}</span>
+                          <button className="shop-now-btn">Shop Now</button>
+                        </div>
+
                       </div>
                     </div>
                   </SwiperSlide>
@@ -111,6 +124,7 @@ const AdPage = () => {
               ))
             )}
 
+            {/* Arrows for mobile swiper */}
             {isMobile && swiperRef.current && (
               <div className="swiper-arrows">
                 <button className="swiper-arrow prev" onClick={() => swiperRef.current.slidePrev()}>
@@ -123,7 +137,7 @@ const AdPage = () => {
             )}
           </div>
         </div>
-      </div>
+      {/* </div> */}
     </section>
   );
 };

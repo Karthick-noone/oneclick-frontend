@@ -6,6 +6,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import Header2 from "./components/Header2"; // Add this line
+import Header3 from "./components/Header3"; // Add this line
 import Main from "./Main";
 import Computers from "./components/Computers";
 import ComputerAccessories from "./components/ComputerAccessories";
@@ -20,6 +21,7 @@ import Speaker from "./components/Speaker";
 import Printers from "./components/Printers";
 import Watch from "./components/Watch";
 import Sidebar from "./components/Sidebar";
+import ComputerFilter from "./components/ComputerFilter";
 import BrandsPage from "./components/BrandsPage";
 import Modal from "./components/Modal";
 import ProductDetail from "./components/ProductDetail";
@@ -51,6 +53,7 @@ import Secondhandproducts from "./components/Secondhandproducts";
 import AdminMain from "./admin/AdminApp";
 import BuyNow from "./components/BuyNow";
 import NetworkStatus from "./components/NetworkStatus"; // Import the component
+import ScrollToTopButton from "./components/ScrollToTopButton"; // Adjust path as needed
 
 const ScrollToTop = () => {
   const location = useLocation();
@@ -67,11 +70,13 @@ const AppWrapper = ({ children }) => {
   const path = location.pathname.toLowerCase(); // Convert to lowercase
 
   const isExcluded =
-    path.startsWith("/admin") || path === "/login"|| path === "/signup"|| path === "/forgotpassword";
+    path.startsWith("/admin") || path === "/login" || path === "/signup" || path === "/forgotpassword";
 
   return (
     <>
       {!isExcluded && <Header2 />}
+      {!isExcluded && <Header3 />}
+
       {children}
     </>
   );
@@ -83,54 +88,56 @@ const App = () => {
     <Router>
       <ScrollToTop />
       <NetworkStatus>  {/* Include NetworkStatus at the root level */}
-      <AppWrapper>
-        <Routes>
-          <Route path="/" element={<Main />} />
-          <Route path="/Computers" element={<Computers />} />
-          <Route path="/ComputerAccessories" element={<ComputerAccessories />} />
-          <Route path="/Mobiles" element={<Mobiles />} />
-          <Route path="/MobileAccessories" element={<MobileAccessories />} />
-          <Route path="/PrinterAccessories" element={<PrinterAccessories />} />
-          <Route path="/CCTVAccessories" element={<CCTVAccessories />} />
-          <Route path="/CCTV" element={<CCTV />} />
-          <Route path="/Headphones" element={<Headphones />} />
-          <Route path="/TV" element={<TV />} />
-          <Route path="/Speakers" element={<Speaker />} />
-          <Route path="/Watch" element={<Watch />} />
-          <Route path="/Printers" element={<Printers />} />
-          <Route path="/Sidebar" element={<Sidebar />} />
-          <Route path="/BrandsPage" element={<BrandsPage />} />
-          <Route path="/Modal" element={<Modal />} />
-          <Route path="/shop/:id" element={<ProductDetail />} />
-          <Route path="/AdminLogin" element={<Login />} />
-          <Route path="/Adminregister" element={<Adminregister />} />
-          <Route path="/Login" element={<ClientLogin />} />
-          <Route path="/Signup" element={<ClientSignup />} />
-          <Route path="/ForgotPassword" element={<ForgotPassword />} />
-          <Route path="/ChangePassword" element={<ChangePassword />} />
-          <Route path="/AdminForgotPassword" element={<AdminForgotPassword />} />
-          <Route path="/About" element={<About />} />
-          <Route path="/Contact" element={<Contact />} />
-          <Route path="/HelpCenter" element={<HelpCenter />} />
-          <Route path="/ShippingAndReturns" element={<ShippingAndReturns />} />
-          <Route path="/Privacypolicy" element={<TermsAndConditions />} />
-          <Route path="/Terms" element={<Terms />} />
-          <Route path="/PaymentSecurity" element={<PaymentSecurity />} />
-          <Route path="/CareersForm" element={<CareersForm />} />
-          <Route path="/Cart" element={<Cart />} />
-          <Route path="/UserAddress" element={<UserAddress />} />
-          <Route path="/Checkout" element={<Checkout />} />
-          <Route path="/Purchase" element={<BuyNow />} />
-          <Route path="/MyAccount" element={<MyAccount />} />
-          <Route path="/MyOrders" element={<MyOrders />} />
-          <Route path="/ComputerAd" element={<ComputerAdBanner />} />
-          <Route path="/CCTVAd" element={<CCTVAdBanner />} />
-          <Route path="/MobileAd" element={<MobileAdBanner />} />
-          <Route path="/FilterBar" element={<FilterBar />} />
-          <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
-          <Route path="/Admin/*" element={<AdminMain />} />
-        </Routes>
-      </AppWrapper>
+        <AppWrapper>
+          <Routes>
+            <Route path="/" element={<Main />} />
+            <Route path="/Computers" element={<Computers />} />
+            <Route path="/ComputerAccessories" element={<ComputerAccessories />} />
+            <Route path="/Mobiles" element={<Mobiles />} />
+            <Route path="/MobileAccessories" element={<MobileAccessories />} />
+            <Route path="/PrinterAccessories" element={<PrinterAccessories />} />
+            <Route path="/CCTVAccessories" element={<CCTVAccessories />} />
+            <Route path="/CCTV" element={<CCTV />} />
+            <Route path="/Headphones" element={<Headphones />} />
+            <Route path="/TV" element={<TV />} />
+            <Route path="/Speakers" element={<Speaker />} />
+            <Route path="/Watch" element={<Watch />} />
+            <Route path="/Printers" element={<Printers />} />
+            <Route path="/Sidebar" element={<Sidebar />} />
+            <Route path="/ComputerFilter" element={<ComputerFilter />} />
+            <Route path="/BrandsPage" element={<BrandsPage />} />
+            <Route path="/Modal" element={<Modal />} />
+            <Route path="/shop/:id" element={<ProductDetail />} />
+            <Route path="/AdminLogin" element={<Login />} />
+            <Route path="/Adminregister" element={<Adminregister />} />
+            <Route path="/Login" element={<ClientLogin />} />
+            <Route path="/Signup" element={<ClientSignup />} />
+            <Route path="/ForgotPassword" element={<ForgotPassword />} />
+            <Route path="/ChangePassword" element={<ChangePassword />} />
+            <Route path="/AdminForgotPassword" element={<AdminForgotPassword />} />
+            <Route path="/About" element={<About />} />
+            <Route path="/Contact" element={<Contact />} />
+            <Route path="/HelpCenter" element={<HelpCenter />} />
+            <Route path="/ShippingAndReturns" element={<ShippingAndReturns />} />
+            <Route path="/Privacypolicy" element={<TermsAndConditions />} />
+            <Route path="/Terms" element={<Terms />} />
+            <Route path="/PaymentSecurity" element={<PaymentSecurity />} />
+            <Route path="/CareersForm" element={<CareersForm />} />
+            <Route path="/Cart" element={<Cart />} />
+            <Route path="/UserAddress" element={<UserAddress />} />
+            <Route path="/Checkout" element={<Checkout />} />
+            <Route path="/Purchase" element={<BuyNow />} />
+            <Route path="/MyAccount" element={<MyAccount />} />
+            <Route path="/MyOrders" element={<MyOrders />} />
+            <Route path="/ComputerAd" element={<ComputerAdBanner />} />
+            <Route path="/CCTVAd" element={<CCTVAdBanner />} />
+            <Route path="/MobileAd" element={<MobileAdBanner />} />
+            <Route path="/FilterBar" element={<FilterBar />} />
+            <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
+            <Route path="/Admin/*" element={<AdminMain />} />
+          </Routes>
+        </AppWrapper>
+        <ScrollToTopButton />
       </NetworkStatus>
     </Router>
   );

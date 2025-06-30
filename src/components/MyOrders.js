@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./css/MyOrders.css"; // Add CSS for styles
-import Header2 from "./Header2";
+// import Header2 from "./Header2";
 import Footer from "./footer";
 import { ApiUrl } from "./ApiUrl";
 import Modal from "react-modal"; // Install if needed using `npm install react-modal`
@@ -13,35 +13,31 @@ import stamp2 from "./img/cancelled-stamp.png";
 
 import ReactDOMServer from "react-dom/server"; // Add this import at the top
 import Invoice from "../admin/pages/Invoice";
-import RecentlyViewed from "./RecentlyViewed";
+// import RecentlyViewed from "./RecentlyViewed";
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null); // For modal
   const [productDetails, setProductDetails] = useState(null); // To store fetched product details
   const [modalIsOpen, setModalIsOpen] = useState(false); // To open and close modal
-  const [deliveryStatus] = useState("");
-  const statuses = ["Order Placed", "Shipped", "Out for Delivery", "Delivered"]; // Define the statuses
+  // const [deliveryStatus] = useState("");
+  // const statuses = ["Order Placed", "Shipped", "Out for Delivery", "Delivered"]; // Define the statuses
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState(null); // State for the current order ID
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Month is 0-indexed
   const [filteredOrders, setFilteredOrders] = useState(orders);
 
-  useEffect(() => {
-    filterOrders(selectedYear, selectedMonth);
-  }, [selectedYear, selectedMonth, orders]);
+useEffect(() => {
+  const filtered = orders.filter((order) => {
+    const orderDate = new Date(order.order_date);
+    const orderYear = orderDate.getFullYear();
+    const orderMonth = orderDate.getMonth() + 1;
+    return orderYear === selectedYear && orderMonth === selectedMonth;
+  });
 
-  const filterOrders = (year, month) => {
-    const filtered = orders.filter((order) => {
-      const orderDate = new Date(order.order_date);
-      const orderYear = orderDate.getFullYear();
-      const orderMonth = orderDate.getMonth() + 1; // Month is 0-indexed
+  setFilteredOrders(filtered);
+}, [selectedYear, selectedMonth, orders]);
 
-      return orderYear === year && orderMonth === month;
-    });
-
-    setFilteredOrders(filtered);
-  };
 
   useEffect(() => {
     window.history.pushState(null, "", window.location.href);

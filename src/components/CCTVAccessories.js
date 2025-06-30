@@ -25,6 +25,34 @@ const CCTVAccessories = () => {
    const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [loading, setLoading] = useState(true);
 
+const [hoveredProductId, setHoveredProductId] = useState(null);
+const [hoverImageIndexes, setHoverImageIndexes] = useState({});
+
+useEffect(() => {
+  let interval;
+
+  if (hoveredProductId !== null) {
+    interval = setInterval(() => {
+      setHoverImageIndexes((prev) => {
+        const currentIndex = prev[hoveredProductId] || 0;
+        const product = products.find(p => p.id === hoveredProductId);
+        const images = Array.isArray(product?.prod_img)
+          ? product.prod_img
+          : JSON.parse(product?.prod_img || "[]");
+
+        const nextIndex = (currentIndex + 1) % images.length;
+        return {
+          ...prev,
+          [hoveredProductId]: nextIndex,
+        };
+      });
+    }, 1000); // change image every 1 second
+  }
+
+  return () => clearInterval(interval);
+}, [hoveredProductId, products]);
+
+
 
   
   // const {
@@ -73,60 +101,69 @@ const CCTVAccessories = () => {
 
   const [coupons, setCoupons] = useState({}); // State to store coupons
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`${ApiUrl}/fetchcctvaccessories`);
-        const fetchedProducts = response.data;
+const cacheRef = {
+  cctvaccessories: null,
+  cctvaccessoriesCoupons: {},
+};
 
-        // Set products to state
-        setProducts(fetchedProducts);
+useEffect(() => {
+  const fetchProducts = async () => {
+    setLoading(true);
 
-        // Fetch coupons for each product
-        for (const product of fetchedProducts) {
-          try {
-            const couponResponse = await axios.get(
-              `${ApiUrl}/coupons/${product.prod_id}`
-            );
-            // Assuming couponResponse.data.coupons returns an array of coupons
-            if (couponResponse.data.coupons.length > 0) {
-              // Set the first coupon code for the product
-              setCoupons((prev) => ({
-                ...prev,
-                [product.prod_id]: couponResponse.data.coupons[0].coupon_code, // Use coupon_code from the first coupon
-              }));
-              console.log(
-                `Set coupon code for product ${product.prod_id}: ${couponResponse.data.coupons[0].coupon_code}`
-              );
-            } else {
-              console.log(`No coupons found for product ${product.prod_id}`);
-            }
-          } catch (couponError) {
-            console.error(
-              `Failed to fetch coupon for product ${product.prod_id}:`,
-              couponError
-            );
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        toast.error("Failed to fetch products.", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      }finally {
-        setLoading(false); // Stop loading regardless of success or failure
+    try {
+      //  Return from cache if available
+      if (cacheRef.cctvaccessories) {
+        setProducts(cacheRef.cctvaccessories);
+        setCoupons(cacheRef.cctvaccessoriesCoupons);
+        setLoading(false);
+        return;
       }
-    };
 
-    fetchProducts();
-  }, []);
+      //  Fetch product list
+      const response = await axios.get(`${ApiUrl}/fetchcctvaccessories`);
+      const fetchedProducts = response.data;
+      setProducts(fetchedProducts);
+      cacheRef.cctvaccessories = fetchedProducts;
+
+      // Fetch all coupons in parallel
+      const couponPromises = fetchedProducts.map((product) =>
+        axios
+          .get(`${ApiUrl}/coupons/${product.prod_id}`)
+          .then((res) => ({
+            prod_id: product.prod_id,
+            coupon_code: res.data?.coupons?.[0]?.coupon_code || null,
+          }))
+          .catch((err) => {
+            console.error(`Error fetching coupon for ${product.prod_id}`, err);
+            return { prod_id: product.prod_id, coupon_code: null };
+          })
+      );
+
+      const couponResults = await Promise.all(couponPromises);
+      const couponMap = {};
+
+      couponResults.forEach(({ prod_id, coupon_code }) => {
+        if (coupon_code) {
+          couponMap[prod_id] = coupon_code;
+        }
+      });
+
+      setCoupons(couponMap); // Set once
+      cacheRef.cctvaccessoriesCoupons = couponMap;
+    } catch (error) {
+      console.error("Error fetching cctvaccessories:", error);
+      toast.error("Failed to fetch cctvaccessories.", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchProducts();
+}, []);
 
     const [isOfferActive, setIsOfferActive] = useState(true);
       const [product, setProduct] = useState(null);
@@ -221,47 +258,39 @@ const CCTVAccessories = () => {
   // };
 
   const handleCardClick = (product) => {
-    if (product && product.id) {
-      // Retrieve existing recently viewed products
-      let storedProductIds = localStorage.getItem("Recently-viewed");
-  
-      if (storedProductIds) {
-        try {
-          storedProductIds = JSON.parse(storedProductIds);
-          
-          // Ensure it's an array
-          if (!Array.isArray(storedProductIds)) {
-            storedProductIds = [storedProductIds]; 
-          }
-        } catch (error) {
-          console.error("Error parsing Recently Viewed data:", error);
-          storedProductIds = [];
-        }
-      } else {
-        storedProductIds = [];
-      }
-  
-      // Remove the product ID if it already exists (to avoid duplicates)
-      storedProductIds = storedProductIds.filter((id) => id !== product.id);
-  
-      // Add the new product ID to the beginning of the list
-      storedProductIds.unshift(product.id);
-  
-      // Keep only the last 10 recently viewed products
-      storedProductIds = storedProductIds.slice(0, 10);
-  
-      // Save back to localStorage
-      localStorage.setItem("Recently-viewed", JSON.stringify(storedProductIds));
-  
-      // Navigate to product details page
-      const slugify = (name) =>
-        name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-      
-      navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
-    } else {
-      console.error("Product is undefined or missing ID:", product);
+  if (product && product.id) {
+    const now = Date.now();
+
+    let storedData = localStorage.getItem("Recently-viewed");
+    let parsedData = [];
+
+    try {
+      parsedData = storedData ? JSON.parse(storedData) : [];
+    } catch (err) {
+      console.error("Failed to parse Recently-viewed:", err);
     }
-  };
+
+    // Remove if already exists
+    parsedData = parsedData.filter((item) => item.id !== product.id);
+
+    // Add current item with timestamp
+    parsedData.unshift({
+      id: product.id,
+      timestamp: now,
+    });
+
+    // Keep only last 10
+    parsedData = parsedData.slice(0, 10);
+
+    localStorage.setItem("Recently-viewed", JSON.stringify(parsedData));
+
+    const slugify = (name) =>
+      name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
+
+    navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
+  }
+};
+
   
 
   const handleCloseModal = () => {
@@ -320,7 +349,7 @@ const CCTVAccessories = () => {
 
       // Handle the response
       if (response.status === 200) {
-        toast.success(`${product.prod_name} added to your cart!`, {
+        toast.success(`${product.prod_name.substring(0,25)+'...'} added to your cart!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -370,7 +399,7 @@ const CCTVAccessories = () => {
           `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.info(`${product.prod_name} removed from your wishlist!`, {
+        toast.info(`${product.prod_name.substring(0,25)+'...'} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -391,7 +420,7 @@ const CCTVAccessories = () => {
           `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.success(`${product.prod_name} added to your wishlist!`, {
+        toast.success(`${product.prod_name.substring(0,25)+'...'} added to your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -492,32 +521,39 @@ const CCTVAccessories = () => {
             </div>
           ) : filteredProducts.length === 0 ? (
             // If filteredProducts is empty, fallback to using all products
-            products.map((product) => {
-              // Parse the prod_img if it's a JSON string; assuming it's an array
-              const images = Array.isArray(product.prod_img)
-                ? product.prod_img
-                : JSON.parse(product.prod_img);
-              const firstImage = images[0]; // Get the first image
+             products.map((product) => {
+  const images = Array.isArray(product.prod_img)
+    ? product.prod_img
+    : JSON.parse(product.prod_img || "[]");
 
-              return (
-                <div
-                  key={product.id}
-                  className="product-card"
-                  onClick={() => handleCardClick(product)}
-                >
-                  {product.offer_label && (
-                    <div className="product-label">{product.offer_label}</div>
-                  )}
-                  <div className="product-actions">
-                    <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                        firstImage
-                      }`}
-                      alt={product.prod_name}
-                      className="product-image"
-                    // loading="lazy"
+  const activeIndex =
+    hoveredProductId === product.id
+      ? hoverImageIndexes[product.id] || 0
+      : 0;
 
-                    />
+  const currentImage = images[activeIndex];
+
+  return (
+    <div
+      key={product.id}
+      className="product-card"
+      onClick={() => handleCardClick(product)}
+      onMouseEnter={() => setHoveredProductId(product.id)}
+      onMouseLeave={() => {
+        setHoveredProductId(null);
+        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+      }}
+    >
+      {product.offer_label && (
+        <div className="product-label">{product.offer_label}</div>
+      )}
+
+      <div className="product-actions">
+        <img
+          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
+          alt={product.prod_name}
+          className="product-image"
+        />
                     <span
                       title={
                         favorites[`${product.id}`]
@@ -537,7 +573,7 @@ const CCTVAccessories = () => {
                     </span>
                   </div>
 
-                  <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
+                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
 
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
                   <span className="product-subtitle2">{product.subtitle}</span>
@@ -626,31 +662,38 @@ const CCTVAccessories = () => {
           ) : (
             // If filteredProducts has results, display them
             filteredProducts.map((product) => {
-              const images = Array.isArray(product.prod_img)
-                ? product.prod_img
-                : JSON.parse(product.prod_img);
-              const firstImage = images[0];
+  const images = Array.isArray(product.prod_img)
+    ? product.prod_img
+    : JSON.parse(product.prod_img || "[]");
 
-              return (
-                <div
-                  key={product.id}
-                  className="product-card"
-                  onClick={() => handleCardClick(product)}
-                >
-                  {product.offer_label && (
-                    <div className="product-label">{product.offer_label}</div>
-                  )}
+  const activeIndex =
+    hoveredProductId === product.id
+      ? hoverImageIndexes[product.id] || 0
+      : 0;
 
-                  <div className="product-actions">
-                    <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                        firstImage
-                      }`}
-                      alt={product.prod_name}
-                      className="product-image"
-                    // loading="lazy"
+  const currentImage = images[activeIndex];
 
-                    />
+  return (
+    <div
+      key={product.id}
+      className="product-card"
+      onClick={() => handleCardClick(product)}
+      onMouseEnter={() => setHoveredProductId(product.id)}
+      onMouseLeave={() => {
+        setHoveredProductId(null);
+        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+      }}
+    >
+      {product.offer_label && (
+        <div className="product-label">{product.offer_label}</div>
+      )}
+
+      <div className="product-actions">
+        <img
+          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
+          alt={product.prod_name}
+          className="product-image"
+        />
                     <span
                       title={
                         favorites[`${product.id}`]
@@ -670,7 +713,7 @@ const CCTVAccessories = () => {
                     </span>
                   </div>
 
-                  <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
+                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
                   <span className="product-subtitle2">{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}

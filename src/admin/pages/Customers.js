@@ -7,6 +7,8 @@ import Modal from "react-modal"; // Importing Modal
 import Swal from "sweetalert2";
 import { FaTrash } from "react-icons/fa";
 import userlogo from "./img/user.jpg";
+import checkIcon from './img/check-mark.png'
+import { SearchIcon } from "lucide-react";
 
 const Customers = () => {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ const Customers = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch Users Data
   const fetchUsers = async () => {
@@ -36,10 +39,24 @@ const Customers = () => {
       fetchUsers();
     }
   }, [navigate]);
-
   const indexOfLastUser = currentPage * itemsPerPage;
   const indexOfFirstUser = indexOfLastUser - itemsPerPage;
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+  const filteredUsers = users.filter((user) =>
+    `${user.username} ${user.email} ${user.contact_number}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
+
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  useEffect(() => {
+    const newTotalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+    setTotalPages(newTotalPages);
+    if (currentPage > newTotalPages) {
+      setCurrentPage(1);
+    }
+  }, [filteredUsers, itemsPerPage, currentPage]);
+
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
@@ -169,6 +186,30 @@ const Customers = () => {
         <div className="orders-header">
           <h2 className="orders-page-title">Customer Details</h2>
         </div>
+        <div className="filters-section">
+          <div className="product-search-wrapper">
+            <span className="product-search-icon">
+
+              <SearchIcon width={'18px'} className="search-icon-btn" />
+            </span>
+            <input
+              type="text"
+              placeholder="Search by Username, email"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="product-search-input"
+            />
+            {searchQuery && (
+              <button
+                className="product-clear-btn"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
+        </div>
         {/* Customers Table */}
         <section className="customers-section">
           <div className="table-wrapper">
@@ -236,9 +277,8 @@ const Customers = () => {
               onClick={() => {
                 if (page !== "...") handlePageChange(page);
               }}
-              className={`pagination-button ${
-                currentPage === page ? "active" : ""
-              }`}
+              className={`pagination-button ${currentPage === page ? "active" : ""
+                }`}
               disabled={page === "..."}
             >
               {page}
@@ -287,34 +327,41 @@ const Customers = () => {
           </div>
 
           {/* Addresses displayed below the container */}
-          <div className="user-addresses">
-            <p>
-              <strong>Addresses:</strong>
-            </p>
-            {selectedUser &&
-              selectedUser.address_names &&
-              selectedUser.address_names.split(", ").map((address, i) => {
-                const street = selectedUser.streets?.split(", ")[i] || "N/A";
-                const city = selectedUser.cities?.split(", ")[i] || "N/A";
-                const state = selectedUser.states?.split(", ")[i] || "N/A";
-                const postalCode =
-                  selectedUser.postal_codes?.split(", ")[i] || "N/A";
-                const country = selectedUser.countries?.split(", ")[i] || "N/A";
-                const phone = selectedUser.phones?.split(", ")[i] || "N/A";
+          {selectedUser &&
+            selectedUser.address_names &&
+            selectedUser.address_names.split(", ").map((address, i) => {
+              const street = selectedUser.streets?.split(", ")[i] || "N/A";
+              const city = selectedUser.cities?.split(", ")[i] || "N/A";
+              const state = selectedUser.states?.split(", ")[i] || "N/A";
+              const postalCode = selectedUser.postal_codes?.split(", ")[i] || "N/A";
+              const country = selectedUser.countries?.split(", ")[i] || "N/A";
+              const phone = selectedUser.phones?.split(", ")[i] || "N/A";
+              const isCurrent =
+                selectedUser.current_addresses?.split(", ")[i] === "1";
 
-                return (
-                  <div key={i} className="address-box">
-                    <p>
-                      <strong>Address {i + 1}:</strong> {address}, {street},{" "}
-                      {city}, {state}, {postalCode}, {country}
-                    </p>
-                    <p>
-                      <strong>Phone:</strong> {phone}
-                    </p>
-                  </div>
-                );
-              })}
-          </div>
+              return (
+                <div
+                  key={i}
+                  className={`address-box ${isCurrent ? "current-address" : ""}`}
+                >
+                  {isCurrent && (
+                    <p className="current-label">Current Address</p>
+                  )}
+                  {isCurrent && (
+                    <img src={checkIcon} className="current-icon" alt="Current" />
+                  )}
+                  <p>
+                    <strong>Address {i + 1}:</strong> {address}, {street}, {city}, {state},{" "}
+                    {postalCode}, {country}
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> {phone}
+                  </p>
+
+                </div>
+              );
+            })}
+
 
           <button onClick={closeModal}>Close</button>
         </Modal>

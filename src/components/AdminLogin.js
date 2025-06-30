@@ -17,7 +17,47 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [role, setRole] = useState("Admin"); // Added role state
-  const [backgroundImage, setBackgroundImage] = useState('');
+  // const [backgroundImage, setBackgroundImage] = useState('');
+
+  const preloadImage = (src) => {
+  const img = new Image();
+  img.src = src;
+};
+ const [backgroundImage, setBackgroundImage] = useState(() => {
+  const cachedImage = localStorage.getItem("cachedLoginBg");
+  if (cachedImage) {
+    preloadImage(`${ApiUrl}/uploads/singleadpage/${cachedImage}`);
+  }
+  return cachedImage || "";
+});
+
+useEffect(() => {
+  const fetchAndCacheBackgroundImage = async () => {
+    try {
+      const response = await axios.get(`${ApiUrl}/fetchloginbg`);
+      if (response.data.length > 0) {
+        const image = response.data[0].image;
+
+        // If image is new or different
+        if (image !== localStorage.getItem("cachedLoginBg")) {
+          const img = new Image();
+          img.src = `${ApiUrl}/uploads/singleadpage/${image}`;
+          img.onload = () => {
+            localStorage.setItem("cachedLoginBg", image);
+            setBackgroundImage(image);
+          };
+        }
+      } else {
+        localStorage.removeItem("cachedLoginBg");
+        setBackgroundImage("");
+      }
+    } catch (error) {
+      console.error("Error fetching background image:", error);
+    }
+  };
+
+  fetchAndCacheBackgroundImage();
+}, []);
 
   const handleRoleChange = (e) => {
     setRole(e.target.value); // Update role based on radio button selection
@@ -132,6 +172,7 @@ const LoginPage = () => {
           icon: "error",
           title: `${role} Login failed 👎`,
           text: result.message || "Invalid credentials!",
+          confirmButtonText: "Try Again",
           customClass: {
             popup: "shake-popup", // Add a custom shake animation class
           },
@@ -206,26 +247,26 @@ const LoginPage = () => {
     },
   };
 
-  // Fetch the background image from the server
-  useEffect(() => {
-    console.log('Fetching background image from:', `${ApiUrl}/fetchloginbg`); // Log the API URL being used
+  // // Fetch the background image from the server
+  // useEffect(() => {
+  //   console.log('Fetching background image from:', `${ApiUrl}/fetchloginbg`); // Log the API URL being used
 
-    axios.get(`${ApiUrl}/fetchloginbg`)
-      .then((response) => {
-        console.log('Response data:', response.data); // Log the data received from the server
+  //   axios.get(`${ApiUrl}/fetchloginbg`)
+  //     .then((response) => {
+  //       console.log('Response data:', response.data); // Log the data received from the server
         
-        if (response.data.length > 0) {
-          console.log('Background image found:', response.data[0].image); // Log the image being used
-          setBackgroundImage(response.data[0].image); // Only set the filename, base path is handled in style
-        } else {
-          console.log('No background image found, using gradient instead');
-          setBackgroundImage(''); // No image, fallback to gradient
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching background image:', error); // Log any errors that occur
-      });
-  }, []);
+  //       if (response.data.length > 0) {
+  //         console.log('Background image found:', response.data[0].image); // Log the image being used
+  //         setBackgroundImage(response.data[0].image); // Only set the filename, base path is handled in style
+  //       } else {
+  //         console.log('No background image found, using gradient instead');
+  //         setBackgroundImage(''); // No image, fallback to gradient
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error fetching background image:', error); // Log any errors that occur
+  //     });
+  // }, []);
 
   return (
     <div className="login-page">

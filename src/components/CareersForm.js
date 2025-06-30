@@ -18,11 +18,11 @@ const CareersForm = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-  
+
     // Check file type and size
     if (file) {
       const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      
+
       // Validate file type
       if (!validTypes.includes(file.type)) {
         Swal.fire({
@@ -37,24 +37,24 @@ const CareersForm = () => {
         });
         return; // Exit the function
       }
-  
-      // Validate file size (50 KB limit)
-      if (file.size > 50 * 1024) { // 50 KB
-        Swal.fire({
-          icon: 'error',
-          title: 'File Too Large',
-          text: 'File size should be below 50 KB.',
-        });
-        setResumeFile(null); // Reset file input
-        e.target.value = ''; // Clear the input field
 
-        setErrors({
-          ...errors,
-          resumeFile: 'File size must be below 50 KB.',
-        });
-        return; // Exit the function
-      }
-  
+      // Validate file size (50 KB limit)
+      // if (file.size > 50 * 1024) { // 50 KB
+      //   Swal.fire({
+      //     icon: 'error',
+      //     title: 'File Too Large',
+      //     text: 'File size should be below 50 KB.',
+      //   });
+      //   setResumeFile(null); // Reset file input
+      //   e.target.value = ''; // Clear the input field
+
+      //   setErrors({
+      //     ...errors,
+      //     resumeFile: 'File size must be below 50 KB.',
+      //   });
+      //   return; // Exit the function
+      // }
+
       // If file is valid
       setResumeFile(file); // Update the state with the selected file
       setErrors({
@@ -89,13 +89,13 @@ const CareersForm = () => {
 
   const validateForm = () => {
     const newErrors = {};
-  
+
     // First name validation
     if (!formData.firstName) newErrors.firstName = 'First name is required.';
-  
+
     // Last name validation
     if (!formData.lastName) newErrors.lastName = 'Last name is required.';
-  
+
     // Email validation
     if (!formData.email) {
       newErrors.email = 'Email is required.';
@@ -104,39 +104,39 @@ const CareersForm = () => {
     } else if (!/\.[a-z]{2,}$/.test(formData.email)) { // Relaxed check for email ending with any domain
       newErrors.email = 'Enter a valid email address (e.g., .com, .org).';
     }
-  
+
     // Phone number validation
     if (!formData.phone) {
       newErrors.phone = 'Phone number is required.';
     } else if (!/^[6-9]\d{9}$/.test(formData.phone)) {
       newErrors.phone = 'Phone number must be 10 digits starting with 6-9.';
     }
-  
+
     // Position validation
     if (!formData.position) newErrors.position = 'Position is required.';
-  
+
     // Start date validation
     if (!formData.startDate) newErrors.startDate = 'Start date is required.';
-  
+
     // Resume file validation
     if (!resumeFile) newErrors.resumeFile = 'Resume file is required.';
-  
+
     // Set errors state
     setErrors(newErrors);
-  
+
     // Clear errors after 5 seconds (timeout implementation)
     setTimeout(() => {
       setErrors({});
     }, 5000);
-  
+
     return Object.keys(newErrors).length === 0;
   };
-  
-  
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     if (name === "phone") {
       // Validate number input
       const sanitizedValue = value.replace(/\D/g, "").slice(0, 10);
@@ -162,17 +162,24 @@ const CareersForm = () => {
     setErrors({
       ...errors,
       [name]: '',  // Clear the specific error message for the field being changed
-  });
+    });
   };
- 
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
+
+    // if (!resumeFile) {
+    //   Swal.fire('Error!', 'Please upload your resume before submitting.', 'error');
+    //   setIsSubmitting(false);
+    //   return;
+    // }
+
     // Perform client-side validation
     if (!validateForm()) {
-        // Swal.fire('Error!', 'Please fill in the required fields.', 'error');
-        setIsSubmitting(false);
-        return; // Prevent further execution if validation fails
+      // Swal.fire('Error!', 'Please fill in the required fields.', 'error');
+      setIsSubmitting(false);
+      return; // Prevent further execution if validation fails
     }
 
     setIsSubmitting(true); // Set the button state to 'Submitting...' only when validation passes
@@ -181,57 +188,71 @@ const CareersForm = () => {
 
     // Combine firstName and lastName into a single name variable
     const fullName = `${formData.firstName} ${formData.lastName}`;
-    
+
     // Add combined name and other fields to FormData
     formDataToSend.append('name', fullName);
     formDataToSend.append('email', formData.email);
     formDataToSend.append('phone', formData.phone);
     formDataToSend.append('position', formData.position);
     formDataToSend.append('startDate', formData.startDate);
-    
+
     // Add the resume file to FormData
     if (resumeFile) {
-        formDataToSend.append('resume', resumeFile);
+      formDataToSend.append('resume', resumeFile);
     }
 
     // Send data via fetch
     fetch(`${ApiUrl}/submit-careers-form`, {
-        method: 'POST',
-        body: formDataToSend,
+      method: 'POST',
+      body: formDataToSend,
     })
-    .then((response) => {
+      .then((response) => {
         if (response.ok) {
-            Swal.fire('Success!', 'Form submitted successfully!', 'success');
-            
-            // Clear the form data and resume file
-            setFormData({
-                firstName: '',
-                lastName: '',
-                email: '',
-                phone: '',
-                position: '',
-                startDate: ''
-            });
-            document.querySelector('input[type="file"]').value = '';
+          Swal.fire('Success!', 'Form submitted successfully!', 'success');
+
+          // Clear the form data and resume file
+          setFormData({
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            position: '',
+            startDate: ''
+          });
+          document.querySelector('input[type="file"]').value = '';
         } else {
-            return response.json().then((data) => {
-                // Handle specific response errors
-                Swal.fire({
-                    title: 'You already applied',
-                    text: data.message || 'Failed to submit the form.',
-                    icon: 'info' // Info icon added
-                });
+          return response.json().then((data) => {
+            // Show the error alert
+            Swal.fire({
+              title: 'Info',
+              text: data.message || 'Failed to submit the form.',
+              icon: 'info'
             });
+
+            //  Clear the form fields after showing the message
+            setFormData({
+              firstName: '',
+              lastName: '',
+              email: '',
+              phone: '',
+              position: '',
+              startDate: ''
+            });
+
+            //  Clear the resume input field
+            document.querySelector('input[type="file"]').value = '';
+          });
+
         }
-    })
-    .catch((error) => {
-        Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
-    })
-    .finally(() => {
+      })
+      .catch((error) => {
+        Swal.fire('Error!', error?.message || 'Something went wrong.', 'error');
+      })
+      .finally(() => {
         // Always reset the button to 'Submit' regardless of success or failure
         setIsSubmitting(false);
-    });
-};
+      });
+  };
 
 
 
@@ -448,7 +469,7 @@ const formStyles = {
     marginTop: '10px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Shadow effect
     outline: 'none',
-    width:'200px',
+    width: '200px',
   },
   buttonHover: {
     backgroundColor: '#0056b3', // Darker blue on hover

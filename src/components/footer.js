@@ -8,7 +8,7 @@ import { FaMapMarkerAlt, FaHeadset, FaShareAlt, FaGavel } from "react-icons/fa";
 import {
   FaFacebookF,
   FaInstagram,
-  FaTwitter,
+  // FaTwitter,
   FaYoutube,
   FaWhatsapp,
 } from "react-icons/fa";
@@ -50,27 +50,37 @@ const Footer = () => {
           <h4>
             <FaShareAlt /> Follow Us
           </h4>
-          <p>
-            <FaFacebookF style={{ color: "white", marginRight: "8px" }} />{" "}
-            Facebook
-          </p>
-          <p>
-            <FaInstagram style={{ color: "white", marginRight: "8px" }} />{" "}
-            Instagram
-          </p>
-          <p>
-            <FaTwitter style={{ color: "white", marginRight: "8px" }} />{" "}
-            Twitter
-          </p>
-          <p>
-            <FaYoutube style={{ color: "white", marginRight: "8px" }} />{" "}
-            YouTube
-          </p>
-          <p>
-            <FaWhatsapp style={{ color: "white", marginRight: "8px" }} />{" "}
-            WhatsApp
-          </p>
+          <a href="https://www.facebook.com/oneclickteck/" target="_blank" rel="noopener noreferrer">
+            <p>
+              <FaFacebookF style={{ color: "white", marginRight: "8px" }} /> Facebook
+            </p>
+          </a>
+          <a href="https://www.instagram.com/oneclicktechnologies/" target="_blank" rel="noopener noreferrer">
+            <p>
+              <FaInstagram style={{ color: "white", marginRight: "8px" }} /> Instagram
+            </p>
+          </a>
+          {/* <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer">
+            <p>
+              <FaTwitter style={{ color: "white", marginRight: "8px" }} /> Twitter
+            </p>
+          </a> */}
+          <a href="https://www.youtube.com/@oneclickteck" target="_blank" rel="noopener noreferrer">
+            <p>
+              <FaYoutube style={{ color: "white", marginRight: "8px" }} /> YouTube
+            </p>
+          </a>
+          <a
+            href="https://wa.me/919092206677"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <p>
+              <FaWhatsapp style={{ color: "white", marginRight: "8px" }} /> WhatsApp
+            </p>
+          </a>
         </div>
+
 
         <div className="footer-section">
           <h4>
@@ -98,7 +108,7 @@ const Footer = () => {
       </footer>
 
       <PaymentMethods />
-      
+
     </>
   );
 };

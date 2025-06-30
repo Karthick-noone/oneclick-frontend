@@ -25,13 +25,32 @@ const RecentlyViewed = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedProductIds = JSON.parse(localStorage.getItem("Recently-viewed")) || [];
-    if (!storedProductIds.length) return;
+    const now = Date.now();
+    const fifteenDaysInMs = 15 * 24 * 60 * 60 * 1000;
+
+    let storedData = localStorage.getItem("Recently-viewed");
+    let parsedData = [];
+
+    try {
+      parsedData = storedData ? JSON.parse(storedData) : [];
+    } catch (err) {
+      console.error("Failed to parse Recently-viewed:", err);
+    }
+
+    // Filter out expired items
+    const validData = parsedData.filter(item => now - item.timestamp < fifteenDaysInMs);
+
+    // Save cleaned-up list back to localStorage
+    if (validData.length !== parsedData.length) {
+      localStorage.setItem("Recently-viewed", JSON.stringify(validData));
+    }
+
+    if (validData.length === 0) return;
 
     const fetchProducts = async () => {
       try {
         const productResponses = await Promise.all(
-          storedProductIds.map((id) => axios.get(`${ApiUrl}/recently-viewed-products/${id}`))
+          validData.map((item) => axios.get(`${ApiUrl}/recently-viewed-products/${item.id}`))
         );
         setRecentProducts(productResponses.map((res) => res.data[0]).filter(Boolean));
       } catch (error) {
@@ -41,6 +60,7 @@ const RecentlyViewed = () => {
 
     fetchProducts();
   }, []);
+
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -72,7 +92,7 @@ const RecentlyViewed = () => {
           .toLowerCase()
           .replace(/\s+/g, "-")
           .replace(/[^\w-]+/g, "");
-  
+
       navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
     };
 
@@ -87,17 +107,19 @@ const RecentlyViewed = () => {
           alt={product.prod_name}
           className="recently-viewed-image"
         />
-        <h3 className="recent-product-name">{product.prod_name}</h3>
+        <h3 className="recent-product-name" title={product.prod_name}>{product.prod_name}</h3>
         <span className="recent-product-subtitle">{product.subtitle}</span>
         <p>
-          <span className="product-price">₹{product.offer_price > 0 ? product.offer_price : product.prod_price}</span>
-          <span style={{ marginRight: "5px", fontSize: "15px" }}>M.R.P</span>
+          <span style={{ marginRight: "5px", fontSize: "15px", color:'#888' }}>M.R.P</span>
           <span className="product-actual-price" style={{ textDecoration: "line-through", color: "red" }}>
             ₹{product.actual_price}
+            
           </span>
-          <p style={{ color: "green", marginLeft: "10px", marginBottom: "10px" }}>
+          <span style={{ color: "green", marginLeft: "10px", marginBottom: "10px" }}>
             ({getDiscountPercentage(product.actual_price, product.offer_price, product.prod_price)}% OFF)
-          </p>
+          </span>
+          <p className="product-price">₹{product.offer_price > 0 ? product.offer_price : product.prod_price}</p>
+
         </p>
       </div>
     );
@@ -115,27 +137,31 @@ const RecentlyViewed = () => {
   };
 
   return (
-    <div className="recently-viewed-container">
-      <h2 className="recently-viewed-title">Recently Viewed Products</h2>
-      
+    <>
+      {recentProducts.length > 4 && (
+        <div className="recently-viewed-container">
+          <h2 className="recently-viewed-title">Recently Viewed Products</h2>
 
-      {/* Normal Grid View if products <= 5 (Desktop), otherwise enable slider */}
-      {!isMobile && recentProducts.length <= 5 ? (
-        <div className="recently-viewed-grid">
-          {recentProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {/* Normal Grid View if products <= 5 (Desktop), otherwise enable slider */}
+          {!isMobile && recentProducts.length <= 5 ? (
+            <div className="recently-viewed-grid">
+              {recentProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            // Slider View for Mobile or if products > 5
+            <Slider {...sliderSettings} className="recently-viewed-slider">
+              {recentProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </Slider>
+          )}
         </div>
-      ) : (
-        // Slider View for Mobile or if products > 5
-        <Slider {...sliderSettings} className="recently-viewed-slider">
-          {recentProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </Slider>
       )}
-    </div>
+    </>
   );
+
 };
 
 export default RecentlyViewed;

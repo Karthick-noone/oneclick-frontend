@@ -1,8 +1,8 @@
 import React from 'react';
 import './css/UserCard.css'; // Add styles for dropdown
-import { FaAddressBook, FaCalendarCheck, FaUser, FaBox, FaHeart,  FaPowerOff, FaShoppingBag } from 'react-icons/fa';
+// import { FaAddressBook, FaCalendarCheck, FaUser, FaBox, FaHeart,  FaPowerOff, FaShoppingBag } from 'react-icons/fa';
 
-const UserCard = ({ onLogout }) => {
+const UserCard = () => {
   return (
     <div className="dropdownnn-container">
      

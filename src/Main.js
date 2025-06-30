@@ -17,13 +17,11 @@ import RecentlyViewed from './components/RecentlyViewed';
 const Main = () => {
     return (
         <div>
-            {/* <Header1 /> */}
-            {/* <Header2 /> */}
-            {/* <Header3 /> */}
-            <Homepage />
+            
+            <Homepage/>
+            <RecentlyViewed />
 
             <FeaturesCard />
-            <RecentlyViewed />
 
             <AdPage />
             <ShopByCategory />

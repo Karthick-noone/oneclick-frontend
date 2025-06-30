@@ -1,0 +1,172 @@
+.computer-filter {
+  width: 100%;
+  max-width: 210px;
+  padding: 20px 15px 20px 20px;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  overflow-y: auto;
+  position: sticky; /* Desktop: sticky */
+  top: 0;
+  left: 0;
+  transform: none; /* Default no transform on desktop */
+  transition: none; /* No transition on desktop */
+}
+
+
+/* Custom Scrollbar */
+.computer-filter::-webkit-scrollbar {
+    width: 5px; /* Set the width of the scrollbar */
+}
+
+.computer-filter::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Set the track color */
+    border-radius: 10px; /* Rounded corners for the track */
+}
+
+.computer-filter::-webkit-scrollbar-thumb {
+    background: #888; /* Set the color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners for the thumb */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.computer-filter::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker color on hover */
+}
+
+.computer-filter::-webkit-scrollbar-button {
+    background: #ccc; /* Button color on the scrollbar */
+}
+
+.computer-filter h2 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+}
+
+.filter-section h4 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 4px;
+}
+
+.filter-section label {
+  display: block;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+
+
+.filter-section input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.price-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.price-box input {
+  width: 100%;
+  max-width: 100px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.price-slider-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.range-values {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+input[type='range'] {
+  width: 100%;
+  margin-bottom: 10px;
+}
+    .responsive-filter-controls{
+        display: none;
+    }
+
+@media (max-width: 768px) {
+
+
+  .filter-toggle-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #fff;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: #007bff;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .responsive-filter-controls {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .responsive-filter-controls {
+    display: none;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .computer-filter {
+    position: fixed; /* Responsive: fixed to slide over */
+    top: 0;
+    left: 0;
+    width: 80%;
+    max-width: 230px;
+    height: 100vh;
+    background: white;
+    z-index: 1002;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    transform: translateX(-100%); /* Start off screen to left */
+    transition: transform 0.6s ease-in-out; /* Smooth slide */
+  }
+
+
+}
+/* When filter is shown */
+.computer-filter.show {
+  transform: translateX(0);
+      transition: transform 0.6s ease-in-out; 
+
+}
+
+/* Already handled in your media query */
+.computer-filter {
+  transform: translateX(-100%);
+}
+
+
+.single-thumb{
+  cursor: pointer;
+}

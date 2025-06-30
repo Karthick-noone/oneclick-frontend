@@ -19,6 +19,13 @@ const EditSingleImageAd = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [category, setCategory] = useState(''); // Add a new state to track the selected category
 
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateProgress, setUpdateProgress] = useState(0); // optional if needed
+
+
   const handleCategoryChange = (e) => {
     setCategory(e.target.value); // Update category value when a new category is selected
   };
@@ -50,48 +57,58 @@ const EditSingleImageAd = () => {
   };
 
   const handleAddProduct = async () => {
-    if (!newImage ) {
+    if (!newImage) {
       Swal.fire({
-        icon: 'error',
-        title: 'Missing Data',
-        text: 'Please choose image .',
+        icon: "error",
+        title: "Missing Data",
+        text: "Please select both an image and a category.",
       });
       return;
     }
 
     const formData = new FormData();
-    formData.append('image', newImage);
-    // formData.append('category', category);  // Include category in the form data
+    formData.append("image", newImage);
+    // formData.append("category", category);
 
+    setIsUploading(true); // Start loader
 
     try {
       await axios.post(`${ApiUrl}/loginbg`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percent);
+        },
       });
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Image Added',
-        text: 'The image has been uploaded successfully!',
+      await Swal.fire({
+        icon: "success",
+        title: "Image Added",
+        text: "The image has been uploaded successfully!",
+        timer: 3000,
       }).then(() => {
-        return axios.get(`${ApiUrl}/fetchloginbg`);
-      }).then((productsResponse) => {
-        setProducts(productsResponse.data);
-        setNewImage(null);
-        setCategory('');  // Clear the category
-        document.querySelector('input[type="file"]').value = ''; // Clear the input field
-
+        setIsUploading(false); //  Stop loader immediately
+        setUploadProgress(0);
+        // return axios.get(`${ApiUrl}/fetchedithomepage`);
       });
 
+      const res = await axios.get(`${ApiUrl}/fetchloginbg`);
+      setProducts(res.data);
+      setNewImage(null);
+      setCategory("");
+      document.querySelector('input[type="file"]').value = "";
     } catch (error) {
-      console.error('Error adding image:', error);
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'There was an error uploading the image. Please try again.',
+        icon: "error",
+        title: "Error",
+        text: "There was an error uploading the image. Please try again.",
       });
+    } finally {
+      setIsUploading(false); // Stop loader
     }
   };
 
@@ -120,7 +137,7 @@ const EditSingleImageAd = () => {
           icon: 'success',
           title: 'Image Deleted',
           text: 'The image has been deleted successfully!',
-          timer:3000,
+          timer: 3000,
         }).then(() => {
           window.location.reload();
         });
@@ -140,7 +157,6 @@ const EditSingleImageAd = () => {
   };
 
   const handleUpdateImage = async () => {
-    // Check if both selectedFile and category are not set
     if (!selectedFile && !editingProduct.category) {
       Swal.fire({
         icon: 'error',
@@ -149,46 +165,60 @@ const EditSingleImageAd = () => {
       });
       return;
     }
-  
+
     const formData = new FormData();
-  
-    // Append selected file if it exists
+
     if (selectedFile) {
       formData.append('image', selectedFile);
     }
-  
-    // Append category only if it has changed
+
     if (editingProduct.category) {
       formData.append('category', editingProduct.category);
     }
-  
+
+    setIsUpdating(true); // Show overlay before starting
+    setUpdateProgress(0); // Reset progress
+
     try {
-      const response = await axios.put(`${ApiUrl}/updateloginbgimage/${editingProduct.id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-  
+      const response = await axios.put(
+        `${ApiUrl}/updateloginbgimage/${editingProduct.id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUpdateProgress(percentCompleted);
+          },
+        }
+      );
+
       Swal.fire({
         icon: 'success',
         title: 'Product Updated',
         text: 'The product has been updated successfully!',
+        timer: 3000,
       });
-  
-      // Update the product in the state with the new image or category if they were updated
+
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.id === editingProduct.id
             ? {
-                ...product,
-                image: selectedFile ? response.data.updatedImage : product.image, // Update image only if selectedFile is present
-                category: editingProduct.category !== product.category ? editingProduct.category : product.category, // Update category only if it's changed
-              }
+              ...product,
+              image: selectedFile ? response.data.updatedImage : product.image,
+              category:
+                editingProduct.category !== product.category
+                  ? editingProduct.category
+                  : product.category,
+            }
             : product
         )
       );
-  
-      setModalIsOpen(false); // Close the modal after successful update
+
+      setModalIsOpen(false); // Close modal
     } catch (error) {
       console.error('Error updating product:', error);
       Swal.fire({
@@ -196,10 +226,13 @@ const EditSingleImageAd = () => {
         title: 'Update Failed',
         text: 'There was an error updating the product. Please try again.',
       });
+    } finally {
+      setIsUpdating(false); // Hide overlay
+      setUpdateProgress(0); // Optional: Reset progress for next time
     }
   };
-  
-  
+
+
 
   return (
     <div className="laptops-page">
@@ -213,27 +246,52 @@ const EditSingleImageAd = () => {
           </div>
 
           <div className="ad-product-form">
-  <input
-    type="file"
-    multiple
-    name="images"
-    onChange={handleImageChange}
-    className="ad-form-input"
-    accept="image/jpeg, image/png" // This allows all image types
-  />
+            <input
+              type="file"
+              multiple
+              name="images"
+              onChange={handleImageChange}
+              className="ad-form-input"
+              accept="image/jpeg, image/png, image/webp" // This allows all image types
+            />
 
-  <button onClick={handleAddProduct} className="ad-form-btn">
-    Add
-  </button>
+            <button onClick={handleAddProduct} className="add-btn" disabled={isUploading}>
+              {isUploading ? (
+                <div className="circular-progress-wrapper">
+                  <svg className="circular-progress" viewBox="0 0 36 36">
+                    <g transform="rotate(95 18 18)">
+                      <path
+                        className="circle-bg"
+                        d="M18 2.0845
+               a 15.9155 15.9155 0 0 1 0 31.831
+               a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="circle"
+                        strokeDasharray={`${uploadProgress}, 100`}
+                        d="M18 2.0845
+               a 15.9155 15.9155 0 0 1 0 31.831
+               a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </g>
+                    <text x="18" y="20.35" className="percentage-text">
+                      {uploadProgress}%
+                    </text>
+                  </svg>
+                </div>
+              ) : (
+                "Add"
+              )}
+            </button>
 
-  <FaInfoCircle
-    className="ad-form-info"
-    title="Add banner size image for better view (1920 X 1080)"
-  />
-</div>
+            <FaInfoCircle
+              className="ad-form-info"
+              title="Add banner size image for better view (1920 X 1080)"
+            />
+          </div>
 
         </div>
-      
+
         <div className="ad-cards-container">
           {products && products.length > 0 ? (
             products.map((product) => (
@@ -241,21 +299,21 @@ const EditSingleImageAd = () => {
                 <div className="ad-image-container">
                   {product.image ? (
                     <>
-                    <img
-                      src={`${ApiUrl}/uploads/singleadpage/${product.image}`}
-                      alt="Ad"
-                      className="ad-image4"
-                    />
-                    <button
-                    onClick={() => handleEditProduct(product)} // Pass 'true' for portrait images
-                    className="laptops-edit-btnn"
-                  >
-                    Edit
-                  </button></>
+                      <img
+                        src={`${ApiUrl}/uploads/singleadpage/${product.image}`}
+                        alt="Ad"
+                        className="ad-image4"
+                      />
+                      <button
+                        onClick={() => handleEditProduct(product)} // Pass 'true' for portrait images
+                        className="laptops-edit-btnn"
+                      >
+                        Edit
+                      </button></>
                   ) : (
                     <p>No image available.Please add one image for advertisement.</p>
                   )}
-                 
+
                 </div>
 
                 {/* <div>Category - {product.category}</div> */}
@@ -268,34 +326,60 @@ const EditSingleImageAd = () => {
       </div>
 
       {editingProduct && (
-  <Modal
-    isOpen={modalIsOpen}
-    onRequestClose={() => setModalIsOpen(false)}
-    contentLabel="Edit Image and Category"
-    className="adminmodal"
-    overlayClassName="adminmodal-overlay"
-  >
-    <div className="adminmodal-header">
-      <h2>Edit Image and Category</h2>
-      <button onClick={() => setModalIsOpen(false)} className="adminmodal-close-btn">
-        &times;
-      </button>
-    </div>
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={() => setModalIsOpen(false)}
+          contentLabel="Edit Image and Category"
+          className="adminmodal"
+          overlayClassName="adminmodal-overlay"
+        >
+          {isUpdating && (
+            <div className="modal-upload-overlay">
+              <div className="circular-progress-wrapper">
+                <svg className="circular-progress" viewBox="0 0 36 36">
+                  <g transform="rotate(-0 18 18)">
+                    <path
+                      className="circle-bg"
+                      d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      className="circle"
+                      strokeDasharray={`${updateProgress}, 100`}
+                      d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </g>
+                  <text x="18" y="20.35" className="percentage-text">
+                    {updateProgress}%
+                  </text>
+                </svg>
+              </div>
+            </div>
+          )}
+          <div className="adminmodal-header">
+            <h2>Edit Image </h2>
+            <button onClick={() => setModalIsOpen(false)} className="adminmodal-close-btn">
+              &times;
+            </button>
+          </div>
 
-    {/* Input for Image Upload */}
-    <input
-      type="file"
-      onChange={(e) => setSelectedFile(e.target.files[0])}
-      className="adminmodal-input"
-      accept="image/jpeg, image/png"  // Allow all image types
-    />
+          {/* Input for Image Upload */}
+          <input
+            type="file"
+            onChange={(e) => setSelectedFile(e.target.files[0])}
+            className="adminmodal-input"
+            accept="image/jpeg, image/png, image/webp"  // Allow all image types
+          />
 
- 
-    {/* Update and Cancel Buttons */}
-    <button onClick={handleUpdateImage} className="adminmodal-update-btn">Update</button>
-    <button onClick={() => handleDeleteImage(editingProduct)} className="adminmodal-cancel-btn">Delete</button>
-  </Modal>
-)}
+
+          {/* Update and Cancel Buttons */}
+          <button onClick={handleUpdateImage} className="adminmodal-update-btn">Update</button>
+          <button onClick={() => handleDeleteImage(editingProduct)} className="adminmodal-cancel-btn">Delete</button>
+        </Modal>
+      )}
 
 
     </div>

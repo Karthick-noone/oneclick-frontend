@@ -13,10 +13,11 @@ import {
   FaAddressBook,
   FaPowerOff,
   FaBox,
+  FaChevronDown
 } from "react-icons/fa";
 import "./../styles.css"; // Adjust path as needed
 import "./css/Header2.css"; // Adjust path as needed
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import UserCard from "./UserCard"; // Import UserCard component
 import WishlistSidebar from "./WishlistSidebar"; // Import WishlistSidebar component
 import logo from "./img/logo3.png";
@@ -24,7 +25,7 @@ import logo from "./img/logo3.png";
 // import "react-toastify/dist/ReactToastify.css";
 import { ApiUrl } from "./ApiUrl";
 import axios from "axios";
-import Header3 from "./Header3";
+// import Header3 from "./Header3";
 import Swal from "sweetalert2";
 import "nprogress/nprogress.css";
 import NProgress from "nprogress";
@@ -32,9 +33,13 @@ import NProgress from "nprogress";
 import { IoMdClose } from "react-icons/io"; // Importing close icon
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
-
+// import { ToastContainer } from "react-toastify";
+// import Lottie from "lottie-react";
+// import empty_cart from './css/empty_cart.json'
+import Empty_cart from './img/empty-cart.png'
+import searchIcon from './img/search.png'
 import usericon from "./img/user.png";
+import defaultUser from "./img/default-picture.png";
 import wishlisticon from "./img/wish-list.png";
 import carticon from "./img/shopping-cart3.png";
 
@@ -61,50 +66,70 @@ const Header2 = () => {
   const [product, setProduct] = useState(null);
   const [cartLoaded, setCartLoaded] = useState(false);
   const [query, setQuery] = useState(""); // ✅ Fix: Declare query state
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+
+  const openMobileSearch = () => setShowMobileSearch(true);
+  const closeMobileSearch = () => setShowMobileSearch(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+
+  const inputRef = useRef(null);
+  const imgRef = useRef(null);
+  const containerRef = useRef(null);
+
+  const location = useLocation();
+
+  // Focus the input when search opens
+  useEffect(() => {
+    if (showMobileSearch && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [showMobileSearch]);
+
+  const suggestionRefs = useRef([]);
 
   //  useEffect(() => {
   //         const now = new Date();
   //         // console.log("Current Time:", now.toLocaleString());
-        
+
   //         const activeProduct = cartItems.find((item) => {
   //           if (!item.offer_start_time || !item.offer_end_time) {
   //             // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
   //             return false;
   //           }
-        
+
   //           const offerStartTime = new Date(item.offer_start_time);
   //           const offerEndTime = new Date(item.offer_end_time);
-        
+
   //           // console.log(
   //           //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
   //           // );
-        
+
   //           return offerStartTime <= now && offerEndTime > now;
   //         });
-        
+
   //         if (activeProduct) {
   //           // console.log("Active Product Found:", activeProduct);
   //         } else {
   //           // console.log("No active product with a valid offer.");
   //         }
-        
+
   //         setProduct(activeProduct || null);
   //         setIsOfferActive(!!activeProduct);
-        
+
   //         // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
   //       }, [cartItems]);
 
-        const isOfferValid = (item) => {
-  if (!item.offer_start_time || !item.offer_end_time) return false;
+  const isOfferValid = (item) => {
+    if (!item.offer_start_time || !item.offer_end_time) return false;
 
-  const now = new Date();
-  const start = new Date(item.offer_start_time);
-  const end = new Date(item.offer_end_time);
+    const now = new Date();
+    const start = new Date(item.offer_start_time);
+    const end = new Date(item.offer_end_time);
 
-  return start <= now && now < end;
-};
+    return start <= now && now < end;
+  };
 
-  
+
 
   useEffect(() => {
     NProgress.configure({ showSpinner: false }); // Disable spinner
@@ -135,22 +160,21 @@ const Header2 = () => {
   }, [showSuggestions]);
 
   useEffect(() => {
-    // Hide dropdown when clicking outside
     const handleClickOutside = (event) => {
-      // Check if click happened inside the search container
-      if (
-        !event.target.closest(".search-container") &&
-        !event.target.closest(".suggestions-dropdown")
-      ) {
+      const clickedOutsideInput = inputRef.current && !inputRef.current.contains(event.target);
+      const clickedOutsideDropdown = dropdownRef.current && !dropdownRef.current.contains(event.target);
+
+      if (clickedOutsideInput && clickedOutsideDropdown) {
         setShowSuggestions(false);
       }
     };
 
-    document.addEventListener("click", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -203,7 +227,7 @@ const Header2 = () => {
     if (!query) {
       console.log("Empty query, skipping API call.");
       setSuggestions([]);
-      setShowSuggestions(false);
+      setShowSuggestions(false);  // hide dropdown when input is cleared
       return;
     }
 
@@ -215,27 +239,28 @@ const Header2 = () => {
       );
       const data = await response.json();
 
-      console.log("Raw API response:", data); // Debugging log
+      console.log("Raw API response:", data); // Debugging
 
-      if (
-        response.ok &&
-        Array.isArray(data.suggestions) &&
-        data.suggestions.length
-      ) {
-        console.log("Suggestions received:", data.suggestions);
-        setSuggestions([...new Set(data.suggestions)]); // Remove duplicates
-        setShowSuggestions(true); // ✅ Ensure this is set to true
+      if (response.ok && Array.isArray(data.suggestions)) {
+        const unique = [...new Set(data.suggestions)];
+        console.log("Suggestions received:", unique);
+
+        setSuggestions(unique);
+        setShowSuggestions(true);    // always keep it open
       } else {
         console.warn("No valid suggestions found.");
-        setSuggestions([]);
-        setShowSuggestions(false); // ✅ Hide when no suggestions
+
+        setSuggestions([]);          // empty array → your “no matches” UI
+        setShowSuggestions(true);    // keep dropdown open to show “No matches”
       }
     } catch (error) {
       console.error("Error fetching suggestions:", error);
-      setSuggestions([]);
-      setShowSuggestions(false);
+
+      setSuggestions([]);            // hide the list, but show “No matches”
+      setShowSuggestions(true);
     }
   };
+
 
   const handleClearInput = () => {
     setSearchQuery("");
@@ -263,6 +288,8 @@ const Header2 = () => {
 
   const handleSearchInputChange = (e) => {
     const value = e.target.value;
+    setHighlightedIndex(-1);
+
     setSearchQuery(value);
 
     if (value.trim() === "") {
@@ -272,46 +299,53 @@ const Header2 = () => {
     }
   };
 
-  const handleSearch = async () => {
-    const trimmedQuery = searchQuery.trim().toLowerCase();
+ const handleSearch = async () => {
+  let finalQuery = searchQuery.trim().toLowerCase();
 
-    if (!trimmedQuery) {
-      console.warn("Search term is empty.");
-      return;
-    }
+  // If a suggestion is highlighted, prefer that
+  if (highlightedIndex >= 0 && suggestions[highlightedIndex]) {
+    const highlighted = suggestions[highlightedIndex];
+    finalQuery = (highlighted?.prod_name || highlighted)?.toLowerCase();
+  }
 
-    try {
-      const response = await fetch(
-        `${ApiUrl}/api/suggestions?query=${encodeURIComponent(trimmedQuery)}`
+  if (!finalQuery) {
+    console.warn("Search term is empty.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${ApiUrl}/api/suggestions?query=${encodeURIComponent(finalQuery)}`
+    );
+    const data = await response.json();
+
+    if (response.ok && data.category) {
+      console.log(`Navigating to category: ${data.category}`);
+      navigate(
+        `/${encodeURIComponent(data.category)}?search=${encodeURIComponent(
+          finalQuery
+        )}`
       );
-      const data = await response.json();
-
-      if (response.ok && data.category) {
-        console.log(`Navigating to category: ${data.category}`);
-        navigate(
-          `/${encodeURIComponent(data.category)}?search=${encodeURIComponent(
-            trimmedQuery
-          )}`
-        );
-      } else {
-        console.warn("No category found.");
-        Swal.fire({
-          title: "Product not found",
-          text: "We could not find any products matching your search.",
-          icon: "warning",
-          confirmButtonText: "OK",
-        });
-      }
-    } catch (error) {
-      console.error("Error during search:", error);
-      Swal.fire({
-        title: "Error",
-        text: "An error occurred while searching.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+    } else {
+      console.warn("No category found.");
+      // Swal.fire({
+      //   title: "Product not found",
+      //   text: "We could not find any products matching your search.",
+      //   icon: "warning",
+      //   confirmButtonText: "OK",
+      // });
     }
-  };
+  } catch (error) {
+    console.error("Error during search:", error);
+    Swal.fire({
+      title: "Error",
+      text: "An error occurred while searching.",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
+  }
+};
+
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -326,16 +360,17 @@ const Header2 = () => {
   // };
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth <= 768);
+    const checkMobileView = () => {
+      setIsMobileView(window.innerWidth <= 768); // adjust as needed
     };
 
-    handleResize(); // Initialize
-    window.addEventListener("resize", handleResize);
+    checkMobileView(); // check on mount
+    window.addEventListener("resize", checkMobileView); // update on resize
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", checkMobileView);
+    };
   }, []);
-
   // useEffect(() => {
   //   const fetchLocalStorageData = () => {
   //     const storedEmail = localStorage.getItem("email");
@@ -533,13 +568,17 @@ const Header2 = () => {
       });
 
       if (response.data.success) {
-        // Toast notification for successful removal
-        toast.success(`${itemName} has been removed from your cart!`, {
+        const shortName = itemName.length > 30
+          ? itemName.substring(0, 27) + "..."
+          : itemName;
+
+        toast.success(`${shortName} has been removed from your cart!`, {
           position: "top-right",
           autoClose: 2000,
           closeOnClick: true,
         });
-      } else {
+      }
+      else {
         console.error("Failed to remove item from cart");
         toast.error("Failed to remove item from cart!", {
           position: "top-right",
@@ -599,12 +638,13 @@ const Header2 = () => {
     const storedEmail = localStorage.getItem("email");
 
     if (storedUsername && storedEmail) {
-      setIsDropdownOpen4((prevState) => !prevState);
+      setIsDropdownOpen4((prevState) => !prevState); //  Toggles open/close
       setUser({ username: storedUsername, email: storedEmail });
     } else {
       navigate("/login");
     }
   };
+
 
   // const handleToggleDropdown = () => {
   //   setIsDropdownOpen((prevState) => !prevState);
@@ -618,19 +658,21 @@ const Header2 = () => {
 
     setUser(null);
     setIsUserCardOpen(false);
+    setIsDropdownOpen4(false); // Close the dropdown immediately
 
     toast.success("Logged out successfully!", {
       position: "top-right",
-      autoClose: 3000,
+      autoClose: 2000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: false,
       draggable: true,
-      progress: undefined,
-      theme: "colored",
     });
 
-    navigate("/login");
+    // Delay the navigation until after the toast is shown
+    setTimeout(() => {
+      navigate("/login");
+    }, 2000); // Match the autoClose duration of the toast
   };
 
   useEffect(() => {
@@ -642,34 +684,44 @@ const Header2 = () => {
     }
 
     const handleClickOutside = (event) => {
+      const target = event.target;
+
+      // Close user card
       if (
         userCardRef.current &&
-        !userCardRef.current.contains(event.target) &&
-        !event.target.closest(".users")
+        !userCardRef.current.contains(target) &&
+        !target.closest(".users")
       ) {
         setIsUserCardOpen(false);
-        setIsDropdownOpen(false);
       }
 
+      // Close the "dots" menu dropdown
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        !event.target.closest(".dots")
+        !dropdownRef.current.contains(target) &&
+        !target.closest(".dots")
       ) {
         setIsDropdownOpen(false);
       }
 
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen4(false); // Close the dropdown if clicked outside
+      // Close the user icon dropdown (using same ref as dots menu, shared dropdownRef)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target) &&
+        imgRef.current &&
+        !imgRef.current.contains(target) &&
+        !target.closest(".icons") // Optional: in case "icons" is your img class
+      ) {
+        setIsDropdownOpen4(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
 
   const removeFromWishlist = async (itemId) => {
     // Remove the item from the wishlistItems state
@@ -727,8 +779,7 @@ const Header2 = () => {
           error.response || error.message || error
         );
         toast.error(
-          `An error occurred: ${
-            error.response?.data?.message || error.message
+          `An error occurred: ${error.response?.data?.message || error.message
           }`,
           {
             position: "top-right",
@@ -790,9 +841,25 @@ const Header2 = () => {
     navigate("/Cart", { state: { isOfferActive, product } });
   };
 
+  useEffect(() => {
+    if (
+      highlightedIndex !== -1 &&
+      suggestionRefs.current[highlightedIndex]
+    ) {
+      suggestionRefs.current[highlightedIndex].scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [highlightedIndex]);
+
+
   const handleSelect = async (suggestion) => {
     setQuery(suggestion); // Update input field
     setShowSuggestions(false); // Hide dropdown
+    setShowMobileSearch(false)
+    handleSearch();
+
 
     try {
       const response = await fetch(
@@ -809,12 +876,12 @@ const Header2 = () => {
         );
       } else {
         console.warn("No category found.");
-        Swal.fire({
-          title: "Product not found",
-          text: "We could not find any products matching your search.",
-          icon: "warning",
-          confirmButtonText: "OK",
-        });
+        // Swal.fire({
+        //   title: "Product not found",
+        //   text: "We could not find any products matching your search.",
+        //   icon: "warning",
+        //   confirmButtonText: "OK",
+        // });
       }
     } catch (error) {
       console.error("Error fetching category:", error);
@@ -826,6 +893,52 @@ const Header2 = () => {
       });
     }
   };
+
+  // Handle Keyboard Events
+  const handleKeyDown = (e) => {
+    if (!showSuggestions || suggestions.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) =>
+        prev === 0 ? suggestions.length - 1 : prev - 1
+      );
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (highlightedIndex >= 0) {
+        const selected = suggestions[highlightedIndex];
+        const query = selected?.prod_name || selected;
+        handleSelect(query); // Send prod_name like in old dropdown
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (
+      highlightedIndex !== null &&
+      suggestionRefs.current[highlightedIndex]
+    ) {
+      suggestionRefs.current[highlightedIndex].scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [highlightedIndex]);
+
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      if (inputRef.current) {
+        inputRef.current.removeEventListener("keydown", handleKeyDown);
+      }
+    };
+  }, [suggestions, highlightedIndex, showSuggestions]);
 
   const handleProductClick = (product) => {
     const slugify = (name) =>
@@ -843,25 +956,41 @@ const Header2 = () => {
         className="header2"
       >
         {/* <div className="company-name"> */}
-        {/* <Link to="/"> */}
-        <img
-          src={logo}
-          width={"230px"}
-          style={{ marginLeft: "50px" }}
-          alt="Company Logo"
-          // loading="lazy"
-           loading="eager"
-        />
-        {/* </Link> */}
-        {/* </div> */}
-        <div className="search-box">
+        <Link to="/">
+          <img
+            src={logo}
+            width={"230px"}
+            style={{ marginLeft: "50px" }}
+            alt="Company Logo"
+            // loading="lazy"
+            loading="eager"
+          />
+        </Link>
+
+        {/* {showMobileSearch && (
+          <IoMdClose
+            title="Close"
+            className="mobile-close-icon"
+            onClick={closeMobileSearch}
+          />
+        )} */}
+
+        {showMobileSearch && (
+          <div className="mobile-backdrop" onClick={closeMobileSearch} />
+        )}
+        {/* <div > */}
+        <div
+
+          className={`search-box ${showMobileSearch ? "mobile-overlay show" : "mobile-overlay"}`}
+        >
           <input
             type="text"
             className="searchboxinput"
+            ref={inputRef}
             value={searchQuery}
             onChange={handleSearchInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder="Search for products..."
+            onFocus={() => setShowSuggestions(true)} // 
+            placeholder="Search for products, brands and more"
             autoComplete="off"
           />
           {searchQuery && (
@@ -876,75 +1005,148 @@ const Header2 = () => {
           </div>
         </div>
 
-        {/* Dropdown should be OUTSIDE search-box */}
-        {showSuggestions && suggestions.length > 0 && (
-          <ul className="suggestions-dropdown">
-            {suggestions.map((suggestion, index) => (
-              <li key={index} onClick={() => handleSelect(suggestion)}>
-                {suggestion}
+        {showSuggestions && (
+          <ul ref={dropdownRef} className="suggestions-dropdown">
+            {suggestions.length > 0 ? (
+              suggestions.map((suggestion, index) => {
+                const prodName = suggestion?.prod_name || suggestion;
+
+                return (
+                  <li
+                    key={index}
+                    ref={(el) => (suggestionRefs.current[index] = el)}
+                    onClick={() => handleSelect(prodName)}
+                    className={index === highlightedIndex ? "highlighted" : ""}
+                  >
+                    <div className="suggestion-item">
+                      {suggestion.prod_img && JSON.parse(suggestion.prod_img)?.[0] && (
+                        <img
+                          src={`${ApiUrl}/uploads/${suggestion.category.toLowerCase()}/${JSON.parse(suggestion.prod_img)[0]}`}
+                          alt={prodName}
+                          className="suggestion-image"
+                        />
+                      )}
+                      <div className="suggestion-text">{prodName}</div>
+                    </div>
+                  </li>
+                );
+              })
+            ) : searchQuery.trim() === "" ? (
+              <li className="no-suggestionss">Search your products...</li> // 👈 New message for empty input
+            ) : (
+              <li className="no-suggestionss">
+                No matches found for “{searchQuery}”
               </li>
-            ))}
+            )}
           </ul>
         )}
 
-        <div className="iconss">
-          {/* <FaUser
-            title={username || "Login"}
-            style={{ color: "white" }}
-            className="users"
-            onClick={toggleUserCard}
-          /> */}
-          <img
-            title={username || "Login"}
-            // style={{ color: "white" }}
-            className="icons"
-            onClick={toggleUserCard}
-            src={usericon}
-            style={{ width: "25px", cursor: "pointer" }}
-            alt=""
-          />
 
-          {isDropdownOpen && (
-            <div className="dropdown-menu" ref={dropdownRef}>
-              <Link to="/About">
-                {/* <a href="/About"> */}
-                <div
-                  className="dropdown-item"
-                  onClick={() => handleMenuClick("About")}
-                >
-                  <FaInfoCircle
-                    style={{ color: "#333" }}
-                    className="dropdown-icon"
+        {/* </div> */}
+
+
+
+        <div className="iconss">
+
+          <div ref={imgRef} className="userLogo" onClick={toggleUserCard}>
+            <img
+              title={username ? `Logged in as ${username}` : "Login"}
+
+              className="icons"
+              src={username ? usericon : defaultUser}
+              style={{ width: "28px", height: "28px", borderRadius: "50%", objectFit: "cover" }}
+              alt=""
+            />
+            <span style={{ fontSize: "14px", color: "#fff", display: "flex", alignItems: "center", gap: "4px" }}>
+              {username ? (
+                <>
+                  <FaChevronDown
+                    className={`down-arrow ${isDropdownOpen4 ? "rotate" : ""}`}
+                    size={13}
                   />
-                  <span>About</span>
-                </div>
-              </Link>
-              <Link to="/Contact">
-                <div
-                  className="dropdown-item"
-                  onClick={() => handleMenuClick("Contact")}
+                </>
+              ) : (
+                <>Login</>
+              )}
+            </span>
+          </div>
+
+
+          {/* {username && (
+            <FaChevronDown className="dropdown-open-arrow" />
+          )} */}
+
+          {isDropdownOpen4 && (
+            <div ref={dropdownRef} className="dropdownnn-container">
+              <div className="dropdownnn-content">
+
+                <Link
+                  to="/MyAccount"
+                  className={location.pathname === "/MyAccount" ? "active" : ""}
+                  onClick={() => setIsDropdownOpen4(false)}
                 >
-                  <FaEnvelope
-                    style={{ color: "#333" }}
-                    className="dropdown-icon"
-                  />
-                  <span>Contact</span>
-                </div>
-              </Link>
-              <Link to="/HelpCenter">
-                <div
-                  className="dropdown-item"
-                  onClick={() => handleMenuClick("Help Center")}
+                  {/* <FaUser style={{ color: "#333" }} className="iicon" /> */}
+                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 15a5.698 5.698 0 1 0 0-11.396A5.698 5.698 0 0 0 12 15Z" stroke="#2A55E5" stroke-width="1.4" stroke-miterlimit="10"></path><path d="M2.906 20.25a10.5 10.5 0 0 1 18.188 0" stroke="#2A55E5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+
+                  <span style={{ fontSize: '16px' }}> My Profile</span>
+                </Link>
+
+
+                <Link
+                  to="/UserAddress"
+                  className={location.pathname === "/UserAddress" ? "active" : ""}
+                  onClick={() => setIsDropdownOpen4(false)}
                 >
-                  <FaQuestionCircle
-                    style={{ color: "#333" }}
-                    className="dropdown-icon"
-                  />
-                  <span>Help Center</span>
-                </div>
-              </Link>
+                  {/* <FaAddressBook style={{ color: "#333" }} className="iicon" /> */}
+                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M5.683 20.75H17.97M11.827 12.558a2.73 2.73 0 1 0 0-5.462 2.73 2.73 0 0 0 0 5.462Z" stroke="#2A55E5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18.654 9.827c0 6.144-6.827 10.923-6.827 10.923S5 15.971 5 9.827a6.827 6.827 0 1 1 13.654 0v0Z" stroke="#2A55E5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <span style={{ fontSize: '16px' }}> Saved Address </span>
+                </Link>
+
+
+
+                <Link
+                  to="/MyOrders"
+                  className={location.pathname === "/MyOrders" ? "active" : ""}
+                  onClick={() => setIsDropdownOpen4(false)}
+                >
+                  {/* <FaBox  className="iicon" />  */}
+                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24" ><path d="M20.087 16.153V7.847a.682.682 0 0 0-.346-.59L12.33 3.089a.657.657 0 0 0-.658 0L4.26 7.258a.682.682 0 0 0-.345.59v8.305a.682.682 0 0 0 .345.59l7.412 4.169a.658.658 0 0 0 .658 0l7.412-4.17a.683.683 0 0 0 .346-.59v0Z" stroke="#2A55E5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.128 14.064v-4.38L7.957 5.177" stroke="#2A55E5" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20.007 7.502 12.082 12 4.008 7.502M12.076 12 12 20.996" stroke="#2A55E5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <span style={{ fontSize: '16px' }}> Orders </span>
+                </Link>
+
+                {/* <Link
+                  to="/Cart"
+                  className={`cart-link ${location.pathname === "/Cart" ? "active" : ""}`}
+                  onClick={() => setIsDropdownOpen4(false)}
+                >
+                  <FaShoppingCart style={{ color: "#2A55E5" }}  />
+                  <div className="cart-icon-container">
+                    {getTotalItemsCount() > 0 && (
+                      <span className="cart-count2">{getTotalItemsCount()}</span>
+                    )}
+                    Cart
+                  </div>
+                </Link> */}
+
+                <hr />
+                <Link
+                  to="#"
+                  onClick={() => {
+                    handleLogout();
+                    setIsDropdownOpen4(false);
+                  }}
+                >
+                  {/* <FaPowerOff style={{ color: "#333" }} /> */}
+                  <svg width="24" height="24" class="" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#2A55E5" stroke-width="0.3" stroke="#2A55E5" d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"></path></svg>
+                  <span style={{ fontSize: '16px' }}> Logout </span>
+                </Link>
+              </div>
             </div>
           )}
+
+
+
+
           {/* <FaHeart
             style={{ color: "white" }}
             title="Wish List"
@@ -959,6 +1161,7 @@ const Header2 = () => {
             alt=""
           />
 
+
           <div className="cart-icon-container">
             {/* <FaShoppingCart
               style={{ color: "white", marginTop: "4px" }}
@@ -969,106 +1172,117 @@ const Header2 = () => {
               title="Cart"
               onClick={toggleSidebar}
               src={carticon}
-              style={{ width: "25px", cursor: "pointer" }}
+              style={{ width: "25px", cursor: "pointer", marginLeft: '5px' }}
               alt=""
               className="icons"
             />
 
+
             <FaEllipsisV
               style={{ color: "white" }}
-              className="dots"
+              // className="dots"
+              className={`dots ${isDropdownOpen ? "dot-rotate" : ""}`}
+
               onClick={handleToggleDropdown}
             />
+
+            {isDropdownOpen && (
+              <div className="dropdown-menu" ref={dropdownRef}>
+                <Link to="/About" onClick={() => handleMenuClick("About")}>
+                  <div className={`dropdown-item ${location.pathname === "/About" ? "active" : ""}`}>
+                    {/* <FaInfoCircle className="dropdown-icon" /> */}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dropdown-icon">
+                      <circle cx="12" cy="12" r="9"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+
+                    <span style={{ fontSize: '16px' }}>About</span>
+                  </div>
+                </Link>
+                <Link to="/Contact" onClick={() => handleMenuClick("Contact")}>
+                  <div className={`dropdown-item ${location.pathname === "/Contact" ? "active" : ""}`}>
+                    {/* <FaEnvelope className="dropdown-icon" /> */}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dropdown-icon">
+                      <path d="M4 4h16v16H4z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+
+
+                    <span style={{ fontSize: '16px' }}>Contact</span>
+                  </div>
+                </Link>
+                <Link to="/HelpCenter" onClick={() => handleMenuClick("Help Center")}>
+                  <div className={`dropdown-item ${location.pathname === "/HelpCenter" ? "active" : ""}`}>
+                    {/* <FaQuestionCircle className="dropdown-icon" /> */}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                      stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="dropdown-icon">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M9 9c0-3.5 5.5-3.5 5.5 0c0 2.5-2.5 3-2.5 5"></path>
+                      <circle cx="12" cy="18.01" r="0.01"></circle>
+                    </svg>
+
+                    <span style={{ fontSize: '16px' }}>Help Center</span>
+                  </div>
+                </Link>
+              </div>
+            )}
+
 
             {getTotalItemsCount() > 0 && (
               <span className="cart-count">{getTotalItemsCount()}</span>
             )}
 
-            {isDropdownOpen4 && (
-              <div ref={dropdownRef} className="dropdownnn-container">
-                <div className="dropdownnn-content">
-                  <Link
-                    to="/UserAddress"
-                    onClick={() => setIsDropdownOpen4(false)}
-                  >
-                    <FaAddressBook
-                      style={{ color: "#333" }}
-                      className="iicon"
-                    />{" "}
-                    My Addresses
-                  </Link>
-                  {/* <a to="/my-subscription"><FaCalendarCheck /> My Subscription</a> */}
-                  <Link
-                    to="/MyAccount"
-                    onClick={() => setIsDropdownOpen4(false)}
-                  >
-                    <FaUser style={{ color: "#333" }} className="iicon" /> My
-                    Account
-                  </Link>
-                  <Link
-                    to="/MyOrders"
-                    onClick={() => setIsDropdownOpen4(false)}
-                  >
-                    <FaBox style={{ color: "#333" }} className="iicon" /> My
-                    Orders
-                  </Link>
-                  <Link
-                    to="/Cart"
-                    className="cart-link"
-                    onClick={() => setIsDropdownOpen4(false)}
-                  >
-                    <FaShoppingBag
-                      style={{ color: "#333" }}
-                      className="iicon"
-                    />
 
-                    <div className="cart-icon-container">
-                      {getTotalItemsCount() > 0 && (
-                        <span className="cart-count2">
-                          {getTotalItemsCount()}
-                        </span>
-                      )}
-                      Cart
-                    </div>
-                  </Link>
-
-                  <hr />
-                  <Link
-                    to="#"
-                    onClick={() => {
-                      handleLogout();
-                      setIsDropdownOpen4(false);
-                    }}
-                  >
-                    <FaPowerOff style={{ color: "#333" }} /> Logout
-                  </Link>
-                </div>
-              </div>
-            )}
           </div>
-          {isMobileView && <Header3 />}
+          <div className="mobile-search-icon" onClick={openMobileSearch}>
+            {/* <FaSearch /> */}
+            <img src={searchIcon} className="search-product-icon" width={"28px"} />
+
+          </div>
+
+
+          {/* {isMobileView && <Header3 />} */}
         </div>
 
         <div
           ref={sidebarRef}
           className={`sidebarcart ${isSidebarOpen ? "open" : ""}`}
         >
-          <button
-            style={{ color: "black" }}
-            className="close-btn"
-            onClick={toggleSidebar}
-          >
-            <FaTimes />
-          </button>
+
           <div className="sidebarcart-header">
+            <button
+              // style={{ color: "white" }}
+              className="close-btn"
+              onClick={toggleSidebar}
+            >
+              <FaTimes />
+            </button>
             <h3>Cart</h3>
           </div>
+          {/* </div> */}
           <div className="sidebarcart-body">
             {isLoading ? (
-              <p>Your cart is empty.</p>
-            ) : cartItems.length === 0 ? (
-              <p>Your cart is empty.</p>
-            ) : (
+
+              <>
+                <p style={{ textAlign: "center" }}>Your cart is empty.</p>
+                <div style={{ display: "flex", justifyContent: "center", marginTop: "5px" }}>
+                  {/* <Lottie animationData={empty_cart} style={{ width: 250, height: 250 }} /> */}
+                  <img src={Empty_cart} className="empty-cart-image" alt="Cart is Empty" />
+                </div>
+              </>) : cartItems.length === 0 ? (
+
+                <>
+                  <p style={{ textAlign: "center" }}>Your cart is empty.</p>
+                  <div style={{ display: "flex", justifyContent: "center", marginTop: "5px" }}>
+                    {/* <Lottie animationData={empty_cart} style={{ width: 250, height: 250 }} /> */}
+                    <img src={Empty_cart} className="empty-cart-image" alt="Cart is Empty" />
+
+                  </div>
+
+                </>) : (
               <ul>
                 {cartItems.map((item) => {
                   // Check if image is a stringified array and parse it
@@ -1110,7 +1324,7 @@ const Header2 = () => {
                           }}
                         >
                           <h3 className="item-name">{item.prod_name}</h3>
-                          <p className="item-features">{item.prod_features}</p>
+                          {/* <span className="item-features">{item.prod_features}</span> */}
                         </span>
                       </div>
 
@@ -1127,9 +1341,9 @@ const Header2 = () => {
                         <p style={{ color: "#27ae60" }}>
                           {" "}
                           {/* ₹{item.prod_price * item.quantity} */}₹
-                       {item.offer_price > 0 && isOfferValid(item)
-  ? item.offer_price
-  : item.prod_price}
+                          {item.offer_price > 0 && isOfferValid(item)
+                            ? item.offer_price
+                            : item.prod_price}
 
                         </p>
 
@@ -1236,7 +1450,10 @@ const Header2 = () => {
           </div>
         )}
       </header>
-      {!isMobileView && <Header3 />}
+      {/* {!isMobileView && <Header3 />} */}
+
+      {/* <ToastContainer /> */}
+
     </>
   );
 };

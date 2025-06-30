@@ -7,9 +7,9 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ApiUrl } from "./ApiUrl"; // Adjust the import path accordingly
 import "./css/ProductDetail.css"; // Ensure you create this CSS file
-import Header2 from "./Header2";
+// import Header2 from "./Header2";
 // import Sidebar from "./Sidebar";
-import { FaHeart, FaRegHeart, FaShoppingBag } from "react-icons/fa"; // Import the heart icon from react-icons
+import { FaHeart, FaRegHeart, } from "react-icons/fa"; // Import the heart icon from react-icons
 import Footer from "./footer";
 import { useNavigate } from "react-router-dom"; // Import useNavigate at the top
 import Slider from "react-slick"; // Import the slider component
@@ -17,6 +17,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css"; // Ensure styles are applied
+import RecentlyViewed from "./RecentlyViewed";
+// import ZoomInCursor from './img/zoom-in.cur'
 
 import {
   FaMemory,
@@ -29,37 +31,38 @@ import {
   FaApple,
 } from "react-icons/fa"; // Import necessary icons
 
-import { useCart } from "../components/CartContext";
+// import { useCart } from "../components/CartContext";
 import leftarrow from "./img/left.png";
 import rightarrow from "./img/right.png";
-import pricetag from "./img/check-mark.png";
-import tag from "./img/percent.png";
-import offertag from "./img/sale.png";
-import couponimg from "./img/couponcode.png";
-import FullAdPage from "./FullAdPage";
+// import pricetag from "./img/check-mark.png";
+// import tag from "./img/percent.png";
+// import offertag from "./img/sale.png";
+// import couponimg from "./img/couponcode.png";
+// import FullAdPage from "./FullAdPage";
 // import Header2 from './Header2'
-const ProductDetail = ({ accessoryCategory }) => {
+const ProductDetail = () => {
   const navigate = useNavigate(); // Initialize useNavigate
 
-  const { addToWishlist, removeFromWishlist } = useCart();
+  // const { addToWishlist, removeFromWishlist } = useCart();
   const { id } = useParams(); // Get the product ID from the URL
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [, setIsFavorite] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null); // State to track the currently selected image
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [currentStartIndex, setCurrentStartIndex] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showCarousel, setShowCarousel] = useState(false);
+  // const [currentIndex, setCurrentIndex] = useState(0);
+  // const [showCarousel, setShowCarousel] = useState(false);
   const [relatedAccessories, setRelatedAccessories] = useState([]);
   const [selectedAccessories, setSelectedAccessories] = useState([]);
-  const [addToCartTriggered, setAddToCartTriggered] = useState(false); // Track if add to cart was triggered
+  // const [addToCartTriggered, setAddToCartTriggered] = useState(false); // Track if add to cart was triggered
   const [products, setProducts] = useState([]);
   const [coupons, setCoupons] = useState({}); // State to hold coupon codes for products
   const [favorites, setFavorites] = useState({});
   const [, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     // Simulate loading delay (remove this in real API calls)
     setTimeout(() => setLoading(false), 1000);
@@ -73,6 +76,11 @@ const ProductDetail = ({ accessoryCategory }) => {
   const [isOfferActive, setIsOfferActive] = useState(true);
 
   const [zoomStyle, setZoomStyle] = useState({});
+  const [showZoom, setShowZoom] = useState(false);
+  const [lensBoxStyle, setLensBoxStyle] = useState({});
+  const [showLensBox, setShowLensBox] = useState(false);
+
+
   const zoomRef = useRef(null);
 
   useEffect(() => {
@@ -159,15 +167,15 @@ const ProductDetail = ({ accessoryCategory }) => {
     }
   };
 
-  const handleNext2 = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
+  // const handleNext2 = () => {
+  //   setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+  // };
 
-  const handlePrev2 = () => {
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + images.length) % images.length
-    );
-  };
+  // const handlePrev2 = () => {
+  //   setCurrentIndex(
+  //     (prevIndex) => (prevIndex - 1 + images.length) % images.length
+  //   );
+  // };
 
   const itemsToShow = 5;
 
@@ -188,7 +196,7 @@ const ProductDetail = ({ accessoryCategory }) => {
   };
 
   // Sort related products to prioritize matching product name (exact and partial)
-  const sortedFilteredProducts = filteredProducts.slice().sort((a, b) => {
+  const s = filteredProducts.slice().sort((a, b) => {
     const currentProductName = product.prod_name.trim().toLowerCase(); // Trim and lower case the main product name
     const nameA = a.prod_name.trim().toLowerCase(); // Trim and lower case for comparison
     const nameB = b.prod_name.trim().toLowerCase(); // Trim and lower case for comparison
@@ -207,15 +215,15 @@ const ProductDetail = ({ accessoryCategory }) => {
   });
 
   // Log the sorted related products
-  // console.log("Sorted Related Products:", sortedFilteredProducts);
+  // console.log("Sorted Related Products:", s);
 
   const handleProductClick = (product) => {
     const slugify = (name) =>
       name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-  
+
     navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
-  
+
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
@@ -299,51 +307,57 @@ const ProductDetail = ({ accessoryCategory }) => {
     }
   }, [product]); // Dependency on product
 
-  const handleAddToCart2 = async (selectedAccessories, event) => {
-    if (!event) return;
-    event.stopPropagation(); // Prevent event bubbling
+  // const handleAddToCart2 = async (selectedAccessories, event) => {
+  //   if (!event) return;
+  //   event.stopPropagation(); // Prevent event bubbling
 
-    const email = localStorage.getItem("email");
+  //   const email = localStorage.getItem("email");
 
-    if (!email) {
-      toast.error("User is not logged in!", {
-        position: "top-right",
-        autoClose: 2000,
-      });
-      window.location.href = "/login";
-      return;
-    }
+  //   if (!email) {
+  //     toast.error("User is not logged in!", {
+  //       position: "top-right",
+  //       autoClose: 2000,
+  //     });
+  //     window.location.href = "/login";
+  //     return;
+  //   }
 
-    setIsAdding(true); // Disable button while processing
+  //   setIsAdding(true); // Disable button while processing
 
-    try {
-      for (const accessoryId of selectedAccessories) {
-        const accessory = relatedAccessories.find(
-          (acc) => acc.id === accessoryId
-        );
-        if (accessory) {
-          await axios.post(`${ApiUrl}/add-to-cart`, {
-            email,
-            productId: accessory.id,
-            quantity: 1,
-          });
+  //   try {
+  //     for (const accessoryId of selectedAccessories) {
+  //       const accessory = relatedAccessories.find(
+  //         (acc) => acc.id === accessoryId
+  //       );
+  //       if (accessory) {
+  //         await axios.post(`${ApiUrl}/add-to-cart`, {
+  //           email,
+  //           productId: accessory.id,
+  //           quantity: 1,
+  //         });
+  //         const shortName = accessory.prod_name.length > 30
+  //           ? accessory.prod_name.substring(0, 27) + "..."
+  //           : accessory.prod_name;
 
-          toast.success(`${accessory.prod_name} added to your cart!`, {
-            position: "top-right",
-            autoClose: 2000,
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error adding item to cart:", error);
-      toast.error("Failed to add item to cart", {
-        position: "top-right",
-        autoClose: 2000,
-      });
-    } finally {
-      setIsAdding(false); // Enable button after completion
-    }
-  };
+  //         toast.success(`${shortName} added to your cart!`, {
+  //           position: "top-right",
+  //           autoClose: 2000,
+  //         });
+
+
+
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding item to cart:", error);
+  //     toast.error("Failed to add item to cart", {
+  //       position: "top-right",
+  //       autoClose: 2000,
+  //     });
+  //   } finally {
+  //     setIsAdding(false); // Enable button after completion
+  //   }
+  // };
 
   const handleBuyNowWithAccessories = (selectedAccessories, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
@@ -360,7 +374,7 @@ const ProductDetail = ({ accessoryCategory }) => {
       });
       return; // Exit the function if no accessory is selected
     }
-  
+
     const email = localStorage.getItem("email");
     if (!email) {
       toast.error("User is not logged in!", {
@@ -370,17 +384,17 @@ const ProductDetail = ({ accessoryCategory }) => {
       window.location.href = "/login";
       return;
     }
-  
+
     const prod_price =
       product.offer_price > 0 && isOfferActive
         ? product.offer_price
         : product.prod_price;
-  
+
     // Get accessory details
     const selectedAccessoryDetails = relatedAccessories.filter((acc) =>
       selectedAccessories.includes(acc.id)
     );
-  
+
     // Navigate to purchase page with both product and accessories
     navigate("/purchase", {
       state: {
@@ -392,18 +406,18 @@ const ProductDetail = ({ accessoryCategory }) => {
         email,
       },
     });
-  
+
     console.log("Navigating with product and accessories", product, selectedAccessoryDetails);
   };
-  
-  
+
+
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
 
     const email = localStorage.getItem("email");
 
     // Check if the user is logged in
-     if (!email) {
+    if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -429,13 +443,19 @@ const ProductDetail = ({ accessoryCategory }) => {
         quantity: 1,
       });
 
+
       // Handle the response
       if (response.status === 200) {
-        toast.success(`${product.prod_name} added to your cart!`, {
+        const shortName = product.prod_name.length > 30
+          ? product.prod_name.substring(0, 27) + "..."
+          : product.prod_name;
+
+        toast.success(`${shortName} added to your cart!`, {
           position: "top-right",
           autoClose: 2000,
         });
       }
+
     } catch (error) {
       console.error("Error adding item to cart:", error);
       toast.error("Failed to add item to cart", {
@@ -453,7 +473,7 @@ const ProductDetail = ({ accessoryCategory }) => {
 
     // Check if the user is logged in
     const email = localStorage.getItem("email");
-     if (!email) {
+    if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -512,7 +532,11 @@ const ProductDetail = ({ accessoryCategory }) => {
           productId: product.id,
         });
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.info(`${product.prod_name} removed from your wishlist!`, {
+        const shortName =
+          product.prod_name.length > 30
+            ? product.prod_name.substring(0, 27) + "..."
+            : product.prod_name;
+        toast.info(`${shortName} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -525,7 +549,12 @@ const ProductDetail = ({ accessoryCategory }) => {
           prod_id: product.id,
         });
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.success(`${product.prod_name} added to your wishlist!`, {
+        const shortName =
+          product.prod_name.length > 30
+            ? product.prod_name.substring(0, 27) + "..."
+            : product.prod_name;
+
+        toast.success(`${shortName} added to your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -557,7 +586,7 @@ const ProductDetail = ({ accessoryCategory }) => {
     fetchProducts();
   }, []);
 
-  
+
 
   useEffect(() => {
     const fetchRelatedAccessories = async () => {
@@ -735,34 +764,79 @@ const ProductDetail = ({ accessoryCategory }) => {
   }, []);
 
 
-  
+
   if (isLoading || !product) {
     return null; // Show nothing when loading or if the product is not found
   }
-  
+
   // // Ensure product exists before accessing prod_img
   const images = product?.prod_img
-  ? Array.isArray(product.prod_img)
-    ? product.prod_img
-    : JSON.parse(product.prod_img)
-  : [];
-
+    ? Array.isArray(product.prod_img)
+      ? product.prod_img
+      : JSON.parse(product.prod_img)
+    : [];
 
   const handleMouseMove = (e) => {
     const image = zoomRef.current;
-    if (!image) return;
+    const container = document.querySelector(".big-image-container");
+    const mainRow = document.querySelector(".side-row");
+    if (!image || !container || !mainRow) return;
 
-    const { left, top, width, height } = image.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
+    const { left, top, width, height } = container.getBoundingClientRect();
+    const x = e.clientX - left;
+    const y = e.clientY - top;
+    // Lens box dimensions
+    const lensWidth = 200;
+    const lensHeight = 120;
+
+    // Clamp the lens so it stays within the container
+    const clampedX = Math.max(0, Math.min(x - lensWidth / 2, width - lensWidth));
+    const clampedY = Math.max(0, Math.min(y - lensHeight / 2, height - lensHeight));
+
+    setLensBoxStyle({
+      position: "absolute",
+      top: `${clampedY}px`,
+      left: `${clampedX}px`,
+      width: `${lensWidth}px`,
+      height: `${lensHeight}px`,
+      backgroundImage: "radial-gradient(silver .3px, transparent .3px)", // Visible dots
+      backgroundSize: "3px 3px", // Tight spacing
+      pointerEvents: "none",
+      zIndex: 11,
+    });
+
+
+    // Zoomed background preview in .side-row
+    const percentX = (x / width) * 100;
+    const percentY = (y / height) * 100;
 
     setZoomStyle({
-      transformOrigin: `${x}% ${y}%`,
-      transform: "scale(2)", // Adjust scale for zoom level
-      cursor: "zoom-in",
+      backgroundImage: `url(${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[selectedImage]})`,
+      backgroundSize: "250%", // 2x zoom
+      backgroundPosition: `${percentX}% ${percentY}%`,
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: mainRow.offsetWidth + "px",
+      height: mainRow.offsetHeight + "px",
+      pointerEvents: "none",
+      zIndex: 10,
+      backgroundRepeat: "no-repeat",
+      border: "1px solid rgba(0, 0, 0, 0.1)",
+      // cursor: "zoom-in",
     });
+
+    setShowLensBox(true);
+    setShowZoom(true);
   };
 
+
+  const handleMouseLeave = () => {
+    setShowZoom(false);
+
+    setShowLensBox(false);
+    setZoomStyle({});
+  };
   // const hasMultipleImages = images.length > 1;
 
   // useEffect(() => {
@@ -777,117 +851,36 @@ const ProductDetail = ({ accessoryCategory }) => {
 
   // console.log("couponCode", couponCode);
   // Ensure couponCode is a valid string and contains digits
-  let couponNumber = null; // Default to null in case there's no number
-
   if (typeof couponCode === "string") {
     const match = couponCode.match(/(\d+)/);
     if (match) {
-      couponNumber = match[0]; // Extract the number if a match is found
+      const couponNumber = match[0]; // Use it here if needed
+      console.log("Coupon number:", couponNumber);
     }
   }
 
+
   // Now you can safely use couponNumber
   // console.log("couponNumber", couponNumber); // Will log the coupon number or null if not found
-  const gradientBackgrounds = [
-    "linear-gradient(to bottom, #dcff8a, #f6f7d7)",
-    "linear-gradient(to bottom, #dcff8a, #f6f7d7)",
-  ]; // Two gradient backgrounds
+  // const gradientBackgrounds = [
+  //   "linear-gradient(to bottom, #dcff8a, #f6f7d7)",
+  //   "linear-gradient(to bottom, #dcff8a, #f6f7d7)",
+  // ]; // Two gradient backgrounds
 
   const filteredBanners = products.filter(
-    (product) => product.image && product.image.startsWith("product_banner")
+    (product) =>
+      product.title?.toLowerCase().trim() === "product_banner" &&
+      product.image && product.image.trim() !== ""
   );
+
 
   // Click handler function
   const handleAdClick = (product) => {
-    const url = `/${
-      product.category
-    }?search=${product.brand_name.toLowerCase()}`;
+    const url = `/${product.category
+      }?search=${product.brand_name.toLowerCase()}`;
     navigate(url); // Navigate to the constructed URL
   };
 
-  // const settings = {
-  //   dots: false,
-  //   infinite: images.length > 1,
-  //   speed: 500,
-  //   slidesToShow: 1,
-  //   slidesToScroll: images.length > 1 ? 1 : 0,
-  //   arrows: images.length > 1,
-  //   autoplay: false,
-  //   draggable: images.length > 1,
-  //   swipe: images.length > 1,
-  //   prevArrow: (
-  //     <div className="arrow-container left-arrow">
-  //       <img
-  //         src={leftarrow}
-  //         style={{
-  //           width: "30px",
-  //           borderRadius: "50%",
-  //           backgroundColor: "white",
-  //           padding: "5px",
-  //           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
-  //         }}
-  //         alt="Previous"
-  //       />
-  //     </div>
-  //   ),
-  //   nextArrow: (
-  //     <div className="arrow-container right-arrow">
-  //       <img
-  //         src={rightarrow}
-  //         style={{
-  //           width: "30px",
-  //           borderRadius: "50%",
-  //           backgroundColor: "white",
-  //           padding: "5px",
-  //           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
-  //         }}
-  //         alt="Next"
-  //       />
-  //     </div>
-  //   ),
-  // };
-
-  // const settings2 = {
-  //   dots: false,
-  //   infinite: sortedFilteredProducts.length > 5, // Enable infinite loop only if more than 5 products
-  //   speed: 500,
-  //   slidesToShow: 5, // Number of items to show at once
-  //   slidesToScroll: 1,
-  //   arrows: true, // Enable arrows
-  //   prevArrow: (
-  //     <button className="custom-arrow left-arrow">
-  //       <img src={leftarrow} alt="Previous" style={{ width: "30px" }} />
-  //     </button>
-  //   ),
-  //   nextArrow: (
-  //     <button className="custom-arrow right-arrow">
-  //       <img src={rightarrow} alt="Next" style={{ width: "30px" }} />
-  //     </button>
-  //   ),
-  //   responsive: [
-  //     {
-  //       breakpoint: 1024, // Tablet
-  //       settings2: {
-  //         slidesToShow: 3,
-  //         slidesToScroll: 1,
-  //       },
-  //     },
-  //     {
-  //       breakpoint: 768, // Mobile
-  //       settings2: {
-  //         slidesToShow: 2,
-  //         slidesToScroll: 1,
-  //       },
-  //     },
-  //     {
-  //       breakpoint: 480, // Smaller devices
-  //       settings2: {
-  //         slidesToShow: 1,
-  //         slidesToScroll: 1,
-  //       },
-  //     },
-  //   ],
-  // };
 
   const NextArrow = (props) => {
     const { className, style, onClick } = props;
@@ -900,16 +893,16 @@ const ProductDetail = ({ accessoryCategory }) => {
           right: 0,
           background: "rgba(0, 0, 0, 0.5)",
           borderRadius: "50%",
-          width: "30px",
-          height: "30px",
-          lineHeight: "30px",
+          width: "26px",
+          height: "26px",
+          lineHeight: "23px",
           textAlign: "center",
           color: "#fff",
           zIndex: 2,
         }}
         onClick={onClick}
       >
-        &#8594;
+        {/* &#8594; */}
       </div>
     );
   };
@@ -925,26 +918,101 @@ const ProductDetail = ({ accessoryCategory }) => {
           left: 0,
           background: "rgba(0, 0, 0, 0.5)",
           borderRadius: "50%",
-          width: "30px",
-          height: "30px",
-          lineHeight: "30px",
+          width: "26px",
+          height: "26px",
+          lineHeight: "23px",
           textAlign: "center",
-          color: "#fff",
+          color: "#333",
           zIndex: 2,
         }}
         onClick={onClick}
       >
-        &#8592;
+        {/* &#8592; */}
       </div>
     );
   };
+  const CustomArrow = ({ src, onClick, className }) => (
+    <img
+      src={src}
+      alt="Arrow"
+      className={`custom-arrow ${className}`}
+      onClick={onClick}
+    />
+  );
+const similarSliderSettings = {
+  dots: false,
+  infinite: false,
+  speed: 500,
+  slidesToShow: s.length < 5 ? s.length : 5,
+  slidesToScroll: 1,
+  arrows: s.length > 5,
+  prevArrow: <CustomArrow src={leftarrow} className="prev" />,
+  nextArrow: <CustomArrow src={rightarrow} className="next" />,
+  centerMode: false,
+  responsive: [
+    {
+      breakpoint: 1024,
+      settings: {
+        slidesToShow: Math.min(s.length, 3),
+        arrows: s.length > 3,
+        prevArrow: <CustomArrow src={leftarrow} className="prev" />,
+        nextArrow: <CustomArrow src={rightarrow} className="next" />,
+      },
+    },
+    {
+      breakpoint: 768,
+      settings: {
+        slidesToShow: Math.min(s.length, 2),
+        arrows: s.length > 2,
+        prevArrow: <CustomArrow src={leftarrow} className="prev" />,
+        nextArrow: <CustomArrow src={rightarrow} className="next" />,
+      },
+    },
+    {
+      breakpoint: 480,
+      settings: {
+        slidesToShow: 1,
+        arrows: false,
+        dots: true,
+      },
+    },
+  ],
+};
+
+  const relatedAccessoriesSliderSettings = {
+    dots: false,
+    infinite: false,
+    speed: 500,
+    slidesToShow:
+      prioritizedRelatedItems.length < 5 ? prioritizedRelatedItems.length : 5,
+    // slidesToShow: Math.min(s.length, 5),
+    slidesToScroll: 1,
+    arrows: prioritizedRelatedItems.length > 5,
+    prevArrow: <CustomArrow src={leftarrow} className="prev" />,
+    nextArrow: <CustomArrow src={rightarrow} className="next" />,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: { slidesToShow: 3 },
+      },
+      {
+        breakpoint: 768,
+        settings: { slidesToShow: 2 },
+      },
+      {
+        breakpoint: 480,
+        settings: { slidesToShow: 1 },
+      },
+    ],
+  };
+
 
   const thumbnailSliderSettings = {
     slidesToShow: 5,
     slidesToScroll: 1,
     arrows: images.length > 5, // Enable arrows only if more than 5 images
     infinite: false,
-    draggable: true,
+    draggable: false,
     swipeToSlide: true,
     touchMove: true,
     nextArrow: images.length > 5 ? <NextArrow /> : null,
@@ -977,15 +1045,14 @@ const ProductDetail = ({ accessoryCategory }) => {
                 style={{ marginTop: "5px", marginLeft: "5px" }}
               >
                 <Link style={{ textDecoration: "none", color: "grey" }} to="/">
-                   Home{" "}
+                  Home{" "}
                 </Link>{" "}
                 <span style={{ color: "grey" }}>&gt; </span>
                 <a
                   style={{ textDecoration: "none", color: "grey" }}
-                  href={`/${
-                    product.category === "TV" ? "TeleVision" : product.category
-                  }`} // Conditional URL
-                  // Dynamically set the category in the URL
+                  href={`/${product.category === "TV" ? "TeleVision" : product.category
+                    }`} // Conditional URL
+                // Dynamically set the category in the URL
                 >
                   {" "}
                   {product.category}{" "}
@@ -1007,7 +1074,10 @@ const ProductDetail = ({ accessoryCategory }) => {
                     )
                   )}
 
-                  <div className="big-image-container">
+                  <div className="big-image-container"
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
+                  >
                     {loading || !images || images.length === 0 ? (
                       <Skeleton
                         height={400}
@@ -1018,21 +1088,22 @@ const ProductDetail = ({ accessoryCategory }) => {
                     ) : (
                       <div
                         className="zoom-container"
-                        onMouseMove={handleMouseMove} // Apply zoom for all images
-                        onMouseLeave={() => setZoomStyle({})}
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={handleMouseLeave}
+                        style={{ position: "relative" }}
                       >
                         <img
                           ref={zoomRef}
-                          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                            images[selectedImage]
-                          }`}
+                          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[selectedImage]}`}
                           alt={product.prod_name}
                           className="product-detail-image"
-                          style={zoomStyle}
+                          style={{ cursor: 'zoom-in' }}
                         />
+                        {showLensBox && <div style={lensBoxStyle}></div>}
                       </div>
                     )}
                   </div>
+
                 </div>
 
                 {/* Display Thumbnails only if more than one image exists */}
@@ -1056,13 +1127,12 @@ const ProductDetail = ({ accessoryCategory }) => {
                     ) : images && images.length > 1 ? (
                       <Slider {...thumbnailSliderSettings}>
                         {images.map((image, index) => (
-                          <div key={index}>
+                          <div className="thumbnail-div" key={index}>
                             <img
                               src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${image}`}
-                              alt={product.prod_name}
-                              className={`thumbnail ${
-                                selectedImage === index ? "active" : ""
-                              }`}
+                              // alt="image"
+                              className={`thumbnail ${selectedImage === index ? "active" : ""
+                                }`}
                               onClick={() => setSelectedImage(index)}
                               onMouseEnter={() => setSelectedImage(index)} // Update on hover
                             />
@@ -1076,6 +1146,8 @@ const ProductDetail = ({ accessoryCategory }) => {
 
               <div className="side-row">
                 <div className="product-main-row">
+                  {/* Zoom Preview Box */}
+                  {showZoom && <div className="zoom-box" style={zoomStyle}></div>}
                   {/* Product details */}
                   <div className="product-detail-info">
                     {/* Breadcrumb Navigation */}
@@ -1096,11 +1168,10 @@ const ProductDetail = ({ accessoryCategory }) => {
                           <span style={{ color: "grey" }}>&gt; </span>
                           <a
                             style={{ textDecoration: "none", color: "grey" }}
-                            href={`/${
-                              product.category === "TV"
-                                ? "TV"
-                                : product.category
-                            }`}
+                            href={`/${product.category === "TV"
+                              ? "TV"
+                              : product.category
+                              }`}
                           >
                             {product.category}
                           </a>
@@ -1117,29 +1188,31 @@ const ProductDetail = ({ accessoryCategory }) => {
                       )}
                     </h2>
 
+                    {/* <span>{product.productType}</span> */}
+
                     {/* Coupon Section */}
                     {couponCode && couponCode.trim() && (
-  loading ? (
-    <Skeleton
-      width={250}
-      height={15}
-      style={{ marginTop: "10px", marginBottom: "10px" }}
-    />
-  ) : (
-    <p
-      className="coupon-discount-label"
-      style={{
-        marginTop: "10px",
-        marginBottom: "10px",
-        fontSize: "12px",
-      }}
-    >
-      Apply coupon code and get an amazing discount!
-    </p>
-  )
-)}
+                      loading ? (
+                        <Skeleton
+                          width={250}
+                          height={15}
+                          style={{ marginTop: "10px", marginBottom: "10px" }}
+                        />
+                      ) : (
+                        <p
+                          className="coupon-discount-label"
+                          style={{
+                            marginTop: "10px",
+                            marginBottom: "10px",
+                            fontSize: "12px",
+                          }}
+                        >
+                          Apply coupon code and get an amazing discount!
+                        </p>
+                      )
+                    )}
 
-
+                    {/* <img id="imgpmalogo" src="./themes/pmahomme/img/logo_left.png" alt="phpMyAdmin"> */}
 
                     {/* Price Section */}
                     <p>
@@ -1168,8 +1241,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                             <span className="product-detail-price">
                               ₹
                               {product.offer_price > 0 &&
-                              isOfferActive &&
-                              product.offer_price
+                                isOfferActive &&
+                                product.offer_price
                                 ? product.offer_price
                                 : product.prod_price}{" "}
                             </span>{" "}
@@ -1184,34 +1257,34 @@ const ProductDetail = ({ accessoryCategory }) => {
                               Save upto ₹
                               {product.actual_price -
                                 (product.offer_price > 0 &&
-                                isOfferActive &&
-                                product.offer_price
+                                  isOfferActive &&
+                                  product.offer_price
                                   ? product.offer_price
                                   : product.prod_price)}
                             </span>
 
-                                    {product.offer_price > 0 &&
-                          isOfferActive &&
-                          product.offer_price &&
-                          remainingTime && (
-                            <div className="offer-timer">
-                              {remainingTime.days ? (
-                                <p style={{ color: "red" }}>
-                                  {remainingTime.days} day(s) left for this
-                                  offer
-                                </p>
-                              ) : (
-                                <p>
-                                  Deals end in{" "}
-                                  <span className="timer-tag">
-                                    {remainingTime.hours}h :{" "}
-                                    {remainingTime.minutes}m :{" "}
-                                    {remainingTime.seconds}s
-                                  </span>
-                                </p>
+                            {product.offer_price > 0 &&
+                              isOfferActive &&
+                              product.offer_price &&
+                              remainingTime && (
+                                <div className="offer-timer">
+                                  {remainingTime.days ? (
+                                    <p style={{ color: "red" }}>
+                                      {remainingTime.days} day(s) left for this
+                                      offer
+                                    </p>
+                                  ) : (
+                                    <p>
+                                      Deals end in{" "}
+                                      <span className="timer-tag">
+                                        {remainingTime.hours}h :{" "}
+                                        {remainingTime.minutes}m :{" "}
+                                        {remainingTime.seconds}s
+                                      </span>
+                                    </p>
+                                  )}
+                                </div>
                               )}
-                            </div>
-                          )}
                           </span>
                         )}
 
@@ -1270,7 +1343,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                                       ? product.offer_price
                                       : product.prod_price)) /
                                     product.actual_price) *
-                                    100
+                                  100
                                 )}%`}</span>
                               )}
                             </div>
@@ -1359,9 +1432,8 @@ const ProductDetail = ({ accessoryCategory }) => {
                                 ? "Remove from Wishlist"
                                 : "Add to Wishlist"
                             }
-                            className={`heart-icon ${
-                              favorites[`${product.id}`] ? "filled" : ""
-                            }`}
+                            className={`heart-icon ${favorites[`${product.id}`] ? "filled" : ""
+                              }`}
                             onClick={(event) =>
                               handleToggleFavorite(product, event)
                             }
@@ -1412,7 +1484,7 @@ const ProductDetail = ({ accessoryCategory }) => {
                               <Skeleton
                                 width={45}
                                 height={45}
-                                // style={{ marginLeft: "10px" }}
+                              // style={{ marginLeft: "10px" }}
                               />
                               <div style={{ flex: 1 }}>
                                 <Skeleton
@@ -1615,50 +1687,38 @@ const ProductDetail = ({ accessoryCategory }) => {
                     {loading ? (
                       <Skeleton width={200} height={25} />
                     ) : product.category === "Mobiles" ||
-                      product.category === "Computers" ? (
+                      product.category === "Computers" ||
+                      product.productType === "Mobiles" ||
+                      product.productType === "Computers" ? (
                       "Key Specifications"
-                    ) : [
-                        "CCTV",
-                        "Watch",
-                        "TV",
-                        "Headphones",
-                        "Speaker",
-                      ].includes(product.category) ? (
+                    ) : ["CCTV", "Watch", "TV", "Headphones", "Speaker"].includes(product.category) ? (
                       "Features"
                     ) : (
                       "Description"
                     )}
                   </h3>
 
-                  {/* Key Specifications Skeleton */}
+                  {/* Skeletons */}
                   {loading &&
                     (product.category === "Mobiles" ||
-                      product.category === "Computers") && (
+                      product.category === "Computers" ||
+                      product.productType === "Mobiles" ||
+                      product.productType === "Computers") && (
                       <ul style={{ listStyleType: "none", padding: 0 }}>
                         {[...Array(5)].map((_, index) => (
                           <li key={index} style={listItemStyle}>
-                            <Skeleton
-                              width={120}
-                              height={25}
-                              style={{ labelStyle }}
-                            />
-                            <Skeleton
-                              width={80}
-                              height={25}
-                              style={valueStyle}
-                            />
+                            <Skeleton width={120} height={25} style={{ labelStyle }} />
+                            <Skeleton width={80} height={25} style={{ valueStyle }} />
                           </li>
                         ))}
                       </ul>
                     )}
 
-                  {/* Features Skeleton */}
                   {loading &&
-                    ["CCTV", "Watch", "TV", "Headphones", "Speaker"].includes(
-                      product.category
-                    ) && <Skeleton width="100%" height={50} />}
+                    ["CCTV", "Watch", "TV", "Headphones", "Speaker"].includes(product.category) && (
+                      <Skeleton width="100%" height={50} />
+                    )}
 
-                  {/* Description Skeleton */}
                   {loading &&
                     ![
                       "Mobiles",
@@ -1668,14 +1728,18 @@ const ProductDetail = ({ accessoryCategory }) => {
                       "TV",
                       "Headphones",
                       "Speaker",
-                    ].includes(product.category) && (
+                    ].includes(product.category) &&
+                    product.productType !== "Mobiles" &&
+                    product.productType !== "Computers" && (
                       <Skeleton width="100%" height={80} />
                     )}
 
-                  {/* Key Specifications Data */}
+                  {/* Key Specifications */}
                   {!loading &&
                     (product.category === "Mobiles" ||
-                      product.category === "Computers") && (
+                      product.category === "Computers" ||
+                      product.productType === "Mobiles" ||
+                      product.productType === "Computers") && (
                       <ul style={{ listStyleType: "none", padding: 0 }}>
                         {product.memory && (
                           <li style={listItemStyle}>
@@ -1742,25 +1806,24 @@ const ProductDetail = ({ accessoryCategory }) => {
                           </li>
                         )}
                         {product.others && (
-                          <li style={listItemStyle}>
-                            <span style={labelStyle}>Other Features</span>
-                            <span style={valueStyle}>{product.others}</span>
-                          </li>
+                          <>
+                            <span style={otherFeatures}>Other Features</span>
+
+                            <li style={listItemStyle}>
+
+                              <pre style={productFeatures} className="product-features">{product.others}</pre>
+                            </li></>
                         )}
                       </ul>
                     )}
 
-                  {/* Features Data */}
+                  {/* Features */}
                   {!loading &&
-                    ["CCTV", "Watch", "TV", "Headphones", "Speaker"].includes(
-                      product.category
-                    ) && (
-                      <p className="product-features">
-                        {product.prod_features}
-                      </p>
+                    ["CCTV", "Watch", "TV", "Headphones", "Speaker"].includes(product.category) && (
+                      <pre className="product-features">{product.prod_features}</pre>
                     )}
 
-                  {/* Description Data */}
+                  {/* Description */}
                   {!loading &&
                     ![
                       "Mobiles",
@@ -1770,18 +1833,21 @@ const ProductDetail = ({ accessoryCategory }) => {
                       "TV",
                       "Headphones",
                       "Speaker",
-                    ].includes(product.category) && (
-                      <p className="product-features">
-                        {product.prod_features}
-                      </p>
+                    ].includes(product.category) &&
+                    product.productType !== "Mobiles" &&
+                    product.productType !== "Computers" && (
+                      <pre className="product-features">{product.prod_features}</pre>
                     )}
                 </div>
+
               </div>
             </div>
 
             {/* ad  */}
 
             {/* // Inside the JSX where you display related products */}
+            {/* import Slider from "react-slick"; */}
+
             {product.category !== "MobileAccessories" &&
               product.category !== "CCTVAccessories" &&
               product.category !== "ComputerAccessories" &&
@@ -1792,50 +1858,28 @@ const ProductDetail = ({ accessoryCategory }) => {
               product.category !== "secondhandproducts" &&
               product.category !== "TV" &&
               prioritizedRelatedItems.length > 0 && (
-                <div className="related-products-section">
-                  <h3 style={{ marginBottom: "10px" }}>
-                    {product.category} Accessories
-                  </h3>
-                  <div className="related-products-carousel">
-                    {prioritizedRelatedItems.length > 5 && (
-                      <button
-                        onClick={handlePreviousSlide}
-                        className="carousel-arrow left-arrow"
-                      >
-                        <img
-                          style={{
-                            width: "30px",
-                            borderRadius: "50%",
-                            backgroundColor: "white",
-                            padding: "5px",
-                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
-                          }}
-                          src={leftarrow}
-                          alt=""
-                          loading="lazy"
-                        />
-                      </button>
-                    )}
+                <div className="similar-products-wrapper">
+                  <div className="similar-products-inner">
+                    <h2 className="similar-products-title">
+                      {product.category} Accessories
+                    </h2>
 
-                    <div className="related-products-grid">
-                      {prioritizedRelatedItems
-                        .slice(
-                          currentStartIndex2,
-                          currentStartIndex2 + maxDisplayItems
-                        )
-                        .map((relatedProduct) => {
-                          // Parse the prod_img string into an array
-                          const images = JSON.parse(relatedProduct.prod_img);
-                          // Get the first image from the array
-                          const firstImage = images[0];
+                    <Slider
+                      {...relatedAccessoriesSliderSettings}
+                      className="similar-products-slider"
+                    >
+                      {prioritizedRelatedItems.map((relatedProduct) => {
+                        const images = JSON.parse(relatedProduct.prod_img || "[]");
+                        const firstImage = images[0];
 
-                          return (
+                        return (
+                          <div
+                            key={relatedProduct.id}
+                            className="similar-product-slide"
+                          >
                             <div
-                              key={relatedProduct.id}
-                              onClick={() =>
-                                handleProductClick(relatedProduct)
-                              }
-                              className="related-product-card"
+                              className="similar-product-card"
+                              onClick={() => handleProductClick(relatedProduct)}
                             >
                               {relatedProduct.offer_label && (
                                 <div className="product-label">
@@ -1845,70 +1889,45 @@ const ProductDetail = ({ accessoryCategory }) => {
                               <img
                                 src={`${ApiUrl}/uploads/${relatedProduct.category.toLowerCase()}/${firstImage}`}
                                 alt={relatedProduct.prod_name}
-                                className="related-product-image"
+                                className="similar-product-image"
                                 loading="lazy"
                               />
-                              <p className="related-product-name">
-                                {relatedProduct.prod_name
-                                  .charAt(0)
-                                  .toUpperCase() +
+                              <p className="product-name">
+                                {relatedProduct.prod_name.charAt(0).toUpperCase() +
                                   relatedProduct.prod_name.slice(1)}
                               </p>
-                              {/* <p className="related-product-features">
-                  {relatedProduct.prod_features}
-                </p> */}
-                              <p className="product-actual-price">
+                              <p className="similar-product-price-actual">
                                 M.R.P{" "}
-                                <span
-                                  style={{
-                                    textDecoration: "line-through",
-                                    color: "red",
-                                  }}
-                                >
-                                  ₹{relatedProduct.actual_price}{" "}
+                                <span className="similar-price-strike">
+                                  ₹{relatedProduct.actual_price}
                                 </span>
-                                <span
-                                  style={{ color: "green", marginLeft: "10px" }}
-                                >
+                                <span className="similar-price-discount">
                                   (
                                   {Math.round(
                                     ((relatedProduct.actual_price -
                                       relatedProduct.prod_price) /
                                       relatedProduct.actual_price) *
-                                      100
+                                    100
                                   )}
                                   % OFF)
                                 </span>
                               </p>
-                              <p className="related-product-price">
+                              <p className="similar-product-price">
                                 ₹{relatedProduct.prod_price}
                               </p>
                             </div>
-                          );
-                        })}
-                    </div>
-                    {prioritizedRelatedItems.length > 5 && (
-                      <button
-                        onClick={handleNextSlide}
-                        className="carousel-arrow right-arrow"
-                      >
-                        <img
-                          style={{
-                            width: "30px",
-                            borderRadius: "50%",
-                            backgroundColor: "white",
-                            padding: "5px",
-                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
-                          }}
-                          src={rightarrow}
-                          alt=""
-                          loading="lazy"
-                        />
-                      </button>
-                    )}
+                          </div>
+                        );
+                      })}
+                    </Slider>
                   </div>
                 </div>
               )}
+
+
+
+
+
             <div className="bannerr-container4" style={{ marginTop: "20px" }}>
               {filteredBanners.length > 0 ? (
                 <div>
@@ -1928,56 +1947,30 @@ const ProductDetail = ({ accessoryCategory }) => {
                       className="banner-image"
                       loading="lazy"
 
-                      // style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
+                    // style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
                     />
                   </div>
                 </div>
               ) : (
-                <h4 className="banner-title"></h4>
+                <span className="banner-title"></span>
               )}
             </div>
 
             {/* // Inside the JSX where you display related products */}
-            {sortedFilteredProducts.length > 0 && (
-              <div className="related-products-section">
-                <h3 style={{ marginBottom: "10px" }}>You might also like</h3>
-                <div className="related-products-carousel">
-                  {sortedFilteredProducts.length > 5 && (
-                    <button
-                      onClick={handlePrev}
-                      className="carousel-arrow left-arrow"
-                    >
-                      <img
-                        style={{
-                          width: "30px",
-                          borderRadius: "50%",
-                          backgroundColor: "white",
-                          padding: "5px",
-                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
-                        }}
-                        src={leftarrow}
-                        alt=""
-                        loading="lazy"
-                      />
-                    </button>
-                  )}
+            {Array.isArray(s) && s.length > 0 && (
+              <div className="similar-products-wrapper">
+                <div className="similar-products-inner">
+                  <h2 className="similar-products-title">Similar Products</h2>
+                  <Slider {...similarSliderSettings} className="similar-products-slider">
+                    {s.map((relatedProduct) => {
+                      const images = JSON.parse(relatedProduct.prod_img || "[]");
+                      const firstImage = images[0];
 
-                  <div className="related-products-grid">
-                    {sortedFilteredProducts
-                      .slice(currentStartIndex, currentStartIndex + itemsToShow)
-                      .map((relatedProduct) => {
-                        // Parse the prod_img string into an array
-                        const images = JSON.parse(relatedProduct.prod_img);
-                        // Get the first image from the array
-                        const firstImage = images[0];
-
-                        return (
+                      return (
+                        <div key={relatedProduct.id} className="similar-product-slide">
                           <div
-                            key={relatedProduct.id}
-                            onClick={() =>
-                              handleProductClick(relatedProduct)
-                            }
-                            className="related-product-card"
+                            className="similar-product-card"
+                            onClick={() => handleProductClick(relatedProduct)}
                           >
                             {relatedProduct.offer_label && (
                               <div className="product-label">
@@ -1987,73 +1980,41 @@ const ProductDetail = ({ accessoryCategory }) => {
                             <img
                               src={`${ApiUrl}/uploads/${relatedProduct.category.toLowerCase()}/${firstImage}`}
                               alt={relatedProduct.prod_name}
-                              className="related-product-image"
-                              loading="lazy"
+                              className="similar-product-image"
                             />
-                            <p className="related-product-name">
-                              {relatedProduct.prod_name
-                                .charAt(0)
-                                .toUpperCase() +
+                            <p className="product-name">
+                              {relatedProduct.prod_name.charAt(0).toUpperCase() +
                                 relatedProduct.prod_name.slice(1)}
                             </p>
-                            {/* <p className="related-product-features">
-                  {relatedProduct.prod_features}
-                </p> */}
-                            <p className="product-actual-price">
+                            <p className="similar-product-price-actual">
                               M.R.P{" "}
-                              <span
-                                style={{
-                                  textDecoration: "line-through",
-                                  color: "red",
-                                }}
-                              >
-                                ₹{relatedProduct.actual_price}{" "}
+                              <span className="similar-price-strike">
+                                ₹{relatedProduct.actual_price}
                               </span>
-                              <span
-                                style={{ color: "green", marginLeft: "10px" }}
-                              >
+                              <span className="similar-price-discount">
                                 (
                                 {Math.round(
-                                  ((relatedProduct.actual_price -
-                                    relatedProduct.prod_price) /
+                                  ((relatedProduct.actual_price - relatedProduct.prod_price) /
                                     relatedProduct.actual_price) *
-                                    100
+                                  100
                                 )}
                                 % OFF)
                               </span>
                             </p>
-                            <p className="related-product-price">
-                              ₹{relatedProduct.prod_price}
-                            </p>
+                            <p className="similar-product-price">₹{relatedProduct.prod_price}</p>
                           </div>
-                        );
-                      })}
-                  </div>
-                  {sortedFilteredProducts.length > 5 && (
-                    <button
-                      onClick={handleNext}
-                      className="carousel-arrow right-arrow"
-                    >
-                      <img
-                        style={{
-                          width: "30px",
-                          borderRadius: "50%",
-                          backgroundColor: "white",
-                          padding: "5px",
-                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Box shadow applied here
-                        }}
-                        src={rightarrow}
-                        alt=""
-                        loading="lazy"
-                      />
-                    </button>
-                  )}
+                        </div>
+                      );
+                    })}
+                  </Slider>
                 </div>
               </div>
             )}
 
-            <div className="bannerr-container4">
-              {filteredBanners.length > 1 ? (
+
+
+            {filteredBanners.length > 1 && filteredBanners[1].image && filteredBanners[1].image.trim() !== "" && (
+              <div className="bannerr-container4">
                 <div>
                   <div
                     className="banner-image-display"
@@ -2063,38 +2024,33 @@ const ProductDetail = ({ accessoryCategory }) => {
                       marginBottom: "5px",
                     }}
                   >
-                    {/* <p className="brand-name" style={{ marginTop: '30px' }}>{filteredBanners[0].brand_name}</p> */}
                     <img
                       onClick={() => handleAdClick(filteredBanners[1])}
                       src={`${ApiUrl}/uploads/offerspage/${filteredBanners[1].image}`}
                       alt={`Banner for ${filteredBanners[1].brand_name}`}
                       className="banner-image"
                       loading="lazy"
-
-                      // style={{ width: '1250px', marginTop: '20px', height: '300px' }} // Styling for the image
                     />
                   </div>
                 </div>
-              ) : (
-                <h4 className="banner-title"></h4>
-              )}
-            </div>
+              </div>
+            )}
+
+            <RecentlyViewed />
 
             <ToastContainer />
           </div>
+
         </div>
       </div>
 
       {/* Related Products Section */}
-
       <Footer />
     </>
   );
 };
 
-{
-  /* Styling for the list items */
-}
+
 const listItemStyle = {
   display: "flex",
   justifyContent: "space-between",
@@ -2113,8 +2069,22 @@ const labelStyle = {
   // background: "linear-gradient(135deg, #007BFF, #00c6ff)",
   color: "#333", // White text for contrast
   borderRadius: "8px 0 0 8px",
-  width: "30%", // Increased width for label
+  width: "37%", // Increased width for label
   marginRight: "15px", // More space between label and value
+  fontSize: "16px", // Slightly larger font for readability
+  display: "flex",
+  alignItems: "center",
+};
+
+const otherFeatures = {
+  fontWeight: "bold",
+  padding: "12px 15px", // More padding for better spacing
+  background: "linear-gradient(135deg, #e9ecef, #ffffff)",
+  // background: "linear-gradient(135deg, #007BFF, #00c6ff)",
+  color: "#333", // White text for contrast
+  borderRadius: "8px 0 0 8px",
+  width: "37%", // Increased width for label
+  marginLeft: "10px", // More space between label and value
   fontSize: "16px", // Slightly larger font for readability
   display: "flex",
   alignItems: "center",
@@ -2128,6 +2098,19 @@ const valueStyle = {
   width: "70%", // Adjusted width for value
   fontSize: "16px", // Consistent font size
   fontWeight: "normal", // Regular weight for value
+  textAlign: 'justify'
+};
+
+const productFeatures = {
+  padding: "12px 15px", // Same padding as label
+  background: "linear-gradient(135deg, #e9ecef, #ffffff)",
+  color: "#333", // Dark text for better visibility
+  borderRadius: "0 8px 8px 0",
+  width: "100%", // Adjusted width for value
+  fontSize: "16px", // Consistent font size
+  fontWeight: "normal", // Regular weight for value
+  textAlign: 'justify'
+
 };
 
 const iconStyle = {
@@ -2136,16 +2119,16 @@ const iconStyle = {
   color: "#007bff",
 };
 
-// Additional styles for description and text
-const descriptionStyle = {
-  padding: "15px",
-  // background: "linear-gradient(135deg, #f0f8ff, #e0f7fa)", // original
-  background: "linear-gradient(135deg, #e0f7fa, #f0f8ff)", // Light gradient for descriptions
-  borderRadius: "8px",
-  fontSize: "14px",
-  lineHeight: "1.6",
-  color: "#333", // Dark text for good contrast
-  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.05)", // Slight shadow for depth
-};
+// // Additional styles for description and text
+// const descriptionStyle = {
+//   padding: "15px",
+//   // background: "linear-gradient(135deg, #f0f8ff, #e0f7fa)", // original
+//   background: "linear-gradient(135deg, #e0f7fa, #f0f8ff)", // Light gradient for descriptions
+//   borderRadius: "8px",
+//   fontSize: "14px",
+//   lineHeight: "1.6",
+//   color: "#333", // Dark text for good contrast
+//   boxShadow: "0 4px 6px rgba(0, 0, 0, 0.05)", // Slight shadow for depth
+// };
 
 export default ProductDetail;

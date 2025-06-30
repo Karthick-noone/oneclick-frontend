@@ -13,13 +13,14 @@ import {
 import "./css/TrackingModal.css";
 import Lottie from "lottie-react";
 import truckAnimation from "./css/truck2.json"; // Import your Lottie animation
-
-import citybg from "./img/city.jpg"
+import delivery_truck from "./css/delivery_truck2.json"; // Import your Lottie animation
+import cityBG from "./css/city-bg-2.json"; // Import your Lottie animation
+// import citybg from "./img/city.jpg"
 
 const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   const [deliveryStatus, setDeliveryStatus] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   // Define statuses for regular and cancelled orders
   const regularStatuses = [
@@ -80,17 +81,16 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
 
   // Calculate current status index
   const currentIndex = statuses.indexOf(deliveryStatus);
+  const totalSteps = statuses.length - 1;
 
-  // Calculate fillPercentage:
-  // If currentIndex is valid and not the last status, set fill to halfway between current and next.
-  // Otherwise, 0 or 100%.
   let fillPercentage = 0;
+
   if (currentIndex === -1) {
     fillPercentage = 0;
-  } else if (currentIndex < statuses.length - 1) {
-    fillPercentage = ((currentIndex + 0.5) / (statuses.length - 1)) * 100;
-  } else {
-    fillPercentage = 100;
+  } else if (deliveryStatus === 'Delivered') {
+    fillPercentage = 90; // Custom value for 'Delivered'
+  } else if (currentIndex < totalSteps) {
+    fillPercentage = ((currentIndex + 0.35) / totalSteps) * 100;
   }
 
   // Helper function to format the date for display
@@ -107,20 +107,21 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
       className="trackorder-modal"
       overlayClassName="trackorder-overlay"
       ariaHideApp={false}
-      style={{
-        content: {
-          backgroundImage: `url(${citybg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          // color: 'white' // Adjust text color for contrast
-          // backgoundRepeat:'no-repeat'
-          // marginBottom:'50px'
-        }
-      }}  
-    > 
+    >
 
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <Lottie
+          animationData={cityBG}
+          loop
+          autoplay
+          style={{
+            // width: '100%',
+            // height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+      </div>
 
-      
       <button onClick={handleModalClose} className="trackorder-close-button">
         <FaTimes />
       </button>
@@ -129,12 +130,16 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
       {/* <img src={citybg} width={'100%'} /> */}
 
       <div className="trackorder-progress-wrapper">
-        <div className="trackorder-progress-bar">
+        <div
+          className={`trackorder-progress-bar ${deliveryStatus === 'Delivered' ? 'no-animation' : ''
+            }`}
+        >
           <div
             className="trackorder-progress-fill"
             style={{ width: `${fillPercentage}%` }}
           ></div>
         </div>
+
         {deliveryStatus !== "Cancelled" && deliveryStatus !== "Delivered" && (
           <div
             className="trackorder-truck"
@@ -142,7 +147,18 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
           >
             <Lottie
               animationData={truckAnimation}
-              style={{ width: 50, height: 50 }}
+              style={{ width: 55, height: 55 }}
+            />
+          </div>
+        )}
+        {deliveryStatus !== "Cancelled" && deliveryStatus === "Delivered" && (
+          <div
+            className="trackorder-truck"
+            style={{ left: `${fillPercentage}%` }}
+          >
+            <Lottie
+              animationData={delivery_truck}
+              style={{ width: 70, height: 70, transform: "rotateY(180deg)" }}
             />
           </div>
         )}
@@ -159,12 +175,11 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
             return (
               <div key={index} className="trackorder-status-item">
                 <IconComponent
-                // style={{color:'red'}}
-                  className={`trackorder-status-icon ${
-                    isActive || index === currentIndex ? "active" : ""
-                  } ${isCurrent ? "current" : ""}`}
+                  // style={{color:'red'}}
+                  className={`trackorder-status-icon ${isActive || index === currentIndex ? "active" : ""
+                    } ${isCurrent ? "current" : ""}`}
                 />
-                <span  className="trackorder-status-label">{status}</span>
+                <span className="trackorder-status-label">{status}</span>
               </div>
             );
           })}
@@ -174,8 +189,8 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
       {deliveryDate && (
         <p className="trackorder-delivery-date">
           {deliveryStatus === "Delivered"
-            ? "Delivered on: "
-            : "Expected Delivery: "}
+            ? "Product delivered on: "
+            : "Expected delivery: "}
           {formatDeliveryDate(deliveryDate)}
         </p>
       )}

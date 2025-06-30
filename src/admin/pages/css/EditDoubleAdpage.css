@@ -11,6 +11,133 @@
   box-sizing: border-box;            /* Ensure padding and border are included in the total width and height */
 }
 
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.add-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: 0.3s;
+  cursor: pointer;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.add-btn:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+.action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 58%;
+}
+
+.add-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 80px;
+}
+
+.circular-progress-wrapper {
+  width: 60px;
+  height: 60px;
+}
+
+.circular-progress {
+  width: 100%;
+  height: 100%;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #e6e6e6;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke: #4CAF50;
+  stroke-width: 3.8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s ease;
+   filter: url(#shadow);
+}
+
+.percentage-text {
+  fill: #4CAF50;
+  font-size: 0.6em;
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+
+/* .progress-text {
+  font-size: 13px;
+  color: black;
+  font-weight: 500;
+} */
+.modal-upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1003;
+  border-radius: 10px;
+}
+
+.circular-progress-wrapper {
+  width: 70px;
+  height: 70px;
+  
+}
+
+.circular-progress {
+  width: 100%;
+  height: 100%;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #e6e6e6;
+  stroke-width: 3.8;
+}
+
+
+
+
+
+.ad-form-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
 
 .ad-card {
   flex: 0 0 calc(33.33% - 20px);    /* Default to three cards per row */
@@ -155,6 +282,7 @@
     height: 120px; /* Fixed height for uniformity */
     object-fit: contain; /* Crop the image to fit within the dimensions */
     border-radius: 5px;
+    cursor: pointer;
   }
   
   .ad-image3 {

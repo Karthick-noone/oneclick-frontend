@@ -89,7 +89,7 @@ const Modal = ({
             quantity: 1,
           });
 
-          toast.success(`${product.prod_name} has been added to your cart!`, {
+          toast.success(`${product.prod_name.substring(0,25)+'...'} has been added to your cart!`, {
             position: "top-right",
             autoClose: 2000,
             hideProgressBar: false,
@@ -162,7 +162,7 @@ const Modal = ({
             product,
           });
 
-          toast.info(`${product.prod_name} removed from your wishlist.`, {
+          toast.info(`${product.prod_name.substring(0,25)+'...'} removed from your wishlist.`, {
             position: "top-right",
             autoClose: 2000,
             hideProgressBar: false,
@@ -209,7 +209,7 @@ const Modal = ({
             product,
           });
 
-          toast.success(`${product.prod_name} added to your wishlist!`, {
+          toast.success(`${product.prod_name.substring(0,25)+'...'} added to your wishlist!`, {
             position: "top-right",
             autoClose: 2000,
             hideProgressBar: false,

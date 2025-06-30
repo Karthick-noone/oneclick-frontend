@@ -5,6 +5,7 @@ import "./css/Reports.css"; // Import external CSS
 import { ApiUrl } from "../../components/ApiUrl";
 import { FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { SearchIcon } from "lucide-react";
 
 const Reports = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const Reports = () => {
   const [currentPageOrders, setCurrentPageOrders] = useState(1);
   const [currentPageSales, setCurrentPageSales] = useState(1);
   const [currentPageCustomers, setCurrentPageCustomers] = useState(1);
+
+
 
   const [itemsPerPage] = useState(10); // Number of items per page
   const userId = localStorage.getItem("user_id");
@@ -101,44 +104,33 @@ const Reports = () => {
     }
   }, [navigate]);
 
-  const [selectedYear, setSelectedYear] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("All");
+  const [selectedMonth, setSelectedMonth] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   // const years = [2023, 2024, 2025]; // Example years
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+
   const statuses = ["Pending", "Paid", "Refund Pending", "Refunded"];
 
   // Filter orders based on year, month, and status
   const filteredOrders = ordersReport.filter((order) => {
-    const orderYear = new Date(order.order_date).getFullYear();
-    const orderMonth = new Date(order.order_date).getMonth() + 1; // Ensure it's 1-12
+    const orderDate = new Date(order.order_date);
+    const orderYear = orderDate.getFullYear();
+    const orderMonth = orderDate.getMonth() + 1;
 
-    return (
-      (selectedYear ? orderYear === selectedYear : true) && // Ensure `selectedYear` is used as a number
-      (selectedMonth ? orderMonth === Number(selectedMonth) : true) &&
-      (selectedStatus ? order.status === selectedStatus : true) &&
-      (searchQuery
-        ? order.unique_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          order.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (order.contact_number && order.contact_number.includes(searchQuery))
-        : true)
-    );
+    const matchYear = selectedYear === "All" || orderYear === Number(selectedYear);
+    const matchMonth = selectedMonth === "All" || orderMonth === Number(selectedMonth);
+    const matchStatus = selectedStatus ? order.status === selectedStatus : true;
+    const matchSearch = searchQuery
+      ? order.unique_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.contact_number?.includes(searchQuery)
+      : true;
+
+    return matchYear && matchMonth && matchStatus && matchSearch;
   });
+
 
   // Pagination Logic
   const indexOfLastOrderItem = currentPageOrders * itemsPerPage;
@@ -151,8 +143,7 @@ const Reports = () => {
   // Pagination Logic for total pages
   const totalOrderPages = Math.ceil(filteredOrders.length / itemsPerPage);
 
-  const totalSalesPages = Math.ceil(salesReport.length / itemsPerPage);
-  const totalCustomerPages = Math.ceil(customersReport.length / itemsPerPage);
+
 
   // Get Pagination Pages
   const getPaginationPages = (totalPages, currentPage, setCurrentPage) => {
@@ -254,23 +245,38 @@ const Reports = () => {
           <h2 className="orders-page-title">Order Report</h2>
         </div>
 
-        <div className="filters">
-          <input
-            type="text"
-            placeholder="Search by username"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+        <div className="order-filters-container">
+          <div className="order-search-wrapper">
+            <span className="order-search-icon">
+              <SearchIcon width={'18px'} className="search-icon-btn" />
+            </span>
+            <input
+              type="text"
+              placeholder="Search by username"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="order-search-input"
+            />
+            {searchQuery && (
+              <button
+                className="order-search-clear-btn"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
 
           <select
             onChange={(e) => setSelectedStatus(e.target.value)}
             value={selectedStatus}
-            className="order_status_filter"
+            className="order-status-select"
           >
             <option value="">Order Status</option>
             {statuses.map((status) => (
               <option key={status} value={status}>
-                <span className="order_status_option">{status}</span>
+                {status}
               </option>
             ))}
           </select>
@@ -278,34 +284,34 @@ const Reports = () => {
           <select
             id="year"
             value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="order_year_filter"
+            onChange={(e) => setSelectedYear(e.target.value)}
+            className="order-year-select"
           >
-            <option value="">Year</option>
-            {Array.from(
-              { length: 5 },
-              (_, i) => new Date().getFullYear() - i
-            ).map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
+            <option value="All">All Years</option>
+            {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(
+              (year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              )
+            )}
           </select>
 
           <select
             id="month"
             value={selectedMonth}
-            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="order-month-select"
           >
+            <option value="All">All Months</option>
             {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
               <option key={month} value={month}>
-                {new Date(0, month - 1).toLocaleString("en-US", {
-                  month: "long",
-                })}
+                {new Date(0, month - 1).toLocaleString("en-US", { month: "long" })}
               </option>
             ))}
           </select>
         </div>
+
         <div className="table-wrapper">
           <table className="styled-table">
             <thead>

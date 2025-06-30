@@ -16,8 +16,15 @@ import {
   FaInfoCircle,
   FaEnvelope,
   FaQuestionCircle,
+  FaStopwatch,
+  // FontAwesomeIcon
 } from "react-icons/fa";
 import "./css/Header3.css"; // Adjust path as needed
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import listIcon from './img/list.png'
+
+import { Watch } from 'lucide-react';
+
 
 const Header3 = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,12 +33,57 @@ const Header3 = () => {
   const headphonesRef = useRef(null);
   const accessoriesRef = useRef(null);
   const location = useLocation(); // To get the current URL
+  const [isMobileView, setIsMobileView] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
 
   const headerRef = useRef(null); // Reference to the header
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        headerRef.current &&
+        !headerRef.current.contains(event.target) &&
+        window.innerWidth <= 768 // Apply only for mobile/tablet views
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    setIsOpen(prev => !prev);
   };
+
+  // Open the menu (☰ icon)
+  const openMenu = () => {
+    console.log("sidebar opened");
+    setIsOpen(true);
+  };
+
+  // Close the menu (✖ icon or link click)
+  const closeMenu = () => {
+    console.log("sidebar closed");
+    setIsOpen(false);
+  };
+
 
   const toggleHeadphonesDropdown = () => {
     setShowHeadphones(!showHeadphones);
@@ -84,7 +136,7 @@ const Header3 = () => {
       ) {
         setShowHeadphones(false); // close Audio dropdown
       }
-  
+
       if (
         accessoriesRef.current &&
         !accessoriesRef.current.contains(event.target) &&
@@ -93,7 +145,7 @@ const Header3 = () => {
         setShowMore(false); // close Accessories dropdown
       }
     };
-    
+
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -128,331 +180,357 @@ const Header3 = () => {
     setShowMore(false);
   };
 
-  
+
   return (
     <>
-     <div
-        style={{
-          position: isOpen ? "fixed" : "",
-          left: isOpen ? "" : "25px",
-          top: !isOpen ? "125px" : "10px",
-          zIndex: isOpen ? "9999" : "",
-        }}
-        className="hamburger"
-        onClick={toggleMenu}
-      >
-        {isOpen ? "✖" : "☰"}
-      </div>
-    <header
-      className="header3"
-      ref={headerRef}
-      style={{ position: "sticky", top: "68px", zIndex: 1001 }}
-    >
-     
-      <nav className={`nav ${isOpen ? "open" : ""}`}>
-        <Link
-          to="/"
-          exact
-          onClick={handleLinkClick}
-          className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
-        >
-          
-          <FaHome
-            className={`fa-icons ${location.pathname === "/" ? "active" : ""}`}
-          />{" "}
-          {isOpen ? "Home" : ""}
-        </Link>
-        <Link
-          to="/ComputerAd"
-          onClick={handleLinkClick}
-          className={`nav-link ${
-            location.pathname.startsWith("/computers") ||
-            location.pathname.startsWith("/ComputerAd")
-              ? "active"
-              : ""
-          }`}
-        >
-          <FaLaptop
-            className={`fa-icons ${
-              location.pathname.startsWith("/computers") ||
-              location.pathname.startsWith("/ComputerAd")
-                ? "active"
-                : ""
-            }`}
-          />{" "}
-          Computers
-        </Link>
-
-        <Link
-          to="/MobileAd"
-          onClick={handleLinkClick}
-          className={`nav-link ${
-            location.pathname.startsWith("/mobiles") ||
-            location.pathname.startsWith("/MobileAd")
-              ? "active"
-              : ""
-          }`}
-        >
-          <FaMobileAlt
-            className={`fa-icons ${
-              location.pathname.startsWith("/mobiles") ||
-              location.pathname.startsWith("/MobileAd")
-                ? "active"
-                : ""
-            }`}
-          />{" "}
-          Mobile
-        </Link>
-
-        <Link
-          to="/CCTVAd"
-          onClick={handleLinkClick}
-          className={`nav-link ${
-            location.pathname.startsWith("/cctv") ||
-            location.pathname.startsWith("/CCTVAd")
-              ? "active"
-              : ""
-          }`}
-        >
-          <FaVideo
-            className={`fa-icons ${
-              location.pathname.startsWith("/cctv") ||
-              location.pathname.startsWith("/CCTVAd")
-                ? "active"
-                : ""
-            }`}
-          />{" "}
-          CCTV
-        </Link>
-
-        {/* Parent Audio link */}
+      {/* Show hamburger ☰ only when menu is closed */}
+      {isMobileView && !isOpen && (
         <div
-          className={`nav-item ${isAudioActive ? "active" : ""}`}
-          onClick={toggleHeadphonesDropdown}
+          style={{
+            position: "fixed",
+            top: "77px",
+            left: "5px",
+            zIndex: 1002,
+            color: "#fff",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            fontSize: "24px",
+            cursor: "pointer",
+            backgroundColor: "transparent",
+          }}
+          className="hamburger"
+          onClick={openMenu}
         >
-          <span className="activelink">
-            <FaHeadphones
-              className={`fa-icons ${isAudioActive ? "active" : ""}`}
+          {/* ☰ */}
+          <img src={listIcon} width={'28px'} />
+        </div>
+      )}
+
+      {/* Show close ✖ only when menu is open */}
+      {isMobileView && isOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: "5px",
+            left: "70%",
+            transform: "translateX(-50%)",
+            zIndex: 1003,
+            color: "#fff",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            fontSize: "24px",
+            cursor: "pointer",
+            backgroundColor: "transparent",
+          }}
+          className="hamburger"
+          onClick={closeMenu}
+        >
+          ✖
+        </div>
+      )}
+
+
+
+      <header
+        className="header3"
+        ref={headerRef}
+        style={{ position: "sticky", top: "72px" }}
+      >
+
+        <nav className={`nav ${isOpen ? "open" : ""}`}>
+          <Link
+            to="/"
+            exact
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
+          >
+
+            <FaHome
+              className={`fa-icons ${location.pathname === "/" ? "active" : ""}`}
             />{" "}
-            Audio
-          </span>
-          {showHeadphones && (
-            <div className="dropdown"  ref={headphonesRef}>
+            {isOpen ? "Home" : ""}
+          </Link>
+          <Link
+            to="/ComputerAd"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname.startsWith("/computers") ||
+              location.pathname.startsWith("/ComputerAd")
+              ? "active"
+              : ""
+              }`}
+          >
+            <FaLaptop
+              className={`fa-icons ${location.pathname.startsWith("/computers") ||
+                location.pathname.startsWith("/ComputerAd")
+                ? "active"
+                : ""
+                }`}
+            />{" "}
+            Computers
+          </Link>
+
+          <Link
+            to="/MobileAd"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname.startsWith("/mobiles") ||
+              location.pathname.startsWith("/MobileAd")
+              ? "active"
+              : ""
+              }`}
+          >
+            <FaMobileAlt
+              className={`fa-icons ${location.pathname.startsWith("/mobiles") ||
+                location.pathname.startsWith("/MobileAd")
+                ? "active"
+                : ""
+                }`}
+            />{" "}
+            Mobile
+          </Link>
+
+          <Link
+            to="/CCTVAd"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname.startsWith("/cctv") ||
+              location.pathname.startsWith("/CCTVAd")
+              ? "active"
+              : ""
+              }`}
+          >
+            <FaVideo
+              className={`fa-icons ${location.pathname.startsWith("/cctv") ||
+                location.pathname.startsWith("/CCTVAd")
+                ? "active"
+                : ""
+                }`}
+            />{" "}
+            CCTV
+          </Link>
+
+          {/* Parent Audio link */}
+          <div
+            className={`nav-item ${isAudioActive ? "active" : ""} ${showHeadphones ? "show-dropdown" : ""}`}
+            onClick={toggleHeadphonesDropdown}
+          >
+            <span className="activelink">
+              <FaHeadphones
+                className={`fa-icons ${isAudioActive ? "active" : ""}`}
+              />{" "}
+              Audio
+              {/* {showHeadphones ? (
+                <FaChevronUp className="dropdown-arrow" />
+              ) : (
+                <FaChevronDown className="dropdown-arrow" />
+              )} */}
+              <FaChevronDown
+                className={`dropdown-arrow ${showHeadphones ? "rotate" : ""}`}
+                size={13}
+              />
+            </span>
+            <div className={`audio-dropdown ${showHeadphones ? "visible" : ""}`} ref={headphonesRef}>
               <Link
                 to="/Headphones"
                 onClick={handleLinkClick}
-                className={`nav-link ${
-                  location.pathname === "/Headphones" ? "active" : ""
-                }`}
+                className={`nav-link ${location.pathname === "/Headphones" ? "active" : ""
+                  }`}
               >
                 <FaHeadphones
-                  className={`fa-icons ${
-                    location.pathname === "/Headphones" ? "active" : ""
-                  }`}
+                style={{fontSize:'16px'}}
+
+                  className={`fa-icons ${location.pathname === "/Headphones" ? "active" : ""
+                    }`}
                 />{" "}
                 Headphones
               </Link>
               <Link
                 to="/Speakers"
                 onClick={handleLinkClick}
-                className={`nav-link ${
-                  location.pathname === "/Speakers" ? "active" : ""
-                }`}
+                className={`nav-link ${location.pathname === "/Speakers" ? "active" : ""
+                  }`}
               >
                 <FaVolumeUp
-                  className={`fa-icons ${
-                    location.pathname === "/Speakers" ? "active" : ""
-                  }`}
+                style={{fontSize:'16px'}}
+
+                  className={`fa-icons ${location.pathname === "/Speakers" ? "active" : ""
+                    }`}
                 />{" "}
                 Speakers
               </Link>
             </div>
-          )}
-        </div>
-        <Link
-          to="/TV"
-          onClick={handleLinkClick}
-          className={`nav-link ${
-            location.pathname === "/TV" ? "active" : ""
-          }`}
-        >
-          <FaTv
-            className={`fa-icons ${
-              location.pathname === "/TV" ? "active" : ""
-            }`}
-          />{" "}
-          T.V & Home Cinema
-        </Link>
-        <Link
-          to="/Watch"
-          onClick={handleLinkClick}
-          className={`nav-link ${
-            location.pathname === "/Watch" ? "active" : ""
-          }`}
-        >
-          <FaAppleAlt
-            className={`fa-icons ${
-              location.pathname === "/Watch" ? "active" : ""
-            }`}
-          />{" "}
-          Wearable Tech
-        </Link>
-        <Link
-          to="/Printers"
-          onClick={handleLinkClick}
-          className={`nav-link ${
-            location.pathname === "/Printers" ? "active" : ""
-          }`}
-        >
-          <FaPrint
-            className={`fa-icons ${
-              location.pathname === "/Printers" ? "active" : ""
-            }`}
-          />{" "}
-          Printers
-        </Link>
-
-        {/* Parent Accessories link */}
-        <div
-          className={`nav-item ${isAccessoriesActive ? "active" : ""}`}
-          onClick={toggleMoreDropdown}
-        >
-          <span className="activelink">
-            <FaCog
-              className={`fa-icons ${isAccessoriesActive ? "active" : ""}`}
+          </div>
+          <Link
+            to="/TV"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname === "/TV" ? "active" : ""
+              }`}
+          >
+            <FaTv
+              className={`fa-icons ${location.pathname === "/TV" ? "active" : ""
+                }`}
             />{" "}
-            Accessories
-          </span>
-          {showMore && (
-            <div className="dropdown"  ref={accessoriesRef}>
+            T.V & Home Cinema
+          </Link>
+          <Link
+            to="/Watch"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname === "/Watch" ? "active" : ""
+              }`}
+          >
+            <Watch
+              className={`fa-icons ${location.pathname === "/Watch" ? "active" : ""
+                }`}
+            />{" "}
+            Wearable Tech
+          </Link>
+          <Link
+            to="/Printers"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname === "/Printers" ? "active" : ""
+              }`}
+          >
+            <FaPrint
+              className={`fa-icons ${location.pathname === "/Printers" ? "active" : ""
+                }`}
+            />{" "}
+            Printers
+          </Link>
+
+          <div
+            className={`nav-item ${isAccessoriesActive ? "active" : ""} ${showMore ? "show-dropdown" : ""}`}
+            ref={accessoriesRef}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleMoreDropdown();
+            }}
+          >
+            <span className="activelink" style={{ cursor: "pointer" }}>
+              <FaCog className={`fa-icons ${isAccessoriesActive ? "active" : ""}`} /> Accessories
+              {/* {showMore ? (
+                <FaChevronUp className="dropdown-arrow" />
+              ) : (
+                <FaChevronDown className="dropdown-arrow" />
+              )} */}
+              <FaChevronDown
+                className={`dropdown-arrow ${showMore ? "rotate" : ""}`}
+                size={13}
+              />
+            </span>
+
+            <div className={`dropdown ${showMore ? "visible" : ""}`}>
               <Link
                 to="/ComputerAccessories"
                 onClick={handleLinkClick}
-                className={`nav-link ${
-                  isComputerAccessoriesActive ? "active" : ""
-                }`}
+                className={`nav-link ${isComputerAccessoriesActive ? "active" : ""}`}
               >
                 <FaUsb
-                  className={`fa-icons ${
-                    isComputerAccessoriesActive ? "active" : ""
-                  }`}
-                />{" "}
-                Computer Accessories
+                style={{fontSize:'16px'}}
+                  className={`fa-icons ${location.pathname === "/ComputerAccessories" ? "active" : ""
+                    }`}
+                /> Computer Accessories
               </Link>
+
+
               <Link
                 to="/MobileAccessories"
                 onClick={handleLinkClick}
-                className={`nav-link ${
-                  isMobileAccessoriesActive ? "active" : ""
-                }`}
+                className={`nav-link ${isMobileAccessoriesActive ? "active" : ""}`}
               >
                 <FaMobileAlt
-                  className={`fa-icons ${
-                    isMobileAccessoriesActive ? "active" : ""
-                  }`}
-                />{" "}
-                Mobile Accessories
+                style={{fontSize:'16px'}}
+
+                  className={`fa-icons ${location.pathname === "/MobileAccessories" ? "active" : ""
+                    }`} /> Mobile Accessories
               </Link>
               <Link
                 to="/CCTVAccessories"
                 onClick={handleLinkClick}
-                className={`nav-link ${
-                  isCCTVAccessoriesActive ? "active" : ""
-                }`}
+                className={`nav-link ${isCCTVAccessoriesActive ? "active" : ""}`}
               >
                 <FaVideo
-                  className={`fa-icons ${
-                    isCCTVAccessoriesActive ? "active" : ""
-                  }`}
-                />{" "}
-                CCTV Accessories
+                style={{fontSize:'16px'}}
+
+                  className={`fa-icons ${location.pathname === "/CCTVAccessories" ? "active" : ""
+                    }`}
+                /> CCTV Accessories
               </Link>
               <Link
                 to="/PrinterAccessories"
                 onClick={handleLinkClick}
-                className={`nav-link ${
-                  isPrinterAccessoriesActive ? "active" : ""
-                }`}
+                className={`nav-link ${isPrinterAccessoriesActive ? "active" : ""}`}
               >
                 <FaPrint
-                  className={`fa-icons ${
-                    isPrinterAccessoriesActive ? "active" : ""
-                  }`}
-                />{" "}
-                Printer Accessories
+                style={{fontSize:'16px'}}
+
+                  className={`fa-icons ${location.pathname === "/PrinterAccessories" ? "active" : ""
+                    }`}
+                /> Printer Accessories
               </Link>
             </div>
-          )}
-        </div>
-        <Link
-          to="/Secondhandproducts"
-          onClick={handleLinkClick}
-          className={`nav-link ${
-            location.pathname === "/Secondhandproducts" ? "active" : ""
-          }`}
-        >
-          <FaRecycle
-            className={`fa-icons ${
-              location.pathname === "/Secondhandproducts" ? "active" : ""
-            }`}
-          />{" "}
-          Refurbish
-        </Link>
-        <Link
-          to="/About"
-          onClick={handleLinkClick}
-          className={`nav-link ${
-            location.pathname === "/About" ? "active" : ""
-          }`}
-          style={{
-            display: window.innerWidth <= 768 ? "flex" : "none", // Show only on mobile
-          }}
-        >
-          <FaInfoCircle
-            className={`fa-icons ${
-              location.pathname === "/About" ? "active" : ""
-            }`}
-          />{" "}
-          About
-        </Link>
+          </div>
 
-        <Link
-          to="/Contact"
-          onClick={handleLinkClick}
-          className={`nav-link ${
-            location.pathname === "/Contact" ? "active" : ""
-          }`}
-          style={{
-            display: window.innerWidth <= 768 ? "flex" : "none", // Show only on mobile
-          }}
-        >
-          <FaEnvelope
-            className={`fa-icons ${
-              location.pathname === "/Contact" ? "active" : ""
-            }`}
-          />{" "}
-          Contact
-        </Link>
 
-        <Link
-          to="/HelpCenter"
-          onClick={handleLinkClick}
-          className={`nav-link ${
-            location.pathname === "/HelpCenter" ? "active" : ""
-          }`}
-          style={{
-            display: window.innerWidth <= 768 ? "flex" : "none", // Show only on mobile
-          }}
-        >
-          <FaQuestionCircle
-            className={`fa-icons ${
-              location.pathname === "/HelpCenter" ? "active" : ""
-            }`}
-          />{" "}
-          Help Center
-        </Link>
-      </nav>
-    </header>
+          <Link
+            to="/Secondhandproducts"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname === "/Secondhandproducts" ? "active" : ""
+              }`}
+          >
+            <FaRecycle
+              className={`fa-icons ${location.pathname === "/Secondhandproducts" ? "active" : ""
+                }`}
+            />{" "}
+            Refurbish
+          </Link>
+          <Link
+            to="/About"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname === "/About" ? "active" : ""
+              }`}
+            style={{
+              display: window.innerWidth <= 768 ? "flex" : "none", // Show only on mobile
+            }}
+          >
+            <FaInfoCircle
+              className={`fa-icons ${location.pathname === "/About" ? "active" : ""
+                }`}
+            />{" "}
+            About
+          </Link>
+
+          <Link
+            to="/Contact"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname === "/Contact" ? "active" : ""
+              }`}
+            style={{
+              display: window.innerWidth <= 768 ? "flex" : "none", // Show only on mobile
+            }}
+          >
+            <FaEnvelope
+              className={`fa-icons ${location.pathname === "/Contact" ? "active" : ""
+                }`}
+            />{" "}
+            Contact
+          </Link>
+
+          <Link
+            to="/HelpCenter"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname === "/HelpCenter" ? "active" : ""
+              }`}
+            style={{
+              display: window.innerWidth <= 768 ? "flex" : "none", // Show only on mobile
+            }}
+          >
+            <FaQuestionCircle
+              className={`fa-icons ${location.pathname === "/HelpCenter" ? "active" : ""
+                }`}
+            />{" "}
+            Help Center
+          </Link>
+        </nav>
+      </header>
     </>
   );
 };

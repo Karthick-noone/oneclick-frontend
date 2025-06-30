@@ -19,10 +19,12 @@
     flex: 1;
     min-width: 300px;
     max-width: 600px;
+    max-height: 450px;
     background-color: #f9f9f9;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
   }
   
   h1, h2 {
@@ -67,8 +69,9 @@
     border: 1px solid #ddd;
     margin-bottom: 10px;
     background-color: #f9f9f9;
-    overflow: hidden; /* Ensure content does not overflow */
+    overflow: auto; /* Ensure content does not overflow */
     max-width: 100%; /* Ensure the card does not exceed the container width */
+    /* max-height: 500px; */
   }
   
   .address-card p {
@@ -101,7 +104,83 @@
     gap: 10px;
   }
   
+.adr-btn {
+  padding: 10px 14px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.adr-btn.set {
+  background-color: #28a745;
+  color: white;
+}
+
+.adr-btn.set:hover {
+  background-color: #218838;
+}
+
+.adr-btn.edit {
+  background-color: #ffc107;
+  color: black;
+}
+
+.adr-btn.edit:hover {
+  background-color: #e0a800;
+}
+
+.adr-btn.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.adr-btn.delete:hover {
+  background-color: #c82333;
+}
+@media (max-width: 500px) {
   .adr-btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+.address-details {
+  position: relative;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+}
+.current-icon {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 40px; /* Or 50px if you prefer */
+}
+.addr-name {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: #212121;
+}
+
+.addr-line {
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.addr-phone {
+  color: #555;
+}
+
+  .submit-btn {
     background-color: #007BFF;
     color: #fff;
     border: none;
@@ -116,10 +195,36 @@
     background-color: #0056b3;
   }
 
+.address-card.current-address {
+  background-color: #e6f9e6; /* light green background */
+  border: 2px solid #28a745; /* optional green border */
+  box-shadow: 0 0 5px rgba(0, 128, 0, 0.2);
+}
+.address-box {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+}
+
+.address-box.current-address {
+  border: 2px solid #4CAF50;
+  background-color: #e8f5e9; /* light green background */
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.current-label {
+  color: #388e3c;
+  font-weight: bold;
+  margin-top: 5px;
+  margin-right: 10px;
+}
 
   .back-to-cart-button {
     position: absolute;  /* Position it absolutely */
-    top: 150px;          /* Distance from the top of the container */
+    top: 130px;          /* Distance from the top of the container */
     right: 10px;        /* Distance from the right of the container */
     background-color: #007BFF; /* Button color */
     color: white;       /* Text color */
@@ -148,8 +253,8 @@
 
 @media (max-width: 480px) {
   .back-to-cart-button {
-    top: 200px;          /* Further adjust top distance for very small screens */
-    right: 5px;          /* Keep right distance */
+    top: 120px;          /* Further adjust top distance for very small screens */
+    right: 15px;          /* Keep right distance */
     padding: 6px 10px;   /* Further adjust padding for very small screens */
     font-size: 12px;     /* Further adjust font size for very small screens */
   }
@@ -168,6 +273,7 @@
       border-radius: 8px;
       padding: 20px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-top: 11px;
     }
     .form-group2-row {
       display: inline;
@@ -184,9 +290,10 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.9);
     /* margin-top: 10px; */
-    z-index: 1001;
+    z-index: 1002;
+    overflow: hidden !important;
   }
   
   .model-content {

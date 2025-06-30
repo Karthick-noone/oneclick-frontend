@@ -2,18 +2,25 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes, FaImages  } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes, FaImages } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick"; // Import Slider from react-slick
-import { FaInfoCircle, FaPlusCircle, FaClone } from "react-icons/fa"; // Ensure to import any icons you need
+import {  FaPlusCircle, FaClone, FaInfoCircle } from "react-icons/fa"; // Ensure to import any icons you need
 import CouponEditPopup from "./CouponEditPopup";
 import EditCouponModal from "./EditCouponModal"; // Import the modal component
+// import CouponImage from './img/coupons.png'
+import ActiveCouponImage from './img/Active-coupon.png'
+import ExpiredCouponImage from './img/Expired-coupon.png'
+import AccessoriesImage from './img/Accessories.png'
+import { SearchIcon } from "lucide-react";
+import FilterIcon from "./img/filter.png";
+// import leftarrow from './img/left.png';
+// import rightarrow from './img/right.png';
 
-
-import leftarrow from './img/left.png';
-import rightarrow from './img/right.png';
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 // Set up the modal root element
 Modal.setAppElement("#root");
 
@@ -61,7 +68,7 @@ const Mobiles = () => {
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [productName, setproductName] = useState(null);
   const [selectedProductPrice, setSelectedProductPrice] = useState(null);
-const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
+  const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
   const [selectedAccessories, setSelectedAccessories] = useState([]);
   const [computerAccessories, setComputerAccessories] = useState([]);
   const [currentProductId, setCurrentProductId] = useState(null);
@@ -73,11 +80,87 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
   const [isOfferActive, setIsOfferActive] = useState(true);
-    const [product, setProduct] = useState(null);
+  const [, setProduct] = useState(null);
 
-  
+
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [modalProductId, setModalProductId] = useState(null);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [lightboxImages, setLightboxImages] = useState([]);
+  const [couponProducts, setCouponProducts] = useState({});
+  const [accessoryCounts, setAccessoryCounts] = useState({});
+
+   const [searchTerm, setSearchTerm] = useState("");
+  const [showOutOfStockOnly, setShowOutOfStockOnly] = useState(false);
+  const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
+  const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
+
+  useEffect(() => {
+    const loadAccessoryCounts = async () => {
+      const result = {};
+      for (const product of products) {
+        const count = await fetchAccessoryCount(product.prod_id);
+        result[product.id] = count;
+      }
+      setAccessoryCounts(result);
+    };
+
+    if (products.length > 0) {
+      loadAccessoryCounts();
+    }
+  }, [products]);
+
+  const fetchAccessoryCount = async (productId) => {
+    try {
+      const response = await axios.get(`${ApiUrl}/api/accessorycount/${productId}`);
+      const { accessoryCount } = response.data;
+      return accessoryCount;
+    } catch (error) {
+      console.error(`[ERROR] Failed to fetch accessory count for product ${productId}:`, error.message);
+      return 0;
+    }
+  };
+
+  const fetchCouponStatus = async (productId) => {
+    console.log(`[INFO] Checking coupon for product ID: ${productId}`);
+
+    try {
+      const response = await axios.get(`${ApiUrl}/api/couponstatus/${productId}`);
+      const { hasCoupon, isExpired } = response.data;
+
+      console.log(`[SUCCESS] Product ${productId}: hasCoupon=${hasCoupon}, isExpired=${isExpired}`);
+      return { hasCoupon, isExpired };
+    } catch (error) {
+      console.error(`[ERROR] Failed to check coupon for product ${productId}:`, error.message);
+      return { hasCoupon: false, isExpired: false };
+    }
+  };
+
+  useEffect(() => {
+    const loadCouponStatuses = async () => {
+      const result = {};
+
+      for (const product of products) {
+        const { hasCoupon, isExpired } = await fetchCouponStatus(product.prod_id);
+        result[product.id] = { hasCoupon, isExpired };
+      }
+
+      setCouponProducts(result);
+    };
+
+    if (products.length > 0) {
+      loadCouponStatuses();
+    }
+  }, [products]);
+
+  const handleImageClick = (index, imageArray) => {
+    setPhotoIndex(index); // starting image
+    setLightboxImages(imageArray); // all images of this product
+    setIsOpen(true); // open lightbox
+  };
+
   useEffect(() => {
     setTimeout(() => {
       const section = document.querySelector(".laptops-products-list");
@@ -88,49 +171,49 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
     }, 100);
   }, []);
 
-   useEffect(() => {
-        const now = new Date();
-        // console.log("Current Time:", now.toLocaleString());
-      
-        const activeProduct = products.find((item) => {
-          if (!item.offer_start_time || !item.offer_end_time) {
-            // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
-            return false;
-          }
-      
-          const offerStartTime = new Date(item.offer_start_time);
-          const offerEndTime = new Date(item.offer_end_time);
-      
-          // console.log(
-          //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
-          // );
-      
-          return offerStartTime <= now && offerEndTime > now;
-        });
-      
-        if (activeProduct) {
-          // console.log("Active Product Found:", activeProduct);
-        } else {
-          // console.log("No active product with a valid offer.");
-        }
-      
-        setProduct(activeProduct || null);
-        setIsOfferActive(!!activeProduct);
-      
-        // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
-      }, [products]);
-  
-    // Handle opening modal and passing productId
-  
-    const openProductModal = (productId) => {
-      setModalProductId(productId);
-      setIsModalOpen2(true);
-    };
-  
-    const closeProductModal = () => {
-      setIsModalOpen2(false);
-      setModalProductId(null);
-    };
+  useEffect(() => {
+    const now = new Date();
+    // console.log("Current Time:", now.toLocaleString());
+
+    const activeProduct = products.find((item) => {
+      if (!item.offer_start_time || !item.offer_end_time) {
+        // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
+        return false;
+      }
+
+      const offerStartTime = new Date(item.offer_start_time);
+      const offerEndTime = new Date(item.offer_end_time);
+
+      // console.log(
+      //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
+      // );
+
+      return offerStartTime <= now && offerEndTime > now;
+    });
+
+    if (activeProduct) {
+      // console.log("Active Product Found:", activeProduct);
+    } else {
+      // console.log("No active product with a valid offer.");
+    }
+
+    setProduct(activeProduct || null);
+    setIsOfferActive(!!activeProduct);
+
+    // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
+  }, [products]);
+
+  // Handle opening modal and passing productId
+
+  const openProductModal = (productId) => {
+    setModalProductId(productId);
+    setIsModalOpen2(true);
+  };
+
+  const closeProductModal = () => {
+    setIsModalOpen2(false);
+    setModalProductId(null);
+  };
 
 
   // Handle opening modal and passing productId
@@ -157,7 +240,7 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
     try {
       const response = await axios.get(`${ApiUrl}/api/products/fetchoffer/${id}`);
       const { offer_start_time, offer_end_time, offer_price } = response.data;
-  
+
       // The dates are already in the correct format from the backend
       setOfferStartTime(offer_start_time || "");
       setOfferEndTime(offer_end_time || "");
@@ -166,13 +249,13 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
       console.error("Error fetching offer data", error);
     }
   };
-  
+
   const handleChangePrice = (e, productPrice) => {
     const value = e.target.value;
-  
+
     // Allow only numbers (integer or decimal with up to 2 places), but no leading zero unless decimal.
     const regex = /^(0|[1-9]\d*)(\.\d{0,2})?$/;
-  
+
     if (regex.test(value) || value === "") {
       if (parseFloat(value) <= productPrice || value === "") {
         setOfferPrice(value);
@@ -199,15 +282,15 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
         text: "Ensure all fields are filled out correctly before submitting.",
       });
       return;
-    } 
-  
-    
+    }
+
+
     const offerData = {
       offer_start_time: offerStartTime,
       offer_end_time: offerEndTime,
       offer_price: offerPrice,
     };
-  
+
     try {
       if (isEditMode) {
         await axios.put(`${ApiUrl}/api/products/updateoffer/${productId}`, offerData);
@@ -222,7 +305,7 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
       Swal.fire('Error!', 'There was an error processing your request. Please try again.', 'error');
     }
   };
-  
+
   // Handle deletion of offer with confirmation
   const handleDelete = async () => {
     Swal.fire({
@@ -245,7 +328,7 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
       }
     });
   };
-  
+
   const openPopup = (id, productName, prodPrice) => {
     // Set states
     setSelectedProductId(id);
@@ -304,11 +387,11 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
 
   const handleFileChange = (productId, event) => {
     const files = Array.from(event.target.files);
-  
+
     // Get the existing files for this product (or an empty array)
     const existingFiles = newImages[productId] || [];
     const existingFileNames = existingFiles.map((file) => file.name);
-  
+
     // Check if adding new files exceeds the limit
     if (existingFiles.length + files.length > MAX_FILES) {
       Swal.fire({
@@ -320,70 +403,21 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
       });
       return;
     }
-  
+
     // Filter out duplicate files based on name
     const uniqueFiles = files.filter(
       (file) => !existingFileNames.includes(file.name)
     );
-  
+
     if (uniqueFiles.length === 0) return; // No new images
-  
-    const resizedFiles = [];
-  
-    uniqueFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        const img = new Image();
-        img.src = e.target.result;
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Maximum width for the image
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-  
-          const ctx = canvas.getContext("2d");
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
-          // Compress and convert to blob
-          canvas.toBlob(
-            (blob) => {
-              const processBlob = (finalBlob) => {
-                const processedFile = new File([finalBlob], file.name, {
-                  type: "image/jpeg",
-                });
-                resizedFiles.push(processedFile);
-  
-                if (resizedFiles.length === uniqueFiles.length) {
-                  setNewImages((prev) => ({
-                    ...prev,
-                    [productId]: [...(prev[productId] || []), ...resizedFiles],
-                  }));
-                }
-              };
-  
-              if (blob.size / 1024 < 50) {
-                processBlob(blob);
-              } else {
-                canvas.toBlob(
-                  (compressedBlob) => {
-                    processBlob(compressedBlob);
-                  },
-                  "image/jpeg",
-                  0.7
-                );
-              }
-            },
-            "image/jpeg",
-            0.8
-          );
-        };
-      };
-    });
+
+    // Directly add the unique original image files without resizing or compression
+    setNewImages((prev) => ({
+      ...prev,
+      [productId]: [...(prev[productId] || []), ...uniqueFiles],
+    }));
   };
+
 
   const handleUploadImages = async (productId) => {
     if (!newImages[productId] || newImages[productId].length === 0) {
@@ -496,7 +530,7 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
     //     // Optionally show an error message if the input is invalid
     //     Swal.fire({
     //       icon: "warning",
-    //       title: "Validation Error",
+    //       title: "Invalid Input",
     //       text: "Name and Label should only contain letters and spaces.",
     //     });
     //     return; // Prevent updating state if invalid
@@ -514,7 +548,7 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
         // Optionally show an error message if the input is invalid
         Swal.fire({
           icon: "warning",
-          title: "Validation Error",
+          title: "Invalid Input",
           text: "Price should only contain numbers.",
         });
         return; // Prevent updating state if invalid
@@ -528,85 +562,25 @@ const [isFrequentlyBuyModalOpen, setIsFrequentlyBuyModalOpen] = useState(false);
     });
   };
 
-const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    console.log("Selected image for upload:", file);
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (e) => {
-      const img = new Image();
-      img.src = e.target.result;
-      img.onload = () => {
-        console.log("Original image dimensions:", img.width, img.height);
+    if (file) {
+      console.log("Selected image for upload:", file);
 
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 500; // Define max width
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
+      // Generate unique filename with timestamp
+      const timestamp = new Date().toISOString().replace(/[-:.]/g, ""); // Format: YYYYMMDDTHHMMSS
+      const fileExtension = file.name.split(".").pop(); // Extract file extension
+      const newFileName = `image_${timestamp}.${fileExtension}`;
 
-        const ctx = canvas.getContext("2d");
+      // Create new File instance with original content
+      const newFile = new File([file], newFileName, { type: file.type });
 
-        const isPng = file.type === "image/png";
-        if (!isPng) {
-          // Only fill white if image is NOT PNG
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+      console.log("Prepared file for upload:", newFile);
+      setSelectedFile(newFile);
+    }
+  };
 
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        console.log("Resizing image to:", canvas.width, canvas.height);
-
-        // Generate unique filename with timestamp
-        const timestamp = new Date().toISOString().replace(/[-:.]/g, ""); // Format: YYYYMMDDTHHMMSS
-        const fileExtension = file.name.split(".").pop(); // Extract file extension
-        const newFileName = `image_${timestamp}.${fileExtension}`;
-
-        const mimeType = isPng ? "image/png" : "image/jpeg";
-
-        // Compress image
-        canvas.toBlob(
-          (blob) => {
-            console.log(
-              "Resized image size (KB):",
-              (blob.size / 1024).toFixed(2)
-            );
-
-            if (blob.size / 1024 < 50) {
-              console.log("Image is under 50 KB, ready for upload.");
-              const newFile = new File([blob], newFileName, { type: mimeType });
-              setSelectedFile(newFile);
-            } else {
-              console.log(
-                "Image still above 50 KB, applying further compression."
-              );
-              canvas.toBlob(
-                (compressedBlob) => {
-                  console.log(
-                    "Compressed image size (KB):",
-                    (compressedBlob.size / 1024).toFixed(2)
-                  );
-                  const compressedFile = new File(
-                    [compressedBlob],
-                    newFileName,
-                    { type: mimeType }
-                  );
-                  setSelectedFile(compressedFile);
-                },
-                mimeType,
-                0.7
-              );
-            }
-          },
-          mimeType,
-          0.8
-        );
-      };
-    };
-  }
-};
 
   // Your existing handleImageUpdate function
   const handleImageUpdate = () => {
@@ -701,9 +675,9 @@ const handleImageUpload = (event) => {
   //   });
   // };
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-  
+
     // If more than 5 images are selected, show an alert and prevent upload
     if (files.length > 5) {
       Swal.fire({
@@ -715,88 +689,31 @@ const handleImageUpload = (event) => {
       e.target.value = ""; // Reset input to allow re-selection
       return;
     }
-  
-    // Resize images before adding them
-    const resizedImages = await Promise.all(files.map((file) => resizeImage(file)));
-  
+
+    // Filter out duplicates based on file name
     setNewProduct((prevProduct) => {
-      // Convert existing images to a comparable format
       const existingImages = prevProduct.images.map((img) => img.name || img);
-  
-      // Filter out duplicates
-      const newUniqueImages = resizedImages.filter(
-        (newImg) => !existingImages.includes(newImg.name || newImg)
+
+      const newUniqueImages = files.filter(
+        (file) => !existingImages.includes(file.name)
       );
-  
+
       return {
         ...prevProduct,
-        images: [...prevProduct.images, ...newUniqueImages], // Append only unique images
+        images: [...prevProduct.images, ...newUniqueImages],
       };
     });
-  
-    setImageCount(resizedImages.length);
-  
-    // Reset file input to allow selecting new files again
-    e.target.value = "";
+
+    setImageCount(files.length); // You can update this to only count unique if needed
+
+    e.target.value = ""; // Reset file input
   };
-  
-  const resizeImage = (file) => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 500;
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
-
-        const ctx = canvas.getContext("2d");
-        const isPng = file.type === "image/png";
-
-        // Fill white background only for non-PNG images
-        if (!isPng) {
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        const mimeType = isPng ? "image/png" : "image/jpeg";
-
-        canvas.toBlob(
-          (blob) => {
-            if (blob.size / 1024 < 50) {
-              resolve(new File([blob], file.name, { type: mimeType }));
-            } else {
-              canvas.toBlob(
-                (compressedBlob) =>
-                  resolve(
-                    new File([compressedBlob], file.name, {
-                      type: mimeType,
-                    })
-                  ),
-                mimeType,
-                0.7
-              );
-            }
-          },
-          mimeType,
-          0.8
-        );
-      };
-    };
-  });
-};
 
   const handleAddProduct = async () => {
     if (newProduct.label && newProduct.label.replace(/\s/g, "").length > 15) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot exceed 30 characters.",
       });
       return;
@@ -806,7 +723,7 @@ const handleImageUpload = (event) => {
     if (newProduct.label && !newProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot be just spaces.",
       });
       return;
@@ -816,7 +733,7 @@ const handleImageUpload = (event) => {
     if (!newProduct.name.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Product name is required.",
       });
       return;
@@ -824,7 +741,7 @@ const handleImageUpload = (event) => {
     // if (!newProduct.features.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Product features are required.",
     //   });
     //   return;
@@ -832,7 +749,7 @@ const handleImageUpload = (event) => {
     // if (!newProduct.category.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Product category is required.",
     //   });
     //   return;
@@ -844,7 +761,7 @@ const handleImageUpload = (event) => {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid product price is required.",
       });
       return;
@@ -856,7 +773,7 @@ const handleImageUpload = (event) => {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid actual price is required.",
       });
       return;
@@ -865,7 +782,7 @@ const handleImageUpload = (event) => {
       // Check for images array length
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "At least one product image is required.",
       });
       return;
@@ -875,7 +792,7 @@ const handleImageUpload = (event) => {
     if (Number(newProduct.actual_price) <= Number(newProduct.price)) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Actual price must be greater than the product price.",
       });
       return;
@@ -892,7 +809,7 @@ const handleImageUpload = (event) => {
     // ) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
     //   });
     //   return;
@@ -902,7 +819,7 @@ const handleImageUpload = (event) => {
     // if (couponCode && !couponCode.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon code cannot be just spaces.",
     //   });
     //   return;
@@ -916,7 +833,7 @@ const handleImageUpload = (event) => {
     // if (couponValue >= Number(newProduct.price)) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon discount must be less than the product price.",
     //   });
     //   return;
@@ -930,18 +847,18 @@ const handleImageUpload = (event) => {
     //   if (!hasDigit) {
     //     Swal.fire({
     //       icon: "warning",
-    //       title: "Validation Error",
+    //       title: "Invalid Input",
     //       text: "Coupon code must contain price value like OFFER599.",
     //     });
     //     return;
     //   }
     // }
 
-        // Fetch user role from localStorage
-const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+    // Fetch user role from localStorage
+    const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
-// Set product status based on user role
-const productStatus = userRole === "Admin" ? "approved" : "unapproved";
+    // Set product status based on user role
+    const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
     formData.append("name", newProduct.name);
@@ -1011,7 +928,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
         os: "",
         network: "",
         others: "",
-});
+      });
       setImageCount(0);
       document.querySelector('input[type="file"]').value = ""; // Reset file input
     } catch (error) {
@@ -1090,14 +1007,14 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     openProductModal(false);
 
     console.log("Modal opened for editing.");
-  };  
+  };
 
   const handleUpdateProduct = async () => {
     // Validation for label
     if (editingProduct.label && !editingProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot be just spaces. Please remove the spaces.",
       });
       console.log("Validation failed: Label is just spaces.");
@@ -1107,7 +1024,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     // if (editingProduct.label && /\d/.test(editingProduct.label)) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Label cannot contain numeric values.",
     //   });
     //   console.log("Validation failed: Label contains numeric values.");
@@ -1117,7 +1034,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     if (editingProduct.label && editingProduct.label.length > 15) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot exceed 15 characters.",
       });
       console.log("Validation failed: Label exceeds 15 characters.");
@@ -1128,7 +1045,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     if (Number(editingProduct.actual_price) <= Number(editingProduct.price)) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Actual price must be greater than the product price.",
       });
       console.log(
@@ -1141,7 +1058,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     if (!editingProduct.name.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Product name is required.",
       });
       console.log("Validation failed: Product name is required.");
@@ -1156,7 +1073,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid product price is required.",
       });
       console.log("Validation failed: Invalid product price.");
@@ -1171,7 +1088,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid actual product price is required.",
       });
       console.log("Validation failed: Invalid actual product price.");
@@ -1457,10 +1374,10 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     const day = String(date.getDate()).padStart(2, "0");
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-  
+
     return `${year}-${month}-${day}T${hours}:${minutes}`; // Format for datetime-local input
   };
-  
+
   const today = new Date();
   const minDate = getFormattedDate(today);
   const maxDate = getFormattedDate(new Date(today.setDate(today.getDate() + 10)));
@@ -1487,196 +1404,204 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
 
   const handleOpenFrequentlyBuyModal = async (productId, category) => {
-     console.log("[INFO] Opening Frequently Buy Modal");
-     console.log(`[INFO] Product ID: ${productId}, Category: ${category}`);
-   
-     setCurrentProductId(productId);
-     setIsFrequentlyBuyModalOpen(true);
-   
-     try {
-       console.log("[INFO] Fetching accessories from API");
-       const response = await fetch(
-         `${ApiUrl}/getmobileaccessories?&productId=${productId}`
-       );
-   
-       if (!response.ok) {
-         const errorData = await response.text();
-         console.error("[ERROR] Failed to fetch accessories:", errorData);
-         return;
-       }
-   
-       const data = await response.json();
-       console.log("[INFO] Accessories fetched successfully:", data);
-   
-       // Check if the response contains the categoryAccessories array
-       if (Array.isArray(data.categoryAccessories)) {
-         setComputerAccessories(data.categoryAccessories);
-       } else {
-         console.error("[ERROR] categoryAccessories is not an array:", data.categoryAccessories);
-         setComputerAccessories([]); // Set to an empty array if there's an error
-       }
-   
-       // Parse the selected accessories if they exist
-       const selectedAccessories = data.additionalAccessories
-         ? data.additionalAccessories.split(",")
-         : [];
-       console.log("[INFO] Pre-selected accessories:", selectedAccessories);
-   
-       setSelectedAccessories(selectedAccessories);
-     } catch (error) {
-       console.error("[ERROR] Error while fetching accessories:", error);
-     }
-   };
-   
-   const handleCloseFrequentlyBuyModal = () => {
-     console.log("[INFO] Closing Frequently Buy Modal");
-     setIsFrequentlyBuyModalOpen(false);
-     setSelectedAccessories([]);
-   };
-   
-   const handleAccessorySelection = async (e) => {
-     const accessoryId = e.target.value;
-     console.log(`[INFO] Accessory ID: ${accessoryId}, Checked: ${e.target.checked}`);
-   
-     if (e.target.checked) {
-       console.log("[INFO] Adding accessory to the selected list");
-       setSelectedAccessories((prev) => [...prev, accessoryId]);
-     } else {
-       console.log("[INFO] Removing accessory from the selected list");
-       setSelectedAccessories((prev) => prev.filter((id) => id !== accessoryId));
-   
-       try {
-         console.log("[INFO] Removing accessory from the backend");
-         const response = await fetch(`${ApiUrl}/removefrequentlybuy`, {
-           method: "POST",
-           headers: { "Content-Type": "application/json" },
-           body: JSON.stringify({
-             productId: currentProductId,
-             accessoryId: accessoryId,
-           }),
-         });
-   
-         if (response.ok) {
-           const data = await response.text();
-           console.log("[INFO] Accessory removed successfully:", data);
-         } else {
-           const errorData = await response.text();
-           console.error("[ERROR] Error removing accessory:", errorData);
-         }
-       } catch (error) {
-         console.error("[ERROR] Error during accessory removal fetch:", error);
-       }
-     }
-   };
-   
-   const handleAddAccessories = () => {
-     console.log("[INFO] Navigating to Add Accessories page");
-     navigate("/Admin/MobileAccessories");
-   };
-   
-   const handleSaveAccessories = async () => {
-     // if (selectedAccessories.length === 0) {
-     //   Swal.fire({
-     //     icon: "warning",
-     //     title: "No Accessories Selected",
-     //     text: "Please select at least one accessory to update.",
-     //     confirmButtonColor: "#ff9800",
-     //   });
-     //   return; // Prevent saving when no accessories are selected
-     // }
-   
-     console.log("[INFO] Saving selected accessories");
-     const payload = {
-       id: currentProductId,
-       accessoryIds: selectedAccessories.join(","),
-     };
-     console.log("[INFO] Payload for saving accessories:", payload);
-   
-     try {
-       const response = await fetch(`${ApiUrl}/addfrequentlybuy`, {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify(payload),
-       });
-   
-       if (response.ok) {
-         const data = await response.text();
-         console.log("[INFO] Accessories updated successfully:", data);
-   
-         Swal.fire({
-           icon: "success",
-           title: "Success",
-           text: "Accessories have been updated successfully!",
-           confirmButtonColor: "#4caf50",
-         });
-       } else {
-         const errorData = await response.text();
-         console.error("[ERROR] Failed to update accessories:", errorData);
-   
-         Swal.fire({
-           icon: "error",
-           title: "Error",
-           text: "Failed to update accessories. Please try again.",
-           confirmButtonColor: "#f44336",
-         });
-       }
-     } catch (error) {
-       console.error("[ERROR] Unexpected error during save operation:", error);
-   
-       Swal.fire({
-         icon: "error",
-         title: "Error",
-         text: "An unexpected error occurred. Please try again later.",
-         confirmButtonColor: "#f44336",
-       });
-     }
-   
-     setIsFrequentlyBuyModalOpen(false);
-     setSelectedAccessories([]);
-   };
+    console.log("[INFO] Opening Frequently Buy Modal");
+    console.log(`[INFO] Product ID: ${productId}, Category: ${category}`);
 
-    const role = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+    setCurrentProductId(productId);
+    setIsFrequentlyBuyModalOpen(true);
 
+    try {
+      console.log("[INFO] Fetching accessories from API");
+      const response = await fetch(
+        `${ApiUrl}/getmobileaccessories?&productId=${productId}`
+      );
 
-    const handleCopyProduct = async (productId) => {
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error("[ERROR] Failed to fetch accessories:", errorData);
+        return;
+      }
+
+      const data = await response.json();
+      console.log("[INFO] Accessories fetched successfully:", data);
+
+      // Check if the response contains the categoryAccessories array
+      if (Array.isArray(data.categoryAccessories)) {
+        setComputerAccessories(data.categoryAccessories);
+      } else {
+        console.error("[ERROR] categoryAccessories is not an array:", data.categoryAccessories);
+        setComputerAccessories([]); // Set to an empty array if there's an error
+      }
+
+      // Parse the selected accessories if they exist
+      const selectedAccessories = data.additionalAccessories
+        ? data.additionalAccessories.split(",")
+        : [];
+      console.log("[INFO] Pre-selected accessories:", selectedAccessories);
+
+      setSelectedAccessories(selectedAccessories);
+    } catch (error) {
+      console.error("[ERROR] Error while fetching accessories:", error);
+    }
+  };
+
+  const handleCloseFrequentlyBuyModal = () => {
+    console.log("[INFO] Closing Frequently Buy Modal");
+    setIsFrequentlyBuyModalOpen(false);
+    setSelectedAccessories([]);
+  };
+
+  const handleAccessorySelection = async (e) => {
+    const accessoryId = e.target.value;
+    console.log(`[INFO] Accessory ID: ${accessoryId}, Checked: ${e.target.checked}`);
+
+    if (e.target.checked) {
+      console.log("[INFO] Adding accessory to the selected list");
+      setSelectedAccessories((prev) => [...prev, accessoryId]);
+    } else {
+      console.log("[INFO] Removing accessory from the selected list");
+      setSelectedAccessories((prev) => prev.filter((id) => id !== accessoryId));
+
       try {
-        const response = await fetch(`${ApiUrl}/api/copy-product/${productId}`, {
-          method: 'POST',
+        console.log("[INFO] Removing accessory from the backend");
+        const response = await fetch(`${ApiUrl}/removefrequentlybuy`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            productId: currentProductId,
+            accessoryId: accessoryId,
+          }),
         });
-    
-        const data = await response.json();
+
         if (response.ok) {
-          // Success alert using SweetAlert
-          Swal.fire({
-            title: 'Success!',
-            text: `Product copied successfully! New product ID: ${data.newProductId}`,
-            icon: 'success',
-            confirmButtonText: 'OK',
-          }).then(() => {
-            // After the alert closes, call the fetchProducts function
-           window.location.reload();
-          });
+          const data = await response.text();
+          console.log("[INFO] Accessory removed successfully:", data);
         } else {
-          // Error alert using SweetAlert
-          Swal.fire({
-            title: 'Error!',
-            text: data.message,
-            icon: 'error',
-            confirmButtonText: 'OK',
-          });
+          const errorData = await response.text();
+          console.error("[ERROR] Error removing accessory:", errorData);
         }
       } catch (error) {
-        console.error('Error copying product:', error);
-        // Generic error alert using SweetAlert
+        console.error("[ERROR] Error during accessory removal fetch:", error);
+      }
+    }
+  };
+
+  const handleAddAccessories = () => {
+    console.log("[INFO] Navigating to Add Accessories page");
+    navigate("/Admin/MobileAccessories");
+  };
+
+  const handleSaveAccessories = async () => {
+    // if (selectedAccessories.length === 0) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "No Accessories Selected",
+    //     text: "Please select at least one accessory to update.",
+    //     confirmButtonColor: "#ff9800",
+    //   });
+    //   return; // Prevent saving when no accessories are selected
+    // }
+
+    console.log("[INFO] Saving selected accessories");
+    const payload = {
+      id: currentProductId,
+      accessoryIds: selectedAccessories.join(","),
+    };
+    console.log("[INFO] Payload for saving accessories:", payload);
+
+    try {
+      const response = await fetch(`${ApiUrl}/addfrequentlybuy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const data = await response.text();
+        console.log("[INFO] Accessories updated successfully:", data);
+
         Swal.fire({
-          title: 'Oops!',
-          text: 'Something went wrong. Please try again.',
+          icon: "success",
+          title: "Success",
+          text: "Accessories have been updated successfully!",
+          confirmButtonColor: "#4caf50",
+        });
+      } else {
+        const errorData = await response.text();
+        console.error("[ERROR] Failed to update accessories:", errorData);
+
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to update accessories. Please try again.",
+          confirmButtonColor: "#f44336",
+        });
+      }
+    } catch (error) {
+      console.error("[ERROR] Unexpected error during save operation:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An unexpected error occurred. Please try again later.",
+        confirmButtonColor: "#f44336",
+      });
+    }
+
+    setIsFrequentlyBuyModalOpen(false);
+    setSelectedAccessories([]);
+  };
+
+  const role = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+
+
+  const handleCopyProduct = async (productId) => {
+    try {
+      const response = await fetch(`${ApiUrl}/api/copy-product/${productId}`, {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        // Success alert using SweetAlert
+        Swal.fire({
+          title: 'Success!',
+          text: `Product copied successfully! New product ID: ${data.newProductId}`,
+          icon: 'success',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          // After the alert closes, call the fetchProducts function
+          window.location.reload();
+        });
+      } else {
+        // Error alert using SweetAlert
+        Swal.fire({
+          title: 'Error!',
+          text: data.message,
           icon: 'error',
           confirmButtonText: 'OK',
         });
       }
-    };
+    } catch (error) {
+      console.error('Error copying product:', error);
+      // Generic error alert using SweetAlert
+      Swal.fire({
+        title: 'Oops!',
+        text: 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+    }
+  };
 
+// Compute stats
+  const totalProducts = products.length;
+
+  const inStock = products.filter(p => p.status !== "unavailable").length;
+  const outOfStock = totalProducts - inStock;
+
+  const withCoupons = products.filter(p => couponProducts[p.id]?.hasCoupon).length;
+  const withAccessories = products.filter(p => accessoryCounts[p.id] > 0).length;
 
   return (
     <div className="laptops-page">
@@ -1741,7 +1666,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
             <label className="laptops-label">Product Image</label>
             <input
-              accept="image/jpeg, image/png"
+              accept="image/jpeg, image/png, image/webp"
               ref={fileInputRef}
               multiple
               onChange={handleImageChange}
@@ -1759,7 +1684,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                 ? `Selected Images: ${imageCount}`
                 : "Choose Images"}
             </button>
-<label className="laptops-label">RAM</label>
+            <label className="laptops-label">RAM</label>
             <input
               type="text"
               name="memory"
@@ -1769,7 +1694,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
             />
 
 
-            
+
 
           </div>
 
@@ -1778,7 +1703,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
           {/* Right Section */}
           <div className="laptops-right-section">
 
-          <label className="laptops-label">ROM</label>
+            <label className="laptops-label">ROM</label>
             <input
               type="text"
               name="storage"
@@ -1787,7 +1712,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
               className="laptops-input"
             />
 
-          <label className="laptops-label">Camera</label>
+            <label className="laptops-label">Camera</label>
             <input
               type="text"
               name="camera"
@@ -1795,7 +1720,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
               onChange={handleChange}
               className="laptops-input"
             />
-         
+
 
             <label className="laptops-label">Battery</label>
             <input
@@ -1806,7 +1731,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
               className="laptops-input"
             />
 
-          
+
 
             <label className="laptops-label">Network</label>
             <input
@@ -1860,11 +1785,119 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
             </button>
           </div>
         </div>
+                <hr className="dotted-divider" />
+  <h2 className="laptops-page-title">Mobile Product List</h2>
 
+{(totalProducts > 0 || inStock > 0 || outOfStock > 0 || withCoupons > 0 || withAccessories > 0) && (
+  <>
+        <div className="laptops-summary-stats-row">
+          <div className="laptops-stat-card">
+            <h5>Total Products</h5>
+            <p>{totalProducts}</p>
+          </div>
+          <div className="laptops-stat-card">
+            <h5>In Stock </h5>
+            <p>{inStock}</p>
+          </div>
+          <div className="laptops-stat-card">
+            <h5>Out of Stock </h5>
+            <p>{outOfStock}</p>
+          </div>
+          <div className="laptops-stat-card">
+            <h5>With Coupons 🎟️</h5>
+            <p>{withCoupons}</p>
+          </div>
+          <div className="laptops-stat-card">
+            <h5>With Accessories</h5>
+            <p>{withAccessories}</p>
+          </div>
+        </div>
+          <div className="filters-card">
+          <div className="filters-panel">
+            <div className="filter-label-title">
+                <img src={FilterIcon} width={"20px"} />
+
+                <span> Filter By </span>
+                {/* <FilterIcon width={"20px"}/> */}
+              </div>
+            <label className="filter-label">
+              <input
+                type="checkbox"
+                checked={showOutOfStockOnly}
+                onChange={() => setShowOutOfStockOnly(!showOutOfStockOnly)}
+              />
+              Out of Stock
+            </label>
+
+            <label className="filter-label">
+              <input
+                type="checkbox"
+                checked={showHasCouponOnly}
+                onChange={() => setShowHasCouponOnly(!showHasCouponOnly)}
+              />
+              Coupon
+            </label>
+
+            <label className="filter-label">
+              <input
+                type="checkbox"
+                checked={showHasAccessoriesOnly}
+                onChange={() => setShowHasAccessoriesOnly(!showHasAccessoriesOnly)}
+              />
+              Frequently Bought Accessories
+            </label>
+
+             <div className="filter-search-wrapper">
+                <SearchIcon width={'18px'} className="search-icon-btn" />
+                {/* <img src={SearchIcon} width={'20px'}/> */}
+                <input
+                  type="text"
+                  placeholder="Search by name"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="filter-input"
+                />
+                {searchTerm && (
+                  <button
+                    className="filter-clear-btn"
+                    onClick={() => setSearchTerm("")}
+                    aria-label="Clear search"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+          </div>
+        </div>
+</>
+)}
         <div className="laptops-products-list">
-          {products.length > 0 &&
-            products.map((product, index) => (
+       {products.length === 0 ? (
+            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some Mobiles.</div>
+          ) : (
+            (() => {
+              const filteredProducts = products
+              .filter((product) =>
+                product.prod_name.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .filter((product) =>
+                showOutOfStockOnly ? product.status === "unavailable" : true
+              )
+              .filter((product) =>
+                showHasCouponOnly ? couponProducts[product.id]?.hasCoupon : true
+              )
+              .filter((product) =>
+                showHasAccessoriesOnly ? accessoryCounts[product.id] > 0 : true
+              );
+               return filteredProducts.length === 0 ? (
+                <div className="empty-state-message"><FaInfoCircle /> No products match your filters.</div>
+              ) : (
+                filteredProducts
+              .map((product, index) => (
               <div className="laptops-product-card" key={product.id}>
+                {product.status === "unavailable" && (
+                  <span className="out_of_stock_ribbon"></span>
+                )}
                 {product.offer_label && (
                   <div className="product-label">{product.offer_label}</div>
                 )}
@@ -1886,15 +1919,23 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                             src={`${ApiUrl}/uploads/mobiles/${img}`}
                             alt={product.prod_name}
                             className="laptops-product-image"
+                            onClick={() =>
+                              handleImageClick(
+                                imgIndex, // Index of the clicked image in this product
+                                product.prod_img.map(img => `${ApiUrl}/uploads/mobiles/${img}`) // Only current product's images
+                              )
+                            }
                           />
 
                           <div className="image-actions">
                             <FaEdit
+                              title="Update this image"
                               onClick={() => openModal(product.id, imgIndex)} // Pass product ID and image index
                               className="action-icon"
                             />
                             {product.prod_img.length > 1 && ( // Display trash icon only if there is more than one image
                               <FaTrash
+                                title="Delete this image"
                                 onClick={() =>
                                   handleDeleteImage(product.id, imgIndex)
                                 }
@@ -1910,7 +1951,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
                 {/* Display product name */}
                 <div className="laptops-product-details">
-                  <h3 className="laptops-product-name">
+                  <h3 className="laptops-product-name" title={product.prod_name}>
                     {product.prod_name}
                     {product.productStatus === "unapproved" && (
                       <span style={{ color: "red" }}>
@@ -1920,28 +1961,71 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                   </h3>
 
                   {/* "View" button to trigger modal */}
-                 
+
                 </div>
                 <div>
-                 M.R.P <span style={{textDecoration:"line-through", color:'red', fontSize:'14px'}}>₹{product.actual_price}</span> 
-                  <span style={{color:'green',marginLeft:'5px'}}>  ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}</span>
+                  M.R.P <span style={{ textDecoration: "line-through", color: 'red', fontSize: '14px' }}>₹{product.actual_price}</span>
+                  <span style={{ color: 'green', marginLeft: '5px' }}>  ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}</span>
                 </div>
-                <button
+                <div className="product-extras">
+                  {couponProducts[product.id]?.hasCoupon && (
+                    <div className="coupon-wrapper">
+                      <div className="coupon-image-wrapper">
+                        {couponProducts[product.id].isExpired === true ?
+                          <img
+                            src={ExpiredCouponImage}
+                            width="35px"
+                            alt="Coupon"
+                            className="coupon-image"
+                          />
+                          :
+                          <img
+                            src={ActiveCouponImage}
+                            width="35px"
+                            alt="Coupon"
+                            className="coupon-image"
+                          />
+                        }
+                        <span className="tooltip-text">
+                          {couponProducts[product.id].isExpired ? "Coupon Expired" : "Coupon is active"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+
+                  <button
                     className="view-details-btn"
+                    title="View more details"
                     onClick={() => openProductModal(product.id)} // Pass product ID to open modal
                   >
-                    <FaEye /> View Details
+                    <FaEye /> View
                   </button>
+
+                  {accessoryCounts[product.id] > 0 && (
+                    <div className="accessory-count-wrapper">
+                      <span className="accessory-count">
+                        {/* {accessoryCounts[product.id]} FA */}
+                        <img src={AccessoriesImage} width={"60px"} />
+                        <span className="tooltip-text">Frequently buy accessories</span>
+                      </span>
+                    </div>
+                  )}
+
+                </div>
+
                 <div className="laptops-product-actions">
                   <button
                     onClick={() => handleEditProduct(product)}
                     className="laptops-action-btn"
+                    title="Update this product"
                   >
                     <FaEdit /> Edit
                   </button>
                   <button
                     onClick={() => handleDeleteProduct(product.id)}
                     className="laptops-action-btn"
+                    title="Delete this product"
                   >
                     <FaTrash /> Delete
                   </button>
@@ -2095,13 +2179,13 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                         max={
                                           offerStartTime
                                             ? getFormattedDate(
+                                              new Date(
                                                 new Date(
-                                                  new Date(
-                                                    offerStartTime
-                                                  ).getTime() +
-                                                    10 * 86400000
-                                                )
+                                                  offerStartTime
+                                                ).getTime() +
+                                                10 * 86400000
                                               )
+                                            )
                                             : maxDate
                                         } // Max 10 days from start
                                         className="offer-input"
@@ -2280,7 +2364,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                 coupon={selectedCoupon}
                                 productId={selectedProductId}
                                 productPrice={selectedProductPrice}
-                                onCouponUpdated={() => {}}
+                                onCouponUpdated={() => { }}
                               />
 
 
@@ -2326,7 +2410,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                       Select Accessories
                                     </h3>
                                     {Array.isArray(computerAccessories) &&
-                                    computerAccessories.length === 0 ? (
+                                      computerAccessories.length === 0 ? (
                                       <div className="no-accessories-message">
                                         <p>
                                           No accessories added to this category
@@ -2348,8 +2432,8 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                               )
                                                 ? accessory.prod_img
                                                 : JSON.parse(
-                                                    accessory.prod_img || "[]"
-                                                  );
+                                                  accessory.prod_img || "[]"
+                                                );
                                               const firstImage = images[0];
 
                                               return (
@@ -2370,7 +2454,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                                   </div>
                                                   <div className="freq-item-details">
                                                     <span className="freq-item-name">
-                                                    {accessory.prod_name
+                                                      {accessory.prod_name
                                                         .split(" ")
                                                         .slice(0, 4)
                                                         .join(" ")}                                                    </span>
@@ -2415,7 +2499,10 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                   </div>
                 )}
               </div>
-            ))}
+            ))
+      );
+    })()
+  )}
         </div>
 
 
@@ -2430,7 +2517,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
         <h2 style={titleStyle}>Update this image</h2>
         <input
           type="file"
-          accept="image/jpeg, image/png"
+          accept="image/jpeg, image/png, image/webp"
 
           onChange={handleImageUpload} // Keep this function for handling file selection
           style={inputStyle}
@@ -2447,12 +2534,12 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
             onClick={() => handleImageUpdate(productId)} // Use the product ID here
             style={buttonStyle}
             onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonHoverStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonHoverStyle.backgroundColor)
             } // Hover effect
             onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonStyle.backgroundColor)
             } // Reset color
           >
             Update
@@ -2462,12 +2549,12 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
             onClick={closeModal}
             style={buttonStyle}
             onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonHoverStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonHoverStyle.backgroundColor)
             } // Hover effect
             onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonStyle.backgroundColor)
             } // Reset color
           >
             Close
@@ -2476,6 +2563,19 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
       </Modal>
 
       {/* Modal for editing a product */}
+
+      {isOpen && (
+        // Sample usage
+        <Lightbox
+          open={isOpen}
+          close={() => setIsOpen(false)}
+          slides={lightboxImages.map((src) => ({ src }))}
+          index={photoIndex}
+          on={{ view: ({ index }) => setPhotoIndex(index) }}
+          carousel={{ finite: true }}
+
+        />
+      )}
       {/* Modal for editing a product */}
       {editingProduct && (
         <Modal
@@ -2496,7 +2596,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
           </div>
 
           <div className="adminmodal-body">
-      <div className="part1">
+            <div className="part1">
               <div className="feature-item">
                 <label className="feature-label">Name</label>
                 <input
@@ -2603,65 +2703,65 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
               </div>
 
               <div className="feature-item">
-                  <label className="feature-label">Memory</label>
-                  <input
-                    type="text"
-                    name="memory"
-                    value={editingProduct.memory}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        memory: e.target.value,
-                      })
-                    }
-                    placeholder="Enter memory"
-                    className="adminmodal-input"
-                    />
-                </div>
+                <label className="feature-label">Memory</label>
+                <input
+                  type="text"
+                  name="memory"
+                  value={editingProduct.memory}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      memory: e.target.value,
+                    })
+                  }
+                  placeholder="Enter memory"
+                  className="adminmodal-input"
+                />
+              </div>
 
-                <div className="feature-item">
-                  <label className="feature-label">Storage</label>
-                  <input
-                    type="text"
-                    name="storage"
-                    value={editingProduct.storage}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        storage: e.target.value,
-                      })
-                    }
-                    placeholder="Enter storage"
-                    className="adminmodal-input"
-                    />
-                </div>
+              <div className="feature-item">
+                <label className="feature-label">Storage</label>
+                <input
+                  type="text"
+                  name="storage"
+                  value={editingProduct.storage}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      storage: e.target.value,
+                    })
+                  }
+                  placeholder="Enter storage"
+                  className="adminmodal-input"
+                />
+              </div>
 
-                <div className="feature-item">
-                  <label className="feature-label">Processor</label>
-                  <input
-                    type="text"
-                    name="processor"
-                    value={editingProduct.processor}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        processor: e.target.value,
-                      })
-                    }
-                    placeholder="Enter processor"
-                    className="adminmodal-input"
-                    />
-                </div>
+              <div className="feature-item">
+                <label className="feature-label">Processor</label>
+                <input
+                  type="text"
+                  name="processor"
+                  value={editingProduct.processor}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      processor: e.target.value,
+                    })
+                  }
+                  placeholder="Enter processor"
+                  className="adminmodal-input"
+                />
+              </div>
 
-             
+
             </div>
 
             {/* Features Section */}
             <div className="part2">
               <div className="product-features-container">
-               
 
-                
+
+
 
                 <div className="feature-item">
                   <label className="feature-label">Camera</label>
@@ -2767,58 +2867,58 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                 </div>
 
                 <div className="feature-item">
-                <label className="feature-label">
-                  In Stock or Out Of Stock
-                </label>
+                  <label className="feature-label">
+                    In Stock or Out Of Stock
+                  </label>
 
-                <select
-                  name="status"
-                  value={editingProduct.status}
-                  onChange={(e) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      status: e.target.value,
-                    })
-                  }
-                  className="adminmodal-input5"
-                >
-            <option value="available">In Stock</option>
-            <option value="unavailable">Out Of Stock</option>
-                </select>
+                  <select
+                    name="status"
+                    value={editingProduct.status}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        status: e.target.value,
+                      })
+                    }
+                    className="adminmodal-input5"
+                  >
+                    <option value="available">In Stock</option>
+                    <option value="unavailable">Out Of Stock</option>
+                  </select>
                 </div>
 
                 <div className="feature-item">
 
-        <label className="feature-label">Approve or Unapprove</label>
+                  <label className="feature-label">Approve or Unapprove</label>
 
-        <select
-                   disabled={role === 'Staff'}
+                  <select
+                    disabled={role === 'Staff'}
 
-            name="productStatus"
-            value={editingProduct.productStatus}
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, productStatus: e.target.value })
-            }
-            className="adminmodal-input5"
-          >
-            <option value="approved">Approve</option>
-            <option value="unapproved">UnApprove</option>
-          </select>
-      
-      </div>
+                    name="productStatus"
+                    value={editingProduct.productStatus}
+                    onChange={(e) =>
+                      setEditingProduct({ ...editingProduct, productStatus: e.target.value })
+                    }
+                    className="adminmodal-input5"
+                  >
+                    <option value="approved">Approve</option>
+                    <option value="unapproved">UnApprove</option>
+                  </select>
 
-              <button
-                onClick={handleUpdateProduct}
-                className="adminmodal-update-btn"
-              >
-                Update
-              </button>
-              <button
-                onClick={() => setModalIsOpen(false)}
-                className="adminmodal-cancel-btn"
-              >
-                Cancel
-              </button>
+                </div>
+
+                <button
+                  onClick={handleUpdateProduct}
+                  className="adminmodal-update-btn"
+                >
+                  Update
+                </button>
+                <button
+                  onClick={() => setModalIsOpen(false)}
+                  className="adminmodal-cancel-btn"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
@@ -2841,7 +2941,7 @@ const SampleNextArrow = (props) => {
         alignItems: "center",
         right: "10px",
         zIndex: 10,
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.5)", // Add box shadow
+        background: "rgba(0, 0, 0, 0.5)",
         borderRadius: "50%", // Round shape
         width: "30px", // Width for clickable area
         height: "30px", // Height for clickable area
@@ -2849,11 +2949,10 @@ const SampleNextArrow = (props) => {
       }}
       onClick={onClick}
     >
-      <img src={rightarrow} alt="Next" width="15px" height="15px" />
+      {/* <img src={rightarrow} alt="Next" width="15px" height="15px" /> */}
     </div>
   );
 };
-
 
 const SamplePrevArrow = (props) => {
   const { className, style, onClick } = props;
@@ -2863,12 +2962,11 @@ const SamplePrevArrow = (props) => {
       style={{
         ...style,
         display: "flex",
-        justifyContent: "center !important",
+        justifyContent: "center",
         alignItems: "center",
         left: "10px",
         zIndex: 10,
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)", // Box shadow applied here
-        backgroundColor: "white",
+        background: "rgba(0, 0, 0, 0.5)",
         borderRadius: "50%", // Round shape
         width: "30px", // Width for clickable area
         height: "30px", // Height for clickable area
@@ -2876,7 +2974,7 @@ const SamplePrevArrow = (props) => {
       }}
       onClick={onClick}
     >
-      <img src={leftarrow} alt="Previous" width="15px" height="15px" />
+      {/* <img src={leftarrow} alt="Previous" width="15px" height="15px" /> */}
     </div>
   );
 };

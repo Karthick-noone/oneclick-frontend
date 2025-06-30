@@ -11,20 +11,20 @@ import right from "./img/right.png";
 import { useNavigate } from "react-router-dom"; // Import useNavigate from React Router
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the CSS for Toastify
-import { useCart } from "../components/CartContext";
+// import { useCart } from "../components/CartContext";
 
 const ProductList = () => {
-  const {
-    // addToCart,
-    // cartItems,
-    // updateCartItemQuantity,
-    addToWishlist,
-    removeFromWishlist,
-  } = useCart();
+  // const {
+  //   // addToCart,
+  //   // cartItems,
+  //   // updateCartItemQuantity,
+  //   addToWishlist,
+  //   removeFromWishlist,
+  // } = useCart();
   const [productsByCategory, setProductsByCategory] = useState({});
   const [favorites, setFavorites] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
   const navigate = useNavigate(); // Initialize useNavigate
 
   const swiperRefs = {
@@ -57,252 +57,142 @@ const ProductList = () => {
       });
   }, []);
 
-  const handleAddToCart = async (product, event) => {
+   const handleToggleFavorite = async (product, event) => {
     event.stopPropagation();
 
+    // Check if the user is logged in
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
 
     if (!email || !username) {
-      
-      window.location.href = "/login";
-      return;
-    }
-
-    try {
-      const response = await axios.post(`${ApiUrl}/verify-user`, {
-        email,
-        username,
-      });
-
-      if (response.data.exists) {
-        const cartKey = `${email}-cart`;
-        const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
-
-        // Find existing item by id and category
-        const existingItem = cartItems.find(
-          (item) => item.id === product.id && item.category === product.category
-        );
-
-        if (existingItem) {
-          // Increase the quantity if the product already exists in the cart
-          existingItem.quantity += 1;
-          toast.info(
-            `Increased quantity of ${product.prod_name} in your cart!`,
-            {
-              position: "top-right",
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            }
-          );
-        } else {
-          // Add new product to the cart
-          cartItems.push({
-            id: product.id,
-            name: product.prod_name,
-            price: product.prod_price,
-            image: product.prod_img,
-            description: product.prod_features,
-            category: product.category,
-            deliverycharge: product.deliverycharge,
-            product_id: product.prod_id,
-            actual_price: product.actual_price,
-            quantity: 1,
-          });
-
-          toast.success(`${product.prod_name} has been added to your cart!`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-        }
-
-        // Save the updated cart in localStorage
-        localStorage.setItem(cartKey, JSON.stringify(cartItems));
-      } else {
-        toast.error("User not found!", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      }
-    } catch (error) {
-      console.error("Error verifying user or updating cart:", error);
-      toast.error("An error occurred while adding to cart.", {
+      toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        // progress: undefined,
       });
-    }
-  };
-  const handleToggleFavorite = async (product, event) => {
-    event.stopPropagation();
-    const isFavorite = favorites[`${product.prod_name}-${product.id}`];
-
-    const email = localStorage.getItem("email");
-    const username = localStorage.getItem("username");
-
-    if (!email || !username) {
-      
       window.location.href = "/login";
       return;
     }
 
     try {
-      const response = await axios.post(`${ApiUrl}/verify-user`, {
-        email,
-        username,
-      });
+      const isFavorite = favorites[`${product.id}`]; // Check if product is already in the wishlist
 
-      if (response.data.exists) {
-        if (isFavorite) {
-          setFavorites((prevFavorites) => {
-            const newFavorites = { ...prevFavorites };
-            delete newFavorites[`${product.prod_name}-${product.id}`];
-            return newFavorites;
-          });
-          removeFromWishlist(product.id);
+      if (isFavorite) {
+        // If already in wishlist, call remove API
+        console.log(
+          `${product.prod_name} (ID: ${product.id}) is in the wishlist. Removing it.`
+        );
 
-          await axios.post(`${ApiUrl}/update-user-wishlist`, {
-            email,
-            username,
-            action: "remove",
-            product,
-          });
+        await axios.post(`${ApiUrl}/remove-from-wishlist`, {
+          email,
+          productId: product.id,
+        });
 
-          toast.info(`${product.prod_name} removed from your wishlist.`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-
-          const wishlistKey = `${email}-wishlist`;
-          const wishlistData =
-            JSON.parse(localStorage.getItem(wishlistKey)) || [];
-          const updatedWishlistData = wishlistData.filter(
-            (item) => item.id !== product.id
-          );
-          localStorage.setItem(
-            wishlistKey,
-            JSON.stringify(updatedWishlistData)
-          );
-
-          const favouritesKey = "favourites";
-          const currentFavourites = localStorage.getItem(favouritesKey) || "";
-          const newFavourites = currentFavourites
-            .split(",")
-            .filter(
-              (item) => item !== `faredheart-${product.prod_name}-${product.id}`
-            )
-            .join(",");
-          localStorage.setItem(favouritesKey, newFavourites);
-        } else {
-          setFavorites((prevFavorites) => ({
-            ...prevFavorites,
-            [`${product.prod_name}-${product.id}`]: true,
-          }));
-          addToWishlist(product);
-
-          await axios.post(`${ApiUrl}/update-user-wishlist`, {
-            email,
-            username,
-            action: "add",
-            product,
-          });
-
-          toast.success(`${product.prod_name} added to your wishlist!`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-
-          const wishlistKey = `${email}-wishlist`;
-          const wishlistData =
-            JSON.parse(localStorage.getItem(wishlistKey)) || [];
-
-          wishlistData.push(product);
-          localStorage.setItem(wishlistKey, JSON.stringify(wishlistData));
-
-          const favouritesKey = "favourites";
-          const currentFavourites = localStorage.getItem(favouritesKey) || "";
-          const newFavourites = `${currentFavourites},faredheart-${product.prod_name}-${product.id}`;
-          localStorage.setItem(favouritesKey, newFavourites);
-        }
-      } else {
-        toast.error("User not found!", {
+        console.log(
+          `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
+        );
+        window.dispatchEvent(new Event("wishlist-updated"));
+        toast.info(`${product.prod_name.substring(0,25)+'...'} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
+        });
+      } else {
+        // If not in wishlist, call add API
+        console.log(
+          `${product.prod_name} (ID: ${product.id}) is not in the wishlist. Adding it.`
+        );
+
+        await axios.post(`${ApiUrl}/update-user-wishlist`, {
+          email,
+          username,
+          action: "add",
+          prod_id: product.id,
+        });
+
+        console.log(
+          `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
+        );
+        window.dispatchEvent(new Event("wishlist-updated"));
+        toast.success(`${product.prod_name.substring(0,25)+'...'} added to your wishlist!`, {
+          position: "top-right",
+          autoClose: 2000,
         });
       }
     } catch (error) {
-      console.error("Error verifying user or updating wishlist:", error);
+      console.error("Error updating wishlist:", error);
       toast.error("An error occurred while updating wishlist.", {
         position: "top-right",
         autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
       });
     }
   };
 
   useEffect(() => {
-    const updateFavorites = () => {
-      const favouritesKey = "favourites";
-      const currentFavourites = localStorage.getItem(favouritesKey) || "";
-      const favouriteProducts = currentFavourites
-        .split(",")
-        .reduce((acc, item) => {
-          if (item.startsWith("faredheart-")) {
-            const [_, productName, productId] = item.split("-");
-            acc[`${productName}-${productId}`] = true;
-          }
-          return acc;
-        }, {});
+    const fetchWishlist = async () => {
+      const email = localStorage.getItem("email");
+      const username = localStorage.getItem("username");
 
-      setFavorites(favouriteProducts);
+
+
+      try {
+        const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
+          email,
+          username,
+        });
+
+        if (response.data.wishlist) {
+          const wishlist = response.data.wishlist;
+          const favoritesMap = {};
+
+          // Set the favorites map based on product IDs in the wishlist
+          wishlist.forEach((item) => {
+            favoritesMap[`${item}`] = true; // Mark product ID as in wishlist
+          });
+
+          setFavorites(favoritesMap); // Update the favorites state
+        }
+      } catch (error) {
+        console.error("Error fetching wishlist:", error);
+      }
     };
 
-    // Initial fetch
-    updateFavorites();
+    // Fetch wishlist immediately
+    fetchWishlist();
 
-    // Set interval to fetch favorites every second
-    const intervalId = setInterval(updateFavorites, 100);
+    // Set an interval to fetch the wishlist every second
+    const intervalId = setInterval(() => {
+      fetchWishlist();
+    }, 1000); // Update every second (1000ms)
 
-    // Clear interval on component unmount
+    // Cleanup the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, []);
+
+  // useEffect(() => {
+  //   const updateFavorites = () => {
+  //     const favouritesKey = "favourites";
+  //     const currentFavourites = localStorage.getItem(favouritesKey) || "";
+  //     const favouriteProducts = currentFavourites
+  //       .split(",")
+  //       .reduce((acc, item) => {
+  //         if (item.startsWith("faredheart-")) {
+  //           const [_, productName, productId] = item.split("-");
+  //           acc[`${productName}-${productId}`] = true;
+  //         }
+  //         return acc;
+  //       }, {});
+
+  //     setFavorites(favouriteProducts);
+  //   };
+
+  //   // Initial fetch
+  //   updateFavorites();
+
+  //   // Set interval to fetch favorites every second
+  //   const intervalId = setInterval(updateFavorites, 100);
+
+  //   // Clear interval on component unmount
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   const handleProductClick = (product) => {
     const slugify = (name) =>
@@ -318,19 +208,19 @@ const ProductList = () => {
     const combinedProducts =
       categoryName === "HeadphonesAndSpeakers"
         ? [
-            ...(productsByCategory["headphones"] || []),
-            ...(productsByCategory["Speakers"] || []),
-          ]
+          ...(productsByCategory["Headphones"] || []),
+          ...(productsByCategory["Speakers"] || []),
+        ]
         : categoryName === "Accessories"
-        ? [
+          ? [
             ...(productsByCategory["ComputerAccessories"] || []),
             ...(productsByCategory["MobileAccessories"] || []),
             ...(productsByCategory["CCTVAccessories"] || []),
             ...(productsByCategory["PrinterAccessories"] || []),
           ]
-        : productsByCategory[categoryName] || [];
-        
-          if (!loading && combinedProducts.length === 0) return null;
+          : productsByCategory[categoryName] || [];
+
+    if (!loading && combinedProducts.length === 0) return null;
 
 
     return (
@@ -405,125 +295,123 @@ const ProductList = () => {
           >
             {loading || combinedProducts.length === 0
               ? [...Array(5)].map((_, index) => (
-                  <SwiperSlide key={index}>
-                    <div className="skeletonproductcard">
-                      <div className="skeletonimage"></div>
-                      <div className="skeletontext"></div>
-                      <div className="skeletontext short"></div>
-                      <div className="skeletonprice"></div>
-                    </div>
-                  </SwiperSlide>
-                ))
+                <SwiperSlide key={index}>
+                  <div className="skeletonproductcard">
+                    <div className="skeletonimage"></div>
+                    <div className="skeletontext"></div>
+                    <div className="skeletontext short"></div>
+                    <div className="skeletonprice"></div>
+                  </div>
+                </SwiperSlide>
+              ))
               : combinedProducts.map((product, idx) => {
-                  const images = Array.isArray(product.prod_img)
-                    ? product.prod_img
-                    : JSON.parse(product.prod_img || "[]");
-                  const firstImage = images.length > 0 ? images[0] : null;
-                  return (
-                    <SwiperSlide
-                      key={idx}
-                      className={`product-slide ${
-                        combinedProducts.length > 5 &&
-                        idx === combinedProducts.length - 1
-                          ? "last-product"
-                          : ""
+                const images = Array.isArray(product.prod_img)
+                  ? product.prod_img
+                  : JSON.parse(product.prod_img || "[]");
+                const firstImage = images.length > 0 ? images[0] : null;
+                return (
+                  <SwiperSlide
+                    key={idx}
+                    className={`product-slide ${combinedProducts.length > 5 &&
+                      idx === combinedProducts.length - 1
+                      ? "last-product"
+                      : ""
                       }`}
-                    >
-                      <div
-                        onClick={() => handleProductClick(product)}
-                        className={`custom-slider-product ${
-                          combinedProducts.length > 5 &&
-                          idx === combinedProducts.length - 1
-                            ? "blurred"
-                            : ""
+                  >
+                    <div
+                      onClick={() => handleProductClick(product)}
+                      className={`custom-slider-product ${combinedProducts.length > 5 &&
+                        idx === combinedProducts.length - 1
+                        ? "blurred"
+                        : ""
                         }`}
-                      >
-                        {product.offer_label && (
-                          <div className="product-label">
-                            {product.offer_label.charAt(0).toUpperCase() +
-                              product.offer_label.slice(1)}
-                          </div>
-                        )}
-                        {firstImage ? (
-                          <img
-                            src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
-                            alt={product.prod_name}
-                            className="custom-slider-image"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div>No image available</div>
-                        )}
-                        <span
-                          title="Add to Wishlist"
-                          className={`favorite-icon ${
-                            favorites[`${product.prod_name}-${product.id}`]
-                              ? "filled"
-                              : ""
+                    >
+                      {product.offer_label && (
+                        <div className="product-label">
+                          {product.offer_label.charAt(0).toUpperCase() +
+                            product.offer_label.slice(1)}
+                        </div>
+                      )}
+                      {firstImage ? (
+                        <img
+                          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                          alt={product.prod_name}
+                          className="custom-slider-image"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div>No image available</div>
+                      )}
+                      <span
+                        title={
+                          favorites[`${product.id}`]
+                            ? "Remove from Wishlist"
+                            : "Add to Wishlist"
+                        }
+                        className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
                           }`}
-                          onClick={(event) =>
-                            handleToggleFavorite(product, event)
-                          }
-                        >
-                          {favorites[`${product.prod_name}-${product.id}`] ? (
-                            <FaHeart />
-                          ) : (
-                            <FaRegHeart />
-                          )}
-                        </span>
-                        <h3 className="custom-slider-name">
-                          {product.prod_name}
-                        </h3>
-                        {product.subtitle && (
-                          <span className="custom-slider-subtitle">
-                            {product.subtitle}
-                          </span>
+                        onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
+                      >
+                        {favorites[`${product.id}`] ? (
+                          <FaHeart style={{ color: "red" }} /> // Filled heart
+                        ) : (
+                          <FaRegHeart /> // Empty heart
                         )}
-                        <p className="product-actual-price">
+                      </span>
+
+                      <h3 className="custom-slider-name">
+                        {product.prod_name}
+                      </h3>
+                      {product.subtitle && (
+                        <span className="custom-slider-subtitle">
+                          {product.subtitle}
+                        </span>
+                      )}
+                      <p className="product-actual-price">
+                        <span
+                          className="product-price"
+                          style={{
+                            color: "#27ae60",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                          }}
+                        >
+                          ₹{product.prod_price}
+                        </span>
+                        <span>
                           <span
-                            className="product-price"
                             style={{
-                              color: "#27ae60",
-                              fontWeight: "bold",
-                              fontSize: "20px",
+                              color: "black",
+                              marginLeft: "5px",
+                              marginRight: "3px",
                             }}
                           >
-                            ₹{product.prod_price}
+                            M.R.P
                           </span>
-                          <span>
-                            <span
-                              style={{
-                                color: "black",
-                                marginLeft: "5px",
-                                marginRight: "3px",
-                              }}
-                            >
-                              M.R.P
-                            </span>
-                            <span
-                              style={{
-                                textDecoration: "line-through",
-                                color: "red",
-                              }}
-                            >
-                              ₹{product.actual_price}
-                            </span>
-                          </span>
-                          <br />
                           <span
-                            className="discount"
-                            style={{ color: "green", marginLeft: "5px" }}
+                            style={{
+                              textDecoration: "line-through",
+                              color: "red",
+                            }}
                           >
-                            (
-                            {Math.round(
-                              ((product.actual_price - product.prod_price) /
-                                product.actual_price) *
-                                100
-                            )}
-                            % OFF)
+                            ₹{product.actual_price}
                           </span>
-                        </p>
-                        {/* {product.status === "unavailable" ? (
+                        </span>
+                        <br />
+                        <span
+                          className="discount"
+                          style={{ color: "green", marginLeft: "5px" }}
+                        >
+                          (
+                          {Math.round(
+                            ((product.actual_price - product.prod_price) /
+                              product.actual_price) *
+                            100
+                          )}
+                          % OFF)
+                        </span>
+                      </p>
+                      {/* {product.status === "unavailable" ? (
             <p 
               style={{
                 color: "red",
@@ -545,12 +433,12 @@ const ProductList = () => {
               Add to cart
             </button>
           )} */}
-                      </div>
+                    </div>
 
-                      {combinedProducts.length > 5 &&
-                        idx === combinedProducts.length - 1 && (
-                          <div className="see-more-wrapper">
-                            {/* <button
+                    {combinedProducts.length > 5 &&
+                      idx === combinedProducts.length - 1 && (
+                        <div className="see-more-wrapper">
+                          {/* <button
         onClick={() => {
           const lastProductCategory =
             combinedProducts[combinedProducts.length - 1].category;
@@ -560,37 +448,37 @@ const ProductList = () => {
       >
         VIEW MORE
       </button> */}
-                            <button
-                              class="animated-button"
-                              onClick={() => {
-                                const lastProductCategory =
-                                  combinedProducts[combinedProducts.length - 1]
-                                    .category;
-                                navigate(`/${lastProductCategory}`);
-                              }}
+                          <button
+                            class="animated-button"
+                            onClick={() => {
+                              const lastProductCategory =
+                                combinedProducts[combinedProducts.length - 1]
+                                  .category;
+                              navigate(`/${lastProductCategory}`);
+                            }}
+                          >
+                            <svg
+                              viewBox="0 0 24 24"
+                              class="arr-2"
+                              xmlns="http://www.w3.org/2000/svg"
                             >
-                              <svg
-                                viewBox="0 0 24 24"
-                                class="arr-2"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-                              </svg>
-                              <span class="text">View More</span>
-                              <span class="circle"></span>
-                              <svg
-                                viewBox="0 0 24 24"
-                                class="arr-1"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-                              </svg>
-                            </button>
-                          </div>
-                        )}
-                    </SwiperSlide>
-                  );
-                })}
+                              <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                            </svg>
+                            <span class="text">View More</span>
+                            <span class="circle"></span>
+                            <svg
+                              viewBox="0 0 24 24"
+                              class="arr-1"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                  </SwiperSlide>
+                );
+              })}
           </Swiper>
         </div>
       </div>

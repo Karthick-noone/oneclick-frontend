@@ -26,10 +26,9 @@
 }
 
 .custom-arrow {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     padding: 5px;
-
     position: absolute;
     top: 50%;
     transform: translateY(-50%);

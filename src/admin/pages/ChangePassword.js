@@ -7,6 +7,8 @@ import axios from 'axios'; // Import axios for making API requests
 import './css/ChangePassword.css'; // Import the CSS file for styling
 import { ApiUrl } from '../../components/ApiUrl';
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
@@ -47,48 +49,84 @@ const ChangePassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const { oldPassword, newPassword, confirmPassword } = formData;
-  
+
     if (oldPassword === '' || newPassword === '' || confirmPassword === '') {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'All fields are required!',
+      // Swal.fire({
+      //   icon: 'error',
+      //   title: 'Oops...',
+      //   text: 'All fields are required!',
+      // });
+      toast.warning("All fields are required", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
       return;
     }
-  
+
     if (newPassword.length < 5) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Password too short',
-        text: 'New password should be at least 5 characters long.',
+      // Swal.fire({
+      //   icon: 'error',
+      //   title: 'Password too short',
+      //   text: 'New password should be at least 5 characters long.',
+      // });
+      toast.error("New password should be at least 5 characters long.", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
       return;
     }
-  
+
     if (newPassword !== confirmPassword) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Passwords do not match',
-        text: 'Confirm password should match the new password.',
+      // Swal.fire({
+      //   icon: 'error',
+      //   title: 'Passwords do not match',
+      //   text: '',
+      // });
+      toast.error("Confirm password should match the new password.", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
       return;
     }
-  
+
     try {
       // Make the API request to change the password
       const response = await axios.post(`${ApiUrl}/api/change-password`, {
         oldPassword,
         newPassword,
       });
-  
+
       if (response.data.success) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Password Changed',
-          text: 'Your password has been successfully changed!',
+        // Swal.fire({
+        //   icon: 'success',
+        //   title: 'Password Changed',
+        //   text: '',
+        // });
+        toast.success("Password updated successfully!", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
         });
         // Optionally, you can navigate the user to another page or clear the form
         setFormData({
@@ -97,21 +135,29 @@ const ChangePassword = () => {
           confirmPassword: '',
         });
       } else {
-        // Handle specific error messages
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: response.data.message || 'Failed to change password.',
+        toast.error(response.data.message || "Failed to change password.", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
         });
       }
+
     } catch (error) {
-      console.error('API request error:', error); // Log the actual error for debugging
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Something went wrong. Please try again later.',
+      toast.error(error.response?.data?.message || "Something went wrong. Please try again later.", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
     }
+
   };
 
   return (
@@ -134,7 +180,7 @@ const ChangePassword = () => {
                     onChange={handleChange}
                     placeholder="Enter your old password"
                     required
-                    style={{color:'black'}}
+                    style={{ color: 'black' }}
                     className='custom-input'
 
                   />
@@ -158,7 +204,7 @@ const ChangePassword = () => {
                     value={formData.newPassword}
                     onChange={handleChange}
                     placeholder="Enter your new password"
-                    style={{color:'black'}}
+                    style={{ color: 'black' }}
                     required
                     className='custom-input'
 
@@ -184,7 +230,7 @@ const ChangePassword = () => {
                     onChange={handleChange}
                     placeholder="Confirm your new password"
                     required
-                    style={{color:'black'}}
+                    style={{ color: 'black' }}
                     className='custom-input'
 
 
@@ -206,6 +252,8 @@ const ChangePassword = () => {
           </div>
         </div>
       </main>
+      <ToastContainer />
+
     </div>
   );
 };

@@ -1,4 +1,4 @@
-/* From Uiverse.io by adamgiebl */ 
+/* From Uiverse.io by adamgiebl */
 .cssbuttons-io-button {
   background: #a370f0;
   color: white;
@@ -57,68 +57,101 @@
 
 /* Header2.css */
 .item-features {
-  display: -webkit-box; /* Use a box layout for controlling text lines */
-  -webkit-box-orient: vertical; /* Set orientation to vertical */
-  overflow: hidden; /* Hide any overflowing content */
-  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
-  white-space: normal; /* Allow text to wrap */
+  display: -webkit-box;
+  /* Use a box layout for controlling text lines */
+  -webkit-box-orient: vertical;
+  /* Set orientation to vertical */
+  overflow: hidden;
+  /* Hide any overflowing content */
+  text-overflow: ellipsis;
+  /* Add ellipsis at the end of the text */
+  white-space: normal;
+  /* Allow text to wrap */
 
-  font-size: 16px; /* Adjust as per your design */
-  line-height: 1.5; /* Set line height */
-  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+  font-size: 16px;
+  /* Adjust as per your design */
+  line-height: 1.5;
+  /* Set line height */
+  max-height: 3em;
+  /* 1.5 * 2 lines = 3em max height */
 }
 
 
 
 /* Header2.css */
 .item-name {
-  display: -webkit-box; /* Use a box layout for controlling text lines */
-  -webkit-box-orient: vertical; /* Set orientation to vertical */
-  overflow: hidden; /* Hide any overflowing content */
-  text-overflow: ellipsis; /* Add ellipsis at the end of the text */
-  white-space: normal; /* Allow text to wrap */
+  display: -webkit-box;
+  /* Required for WebKit-based browsers */
+  /* display: box;                        */
+  -webkit-box-orient: vertical;
+  /* Required for WebKit-based browsers */
+  box-orient: vertical;
+  /* Fallback for other browsers */
+  overflow: hidden;
+  /* Hide overflow content */
+  -webkit-line-clamp: 1;
+  /* Limit to 2 lines in WebKit-based browsers */
+  line-clamp: 1;
+  /* Future proofing for standard implementation */
+  text-overflow: ellipsis;
+}
 
-  font-size: 16px; /* Adjust as per your design */
-  line-height: 1.5; /* Set line height */
-  max-height: 3em; /* 1.5 * 2 lines = 3em max height */
+
+
+.item-features {
+  display: -webkit-box;
+  /* Required for WebKit-based browsers */
+  /* display: box;                        */
+  -webkit-box-orient: vertical;
+  /* Required for WebKit-based browsers */
+  box-orient: vertical;
+  /* Fallback for other browsers */
+  overflow: hidden;
+  /* Hide overflow content */
+  -webkit-line-clamp: 1;
+  /* Limit to 2 lines in WebKit-based browsers */
+  line-clamp: 1;
+  /* Future proofing for standard implementation */
+  text-overflow: ellipsis;
 }
 
 
 
 
 .sidebarcart.open {
-    transform: translateX(0);
+  transform: translateX(0);
 }
 
 .close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #333;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 /* Sidebar cart header styles */
 .sidebarcart-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #333;
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 18.5px;
+  border-bottom: 1px solid #818181;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  /* background-color: #0056b3; */
 }
 
 .header2 {
   position: sticky;
   top: 0;
-  z-index: 1002;
+  z-index: 1000;
   /* background-color: black  ; */
-  background-color: #001a35  ;
+  background-color: #001a35;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -127,7 +160,8 @@
 }
 
 .header2 .company-name {
-  font-size: 26px; /* Reduced font size */
+  font-size: 26px;
+  /* Reduced font size */
   font-weight: 700;
   color: #333;
 }
@@ -135,8 +169,10 @@
 .header2 .search-box {
   position: relative;
   flex-grow: 1;
-  margin: 0 15px;
+  /* margin: 0 15px; */
+  margin-left: 18px;
 }
+
 .total-prices {
   /* font-size: 16px ; */
   font-weight: bold;
@@ -148,15 +184,13 @@
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5), -2px -2px 5px rgba(255, 255, 255, 0.9);
 }
 
-
-
-
 .header2 .search-box input {
   width: 100%;
   padding: 8px 40px 8px 15px;
   border: 1px solid #e7e7e7;
   border-radius: 20px;
-  font-size: 14px; /* Reduced font size */
+  font-size: 14px;
+  /* Reduced font size */
 }
 
 .header2 .search-box button {
@@ -173,29 +207,41 @@
 .header2 .iconss {
   display: flex;
   align-items: center;
-  gap:30px;
+  gap: 30px;
 }
 
 .header2 .iconss svg {
-  color: white; /* Dark iconss for contrast */
-  font-size: 20px; /* Reduced icon size */
+  color: white;
+  /* Dark iconss for contrast */
+  font-size: 20px;
+  /* Reduced icon size */
   cursor: pointer;
 }
+
 .header2 .iconss .cart-count {
   position: absolute;
   top: -10px;
   right: 25px;
   background-color: red;
+  border: 1px solid white;
   color: white;
-  padding: 2px; /* Adjust padding as needed */
-  width: 20px; /* Set a fixed width */
-  height: 20px; /* Set a fixed height */
-  border-radius: 50%; /* Make it round */
+  padding: 2px;
+  /* Adjust padding as needed */
+  width: 20px;
+  /* Set a fixed width */
+  height: 20px;
+  /* Set a fixed height */
+  border-radius: 50%;
+  /* Make it round */
   font-size: 12px;
-  display: flex; /* Use flexbox to center the text */
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
-  text-align: center; /* Center text */
+  display: flex;
+  /* Use flexbox to center the text */
+  align-items: center;
+  /* Center vertically */
+  justify-content: center;
+  /* Center horizontally */
+  text-align: center;
+  /* Center text */
 }
 
 .cart-icon-container {
@@ -205,7 +251,8 @@
 
 .cart-count2 {
   position: absolute;
-  right: -22px; /* Adjust position */
+  right: -22px;
+  /* Adjust position */
   background-color: red;
   color: white;
   font-size: 12px;
@@ -217,6 +264,7 @@
   justify-content: center;
   align-items: center;
 }
+
 .clear-icon {
   font-size: 18px;
   color: #999;
@@ -239,13 +287,15 @@
 }
 
 .icons2 {
-  transform: rotateY(180deg); /* Initially flipped */
+  transform: rotateY(180deg);
+  /* Initially flipped */
   transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
   cursor: pointer;
 }
 
 .icons2:hover {
-  transform: scale(1.2) rotateY(180deg) !important; /* Zoom on hover */
+  transform: scale(1.2) rotateY(180deg) !important;
+  /* Zoom on hover */
   filter: brightness(1.4);
 }
 
@@ -255,14 +305,21 @@
 .dots {
   font-size: 20px;
   color: #333;
-  cursor:pointer;
+  cursor: pointer;
   margin-left: 22px;
   transition: transform 0.3s ease-in-out;
+  /* padding: 5px; */
 
 }
 
-.dots:hover {
+/* .dots:hover {
   transform: rotate(180deg);
+} */
+.dot-rotate {
+  transform: rotate(180deg);
+  /* border: 1px solid #888; */
+  /* padding: 5px; */
+
 }
 
 .dropdown-item {
@@ -274,68 +331,148 @@
   color: black;
 }
 
-.dropdown-menu {
-  position: absolute;
-  top: 69px; /* Adjust based on icon size and placement */
-  right:1px; /* Aligns the dropdown to the right of the icon */
-  background-color: white;
-  border: 1px solid #ccc;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  padding: 10px 0;
-  z-index: 1000;
-  width: 180px;
-  border-radius: 8px;
+.userLogo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 1px solid rgba(230, 230, 230, 0.396);
+  border-radius: 20px;
+  padding: 4px 10px;
 }
 
-.iicon{
-  color: black;
+
+/* Base dropdown menu styles */
+.dropdown-menu {
+  position: absolute;
+  top: 52px;
+  right: -20px;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  z-index: 1002 !important;
+  transform: translateY(-15px);
+  animation: dropdownSlideDown 0.4s ease forwards;
 }
-.dropdown-menu a{
+
+/* Keyframes for dropdown animation */
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dropdown content styling */
+.dropdown-menu {
+  min-width: 170px;
+  padding: 10px 0;
+}
+
+.dropdown-menu .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #e0e0e0;
+}
+
+/* Active item */
+.dropdown-item.active {
+  background-color: #e0e0e0;
+  font-weight: 600;
+}
+
+.iicon {
+  font-size: 16px;
+  color: #333 !important;
+}
+
+.dropdown-menu a {
   text-decoration: none;
   color: black;
 }
+
 .dropdown-menu div {
   padding: 10px 20px;
   cursor: pointer;
 }
+
 .dropdown-icon {
   margin-right: 12px;
-  font-size: 15px;
+  font-size: 14px;
+  color: #2A55E5 !important;
 
 }
 
 .dropdown-menu div:hover {
   background-color: #f0f0f0;
 }
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .header2 {
-      flex-direction: column;
-      gap: 13px;
-      text-align: center;
+    flex-direction: column;
+    gap: 13px;
+    text-align: center;
+    z-index: 999;
   }
 
+  .userLogo {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    border: 1px solid rgba(230, 230, 230, 0.396);
+    border-radius: 20px;
+    padding: 3px 10px;
+  }
+
+  .icons:hover {
+    transform: none;
+    filter: brightness(1.5);
+  }
+
+  .search-product-icon:hover {
+    transform: none;
+    filter: brightness(1.4);
+  }
+
+
   .dropdown-menu {
-    top: 180px; /* Adjust based on icon size and placement */
-   
+    top: 180px;
+    /* Adjust based on icon size and placement */
+
   }
 
   .header2 .search-box {
-      margin: 0;
-      width: 100%;
-      flex-grow: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    margin: 0;
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .header2 .iconss {
-      justify-content: center;
+    justify-content: center;
   }
 
 
   .dots {
-   display: none;
+    display: none;
   }
 
   .header2 .iconss .cart-count {
@@ -344,17 +481,25 @@
     right: -13px;
     background-color: red;
     color: white;
-    padding: 1px; /* Adjust padding as needed */
-    width: 20px; /* Set a fixed width */
-    height: 20px; /* Set a fixed height */
-    border-radius: 50%; /* Make it round */
+    padding: 1px;
+    /* Adjust padding as needed */
+    width: 20px;
+    /* Set a fixed width */
+    height: 20px;
+    /* Set a fixed height */
+    border-radius: 50%;
+    /* Make it round */
     font-size: 11px;
-    display: flex; /* Use flexbox to center the text */
-    align-items: center; /* Center vertically */
-    justify-content: center; /* Center horizontally */
-    text-align: center; /* Center text */
+    display: flex;
+    /* Use flexbox to center the text */
+    align-items: center;
+    /* Center vertically */
+    justify-content: center;
+    /* Center horizontally */
+    text-align: center;
+    /* Center text */
   }
-  
+
 }
 
 
@@ -363,15 +508,17 @@
   top: 0;
   right: 0;
   width: 330px;
-  height: 100vh; /* Full viewport height */
+  height: 100vh;
+  /* Full viewport height */
   background-color: #ffffff;
   color: #333;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
   transform: translateX(100%);
   transition: transform 0.6s ease;
-  padding-top: 10px;
+  /* padding-top: 10px; */
   z-index: 1004;
-  overflow: hidden; /* Hide overflow to ensure content doesn’t push out */
+  overflow: hidden;
+  /* Hide overflow to ensure content doesn’t push out */
 }
 
 /* Adjusted sidebar content area */
@@ -379,14 +526,19 @@
   display: flex;
   flex-direction: column;
   padding: 0 20px;
-  overflow: auto; /* Allow scrolling if content overflows */
-  height: calc(100vh - 60px); /* Adjust for footer height */
+  overflow: auto;
+  /* Allow scrolling if content overflows */
+  height: calc(100vh - 60px);
+  /* Adjust for footer height */
 }
+
 .sidebarcart-body p {
-    margin-top: 50%; /* Remove default margin */
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Center vertically if needed */
+  margin-top: 50%;
+  /* Remove default margin */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Center vertically if needed */
 }
 
 /* Ensure that items and the footer are correctly positioned */
@@ -394,113 +546,136 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  flex: 1; /* Allow ul to take available space */
+  flex: 1;
+  /* Allow ul to take available space */
   margin-bottom: 80px
 }
 
 /* Footer at the bottom of the sidebar */
 .sidebarcart-footer {
-  position: absolute; /* Position at the bottom */
+  position: absolute;
+  /* Position at the bottom */
   bottom: 0;
   left: 0;
   width: 100%;
   background-color: #fff;
-  padding: 20px 20px; /* Padding for footer content */
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3); /* Optional shadow */
+  padding: 20px 20px;
+  /* Padding for footer content */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+  /* Optional shadow */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 1000; /* Ensure footer is on top of other content */
+  z-index: 1000;
+  /* Ensure footer is on top of other content */
   font-size: 16px;
 
 }
 
 
 .sidebarcart-body li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #ddd;  
-    padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
 }
 
+
+
 .sidebarcart-body img {
-    width: 80px; /* Adjust size */
-    height: 80px; /* Adjust size */
-    object-fit: contain;
-    margin-right: 10px;
-    /* border: 1px solid black; */
+  width: 80px;
+  /* Adjust size */
+  height: 80px;
+  /* Adjust size */
+  object-fit: contain;
+  margin-right: 10px;
+  /* border: 1px solid black; */
+}
+
+
+.empty-cart-image {
+  /* width: 80px; */
+  /* Adjust size */
+  width: 200px !important;
+  height: 200px !important;
+  /* Adjust size */
+  object-fit: contain;
+  margin-right: 10px;
+  filter: drop-shadow(14px 6px 8px rgba(0, 0, 0, .7));
+  /* border: 1px solid black; */
 }
 
 .item-details {
-    flex: 1;
+  flex: 1;
 }
 
 .item-details h3 {
-    margin: 0;
-    font-size: 14px;
+  margin: 0;
+  font-size: 14px;
 }
 
 .item-details p {
-    margin: 0;
-    color: #555;
-    font-size: 14px;
+  margin: 0;
+  color: #555;
+  font-size: 14px;
 
 }
 
 .item-price {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .item-price p {
-    margin: 0;
-    font-size: 14px;
+  margin: 0;
+  font-size: 14px;
 }
 
 .quantity-controls {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
 }
+
 .btns {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
 }
 
 .quantity-controls button {
-    background: #f0f0f0;
-    border: 1px solid #ddd;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 5px 10px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px 10px;
 }
 
 .quantity-controls span {
-    margin: 0 10px;
-    font-size: 18px;
+  margin: 0 10px;
+  font-size: 18px;
 }
 
 .remove-btn {
-    background: #ff4d4f;
-    border: none;
-    color: white;
-    padding: 5px 10px;
-    cursor: pointer;
-    margin-top: 10px;
-    font-size: 14px;
+  background: #ff4d4f;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 14px;
 }
 
 .move-btn {
-    background: #049974;
-    border: none;
-    color: white;
-    padding: 5px 10px;
-    cursor: pointer;
-    margin-top: 10px;
-    font-size: 12px;
+  background: #049974;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 12px;
 }
 
 
@@ -517,10 +692,10 @@
 
 /* Header2.css */
 .cart-icon-container {
-    position: relative;
-  }
-  
-  /* .cart-count {
+  position: relative;
+}
+
+/* .cart-count {
     position: absolute;
     top: -8px;
     right: -8px;
@@ -534,184 +709,245 @@
    */
 
 
-  /* Header2.css */
+/* Header2.css */
 
 /* Wishlist Sidebar styles */
 .wishlist-sidebar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 330px;
-    height: 100vh;
-    background-color: #ffffff;
-    color: #333;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
-    transform: translateX(100%);
-    transition: transform 0.6s ease;
-    padding-top: 10px;
-    z-index: 1004;
-    overflow: auto;
-  }
-  
-  .wishlist-sidebar.open {
-    transform: translateX(0);
-  }
-  
-  .wishlist-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #333;
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .wishlist-body {
-    display: flex;
-    flex-direction: column;
-    padding: 0 20px;
-  }
-  
-  .wishlist-body p {
-    margin-top: 50%; /* Remove default margin */
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Center vertically if needed */
-  }
-  
-  .wishlist-body ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .wishlist-body li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-  }
-  
-  .wishlist-body img {
-    width: 80px; /* Adjust size */
-    height: 80px; /* Adjust size */
-    object-fit: cover;
-    margin-right: 10px;
-  }
-  
-  .item-details {
-    flex: 1;
-  }
-  
-  .item-details h3 {
-    margin: 0;
-    font-size: 14px;
-  }
-  
-  .item-details p {
-    margin: 5px 0;
-    font-size: 12px;
-    color: #666;
-  }
-  
-  .remove-btn {
-    background: #f8f8f8;
-    border: none;
-    color: #ff0000;
-    cursor: pointer;
-    font-size: 12px;
-  }
-  
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 330px;
+  height: 100vh;
+  background-color: #ffffff;
+  color: #333;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  transform: translateX(100%);
+  transition: transform 0.6s ease;
+  padding-top: 10px;
+  z-index: 1004;
+  overflow: auto;
+}
 
-  .close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #333;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-  }
-  
-  .wishlist-footer {
-    text-align: center;
-    padding: 10px;
-    border-top: 2px solid #333;
-  }
-  
+.wishlist-sidebar.open {
+  transform: translateX(0);
+}
+
+.wishlist-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #333;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.wishlist-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+}
+
+.wishlist-body p {
+  margin-top: 50%;
+  /* Remove default margin */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Center vertically if needed */
+}
+
+.wishlist-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.wishlist-body li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.wishlist-body img {
+  width: 80px;
+  /* Adjust size */
+  height: 80px;
+  /* Adjust size */
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-details h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.item-details p {
+  margin: 5px 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.remove-btn {
+  background: #f8f8f8;
+  border: none;
+  color: #ff0000;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.wishlist-footer {
+  text-align: center;
+  padding: 10px;
+  border-top: 2px solid #333;
+}
+
 /* Container for the search box */
 /* Container for the search box */
 .search-box {
-  position: fixed; /* Ensure dropdown is positioned relative to this container */
-  display: flex; /* Align input and button horizontally */
-  align-items: center; /* Center vertically */
-  max-width: 710px; /* Maximum width for the search box */
-  margin: 0 auto; /* Center the search box in its container */
-  border-radius: 5px; /* Rounded corners for the rectangular shape */
-  overflow: hidden; /* Hide overflow for rounded corners */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
-  background-color: #fff; /* Background color of the search box */
+  position: fixed;
+  /* Ensure dropdown is positioned relative to this container */
+  display: flex;
+  /* Align input and button horizontally */
+  align-items: center;
+  /* Center vertically */
+  max-width: 710px;
+  /* Maximum width for the search box */
+  margin: 0 auto;
+  /* Center the search box in its container */
+  border-radius: 5px;
+  /* Rounded corners for the rectangular shape */
+  overflow: hidden;
+  /* Hide overflow for rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* Add shadow for depth */
+  background-color: #fff;
+  /* Background color of the search box */
 }
 
 /* Styling for the input field */
 .search-box input[type="text"] {
-  border: none; /* Remove default border */
-  padding: 10px; /* Add padding for spacing */
-  font-size: 1rem; /* Font size */
-  flex: 1; /* Allow input to take up available space */
-  outline: none; /* Remove outline on focus */
+  border: none;
+  /* Remove default border */
+  padding: 10px;
+  /* Add padding for spacing */
+  font-size: 1rem;
+  /* Font size */
+  flex: 1;
+  /* Allow input to take up available space */
+  outline: none;
+  /* Remove outline on focus */
 }
 
 /* Container for the search icon */
 .search-box .search-icon-container {
-  display: flex; /* Align items horizontally */
-  align-items: center; /* Center icon vertically */
-  justify-content: center; /* Center icon horizontally */
-  background-color: #ffc68e; /* Light orange background for the box */
-  padding: 10px; /* Padding inside the box */
-  cursor: pointer; /* Pointer cursor on hover */
-  margin-left: 8px; /* Space between the input and the icon box */
+  display: flex;
+  /* Align items horizontally */
+  align-items: center;
+  /* Center icon vertically */
+  justify-content: center;
+  /* Center icon horizontally */
+  background-color: #ffc68e;
+  /* Light orange background for the box */
+  padding: 11px;
+  /* Padding inside the box */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  margin-left: 8px;
+  /* Space between the input and the icon box */
 }
 
 /* Styling for the search icon */
 .search-box .search-icon {
-  font-size: 1.2rem; /* Adjust size as needed */
-  color: #333; /* Icon color */
+  font-size: 1.2rem;
+  /* Adjust size as needed */
+  color: #333;
+  /* Icon color */
 }
 
 .suggestions-dropdown {
   position: absolute;
-  top: 79.5%; /* Push dropdown below the search box */
-  left: 52.7%;
-  transform: translateX(-50%); /* Center it below the search bar */
-  width: 100%; /* Default: Full width of search box */
-  max-width: 710px; /* Limit width for large screens */
-  background: #fff; /* White background */
+  top: 79.5%;
+  /* Push dropdown below the search box */
+  left: 50.1%;
+  transform: translateX(-50%);
+  /* Center it below the search bar */
+  width: 100%;
+  /* Default: Full width of search box */
+  max-width: 710px;
+  /* Limit width for large screens */
+  background: #fff;
+  /* White background */
   border: 1px solid #ddd;
-  border-radius: 8px; /* Slightly rounded corners */
+  border-radius: 8px;
+  /* Slightly rounded corners */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   list-style: none;
   padding: 8px 0;
   margin: 0;
-  max-height: 180px;
+  max-height: 280px;
   overflow-y: auto;
   z-index: 1003;
   transition: all 0.2s ease-in-out;
 }
 
+.suggestions-dropdown li.highlighted {
+  background-color: #ffcb90;
+  cursor: pointer;
+  align-items: center;
+}
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.suggestion-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 6px;
+  /* border: 1px solid #eee; */
+}
+
+.suggestion-text {
+  font-size: 16px;
+  color: #333;
+}
+
 /* Hide dropdown on small screens until search is active */
 @media (max-width: 768px) {
   .suggestions-dropdown {
-    width: 90%;
+    width: 98%;
     max-width: 500px;
     border-radius: 6px;
-    left: 49.3%;
-    top:73%
+    left: 50%;
+    top: 134%;
+    max-height: 250px;
   }
+
+  /* 1) BACKDROP styles (full‐screen semi-transparent overlay) */
+
 }
 
 /* Hover & Click Effect */
@@ -726,6 +962,121 @@
 .suggestions-dropdown li:hover {
   background: #f5f5f5;
 }
+
+/* Hide mobile search icon on desktop */
+.mobile-search-icon {
+  display: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #333;
+  /* z-index: 1001; */
+}
+
+
+/* Hide the normal search‐box on mobile */
+@media (max-width: 768px) {
+  .search-box {
+    display: none;
+  }
+
+  .mobile-backdrop {
+    position: fixed;
+    top: 10px;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* background: rgba(0, 0, 0, 0.9); */
+    z-index: 1000;
+    /* sits above page content but below the search‐box & dropdown */
+  }
+
+  /* Show only the little search‐icon on mobile nav/header */
+  .mobile-search-icon {
+    display: block;
+    /* you already have this in your code */
+    font-size: 0.5rem;
+    cursor: pointer;
+    color: #333;
+    position: relative;
+    z-index: 999;
+    margin-left: 10px;
+    /* adjust to fit your header layout */
+  }
+
+
+
+
+  /*─────────────────────────────────────────
+    3) “×” close icon on the top‐right of that overlay
+  ─────────────────────────────────────────*/
+
+  .mobile-close-icon {
+    display: block;
+    position: absolute;
+    top: 10px;
+    /* push it upward so it sits at the very top of the overlay box */
+    right: 10px;
+    /* push it right outside the overlay’s rounded corner */
+    font-size: 1.4rem;
+    background: #fff;
+    border-radius: 50%;
+    padding: 2px;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    z-index: 1300;
+    /* above the overlay */
+  }
+}
+
+@media (max-width: 768px) {
+  .search-box.mobile-overlay {
+    position: fixed;
+    top: 121px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.5);
+    transform-origin: 90% 0%;
+    /* Adjust this based on icon's position */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    width: 98%;
+    max-width: 500px;
+    padding: 0;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    align-items: center;
+    z-index: 1000;
+    height: 40px;
+    display: flex !important;
+  }
+
+  .search-box.mobile-overlay.show {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .clear-icon {
+    margin-right: 70px;
+  }
+
+  .search-box.mobile-overlay input {
+    flex: 1;
+    font-size: 14px;
+    padding: 8px 40px 8px 15px;
+  }
+
+  .search-box.mobile-overlay .search-icon-container {
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+/* Keep your existing styles for search-box input, icons, etc. */
+
 
 /* Improve scrollbar visibility */
 .suggestions-dropdown::-webkit-scrollbar {
@@ -756,19 +1107,28 @@
 
 /* Error message styling */
 .no-suggestions {
-  padding: 10px 15px; /* Padding for error message */
-  color: red; /* Red text color for errors */
-  font-size: 0.875rem; /* Slightly smaller font size */
-  text-align: center; /* Center text alignment */
-  list-style: none; /* Remove default list style */
-  background-color: #fff; /* Background color for error message */
+  padding: 10px 15px;
+  /* Padding for error message */
+  color: red;
+  /* Red text color for errors */
+  font-size: 0.875rem;
+  /* Slightly smaller font size */
+  text-align: center;
+  /* Center text alignment */
+  list-style: none;
+  /* Remove default list style */
+  background-color: #fff;
+  /* Background color for error message */
 }
 
 /* Error message styling */
 .error-message {
-  color: rgb(53, 49, 49); /* Red text color for errors */
-  font-size: 0.875rem; /* Slightly smaller font size */
-  margin-top: 10px; /* Space above the error message */
+  color: rgb(53, 49, 49);
+  /* Red text color for errors */
+  font-size: 0.875rem;
+  /* Slightly smaller font size */
+  margin-top: 10px;
+  /* Space above the error message */
 }
 
 .iconss {
@@ -776,7 +1136,7 @@
   align-items: center;
   margin-left: 30px;
   gap: 40px;
- 
+
 }
 
 .search-icon {
@@ -789,65 +1149,71 @@
 
 /* Button hover effect */
 .search-box button:hover {
-  background-color: #0056b3; /* Darker background on hover */
+  background-color: #0056b3;
+  /* Darker background on hover */
 }
 
 /* Optional: Add responsive design for smaller screens */
 @media (max-width: 768px) {
   .search-box {
-      width: 100%; /* Full width on smaller screens */
-      max-width: none; /* Remove max-width constraint */
+    width: 100%;
+    /* Full width on smaller screens */
+    max-width: none;
+    /* Remove max-width constraint */
   }
-  
+
 }
 
 /* Styling for the cart total price */
 .cart-total p {
   margin: 0;
-  font-size: 16px; /* Font size for total price */
-  font-weight: bold; /* Bold text */
-  
+  font-size: 16px;
+  /* Font size for total price */
+  font-weight: bold;
+  /* Bold text */
+
 }
 
 
 
 .sidebarcart-footer p {
-  margin: 0; /* Remove default margin */
+  margin: 0;
+  /* Remove default margin */
 }
 
 .sidebarcart-footer a {
-  text-decoration: none; /* Remove underline */
-  color: black; /* Text color */
+  text-decoration: none;
+  /* Remove underline */
+  color: black;
+  /* Text color */
 }
 
 /* Style the scrollbar track */
 .sidebarcart-body::-webkit-scrollbar {
-  width: 10px; /* Width of the scrollbar */
+  width: 10px;
+  /* Width of the scrollbar */
 }
 
 /* Style the scrollbar handle */
 .sidebarcart-body::-webkit-scrollbar-thumb {
-  background-color: #888; /* Color of the scrollbar handle */
-  border-radius: 10px; /* Rounded corners for the scrollbar handle */
-  border: 3px solid #fff; /* Adds some space between handle and track */
+  background-color: #888;
+  /* Color of the scrollbar handle */
+  border-radius: 10px;
+  /* Rounded corners for the scrollbar handle */
+  border: 3px solid #fff;
+  /* Adds some space between handle and track */
 }
 
 /* Style the scrollbar handle on hover */
 .sidebarcart-body::-webkit-scrollbar-thumb:hover {
-  background-color: #555; /* Darker color when hovering */
+  background-color: #555;
+  /* Darker color when hovering */
 }
 
 /* Optional: Style the scrollbar track (area not covered by handle) */
 .sidebarcart-body::-webkit-scrollbar-track {
-  background-color: #f1f1f1; /* Color of the track */
-  border-radius: 10px; /* Rounded corners for the track */
+  background-color: #f1f1f1;
+  /* Color of the track */
+  border-radius: 10px;
+  /* Rounded corners for the track */
 }
-
-
-
-
-
-
-
-
-

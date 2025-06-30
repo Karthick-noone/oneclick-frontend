@@ -1,11 +1,354 @@
-/* .laptops-modal-form-container {
-  padding: 20px;
-  max-width: 900px;
-  margin: 0 auto;
-  background-color: #fff;
+.filters-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  margin: 20px auto;
+  width: 750px;
+  max-width: 90%;
+  background: linear-gradient(to right, #e3f2fd, #ffffff);
+
+}
+
+.filters-card2 {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  margin: 20px auto;
+  width: 550px;
+  max-width: 90%;
+  background: linear-gradient(to right, #e3f2fd, #ffffff);
+}
+
+.laptops-stats-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  /* letter-spacing: 1px; */
+}
+
+.filters-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  /* Don't wrap to next line */
+  gap: 10px;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  white-space: nowrap;
+  /* Keep label text in one line */
+}
+
+.filter-label-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0056b3;
+  /* Subtle blue to match theme */
+  margin-right: 16px;
+  padding: 6px 12px;
+  border: 1px solid #cce5ff;
+  background-color: #e9f5ff;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 123, 255, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+
+.filter-label input {
+  margin-right: 6px;
+}
+
+.filter-search-wrapper {
+  position: relative;
+  width: 180px;
+  /* Reduced width */
+  flex-shrink: 0;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 6px 28px 6px 30px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.filter-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  outline: none;
+}
+
+.filter-input:hover {
+  border-color: #0056b3;
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6);
+}
+
+.filter-clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+  color: #888;
+}
+
+.search-icon-btn {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+  color: #333;
+}
+
+.dotted-divider {
+  border: none;
+  border-top: 2px dotted #aaa;
+  margin: 16px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.search-icon-inside {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  /* Allow clicks to pass through */
+  color: #888;
+}
+
+.filter-clear-btn:hover {
+  color: #333;
+}
+
+.empty-state-message {
+  text-align: center;
+  padding: 20px 20px;
+  color: #d32f2f;
+  /* deeper red for better contrast */
+  font-size: 20px;
+  font-weight: 600;
+  background: linear-gradient(to right, #fff0f0, #ffecec);
+  border: 1px solid #f5c2c7;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-} */
+  margin: 40px auto;
+  max-width: 600px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+
+.laptops-summary-stats-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.laptops-stat-card {
+  background: linear-gradient(to right, #e3f2fd, #ffffff);
+  border: 1px solid #d0d0d0;
+  padding: 16px 24px;
+  border-radius: 10px;
+  min-width: 160px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.laptops-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.laptops-stat-card h5 {
+  font-size: 15px;
+  margin-bottom: 6px;
+  color: #333;
+  font-weight: 600;
+}
+
+.laptops-stat-card p {
+  font-size: 22px;
+  color: #007bff;
+  font-weight: bold;
+}
+
+@media (max-width: 480px) {
+  .filters-panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-search-wrapper {
+    width: 100%;
+  }
+
+  .filters-card {
+    width: 90%;
+    padding: 12px;
+  }
+}
+
+
+.product-extras {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.coupon-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.coupon-image-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.coupon-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  object-fit: cover;
+  /* border: 1px solid #ccc; */
+}
+
+.coupon-status-dot {
+  position: absolute;
+  bottom: 1px;
+  right: -7px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  /* border: 1px solid white; */
+  z-index: 2;
+  cursor: pointer;
+}
+
+
+.green-dot {
+  background-color: green;
+}
+
+.red-dot {
+  background-color: red;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  font-size: 12px;
+  border-radius: 5px;
+  padding: 5px 8px;
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  z-index: 3;
+}
+
+.coupon-image-wrapper:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+/* Add blink animation */
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+  }
+
+  50% {
+    opacity: 0.3;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  }
+}
+
+.accessory-count-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.accessory-count {
+  font-size: 15px;
+  /* padding: 8px 8px; */
+  /* background-color: #b7ffcc; */
+  /* color: #2e7d32; */
+  /* border-radius: 5px;
+  font-weight: 500;
+  white-space: nowrap; */
+  cursor: pointer;
+}
+
+
+.accessory-count .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  font-size: 12px;
+  border-radius: 5px;
+  padding: 5px 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 120%;
+  /* above the element */
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+.accessory-count:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+
 .product-table {
   width: 80%;
   border-collapse: collapse;
@@ -15,13 +358,39 @@
   margin-bottom: 20px;
 }
 
+.product-type-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  /* background-color: #f1f5f9; */
+  padding: 10px 20px;
+  border-radius: 12px;
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
+  font-size: 18px;
+}
+
+.product-type-label {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.product-type-value {
+  color: #0f172a;
+  text-transform: uppercase;
+  font-weight: 600;
+  background-color: #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 3px;
+}
+
 .product-table td {
   border: 1px solid #ddd;
   padding: 5px;
   text-align: center;
 }
-.product-table th
-{
+
+.product-table th {
   border: 1px solid #ddd;
   padding: 10px;
   text-align: center;
@@ -30,50 +399,59 @@
 }
 
 .product-name-cell {
-  padding: 2px 5px; /* Reduced padding */
-  max-width: 110px; /* Adjusted width */
+  padding: 2px 5px;
+  /* Reduced padding */
+  max-width: 110px;
+  /* Adjusted width */
   text-overflow: ellipsis;
   overflow: hidden;
-  white-space: nowrap; /* Prevents text from wrapping */
-  font-size: 14px; /* Adjusted font size */
+  white-space: nowrap;
+  /* Prevents text from wrapping */
+  font-size: 14px;
+  /* Adjusted font size */
 }
+
 .action-icon {
   transition: 0.3s ease;
 }
+
 .action-icon:hover {
   transform: scale(1.2);
 }
 
-.product-name-cell, 
-.product-price-cell, 
-.product-actual-price-cell, 
-.product-edit-btn-cell, 
+.product-name-cell,
+.product-price-cell,
+.product-actual-price-cell,
+.product-edit-btn-cell,
 .product-delete-btn-cell {
-  padding: 1px 1px !important; /* Reduced padding for all td elements */
+  padding: 1px 1px !important;
+  /* Reduced padding for all td elements */
 }
 
 .product-image-cell {
   text-align: center;
-  max-width: 70px; /* Adjusted width */
+  max-width: 70px;
+  /* Adjusted width */
   /* padding: 10px; */
 
 }
 
 
 
-.product-price-cell, 
+.product-price-cell,
 .product-actual-price-cell {
   font-size: 14px;
   text-align: center;
 }
 
-.product-edit-btn-cell, 
+.product-edit-btn-cell,
 .product-delete-btn-cell {
   text-align: center;
 }
 
 .table-btn {
-  padding: 5px 10px; /* Reduced padding inside buttons */
+  padding: 5px 10px;
+  /* Reduced padding inside buttons */
   font-size: 14px;
   border-radius: 6px;
 }
@@ -124,16 +502,16 @@
 }
 
 
-.custom-file-input-button:focus
- {
-  border-color: #007bff; /* Change border color on focus */
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a glowing effect */
+.custom-file-input-button:focus {
+  border-color: #007bff;
+  /* Change border color on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  /* Add a glowing effect */
 }
 
-.custom-file-input-button:hover
- {
-  border-color: #0056b3; 
-  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); 
+.custom-file-input-button:hover {
+  border-color: #0056b3;
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6);
 }
 
 
@@ -142,6 +520,7 @@
 .file-icon {
   margin-right: 8px;
 }
+
 .laptops-modal-title {
   font-size: 24px;
   margin-bottom: 20px;
@@ -167,37 +546,46 @@
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  width: 500px; /* Fixed width */
-  height: 500px; /* Fixed height */
+  width: 500px;
+  /* Fixed width */
+  height: 500px;
+  /* Fixed height */
   position: relative;
   text-align: center;
-  overflow: auto; /* Ensure arrows are contained within the modal */
+  overflow: auto;
+  /* Ensure arrows are contained within the modal */
 }
 
 .modal-content3 {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  width: 600px; /* Fixed width */
-  height: 440px; /* Fixed height */
+  width: 600px;
+  /* Fixed width */
+  height: 440px;
+  /* Fixed height */
   position: relative;
   text-align: center;
-  overflow: auto; /* Ensure arrows are contained within the modal */
+  overflow: auto;
+  /* Ensure arrows are contained within the modal */
 }
 
 
 
 .laptops-modal-content {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Two columns for left and right sections */
+  grid-template-columns: 1fr 1fr;
+  /* Two columns for left and right sections */
   gap: 10px;
 }
 
 /* Left section styling */
 .laptops-modal-left-section {
   display: flex;
-  flex-direction: column; /* Stack items vertically */
-  gap: 10px; /* Space between each label-value pair */
+  flex-direction: column;
+  /* Stack items vertically */
+  gap: 10px;
+  /* Space between each label-value pair */
   padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;
@@ -207,7 +595,8 @@
 
 .laptops-modal-left-section p {
   display: flex;
-  justify-content: space-between; /* Space between label and value */
+  justify-content: space-between;
+  /* Space between label and value */
   font-size: 14px;
   margin: 5px 0;
   color: #555;
@@ -215,12 +604,14 @@
 
 .laptops-modal-left-section strong {
   color: #333;
-  flex: 1; /* Allow label to take available space */
+  flex: 1;
+  /* Allow label to take available space */
   text-align: left;
 }
 
 .laptops-modal-left-section span {
-  flex: 1; /* Allow value to take remaining space */
+  flex: 1;
+  /* Allow value to take remaining space */
   text-align: left;
   font-weight: normal;
 }
@@ -237,7 +628,21 @@
 /* Media query for responsive view (small screens) */
 @media (max-width: 768px) {
   .laptops-modal-content {
-    grid-template-columns: 1fr; /* Stack the sections vertically */
+    grid-template-columns: 1fr;
+    /* Stack the sections vertically */
+  }
+
+  .custom-file-input-button {
+    /* display: inline-flex; */
+    align-items: center;
+    background-color: white;
+    color: #333;
+    border: 1px solid #cacaca;
+    padding: 10px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s ease;
   }
 
   /* Ensuring both sections still have full width on smaller screens */
@@ -247,7 +652,8 @@
   }
 }
 
-.upload-container, .frequently-buy {
+.upload-container,
+.frequently-buy {
   margin-top: 10px;
   padding: 15px;
   background-color: #fff;
@@ -264,7 +670,9 @@
   border-radius: 5px;
 }
 
-.upload-button, .offer-submit-btn, .offer-delete-btn {
+.upload-button,
+.offer-submit-btn,
+.offer-delete-btn {
   color: #4CAF50;
   /* color: white; */
   border: none;
@@ -328,7 +736,8 @@
   background-color: #f1f1f1;
 }
 
-.coupon-code, .expiry-date {
+.coupon-code,
+.expiry-date {
   font-weight: bold;
 }
 
@@ -354,12 +763,15 @@
 
 .frequently-buy-icon:hover {
   color: #00d6d6;
-  transform: scale(1.2); /* Slightly enlarges the icon on hover */
+  transform: scale(1.2);
+  /* Slightly enlarges the icon on hover */
 
 }
+
 .copy-icon:hover {
   color: #00d6d6;
-  transform: scale(1.2); /* Slightly enlarges the icon on hover */
+  transform: scale(1.2);
+  /* Slightly enlarges the icon on hover */
 
 }
 
@@ -430,44 +842,63 @@
 }
 
 .view-details-btn {
-  background-color: #4CAF50; /* Green background */
-  color: white; /* White text */
-  padding: 8px 15px; /* Add padding for more space inside the button */
-  border: none; /* Remove border */
-  cursor: pointer; /* Pointer cursor on hover */
-  display: flex; /* Flexbox for alignment */
-  align-items: center; /* Vertically center the icon and text */
-  gap: 10px; /* Space between the icon and text */
-  font-size: 14px; /* Slightly larger font size for better readability */
-  transition: background-color 0.3s, transform 0.2s; /* Smooth transition for hover effects */
+  background-color: #4CAF50;
+  /* Green background */
+  color: white;
+  /* White text */
+  padding: 8px 15px;
+  /* Add padding for more space inside the button */
+  border: none;
+  /* Remove border */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  display: flex;
+  /* Flexbox for alignment */
+  align-items: center;
+  /* Vertically center the icon and text */
+  gap: 10px;
+  /* Space between the icon and text */
+  font-size: 14px;
+  /* Slightly larger font size for better readability */
+  transition: background-color 0.3s, transform 0.2s;
+  /* Smooth transition for hover effects */
   margin: 10px;
 }
 
 /* Hover effect */
 .view-details-btn:hover {
-  background-color: #45a049; /* Slightly darker green on hover */
-  transform: translateY(-2px); /* Small lift effect */
+  background-color: #45a049;
+  /* Slightly darker green on hover */
+  transform: translateY(-2px);
+  /* Small lift effect */
 }
 
 /* Focus effect */
 .view-details-btn:focus {
-  outline: none; /* Remove default focus outline */
-  box-shadow: 0 0 0 3px rgba(72, 230, 103, 0.5); /* Green glow on focus */
+  outline: none;
+  /* Remove default focus outline */
+  box-shadow: 0 0 0 3px rgba(72, 230, 103, 0.5);
+  /* Green glow on focus */
 }
 
 /* Button container (to add space around the button) */
 .button-container {
-  margin: 20px; /* Add space around the button */
+  margin: 20px;
+  /* Add space around the button */
   display: flex;
-  justify-content: center; /* Center button horizontally */
-  align-items: center; /* Center button vertically */
+  justify-content: center;
+  /* Center button horizontally */
+  align-items: center;
+  /* Center button vertically */
 }
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .view-details-btn {
-    font-size: 14px; /* Slightly smaller font size on mobile */
-    padding: 10px 15px; /* Adjust padding for smaller screens */
+    font-size: 14px;
+    /* Slightly smaller font size on mobile */
+    padding: 10px 15px;
+    /* Adjust padding for smaller screens */
   }
 }
 
@@ -533,6 +964,22 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+/* General container styling */
+.secondhand-product-form-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 500px;
+  /* width: 100%; */
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  justify-content: space-between;
 }
 
 /* Left and Right sections */
@@ -562,16 +1009,19 @@
   font-size: 14px;
   outline: none;
 }
+
 .laptops-input:focus,
 .laptops-textarea:focus {
-  border-color: #007bff; /* Change border color on focus */
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a glowing effect */
+  border-color: #007bff;
+  /* Change border color on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  /* Add a glowing effect */
 }
 
 .laptops-input:hover,
 .laptops-textarea:hover {
-  border-color: #0056b3; 
-  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); 
+  border-color: #0056b3;
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6);
 }
 
 
@@ -615,13 +1065,16 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: grey; /* Semi-transparent background */
+  background-color: grey;
+  /* Semi-transparent background */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2; /* Ensure modal is above other content */
+  z-index: 2;
+  /* Ensure modal is above other content */
   padding: 20px;
 }
+
 /* Edit button */
 .offer-edit-btn {
   cursor: pointer;
@@ -631,9 +1084,10 @@
   margin-top: 5px;
 }
 
-.offer-timer{
+.offer-timer {
   margin-top: 5px;
 }
+
 .offer-edit-icon {
   margin-right: 8px;
 }
@@ -643,6 +1097,7 @@
   margin-right: 8px;
   font-weight: 500;
 }
+
 /* Modal Content */
 .offer-modal-content {
   background-color: #fff;
@@ -670,7 +1125,8 @@
 }
 
 .offer-close-btn:hover {
-  color: red; /* Change color on hover */
+  color: red;
+  /* Change color on hover */
 }
 
 /* Modal Title */
@@ -702,7 +1158,8 @@
 }
 
 .offer-input:focus {
-  border-color: #007bff; /* Highlight input border on focus */
+  border-color: #007bff;
+  /* Highlight input border on focus */
   outline: none;
 }
 
@@ -720,7 +1177,8 @@
 }
 
 .offer-submit-btn:hover {
-  background-color: #0056b3; /* Darken on hover */
+  background-color: #0056b3;
+  /* Darken on hover */
 }
 
 /* Delete Offer Button */
@@ -738,7 +1196,8 @@
 }
 
 .offer-delete-btn:hover {
-  background-color: #e60000; /* Darken on hover */
+  background-color: #e60000;
+  /* Darken on hover */
 }
 
 /* Animation for modal opening */
@@ -747,6 +1206,7 @@
     opacity: 0;
     transform: scale(0.9);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -775,13 +1235,17 @@
 
 .frequently-buy {
   display: flex;
-  align-items: center; /* Aligns items vertically in the center */
-  gap: 8px; /* Adds spacing between label and icon */
+  align-items: center;
+  /* Aligns items vertically in the center */
+  gap: 8px;
+  /* Adds spacing between label and icon */
 }
 
 .frequently-buy-label {
-  font-size: 16px; /* Adjust font size for the label */
-  color: #333; /* Adjust color if needed */
+  font-size: 16px;
+  /* Adjust font size for the label */
+  color: #333;
+  /* Adjust color if needed */
 }
 
 
@@ -799,12 +1263,13 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  overflow: hidden;
 }
 
 .freq-modal-content {
   background: white;
   border-radius: 8px;
-  width: 400px;
+  width: 440px;
   padding: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   position: relative;
@@ -842,7 +1307,8 @@
   border: 1px solid #ddd;
   padding: 10px;
   border-radius: 6px;
-  justify-content: space-between; /* Ensures spacing between elements */
+  justify-content: space-between;
+  /* Ensures spacing between elements */
 
 }
 
@@ -857,15 +1323,21 @@
   flex: 2;
   font-size: 1rem;
   font-weight: 500;
+  text-align: left;
 }
 
 .freq-item-details {
-  flex: 1; /* Occupies remaining space */
+  flex: 1;
+  /* Occupies remaining space */
   display: flex;
-  align-items: center; /* Aligns content vertically */
-  justify-content: space-between; /* Spreads name and price evenly */
-  gap: 10px; /* Adds spacing between name and price */
+  align-items: center;
+  /* Aligns content vertically */
+  justify-content: space-between;
+  /* Spreads name and price evenly */
+  gap: 10px;
+  /* Adds spacing between name and price */
 }
+
 .freq-item-price {
   /* flex: 1; */
   font-size: 0.9rem;
@@ -877,7 +1349,8 @@
   flex: 0;
   transform: scale(1.2);
   cursor: pointer;
-  margin-left: auto; /* Pushes the checkbox to the right */
+  margin-left: auto;
+  /* Pushes the checkbox to the right */
 }
 
 
@@ -900,15 +1373,24 @@
 
 
 .laptops-product-coupon {
-  display: inline-block; /* Makes the box only as wide as its content */
-  padding: 8px 10px; /* Adds padding inside the box */
-  background-color: #f8f9fa; /* Light background color */
-  border: 1px solid #007bff; /* Blue border color */
-  border-radius: 5px; /* Rounded corners */
-  color: #007bff; /* Text color to match the border */
-  font-weight: bold; /* Make the text bold */
-  margin: 10px 0; /* Adds margin above and below the box */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  display: inline-block;
+  /* Makes the box only as wide as its content */
+  padding: 8px 10px;
+  /* Adds padding inside the box */
+  background-color: #f8f9fa;
+  /* Light background color */
+  border: 1px solid #007bff;
+  /* Blue border color */
+  border-radius: 5px;
+  /* Rounded corners */
+  color: #007bff;
+  /* Text color to match the border */
+  font-weight: bold;
+  /* Make the text bold */
+  margin: 10px 0;
+  /* Adds margin above and below the box */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow for depth */
   font-size: 14px;
 }
 
@@ -916,19 +1398,29 @@
 
 
 .upload-button {
-  background-color: #4CAF50; /* Green background */
-  color: white; /* White text */
-  padding: 10px 20px; /* Padding for button */
-  margin-top: 10px; /* Space between input and button */
-  margin-left: 20px; /* Space between input and button */
-  border: none; /* Remove default border */
-  border-radius: 5px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s; /* Smooth transition for hover effect */
+  background-color: #4CAF50;
+  /* Green background */
+  color: white;
+  /* White text */
+  padding: 10px 20px;
+  /* Padding for button */
+  margin-top: 10px;
+  /* Space between input and button */
+  margin-left: 20px;
+  /* Space between input and button */
+  border: none;
+  /* Remove default border */
+  border-radius: 5px;
+  /* Rounded corners */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  transition: background-color 0.3s;
+  /* Smooth transition for hover effect */
 }
 
 .upload-button:hover {
-  background-color: #45a049; /* Darker green on hover */
+  background-color: #45a049;
+  /* Darker green on hover */
 }
 
 .slick-arrow {
@@ -938,49 +1430,66 @@
 
 
 .slider-container {
-  position: relative; /* Make the container relative for absolute positioning of arrows */
+  position: relative;
+  /* Make the container relative for absolute positioning of arrows */
 }
 
 .image-wrapper:focus {
   outline: none;
- }
+}
 
 .image-wrapper {
-  position: relative; /* Make the wrapper relative for proper image positioning */
+  position: relative;
+  /* Make the wrapper relative for proper image positioning */
 }
 
 .custom-arrow {
-  width: 40px; /* Set width for arrows */
-  height: 40px; /* Set height for arrows */
-  background-color: rgba(255, 255, 255, 0.6); /* Semi-transparent background */
-  border: 2px solid rgba(0, 0, 0, 0.4); /* Add border for visibility */
-  border-radius: 50%; /* Make it round */
+  width: 40px;
+  /* Set width for arrows */
+  height: 40px;
+  /* Set height for arrows */
+  background-color: rgba(255, 255, 255, 0.6);
+  /* Semi-transparent background */
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  /* Add border for visibility */
+  border-radius: 50%;
+  /* Make it round */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10; /* Ensure arrows are on top */
-  cursor: pointer; /* Change cursor to pointer */
-  transition: background-color 0.3s, border-color 0.3s; /* Add transitions for smooth effects */
+  z-index: 10;
+  /* Ensure arrows are on top */
+  cursor: pointer;
+  /* Change cursor to pointer */
+  transition: background-color 0.3s, border-color 0.3s;
+  /* Add transitions for smooth effects */
 }
 
 .custom-arrow:hover {
-  background-color: rgb(255, 0, 0); /* Change background on hover */
-  border-color: rgba(0, 0, 0, 0.8); /* Darken border on hover */
+  background-color: rgb(255, 0, 0);
+  /* Change background on hover */
+  border-color: rgba(0, 0, 0, 0.8);
+  /* Darken border on hover */
 }
 
 
 .slick-dots {
-  bottom: 10px; /* Position dots */
+  bottom: 10px;
+  /* Position dots */
 }
 
 .slick-dots li button:before {
-  font-size: 12px; /* Size of the dots */
-  color: rgb(255, 255, 255); /* Color of the dots */
+  font-size: 12px;
+  /* Size of the dots */
+  color: rgb(255, 255, 255);
+  /* Color of the dots */
 }
 
 .slick-dots li.slick-active button:before {
-  color: #ff6600; /* Color of the active dot */
+  color: #ff6600;
+  /* Color of the active dot */
 }
+
 .image-actions {
   position: absolute;
   top: 10px;
@@ -997,322 +1506,440 @@
 }
 
 .action-icon:hover {
-  color: #007bff; /* Change color on hover */
+  color: #007bff;
+  /* Change color on hover */
 }
 
 
 
 .adminmodal-input1 {
-  width: 70%;   
-  height: 100px;                    /* Full width */
-  padding: 12px 16px;               /* Padding for comfort */
-  border: 1px solid #ddd;        /* Border color */
-  border-radius: 8px;               /* Rounded corners */
-  background-color: #ffffff;        /* Light background */
-  color: #333;                      /* Text color */
-  font-size: 16px;                  /* Font size */
-  font-family: 'Arial', sans-serif; /* Font family */
-  resize: none;  
-                     /* Disable resizing */
+  width: 70%;
+  height: 100px;
+  /* Full width */
+  padding: 12px 16px;
+  /* Padding for comfort */
+  border: 1px solid #ddd;
+  /* Border color */
+  border-radius: 8px;
+  /* Rounded corners */
+  background-color: #ffffff;
+  /* Light background */
+  color: #333;
+  /* Text color */
+  font-size: 16px;
+  /* Font size */
+  font-family: 'Arial', sans-serif;
+  /* Font family */
+  resize: none;
+  /* Disable resizing */
 }
 
 
 
 /* Style for textarea */
 .laptops-card-input1 {
-  width: 100%; /* Full width */
-  min-height: 19px; /* Minimum height to start with */
-  max-height: 300px; /* Optional: Maximum height to prevent overflow */
-  padding: 10px; /* Comfortable padding */
-  border-radius: 4px; /* Rounded corners */
-  background-color: white; /* Light background */
-  font-size: 14px; /* Font size */
+  width: 100%;
+  /* Full width */
+  min-height: 19px;
+  /* Minimum height to start with */
+  max-height: 300px;
+  /* Optional: Maximum height to prevent overflow */
+  padding: 10px;
+  /* Comfortable padding */
+  border-radius: 4px;
+  /* Rounded corners */
+  background-color: white;
+  /* Light background */
+  font-size: 14px;
+  /* Font size */
   box-sizing: border-box;
-  border: 1px solid #ddd; /* Border style */
-  resize: vertical; /* Allow vertical resizing */
-  transition: border-color 0.3s ease; /* Smooth transition */
+  border: 1px solid #ddd;
+  /* Border style */
+  resize: vertical;
+  /* Allow vertical resizing */
+  transition: border-color 0.3s ease;
+  /* Smooth transition */
 }
 
 /* Container for icons */
 .icons-container {
-  display: flex; /* Align icons in a row */
-  align-items: center; /* Center icons vertically */
+  display: flex;
+  /* Align icons in a row */
+  align-items: center;
+  /* Center icons vertically */
 }
 
 
 
 .laptops-page {
-    display: flex;
+  display: flex;
+  flex-direction: column;
+  margin-top: 70px;
+}
+
+.laptops-content {
+  margin-left: 250px;
+  /* Adjust based on sidebar width */
+  padding: 20px;
+}
+
+.product-label {
+  position: absolute;
+  /* Use absolute positioning */
+  top: 10px;
+  /* Distance from the top */
+  left: 10px;
+  /* Distance from the left */
+  background-color: #00A098;
+  /* Background color */
+  color: white;
+  /* Text color */
+  padding: 5px 10px;
+  /* Padding around the label */
+  border-radius: 3px;
+  /* Rounded corners */
+  font-size: 12px;
+  /* Font size */
+  font-weight: bold;
+  /* Bold text */
+  z-index: 1;
+  /* Ensure label is on top of the image */
+  box-shadow: 0 4px 15px rgba(0, 160, 152, 0.75);
+  /* Glow effect */
+  text-transform: uppercase;
+  /* Make label uppercase */
+  letter-spacing: 1px;
+  /* Add letter spacing for style */
+  /* transform: rotate(-30deg);  */
+  animation: shine 2s infinite linear;
+  /* Add a shine animation */
+}
+
+/* Create a shining effect */
+@keyframes shine {
+  0% {
+    background-color: #00A098;
+    /* Starting color */
+    box-shadow: 0 0 10px rgba(0, 160, 152, 0.5), 0 0 20px rgba(0, 160, 152, 0.3);
+  }
+
+  50% {
+    background-color: #00D6C1;
+    /* Lighter shining color */
+    box-shadow: 0 0 20px rgba(0, 214, 193, 0.8), 0 0 30px rgba(0, 214, 193, 0.6);
+  }
+
+  100% {
+    background-color: #00A098;
+    /* Back to original color */
+    box-shadow: 0 4px 15px rgba(0, 160, 152, 0.75);
+  }
+}
+
+.laptops-page-title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  font-size: 24px;
+}
+
+.laptops-card {
+  width: 500px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.laptops-card-item {
+  font-weight: bold;
+  color: #34495e;
+  display: flex;
+}
+
+.laptops-card-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Group related selectors for consistency */
+.laptops-card-input:focus,
+.laptops-card-input1:focus,
+.laptops-card-input2:focus,
+.adminmodal-input:focus,
+.adminmodal-input1:focus,
+.adminmodal-input5:focus,
+.feature-input:focus,
+.feature-textarea:focus {
+  border-color: #007bff;
+  /* Change border color on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  /* Add a glowing effect */
+  outline: none;
+  /* Remove default outline */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  /* Smooth transition */
+}
+
+
+/* Optional: Add hover effect for consistency */
+.laptops-card-input:hover,
+.laptops-card-input1:hover,
+.laptops-card-input2:hover,
+.adminmodal-input:hover,
+.adminmodal-input1:hover,
+.adminmodal-input5:hover,
+.feature-input:hover,
+.feature-textarea:hover {
+  border-color: #0056b3;
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6);
+}
+
+
+.laptops-card-input2 {
+  width: 25%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .laptops-card-row3 {
     flex-direction: column;
-    margin-top: 70px;
+    /* Stack items vertically */
   }
-  
-  .laptops-content {
-    margin-left: 250px; /* Adjust based on sidebar width */
-    padding: 20px;
+
+  .laptops-card-input4 {
+
+    width: 100%;
+    /* Full width for smaller screens */
   }
-  
-  .product-label {
-    position: absolute; /* Use absolute positioning */
-    top: 10px; /* Distance from the top */
-    left: 10px; /* Distance from the left */
-    background-color: #00A098; /* Background color */
-    color: white; /* Text color */
-    padding: 5px 10px; /* Padding around the label */
-    border-radius: 3px; /* Rounded corners */
-    font-size: 12px; /* Font size */
-    font-weight: bold; /* Bold text */
-    z-index: 1; /* Ensure label is on top of the image */
-    box-shadow: 0 4px 15px rgba(0, 160, 152, 0.75); /* Glow effect */
-    text-transform: uppercase; /* Make label uppercase */
-    letter-spacing: 1px; /* Add letter spacing for style */
-    /* transform: rotate(-30deg);  */
-    animation: shine 2s infinite linear; /* Add a shine animation */
+}
+
+@media (max-width: 480px) {
+  .laptops-card-row3 {
+    flex-direction: column;
+    /* Stack items vertically */
   }
-  
-  /* Create a shining effect */
-  @keyframes shine {
-    0% {
-      background-color: #00A098; /* Starting color */
-      box-shadow: 0 0 10px rgba(0, 160, 152, 0.5), 0 0 20px rgba(0, 160, 152, 0.3);
-    }
-    50% {
-      background-color: #00D6C1; /* Lighter shining color */
-      box-shadow: 0 0 20px rgba(0, 214, 193, 0.8), 0 0 30px rgba(0, 214, 193, 0.6);
-    }
-    100% {
-      background-color: #00A098; /* Back to original color */
-      box-shadow: 0 4px 15px rgba(0, 160, 152, 0.75);
-    }
+
+  .laptops-card-input {
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
   }
-  
-  .laptops-page-title {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #2c3e50;
-    font-size: 24px;
-  }
-  
+
   .laptops-card {
-    width: 500px;
+    width: 350px;
     margin: 0 auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
-  
-
-  .laptops-card-item {
-    font-weight: bold;
-    color: #34495e;
-  }
-  
-  .laptops-card-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-/* Group related selectors for consistency */
-.laptops-card-input:focus, 
-.laptops-card-input1:focus, 
-.laptops-card-input2:focus, 
-.adminmodal-input:focus, 
-.adminmodal-input1:focus, 
-.adminmodal-input5:focus, 
-.feature-input:focus, 
-.feature-textarea:focus {
-  border-color: #007bff; /* Change border color on focus */
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a glowing effect */
-  outline: none; /* Remove default outline */
-  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-}
 
 
-/* Optional: Add hover effect for consistency */
-.laptops-card-input:hover, 
-.laptops-card-input1:hover, 
-.laptops-card-input2:hover, 
-.adminmodal-input:hover, 
-.adminmodal-input1:hover, 
-.adminmodal-input5:hover, 
-.feature-input:hover, 
-.feature-textarea:hover {
-  border-color: #0056b3; 
-  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); 
-}
-
-  
-  .laptops-card-input2 {
-    width: 25%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  @media (max-width: 768px) {
-    .laptops-card-row3 {
-      flex-direction: column; /* Stack items vertically */
-    }
-  
-    .laptops-card-input4{
-    
-      width: 100%; /* Full width for smaller screens */
-    }
-  }
-  @media (max-width: 480px) {
-    .laptops-card-row3 {
-      flex-direction: column; /* Stack items vertically */
-    }
-
-    .laptops-card-input {
-      width: 80%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
-  }
-
-    .laptops-card {
-      width: 350px;
-      margin: 0 auto;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-
-    .freq-modal-content {
-      background: white;
-      border-radius: 8px;
-      width: 325px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      position: relative;
-    }
-  
-    .laptops-card-input4{
-    
-      width: 100% !important; /* Full width for smaller screens */
-    }
-  }
-  
-  .laptops-card-input4 {
-    width: 14%; /* Assign 25% width to the Effective Price input */
-    padding: 10px; /* Add padding for better UX */
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Ensure padding is included in width */
-  }
-  
-  .laptops-card-input5 {
-    width: 75%; /* Full width */
-    min-height: 19px; /* Minimum height to start with */
-    max-height: 300px; /* Optional: Maximum height to prevent overflow */
-    padding: 10px; /* Comfortable padding */
-    background-color: white; /* Light background */
-    font-size: 14px; /* Font size */
-    border-radius: 5px;
-    box-sizing: border-box;
-    border: 1px solid #ddd; /* Border style */
-    resize: vertical; /* Allow vertical resizing */
-    transition: border-color 0.3s ease; /* Smooth transition */
-  }
-  
-  
-  .laptops-card-inputt {
-    width: 100%;
-    padding-top: 8px;
-    padding-left: 2px;
-    padding-bottom: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  .laptops-add-btn {
-    background-color: #1abc9c;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .laptops-add-btn:hover {
-    background-color: #16a085;
-  }
-  
-  .laptops-products-list {
-    margin-top: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-  }
-
-  .laptops-product-actual-price {
-    color: #e74c3c; /* Red color for actual price */
-    font-size: 14px;
-  }
-
-  .actual-price{
-    text-decoration: line-through; /* Strike through for the actual price */
-
-  }
-  
-  .laptops-product-pricee {
-    font-weight: bold; /* Make selling price bold */
-    color: #27ae60; /* Green color for the selling price */
-    font-size: 16px;
-  }
-  
-  .laptops-product-deliverycharge {
-    font-weight: bold; /* Make selling price bold */
-    color: #df8634; /* Green color for the selling price */
-    font-size: 14px;
-  }
-  
-  .laptops-product-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 280px; /* Increase card width */
-    border: 1px solid #ccc;
+  .freq-modal-content {
+    background: white;
     border-radius: 8px;
-    padding: 15px;
-    margin: 10px;
-    background-color: #fff;
-  }
-  
-  .laptops-product-image {
-    width: 100%;
-    height: 200px; 
-    overflow: hidden;
-    object-fit: contain;
-    /* display: flex; */
-    /* justify-content: center; */
-    /* align-items: center; */
-    margin-bottom: 10px;
+    width: 325px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    position: relative;
   }
 
+  .laptops-card-input4 {
 
-  
-  .laptops-product-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-    border-radius: 8px; 
+    width: 100% !important;
+    /* Full width for smaller screens */
   }
-  
+}
 
-   /* .laptops-product-image {
+.laptops-card-input4 {
+  width: 14%;
+  /* Assign 25% width to the Effective Price input */
+  padding: 10px;
+  /* Add padding for better UX */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  /* Ensure padding is included in width */
+}
+
+.laptops-card-input5 {
+  width: 75%;
+  /* Full width */
+  min-height: 19px;
+  /* Minimum height to start with */
+  max-height: 300px;
+  /* Optional: Maximum height to prevent overflow */
+  padding: 10px;
+  /* Comfortable padding */
+  background-color: white;
+  /* Light background */
+  font-size: 14px;
+  /* Font size */
+  border-radius: 5px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  /* Border style */
+  resize: vertical;
+  /* Allow vertical resizing */
+  transition: border-color 0.3s ease;
+  /* Smooth transition */
+}
+
+
+.laptops-card-inputt {
+  width: 100%;
+  padding-top: 8px;
+  padding-left: 2px;
+  padding-bottom: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.laptops-add-btn {
+  background-color: #1abc9c;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.laptops-add-btn:hover {
+  background-color: #16a085;
+}
+
+.laptops-products-list {
+  margin-top: 20px;
+  /* margin-left: 60px; */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.laptops-product-actual-price {
+  color: #e74c3c;
+  /* Red color for actual price */
+  font-size: 14px;
+}
+
+.actual-price {
+  text-decoration: line-through;
+  /* Strike through for the actual price */
+
+}
+
+.laptops-product-pricee {
+  font-weight: bold;
+  /* Make selling price bold */
+  color: #27ae60;
+  /* Green color for the selling price */
+  font-size: 16px;
+}
+
+.laptops-product-deliverycharge {
+  font-weight: bold;
+  /* Make selling price bold */
+  color: #df8634;
+  /* Green color for the selling price */
+  font-size: 14px;
+}
+
+.laptops-product-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 280px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px;
+  background-color: #fff;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+/* Stylish Ribbon */
+.out_of_stock_ribbon {
+  position: absolute;
+  overflow: hidden;
+  width: 150px;
+  height: 150px;
+  top: -10px;
+  left: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.out_of_stock_ribbon::before {
+  content: 'Out Of Stock';
+  position: absolute;
+  width: 150%;
+  height: 40px;
+  background-image: linear-gradient(45deg, #ff3e3e 0%, #f8931f 51%, #ff3e3e 100%);
+  transform: rotate(-45deg) translateY(-20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.out_of_stock_ribbon::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  bottom: 0;
+  left: 0;
+  height: 10px;
+  z-index: -1;
+  background-image: linear-gradient(45deg, #ff3e3e 0%, #f8931f 51%, #ff3e3e 100%);
+  box-shadow: 140px -140px #cc3f47;
+}
+
+.laptops-product-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  object-fit: contain;
+  /* display: flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+
+
+.laptops-product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+
+/* .laptops-product-image {
     width: 100%;
     height: auto;
   }
@@ -1324,600 +1951,719 @@
   }
    */
 
-  .laptops-product-details {
-    text-align: center;
-  }
-  
-  .laptops-product-features,
-  .laptops-product-price {
-    margin: 5px 0;
+.laptops-product-details {
+  text-align: center;
+}
 
-  }
-  .laptops-product-features {
-    text-align: justify;
-  }
-  
-  .laptops-product-actions {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-  }
-  
- 
-  .laptops-product-name {
-    font-size: 18px;
-    color: #2c3e50;
-  }
-  .laptops-product-subtitle {
-    font-size: 14px;
-    color: grey;
-  }
-  
-  .laptops-product-features {
-    font-size: 14px;
-    color: #4c5455;
-  }
-  
-  .laptops-product-price {
-    font-size: 16px;
-    color: #e74c3c;
-    font-weight: bold;
-  }
+.laptops-product-features,
+.laptops-product-price {
+  margin: 5px 0;
 
-  .laptops-action-btn {
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 1rem;
-    color: #007bff;
-  }
-  
-  .laptops-action-btn:hover {
-    color: #0056b3;
-  }
-  .laptops-product-actions {
-    display: flex;
-    gap: 10px;
-  }
+}
 
-  .adminmodal5 {
-    position: relative;
-    width: 80%;
-    max-width: 800px;
-    margin: 50px auto;
-    height: 600px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-    zoom: 0.8;
-  }
+.laptops-product-features {
+  text-align: justify;
+}
 
-  .editmodal {
-    position: relative;
-    width: 80%;
-    max-width: 800px;
-    margin: 50px auto;
-    height: 450px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-    zoom: 0.9;
+.laptops-product-actions {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
 
-  }
-  .adminmodal6 {
-    position: relative;
-    width: 80%;
-    max-width: 800px;
-    margin: 50px auto;
-    height: 550px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-    zoom: 0.8;
 
-  }
-  .adminmodal {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 500px;
-    width: 100%; /* Ensure adminmodal takes 90% of the width on smaller screens */
-    margin-left: 10%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease-in-out;
-    zoom: 0.9;
-  }
+.laptops-product-name {
+  font-size: 18px;
+  color: #2c3e50;
+  cursor: pointer;
+}
 
-  .features {
-    margin-top: 15px;
-  }
-  
-  .features-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .feature-item {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-  }
-  
-  .feature-key {
-    min-width: 100px; /* Adjust width as needed */
-    font-weight: bold;
-    text-align: left;
-  }
-  
-  .feature-value {
-    flex: 1;
-    text-align: left;
-    padding-left: 1px; /* Add some spacing */
-  }
-  .product-features-container {
-    display: flex;
-    /* flex-direction: column; */
-    flex-wrap: wrap;
+.laptops-product-subtitle {
+  font-size: 14px;
+  color: grey;
+}
 
-    gap: 8px;
-  }
+.laptops-product-features {
+  font-size: 14px;
+  color: #4c5455;
+}
 
+.laptops-product-price {
+  font-size: 16px;
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.laptops-action-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #007bff;
+}
+
+.laptops-action-btn:hover {
+  color: #0056b3;
+}
+
+.laptops-product-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.adminmodal5 {
+  position: relative;
+  width: 80%;
+  max-width: 800px;
+  margin: 50px auto;
+  height: 600px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  zoom: 0.8;
+}
+
+.editmodal {
+  position: relative;
+  width: 80%;
+  max-width: 800px;
+  margin: 50px auto;
+  height: 450px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  zoom: 0.9;
+
+}
+
+.editingmodal {
+  position: relative;
+  width: 80%;
+  max-width: 500px;
+  margin: 50px auto;
+  height: 600px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  zoom: 0.9;
+
+}
+
+.feature-modal {
+  position: relative;
+  width: 80%;
+  max-width: 800px;
+  margin: 50px auto;
+  height: 600px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  zoom: 0.9;
+
+}
+
+.adminmodal6 {
+  position: relative;
+  width: 80%;
+  max-width: 800px;
+  margin: 50px auto;
+  height: 550px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  zoom: 0.8;
+
+}
+
+.adminmodal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  /* Ensure adminmodal takes 90% of the width on smaller screens */
+  margin-left: 10%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  zoom: 0.9;
+}
+
+.features {
+  margin-top: 15px;
+}
+
+.features-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.feature-key {
+  min-width: 100px;
+  /* Adjust width as needed */
+  font-weight: bold;
+  text-align: left;
+}
+
+.feature-value {
+  flex: 1;
+  text-align: left;
+  padding-left: 1px;
+  /* Add some spacing */
+}
+
+.product-features-container {
+  display: flex;
+  /* flex-direction: column; */
+  flex-wrap: wrap;
+
+  gap: 8px;
+}
+
+.adminmodal-body {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Part 1 and Part 2 will be side-by-side by default */
+.part1,
+.part2 {
+  flex: 1;
+  min-width: 300px;
+  /* Set a minimum width to prevent them from getting too small */
+}
+
+.custom-arrow:hover {
+  background-color: white;
+  /* Prevent background color change */
+  color: inherit;
+  /* Ensure the color remains the same */
+  box-shadow: inherit;
+  /* Keep box shadow unaffected on hover */
+  border: none;
+}
+
+.custom-arrow {
+  border: none;
+}
+
+
+/* For smaller screens, stack Part 1 and Part 2 vertically */
+@media (max-width: 768px) {
   .adminmodal-body {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  
-  /* Part 1 and Part 2 will be side-by-side by default */
-  .part1,
-  .part2 {
-    flex: 1;
-    min-width: 300px; /* Set a minimum width to prevent them from getting too small */
-  }
-  .custom-arrow:hover {
-  background-color: white; /* Prevent background color change */
-  color: inherit; /* Ensure the color remains the same */
-  box-shadow: inherit; /* Keep box shadow unaffected on hover */
-  border: none;
-}
-
-.custom-arrow{
-  border: none;
-}
-
-
-  /* For smaller screens, stack Part 1 and Part 2 vertically */
-  @media (max-width: 768px) {
-    .adminmodal-body {
-      flex-direction: column;
-      gap: 10px; /* Reduce the gap when stacked */
-    }
-  
-    .part2 {
-      margin-top: 20px; /* Space between part 1 and part 2 */
-    }
-  }
-  
-  
- 
-  
-  .feature-item {
-    display: flex;
-    justify-content: space-between; /* Ensures space between label and input */
-    align-items: center; /* Vertically aligns label and input */
+    flex-direction: column;
     gap: 10px;
-  }
-  
-  .feature-label {
-    min-width: 100px; /* Optional: Ensures consistent label width */
-    font-weight: bold;
-  }
-  
-  .feature-input {
-    width: 100%; /* Adjust width as needed */
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    box-sizing: border-box;
-    text-align: left; /* Optional: Align text inside the input to the right */
+    /* Reduce the gap when stacked */
   }
 
-  
-  .feature-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    resize: vertical;
-    box-sizing: border-box;
-  }
-  
-  @media (max-width: 768px) {
-    .product-features-container {
-      width: 100%;
-    }
-  
-    .feature-label {
-      font-size: 12px;
-    }
-  
-    .feature-input, .feature-textarea {
-      font-size: 14px;
-    }
-  }
-  
-
-  
-  .adminmodal-overlay {
-    background: rgba(0, 0, 0, 0.5);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  /* .laptops-products-list {
+    margin-top: 20px;
+    margin-left: 1px;
     display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
     justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  } */
+
+  .part2 {
+    margin-top: 20px;
+    /* Space between part 1 and part 2 */
   }
-  
+}
+
+
+
+
+.feature-item {
+  display: flex;
+  justify-content: space-between;
+  /* Ensures space between label and input */
+  align-items: center;
+  /* Vertically aligns label and input */
+  gap: 10px;
+}
+
+.feature-label {
+  min-width: 100px;
+  /* Optional: Ensures consistent label width */
+  font-weight: bold;
+}
+
+.feature-input {
+  width: 100%;
+  /* Adjust width as needed */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box;
+  text-align: left;
+  /* Optional: Align text inside the input to the right */
+}
+
+
+.feature-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .product-features-container {
+    width: 100%;
+  }
+
+  .feature-label {
+    font-size: 12px;
+  }
+
+  .feature-input,
+  .feature-textarea {
+    font-size: 14px;
+  }
+}
+
+
+
+.adminmodal-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.adminmodal-input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.adminmodal-input5 {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.adminmodal-update-btn,
+.adminmodal-cancel-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+  float: end;
+}
+
+.adminmodal-update-btn {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+.adminmodal-cancel-btn {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.adminmodal-update-btn:hover {
+  background-color: #45a049;
+}
+
+.adminmodal-cancel-btn:hover {
+  background-color: #e41f1f;
+}
+
+.adminmodal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.adminmodal h2 {
+  margin: 0;
+  /* Remove default margin */
+  text-align: center;
+  /* Center-align the title */
+  flex: 1;
+  /* Allow the title to take up available space */
+}
+
+.adminmodal-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.adminmodal-close-btn:hover {
+  color: #f44336;
+  /* Change color on hover */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .adminmodal {
+    width: 80%;
+  }
+
   .adminmodal-input {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
+    font-size: 14px;
   }
-  .adminmodal-input5 {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  .adminmodal-update-btn, .adminmodal-cancel-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 10px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-    float: end;
-  }
-  
-  .adminmodal-update-btn {
-    background-color: #4CAF50;
-    color: #fff;
-  }
-  
+
+  .adminmodal-update-btn,
   .adminmodal-cancel-btn {
-    background-color: #f44336;
-    color: #fff;
+    font-size: 14px;
+    padding: 8px 16px;
+    margin-right: 5px;
   }
-  
-  .adminmodal-update-btn:hover {
-    background-color: #45a049;
-  }
-  
-  .adminmodal-cancel-btn:hover {
-    background-color: #e41f1f;
-  }
-  
-  .adminmodal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .adminmodal h2 {
-    margin: 0; /* Remove default margin */
-    text-align: center; /* Center-align the title */
-    flex: 1; /* Allow the title to take up available space */
-  }
-  
-  .adminmodal-close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #333;
-    transition: color 0.3s ease;
-  }
-  
-  .adminmodal-close-btn:hover {
-    color: #f44336; /* Change color on hover */
-  }
-  
-  /* Responsive styles */
-  @media (max-width: 768px) {
-    .adminmodal {
-      width: 80%;
-    }
-  
-    .adminmodal-input {
-      font-size: 14px;
-    }
-  
-    .adminmodal-update-btn, .adminmodal-cancel-btn {
-      font-size: 14px;
-      padding: 8px 16px;
-      margin-right: 5px;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .laptops-product-image {
-      width: 100%;
-      height: 200px; 
-      overflow: hidden;
-      /* display: flex; */
-      /* justify-content: center; */
-      /* align-items: center; */
-      margin-bottom: 5px;
-    }
-    .slick-dots{
-      display: none;
-    }
-    
-    .adminmodal {
-      width: 70%;
-      /* margin-left: 80px; */
-    }
-  
-    .adminmodal-input {
-      font-size: 14px;
-    }
-  
-    .adminmodal-update-btn, .adminmodal-cancel-btn {
-      font-size: 14px;
-      padding: 8px 12px;
-      margin-right: 5px;
-    }
+}
+
+@media (max-width: 480px) {
+  .laptops-product-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    margin-bottom: 5px;
   }
 
-  
-  /* Responsive adjustments */
-  @media (max-width: 1200px) {
-    .laptops-content {
-      margin-left: 200px; /* Adjust based on sidebar width */
-    }
-  }
-  
-  @media (max-width: 992px) {
-    .laptops-content {
-      margin-left: 150px; /* Adjust based on sidebar width */
-    }
-  
-    .laptops-card-header {
-      display: none; /* Hide header on smaller screens */
-    }
-  
-    .feature-1 {
-      display: none; /* Hide header on smaller screens */
-    }
-  
-    .laptops-card-row,
-    .laptops-product-card {
-      grid-template-columns: 1fr;
-    }
+  .slick-dots {
+    display: none;
   }
 
-  
+  .adminmodal {
+    width: 70%;
+    /* margin-left: 80px; */
+  }
+
+  .adminmodal-input {
+    font-size: 14px;
+  }
+
+  .adminmodal-update-btn,
+  .adminmodal-cancel-btn {
+    font-size: 14px;
+    padding: 8px 12px;
+    margin-right: 5px;
+  }
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .laptops-content {
+    margin-left: 200px;
+    /* Adjust based on sidebar width */
+  }
+}
+
+@media (max-width: 992px) {
+  .laptops-content {
+    margin-left: 150px;
+    /* Adjust based on sidebar width */
+  }
+
+  .laptops-card-header {
+    display: none;
+    /* Hide header on smaller screens */
+  }
+
+  .feature-1 {
+    display: none;
+    /* Hide header on smaller screens */
+  }
+
+  .laptops-card-row,
+  .laptops-product-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.ad-product-form {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  width: auto;
+  /* Expands based on content */
+  max-width: 100%;
+  min-width: 350px;
+  /* Prevents it from being too small */
+  flex-wrap: wrap;
+  /* Allows wrapping in smaller screens */
+  /* background: #f9f9f9; */
+  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+  /* border: 1px solid #ddd; */
+}
+
+/* Ensure inputs expand properly */
+.ad-form-input {
+  flex: 1;
+  /* Allows elements to take equal space */
+  min-width: 180px;
+  /* Prevents elements from shrinking too much */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.ad-form-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.ad-form-btn:hover {
+  background: #218838;
+  transform: scale(1.05);
+}
+
+/* Responsive Layout */
+@media (max-width: 600px) {
   .ad-product-form {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    border-radius: 8px;
-    width: auto; /* Expands based on content */
-    max-width: 100%;
-    min-width: 350px; /* Prevents it from being too small */
-    flex-wrap: wrap; /* Allows wrapping in smaller screens */
-    /* background: #f9f9f9; */
-    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
-    /* border: 1px solid #ddd; */
+    flex-direction: column;
+    /* Stack elements vertically */
+    width: 100%;
   }
-  
-  /* Ensure inputs expand properly */
-  .ad-form-input {
-    flex: 1; /* Allows elements to take equal space */
-    min-width: 180px; /* Prevents elements from shrinking too much */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    background: #fff;
-  }
-  
+
+  .ad-form-input,
   .ad-form-btn {
-    background: #28a745;
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 10px 15px;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: background 0.3s, transform 0.2s;
+    width: 100%;
   }
-  
-  .ad-form-btn:hover {
-    background: #218838;
-    transform: scale(1.05);
-  }
-  
-  /* Responsive Layout */
-  @media (max-width: 600px) {
-    .ad-product-form {
-      flex-direction: column; /* Stack elements vertically */
-      width: 100%;
-    }
-    
-    .ad-form-input,
-    .ad-form-btn {
-      width: 100%;
-    }
-  }
-  
-  
-  
-  @media (max-width: 768px) {
-    .laptops-content {
-      margin-left:0px; /* Start form 100px from the left on smaller screens */
-      padding: 10px;
-    }
-  }
+}
 
 
-  /* Adjust the flex direction for responsive view */
-@media (max-width: 768px) { /* You can adjust the width as needed */
+
+@media (max-width: 768px) {
+  .laptops-content {
+    margin-left: 0px;
+    /* Start form 100px from the left on smaller screens */
+    padding: 10px;
+  }
+}
+
+
+/* Adjust the flex direction for responsive view */
+@media (max-width: 768px) {
+
+  /* You can adjust the width as needed */
   .features-input-container {
-      flex-direction: column; /* Stack items vertically */
+    flex-direction: column;
+    /* Stack items vertically */
   }
-  
+
   .laptops-card-input2 {
-      width: 100%; /* Set input width to full */
+    width: 100%;
+    /* Set input width to full */
   }
 
   .icons-container {
-display: flex;    margin-top: 10px; /* Space above icons */
-}
-  
- 
-}
-    .features-input-container {
-      display: flex; /* Use flexbox for alignment */
-      align-items: center; /* Center items vertically */
-      position: relative; /* Allow positioning of child elements */
-      width: 100%; /* Ensure full width */
-      margin-top: 15px; /* Adjust margin if needed */
-      margin-bottom: 10px;
-      gap: 37px;
-    }
-    .features-input-container5 {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      gap: 15px;
-    }
-    
-    .feature-grid {
-      display: grid;
-      grid-template-columns: 1fr 2fr; /* Two columns: labels and inputs */
-      align-items: center;
-      gap: 10px; /* Spacing between items */
-      width: 100%;
-    }
-    
-    .feature-label {
-      font-weight: bold;
-      text-align: left;
-    }
-  .pipe-icon {
-    cursor: pointer;
-    font-size: 24px; /* Adjust size as needed */
-    color: #000000; /* Change color to match your theme */
-    margin-left: 10px; /* Space between textarea and pipe icon */
-  }
-  
-  .info-icon {
-    cursor: pointer;
-    padding: 5px;
-    background: #007bff;
-    color: white;
-    border-radius: 50%;
-    text-align: center;
-    width: 24px; /* Adjust size */
-    height: 24px; /* Adjust size */
-    font-size: 14px; /* Font size for the 'i' */
-    margin-left: 10px; /* Space between pipe icon and info icon */
-    display: flex; /* Use flex to center content */
-    align-items: center; /* Center the 'i' vertically */
-    justify-content: center; /* Center the 'i' horizontally */
-  }
-  
- 
-  
-  .info-popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
     display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1008; /* Ensure it's on top */
+    margin-top: 10px;
+    /* Space above icons */
   }
-  
-  .popup-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: left;
-    width: 300px; /* Adjust width as needed */
-    position: relative; /* For close button positioning */
-  }
-  
-  .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-  }
-  @media (max-width: 600px) {
-    .popup-content {
-      width: 90%; /* Responsive width for small screens */
-    }
-  }
-  .product-feature-list {
-    list-style-type: none; /* Remove bullets */
-    padding: 0;
-    margin: 0;
-  }
-  
-  .product-feature-list li {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Two equal-width columns */
-    gap: 10px; /* Space between the key and value */
-    padding: 5px 0;
-    font-size: 16px;
-    color: #333;
-    align-items: center; /* Vertically align key and value */
-  }
-  
 
-  .laptops-product-name {
-    display: -webkit-box; /* Required for multiline clamp */
-    -webkit-line-clamp: 2; /* Limits to exactly 2 lines */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    line-height: 1.1em;
-    height: calc(1.1em * 2);
-    word-break: break-word;
+
+}
+
+.features-input-container {
+  display: flex;
+  /* Use flexbox for alignment */
+  align-items: center;
+  /* Center items vertically */
+  position: relative;
+  /* Allow positioning of child elements */
+  width: 100%;
+  /* Ensure full width */
+  margin-top: 15px;
+  /* Adjust margin if needed */
+  margin-bottom: 10px;
+  gap: 37px;
+}
+
+.features-input-container5 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 15px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  /* Two columns: labels and inputs */
+  align-items: center;
+  gap: 10px;
+  /* Spacing between items */
+  width: 100%;
+}
+
+.feature-label {
+  font-weight: bold;
+  text-align: left;
+}
+
+.pipe-icon {
+  cursor: pointer;
+  font-size: 24px;
+  /* Adjust size as needed */
+  color: #000000;
+  /* Change color to match your theme */
+  margin-left: 10px;
+  /* Space between textarea and pipe icon */
+}
+
+.info-icon {
+  cursor: pointer;
+  padding: 5px;
+  background: #007bff;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  width: 24px;
+  /* Adjust size */
+  height: 24px;
+  /* Adjust size */
+  font-size: 14px;
+  /* Font size for the 'i' */
+  margin-left: 10px;
+  /* Space between pipe icon and info icon */
+  display: flex;
+  /* Use flex to center content */
+  align-items: center;
+  /* Center the 'i' vertically */
+  justify-content: center;
+  /* Center the 'i' horizontally */
+}
+
+
+
+.info-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1008;
+  /* Ensure it's on top */
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: left;
+  width: 300px;
+  /* Adjust width as needed */
+  position: relative;
+  /* For close button positioning */
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+@media (max-width: 600px) {
+  .popup-content {
+    width: 90%;
+    /* Responsive width for small screens */
   }
-  
+}
+
+.product-feature-list {
+  list-style-type: none;
+  /* Remove bullets */
+  padding: 0;
+  margin: 0;
+}
+
+.product-feature-list li {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Two equal-width columns */
+  gap: 10px;
+  /* Space between the key and value */
+  padding: 5px 0;
+  font-size: 16px;
+  color: #333;
+  align-items: center;
+  /* Vertically align key and value */
+}
+
+
+.laptops-product-name {
+  display: -webkit-box;
+  /* Required for multiline clamp */
+  -webkit-line-clamp: 1;
+  /* Limits to exactly 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  line-height: 1.1em;
+  height: calc(1.1em * 1);
+  word-break: break-word;
+}

@@ -5,7 +5,7 @@ import { ApiUrl } from "./ApiUrl";
 // import Header1 from './Header1';
 import Header2 from "./Header2";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   FaTimes,
@@ -103,7 +103,7 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error("Error fetching coupons:", error);
-      Swal.fire("Error", "Failed to fetch coupons. Please try again.", "error");
+      // Swal.fire("Error", "Failed to fetch coupons. Please try again.", "error");
     }
   };
 
@@ -116,7 +116,7 @@ const Checkout = () => {
     const inputValue = event.target.value;
 
     // Use a regular expression to allow only alphanumeric characters (A-Z, a-z, 0-9)
-const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
+    const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
 
     // Check if the input value matches the regex
     if (validCharacters.test(inputValue)) {
@@ -132,6 +132,17 @@ const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
   };
 
   const handleApplyCoupon = async (couponCode) => {
+    if (cartItems.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Cart is Empty",
+        text: "Please add items to your cart before applying coupon.",
+        timer: 5000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
     if (!couponCode.trim()) {
       setMessage("Please enter a coupon code.");
       setMessageType("error");
@@ -153,12 +164,12 @@ const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
       const { data } = await axios.post(`${ApiUrl}/api/apply-coupon`, {
         couponCode,
         product_ids: productIds,
-         cart_total: calculateTotalPrice(),
+        cart_total: calculateTotalPrice(),
       });
       console.log("Response from server:", data);
 
       if (data.success) {
-const discount = data.discount1 ?? data.discount2 ?? 0;
+        const discount = data.discount1 ?? data.discount2 ?? 0;
 
         // Check if discount1 applies but the total doesn't meet the min purchase limit.
         // if (
@@ -172,7 +183,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
         //   setTimeout(() => setMessage(""), 3000);
         //   return;
         // }
-        
+
 
         // Save coupon details.
         setDiscountAmount(data.discount2 ?? 0);
@@ -217,20 +228,20 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
         setMessageType("error");
         setTimeout(() => setMessage(""), 5000);
       }
-   } catch (error) {
-  console.error("Error applying coupon:", error);
+    } catch (error) {
+      console.error("Error applying coupon:", error);
 
-  const serverMessage = error.response?.data?.error;
+      const serverMessage = error.response?.data?.error;
 
-  if (serverMessage) {
-    setMessage(serverMessage); //  Backend message (like minimum purchase limit)
-  } else {
-    setMessage("Invalid or expired coupon.");
-  }
+      if (serverMessage) {
+        setMessage(serverMessage); //  Backend message (like minimum purchase limit)
+      } else {
+        setMessage("Invalid or expired coupon.");
+      }
 
-  setMessageType("error");
-  setTimeout(() => setMessage(""), 5000);
-}
+      setMessageType("error");
+      setTimeout(() => setMessage(""), 5000);
+    }
 
   };
 
@@ -259,7 +270,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
     console.log("User Email:", email);
 
     if (!email) {
-      
+
       Swal.fire({
         icon: "error",
         title: "Login Required",
@@ -366,7 +377,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
         text: "Please select at least one item before clicking Buy Later.",
         icon: "warning",
         confirmButtonText: "OK",
-        timer: 3000,
+        timer: 5000,
       });
       return; // Stop execution
     }
@@ -385,7 +396,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
           title: "Success!",
           text: "Items have been added to Buy Later.",
           icon: "success",
-          confirmButtonText: "OK",
+          showConfirmButton: false,
           timer: 3000,
         }).then(() => {
           window.location.reload();
@@ -598,7 +609,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
   }, [fetchAddress]); // Add fetchAddress as a dependency
 
   const handleConfirm = async () => {
-    fetchAddress(); // Fetch the latest address data when the Confirm button is clicked
+    // fetchAddress(); // Fetch the latest address data when the Confirm button is clicked
 
     if (selectedAddress) {
       try {
@@ -606,11 +617,11 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
           userId: userId, // Ensure userId is set correctly
           addressId: selectedAddress,
         });
-        window.location.reload();
+        // window.location.reload();
         if (response.status === 200) {
           // Update the default address to the newly selected address
           setDefaultAddress(selectedAddress);
-
+          await fetchAddress(userId);
           toast.success("Address updated successfully", {
             position: "top-right",
             autoClose: 2000,
@@ -851,6 +862,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
 
       return;
     }
+
     if (cartItems.length === 0) {
       Swal.fire({
         icon: "warning",
@@ -1010,14 +1022,14 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
         selectedPaymentMethod === "cod"
           ? "COD"
           : selectedPaymentMethod === "pickup"
-          ? "Pick Up From Store"
-          : "Online", // Payment method based on selection
+            ? "Pick Up From Store"
+            : "Online", // Payment method based on selection
       status:
         selectedPaymentMethod === "cod"
           ? "Pending"
           : selectedPaymentMethod === "pickup"
-          ? "Pending"
-          : "Paid", // Status based on selection
+            ? "Pending"
+            : "Paid", // Status based on selection
     };
     setIsOrdering(true); // Show GIF while ordering
     setTimeout(async () => {
@@ -1070,9 +1082,8 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
         Swal.fire({
           icon: "error",
           title: "Order Error",
-          text: `An error occurred: ${
-            error.response?.data?.message || error.message
-          }`,
+          text: `An error occurred: ${error.response?.data?.message || error.message
+            }`,
           timer: 5000,
           showConfirmButton: false,
         });
@@ -1112,11 +1123,11 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
       {/* <Header1 /> */}
       {/* <Header2 /> */}
       <div className="cart-container">
-      <div className="cart-header">
-  <h1>
-    <img src={checkout} width={'40px'} alt="" /> Checkout
-  </h1>
-</div>
+        <div className="cart-header">
+          <h1>
+            <img src={checkout} width={'40px'} alt="" /> Checkout
+          </h1>
+        </div>
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
@@ -1140,7 +1151,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
                     <button
                       className="change-btn"
                       style={{ cursor: "pointer", float: "right" }}
-                      // onClick={() => console.log("Redirect to login page")} // Replace with actual login logic
+                    // onClick={() => console.log("Redirect to login page")} // Replace with actual login logic
                     >
                       Login
                     </button>
@@ -1154,9 +1165,8 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
                 <ul>
                   {addressDetails.map((address) => (
                     <li
-                      className={`addr-list ${
-                        selectedAddress === address.address_id ? "selected" : ""
-                      }`}
+                      className={`addr-list ${selectedAddress === address.address_id ? "selected" : ""
+                        }`}
                       key={address.address_id}
                     >
                       <button
@@ -1168,7 +1178,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
                         } // Ensure this is calling the correct function
                       >
                         {isAddressSelected &&
-                        selectedAddress === address.address_id
+                          selectedAddress === address.address_id
                           ? "Change"
                           : "Change"}
                       </button>
@@ -1322,7 +1332,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
                               >
                                 +
                               </button>
-                              
+
                             </div>
                             <p
                               style={{
@@ -1342,26 +1352,31 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
                             </p>
 
                             <FaTrash
-                                className="cart-remove-btn"
-                                title="Remove this item from cart"
-                                onClick={() =>
-                                  removeFromCart(
-                                    item.id,
-                                    item.prod_name,
-                                    item.quantity
-                                  )
-                                }
-                              />
+                              className="cart-remove-btn"
+                              title="Remove this item from cart"
+                              onClick={() =>
+                                removeFromCart(
+                                  item.id,
+                                  item.prod_name,
+                                  item.quantity
+                                )
+                              }
+                            />
 
                             <div>
-                              <label>
+                              <label className="checkbox-container">
                                 <input
-                                  style={{ marginLeft: "10px" }}
                                   type="checkbox"
                                   checked={buyLaterItems.includes(item.id)}
                                   onChange={() => handleBuyLaterToggle(item.id)}
-                                />{" "}
-                                {/* Buy Later */}
+                                />
+                                <svg viewBox="0 0 64 64" height="2em" width="2em">
+                                  <path
+                                    d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16"
+                                    pathLength="575.0541381835938"
+                                    className="path"
+                                  ></path>
+                                </svg>
                               </label>
                             </div>
                           </div>
@@ -1384,7 +1399,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
                       onClick={handleBuyLaterSubmit}
                       className="Buy-later-btn"
                     >
-                      Buy Later
+                      Save For Later
                     </button>
                   )}
                 </div>
@@ -1393,7 +1408,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
             {/* <div>  */}
             {buyLaterProducts.length > 0 && (
               <div className="cart-product-card">
-                <strong style={{ fontSize: "1.0rem" }}>BUY LATER ITEMS</strong>
+                <strong style={{ fontSize: "1.0rem" }}>SAVED FOR LATER</strong>
                 <div className="cart-list-container">
                   <ul className="cart-list">
                     {buyLaterProducts.map((product) => {
@@ -1441,7 +1456,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
 
                           <div className="cart-product-price">
                             <div className="cart-quantity-controls">
-                             
+
                             </div>
                             <p
                               style={{
@@ -1460,22 +1475,25 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
                                 : product.prod_price}
                             </p>
                             <FaTrash
-                            style={{marginRight:'5px'}}
+                              style={{ marginRight: '5px' }}
                               title="Remove this item "
-                                className="cart-remove-btn"
-                                onClick={() => handleRemoveBuyLater(product.id)}
-                              />
+                              className="cart-remove-btn"
+                              onClick={() => handleRemoveBuyLater(product.id)}
+                            />
                             <div>
-                              <label>
+                              <label className="checkbox-container">
                                 <input
                                   type="checkbox"
-                                  checked={selectedProducts.includes(
-                                    product.id
-                                  )}
-                                  onChange={() =>
-                                    handleCheckboxChange(product.id)
-                                  }
-                                />{" "}
+                                  checked={selectedProducts.includes(product.id)}
+                                  onChange={() => handleCheckboxChange(product.id)}
+                                />
+                                <svg viewBox="0 0 64 64" height="2em" width="2em">
+                                  <path
+                                    d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16"
+                                    pathLength="575.0541381835938"
+                                    className="path"
+                                  ></path>
+                                </svg>
                               </label>
                             </div>
                           </div>
@@ -1546,7 +1564,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
                 {/* <span style={{ color: "green" }}>FREE Delivery</span> */}
               </span>
             </div>
-            {minPurchaseLimit && (
+            {finalAmount >= minPurchaseLimit && minPurchaseLimit > 0 && (
               <div className="summary-item">
                 <span>
                   (If you have coupon)
@@ -1556,6 +1574,7 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
                 <span style={{ color: "green" }}>- ₹{couponValue}</span>
               </div>
             )}
+
             <div className="summary-item">
               {/* Input for coupon code */}
               <input
@@ -1581,8 +1600,8 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
                     messageType === "success"
                       ? "green"
                       : messageType === "error"
-                      ? "red"
-                      : "orange", // Orange for warning (if coupon is already applied)
+                        ? "red"
+                        : "orange", // Orange for warning (if coupon is already applied)
                   // fontWeight: "bold",
                   marginTop: "5px",
                   marginBottom: "5px",
@@ -1669,9 +1688,8 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
             </center>
             <div className="payment-methods">
               <div
-                className={`summary-item2 ${
-                  selectedPaymentMethod === "cod" ? "selected" : ""
-                }`}
+                className={`summary-item2 ${selectedPaymentMethod === "cod" ? "selected" : ""
+                  }`}
               >
                 <FaMoneyBillWave
                   style={{ color: "green" }}
@@ -1708,9 +1726,8 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
               </div>
 
               <div
-                className={`summary-item2 ${
-                  selectedPaymentMethod === "card" ? "selected" : ""
-                }`}
+                className={`summary-item2 ${selectedPaymentMethod === "card" ? "selected" : ""
+                  }`}
               >
                 <FaCreditCard
                   style={{ color: "skyblue" }}
@@ -1776,9 +1793,8 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
               </div>
 
               <div
-                className={`summary-item2 ${
-                  selectedPaymentMethod === "pickup" ? "selected" : ""
-                }`}
+                className={`summary-item2 ${selectedPaymentMethod === "pickup" ? "selected" : ""
+                  }`}
               >
                 <FaStore style={{ color: "orange" }} className="payment-icon" />
                 <span className="methods">Pick Up From Store</span>
@@ -1914,6 +1930,8 @@ const discount = data.discount1 ?? data.discount2 ?? 0;
         </div>
       </div>
       <Footer />
+      <ToastContainer />
+
     </>
   );
 };

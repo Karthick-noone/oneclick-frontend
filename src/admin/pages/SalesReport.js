@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ApiUrl } from '../../components/ApiUrl';
-// import "./css/Reports.css"; // Import external CSS
+import "./css/Reports.css"; // Import external CSS
+import { SearchIcon } from "lucide-react";
 
 const SalesReport = () => {
   const navigate = useNavigate();
@@ -91,23 +92,41 @@ const SalesReport = () => {
     <div className="reports-container">
       <section className="staff-main-content">
         <div className="orders-header">
-          <h2 className="orders-page-title">Sales Report</h2>
-          <div className='filters'>
-          <input
-            type="text"
-            placeholder="Search by Product Name or Category"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          /></div>
+          <h2 className="orders-page-title">Product Sales Report</h2>
+          <div className="filters-section">
+  <div className="product-search-wrapper">
+    <span className="product-search-icon">
+
+ <SearchIcon width={'18px'} className="search-icon-btn" />
+    </span>
+    <input
+      type="text"
+      placeholder="Search by Product Name or Category"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="product-search-input"
+    />
+    {searchQuery && (
+      <button
+        className="product-clear-btn"
+        onClick={() => setSearchQuery("")}
+        aria-label="Clear search"
+      >
+        ×
+      </button>
+    )}
+  </div>
+</div>
+
         </div>
         <div className="table-wrapper">
           <table className="styled-table">
             <thead>
               <tr>
                 <th>S.No</th>
-                <th>Product Name</th>
+                <th >Product Name</th>
                 <th>Category</th>
+                <th>Qnty</th>
                 <th>Total Sales (₹)</th>
               </tr>
             </thead>
@@ -116,8 +135,9 @@ const SalesReport = () => {
                 currentSales.map((item, index) => (
                   <tr key={index}>
                     <td>{indexOfFirstSalesItem + index + 1}</td>
-                    <td>{item.product_name}</td>
+                    <td style={{textAlign:'left'}}>{item.product_name}</td>
                     <td>{item.category}</td>
+                    <td>{item.total_quantity}</td>
                     <td>{item.sales}</td>
                   </tr>
                 ))

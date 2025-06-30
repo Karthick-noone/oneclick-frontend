@@ -4,17 +4,17 @@ import axios from "axios";
 import Header2 from "./Header2";
 // import Header3 from "./Header3";
 import Footer from "./footer";
-import Sidebar from "./Sidebar";
+import ComputerFilter from "./ComputerFilter";
 import Modal from "./Modal";
 import "./css/Computers.css";
 import { useCart } from "../components/CartContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaFilter } from "react-icons/fa";
 import { ApiUrl } from "./ApiUrl";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
-
+import FilterIcon from './img/settings.png'
 // Define a fallback image URL
 // const fallbackImage = require('./img/laptop.jpg'); // Replace with a valid fallback image
 
@@ -22,13 +22,68 @@ const Computers = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [favorites, setFavorites] = useState({});
-   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
+  const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [loading, setLoading] = useState(true);
   const [isOfferActive, setIsOfferActive] = useState(true);
   const [product, setProduct] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [showFilters, setShowFilters] = useState(window.innerWidth > 768);
+
+  const [hoveredProductId, setHoveredProductId] = useState(null);
+  const [hoverImageIndexes, setHoverImageIndexes] = useState({});
+
+  useEffect(() => {
+    let interval;
+
+    if (hoveredProductId !== null) {
+      interval = setInterval(() => {
+        setHoverImageIndexes((prev) => {
+          const currentIndex = prev[hoveredProductId] || 0;
+          const product = products.find(p => p.id === hoveredProductId);
+          const images = Array.isArray(product?.prod_img)
+            ? product.prod_img
+            : JSON.parse(product?.prod_img || "[]");
+
+          const nextIndex = (currentIndex + 1) % images.length;
+          return {
+            ...prev,
+            [hoveredProductId]: nextIndex,
+          };
+        });
+      }, 1000); // change image every 1 second
+    }
+
+    return () => clearInterval(interval);
+  }, [hoveredProductId, products]);
 
 
-  
+  //  const [showFilters, setShowFilters] = useState(true);
+  // const openFilters = () => {
+  //   setShowFilters(true); // This triggers the .show class
+  // };
+
+  const closeFilters = () => {
+    setShowFilters(false); // This removes the .show class
+  };
+
+  const toggleFilters = () => {
+    setShowFilters(prev => !prev);
+  };
+  // Handle resize to toggle filter visibility responsively
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      setShowFilters(!mobile);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  // Toggle filter visibility, simple toggle - only one update per click
+  const toggleFilter = () => {
+    setShowFilters(prev => !prev);
+  };
+
   // const {
   //   cartItems,
   //   addToCart,
@@ -36,133 +91,195 @@ const Computers = () => {
   //   addToWishlist,
   //   removeFromWishlist,
   // } = useCart();
-
   const navigate = useNavigate();
-
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
+
+  // Extract filters from URL
   const searchQuery = queryParams.get("search");
+  const maxPrice = parseInt(queryParams.get("price")) || 100000;
+  const selectedRAM = queryParams.getAll("memory") || [];
+  const selectedStorage = queryParams.getAll("storage") || [];
+  const selectedBrand = queryParams.getAll("brand");
+  const selectedProcessor = queryParams.getAll("processor");
 
-  // Log the raw search query
-  console.log("Search Query:", searchQuery);
-
-  // Normalize a string by trimming, lowercasing, and removing all spaces
+  // Helper to normalize strings
   const normalizeString = (str) =>
-    str.trim().toLowerCase().replace(/\s+/g, "");
+    str?.trim().toLowerCase().replace(/\s+/g, "");
 
-  // Normalize the search query (if it exists)
-  const normalizedSearchQuery = searchQuery
-    ? normalizeString(searchQuery)
-    : "";
+  // Normalize search input
+  const normalizedSearchQuery = searchQuery ? normalizeString(searchQuery) : "";
 
-  // Filter products based on the normalized, concatenated prod_name and prod_features
-  const filteredProducts = searchQuery
-    ? products.filter((product) => {
-        // Concatenate prod_name and prod_features
-        const prodName = product.prod_name || "";
-        const prodFeatures = product.prod_features || "";
-        const combinedString = normalizeString(prodName + " " + prodFeatures);
+  const filteredProducts = products.filter((product) => {
+    const prodName = product.prod_name || "";
+    const productPrice = parseInt(product.prod_price) || 0;
+    const productMemory = normalizeString(product.memory || "");
+    const productStorage = normalizeString(product.storage || "");
+    const productProcessor = normalizeString(product.processor || "");
 
-        // Log the combined string for debugging
-        // console.log(
-        //   `Combined string for product: ${prodName} => ${combinedString}`
-        // );
+    const normalizedName = normalizeString(prodName);
 
-        // Check if the combined string contains the normalized search query
-        return combinedString.includes(normalizedSearchQuery);
+    // 1. Search filter (searching across all fields)
+    const matchesSearch = normalizedSearchQuery
+      ? (normalizedName + productMemory + productStorage + productProcessor).includes(normalizedSearchQuery)
+      : true;
+
+    // 2. Price
+    const matchesPrice = productPrice >= 20000 && productPrice <= maxPrice;
+
+    // 3. Brand (extract from prod_name)
+    const matchesBrand = selectedBrand.length
+      ? selectedBrand.some((brand) =>
+        normalizedName.startsWith(normalizeString(brand))
+      )
+      : true;
+
+    // 4. RAM
+    const matchesRAM = selectedRAM.length
+      ? selectedRAM.some((ram) => productMemory === `${normalizeString(ram)}gb`)
+      : true;
+
+    // 5. Storage
+    const matchesStorage = selectedStorage.length
+      ? selectedStorage.some((storage) => {
+        const normalizedStorage = normalizeString(storage);
+        return (
+          productStorage === `${normalizedStorage}gb` ||
+          (normalizedStorage === "1024" && productStorage === "1tb")
+        );
       })
-    : products; // If no search query, return all products // If no search query, return all products
+      : true;
+
+    // 6. Processor
+    const matchesProcessor = selectedProcessor.length
+      ? selectedProcessor.some((proc) =>
+        productProcessor.includes(normalizeString(proc))
+      )
+      : true;
+
+
+    return (
+      matchesSearch &&
+      matchesPrice &&
+      matchesBrand &&
+      matchesRAM &&
+      matchesStorage &&
+      matchesProcessor
+    );
+  });
+
+  // If no search query, return all products // If no search query, return all products
 
   const [coupons, setCoupons] = useState({}); // State to store coupons
 
+  const cacheRef = {
+    computers: null,
+    computerCoupons: {},
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
+      console.log("[INFO] Fetching computers...");
       setLoading(true);
+
       try {
+        // Return from cache if available
+        if (cacheRef.computers) {
+          console.log("[CACHE] Using cached computer products");
+          console.log(`[CACHE] Product count: ${cacheRef.computers.length}`);
+          setProducts(cacheRef.computers);
+          setCoupons(cacheRef.computerCoupons);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch product list
         const response = await axios.get(`${ApiUrl}/fetchcomputers`);
         const fetchedProducts = response.data;
+        console.log(`[API] Fetched ${fetchedProducts.length} computer products`);
 
-        // Set products to state
         setProducts(fetchedProducts);
+        cacheRef.computers = fetchedProducts;
 
-        // Fetch coupons for each product
-        for (const product of fetchedProducts) {
-          try {
-            const couponResponse = await axios.get(
-              `${ApiUrl}/coupons/${product.prod_id}`
-            );
-            // Assuming couponResponse.data.coupons returns an array of coupons
-            if (couponResponse.data.coupons.length > 0) {
-              // Set the first coupon code for the product
-              setCoupons((prev) => ({
-                ...prev,
-                [product.prod_id]: couponResponse.data.coupons[0].coupon_code, // Use coupon_code from the first coupon
-              }));
-              console.log(
-                `Set coupon code for product ${product.prod_id}: ${couponResponse.data.coupons[0].coupon_code}`
-              );
-            } else {
-              console.log(`No coupons found for product ${product.prod_id}`);
-            }
-          } catch (couponError) {
-            console.error(
-              `Failed to fetch coupon for product ${product.prod_id}:`,
-              couponError
-            );
+        // Fetch all coupons in parallel
+        const couponPromises = fetchedProducts.map((product) =>
+          axios
+            .get(`${ApiUrl}/coupons/${product.prod_id}`)
+            .then((res) => {
+              const code = res.data?.coupons?.[0]?.coupon_code || null;
+              console.log(`[COUPON] Product ${product.prod_id} => Coupon: ${code}`);
+              return {
+                prod_id: product.prod_id,
+                coupon_code: code,
+              };
+            })
+            .catch((err) => {
+              console.error(`[ERROR] Fetching coupon for product ${product.prod_id}`, err.message);
+              return { prod_id: product.prod_id, coupon_code: null };
+            })
+        );
+
+        const couponResults = await Promise.all(couponPromises);
+        const couponMap = {};
+
+        couponResults.forEach(({ prod_id, coupon_code }) => {
+          if (coupon_code) {
+            couponMap[prod_id] = coupon_code;
           }
-        }
+        });
+
+        console.log(`[INFO] Total products with coupons: ${Object.keys(couponMap).length}`);
+        setCoupons(couponMap);
+        cacheRef.computerCoupons = couponMap;
       } catch (error) {
-        console.error("Error fetching products:", error);
-        toast.error("Failed to fetch products.", {
+        console.error("[ERROR] Fetching computers:", error.message);
+        toast.error("Failed to fetch computers.", {
           position: "top-right",
           autoClose: 2000,
           hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
         });
-      }finally {
-        setLoading(false); // Stop loading regardless of success or failure
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchProducts();
   }, []);
 
+
   useEffect(() => {
     const now = new Date();
     // console.log("Current Time:", now.toLocaleString());
-  
+
     const activeProduct = products.find((item) => {
       if (!item.offer_start_time || !item.offer_end_time) {
         // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
         return false;
       }
-  
+
       const offerStartTime = new Date(item.offer_start_time);
       const offerEndTime = new Date(item.offer_end_time);
-  
+
       // console.log(
       //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
       // );
-  
+
       return offerStartTime <= now && offerEndTime > now;
     });
-  
+
     if (activeProduct) {
       // console.log("Active Product Found:", activeProduct);
     } else {
       // console.log("No active product with a valid offer.");
     }
-  
+
     setProduct(activeProduct || null);
     setIsOfferActive(!!activeProduct);
-  
+
     // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
   }, [products]);
-  
-  
+
+
 
 
   const handleBuyNow = (product, event) => {
@@ -170,7 +287,7 @@ const Computers = () => {
 
     // Check if the user is logged in
     const email = localStorage.getItem("email");
-     if (!email) {
+    if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -224,47 +341,39 @@ const Computers = () => {
 
   const handleCardClick = (product) => {
     if (product && product.id) {
-      // Retrieve existing recently viewed products
-      let storedProductIds = localStorage.getItem("Recently-viewed");
-  
-      if (storedProductIds) {
-        try {
-          storedProductIds = JSON.parse(storedProductIds);
-          
-          // Ensure it's an array
-          if (!Array.isArray(storedProductIds)) {
-            storedProductIds = [storedProductIds]; 
-          }
-        } catch (error) {
-          console.error("Error parsing Recently Viewed data:", error);
-          storedProductIds = [];
-        }
-      } else {
-        storedProductIds = [];
+      const now = Date.now();
+
+      let storedData = localStorage.getItem("Recently-viewed");
+      let parsedData = [];
+
+      try {
+        parsedData = storedData ? JSON.parse(storedData) : [];
+      } catch (err) {
+        console.error("Failed to parse Recently-viewed:", err);
       }
-  
-      // Remove the product ID if it already exists (to avoid duplicates)
-      storedProductIds = storedProductIds.filter((id) => id !== product.id);
-  
-      // Add the new product ID to the beginning of the list
-      storedProductIds.unshift(product.id);
-  
-      // Keep only the last 10 recently viewed products
-      storedProductIds = storedProductIds.slice(0, 10);
-  
-      // Save back to localStorage
-      localStorage.setItem("Recently-viewed", JSON.stringify(storedProductIds));
-  
-      // Navigate to product details page
+
+      // Remove if already exists
+      parsedData = parsedData.filter((item) => item.id !== product.id);
+
+      // Add current item with timestamp
+      parsedData.unshift({
+        id: product.id,
+        timestamp: now,
+      });
+
+      // Keep only last 10
+      parsedData = parsedData.slice(0, 10);
+
+      localStorage.setItem("Recently-viewed", JSON.stringify(parsedData));
+
       const slugify = (name) =>
-        name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-      
+        name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
+
       navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
-    } else {
-      console.error("Product is undefined or missing ID:", product);
     }
   };
-  
+
+
 
   const handleCloseModal = () => {
     setSelectedProduct(null);
@@ -296,7 +405,7 @@ const Computers = () => {
     const email = localStorage.getItem("email");
 
     // Check if the user is logged in
-     if (!email) {
+    if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -322,7 +431,7 @@ const Computers = () => {
 
       // Handle the response
       if (response.status === 200) {
-        toast.success(`${product.prod_name} added to your cart!`, {
+        toast.success(`${product.prod_name.substring(0, 25) + '...'} added to your cart!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -372,7 +481,7 @@ const Computers = () => {
           `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.info(`${product.prod_name} removed from your wishlist!`, {
+        toast.info(`${product.prod_name.substring(0, 25) + '...'} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -393,7 +502,7 @@ const Computers = () => {
           `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.success(`${product.prod_name} added to your wishlist!`, {
+        toast.success(`${product.prod_name.substring(0, 25) + '...'} added to your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -452,7 +561,7 @@ const Computers = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  
+
 
   // Define the category variable
   const category = "computers";
@@ -461,30 +570,35 @@ const Computers = () => {
 
   return (
     <div className="computers-page">
-      {/* <Header1 /> */}
-      {/* <Header2 category={category} /> */}
-      {/* <Header3 /> */}
-      <span style={{ marginLeft: "20px", padding: "10px" }}>
-         <Link style={{ textDecoration: "none", color: "black" }} to="/">
-          Home{" "}
-        </Link>
-        &gt; Computers
-      </span>
+
+      <div className="breadcrumb-wrapper">
+        <span className="breadcrumb-text">
+          <Link to="/" style={{ textDecoration: "none", color: "black" }}>
+            Home{" "}
+          </Link>
+          &gt; Computers
+        </span>
+
+
+        <img className="responsive-filter-icon" width="30" onClick={toggleFilters} src={FilterIcon} alt="Filter icon" />
+      </div>
       <div className="main-content">
-        <Sidebar />
+
+        <ComputerFilter showFilters={showFilters} closeFilters={closeFilters} />
+
         <div className="product-list">
           {loading ? (
-        // 1. Loading state
-        [...Array(8)].map((_, index) => (
-          <div key={index} className="skeleton-product-card">
-            <div className="skeleton-image"></div>
-            <div className="skeleton-text"></div>
-            <div className="skeleton-text short"></div>
-            <div className="skeleton-price"></div>
-            <div className="skeleton-buttons"></div>
-          </div>
-        ))
-      ) : products.length === 0 ? (
+            // 1. Loading state
+            [...Array(8)].map((_, index) => (
+              <div key={index} className="skeleton-product-card">
+                <div className="skeleton-image"></div>
+                <div className="skeleton-text"></div>
+                <div className="skeleton-text short"></div>
+                <div className="skeleton-price"></div>
+                <div className="skeleton-buttons"></div>
+              </div>
+            ))
+          ) : products.length === 0 ? (
             <div className="no-products-message">
               <h2>No products here yet...</h2>
               <p>
@@ -495,30 +609,37 @@ const Computers = () => {
           ) : filteredProducts.length === 0 ? (
             // If filteredProducts is empty, fallback to using all products
             products.map((product) => {
-              // Parse the prod_img if it's a JSON string; assuming it's an array
               const images = Array.isArray(product.prod_img)
                 ? product.prod_img
-                : JSON.parse(product.prod_img);
-              const firstImage = images[0]; // Get the first image
+                : JSON.parse(product.prod_img || "[]");
+
+              const activeIndex =
+                hoveredProductId === product.id
+                  ? hoverImageIndexes[product.id] || 0
+                  : 0;
+
+              const currentImage = images[activeIndex];
 
               return (
                 <div
                   key={product.id}
                   className="product-card"
                   onClick={() => handleCardClick(product)}
+                  onMouseEnter={() => setHoveredProductId(product.id)}
+                  onMouseLeave={() => {
+                    setHoveredProductId(null);
+                    setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+                  }}
                 >
                   {product.offer_label && (
                     <div className="product-label">{product.offer_label}</div>
                   )}
+
                   <div className="product-actions">
                     <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                        firstImage
-                      }`}
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
                       alt={product.prod_name}
                       className="product-image"
-                    // loading="lazy"
-
                     />
                     <span
                       title={
@@ -526,9 +647,8 @@ const Computers = () => {
                           ? "Remove from Wishlist"
                           : "Add to Wishlist"
                       }
-                      className={`favorite-icon ${
-                        favorites[`${product.id}`] ? "filled" : ""
-                      }`}
+                      className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
+                        }`}
                       onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
                     >
                       {favorites[`${product.id}`] ? (
@@ -539,7 +659,7 @@ const Computers = () => {
                     </span>
                   </div>
 
-                  <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
+                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
 
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
                   <span className="product-subtitle2">{product.subtitle}</span>
@@ -551,12 +671,12 @@ const Computers = () => {
                       <span className="product-price">
                         ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
                       </span>
-                      <span style={{ marginRight: "5px", fontSize: "15px" }}>
+                      <span style={{ margin: "5px", fontSize: "15px" }}>
                         M.R.P
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through", color:'red' }}
+                        style={{ textDecoration: "line-through", color: 'red' }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -572,7 +692,7 @@ const Computers = () => {
                       {Math.round(
                         ((product.actual_price - (product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
-                          100
+                        100
                       )}
                       % OFF)
                     </p>
@@ -602,7 +722,7 @@ const Computers = () => {
                         title="Add To Cart"
                       >
                         ADD TO CART
-                      </button> 
+                      </button>
                       <button
                         title="Buy Now"
                         onClick={(event) => handleBuyNow(product, event)}
@@ -630,14 +750,25 @@ const Computers = () => {
             filteredProducts.map((product) => {
               const images = Array.isArray(product.prod_img)
                 ? product.prod_img
-                : JSON.parse(product.prod_img);
-              const firstImage = images[0];
+                : JSON.parse(product.prod_img || "[]");
+
+              const activeIndex =
+                hoveredProductId === product.id
+                  ? hoverImageIndexes[product.id] || 0
+                  : 0;
+
+              const currentImage = images[activeIndex];
 
               return (
                 <div
                   key={product.id}
                   className="product-card"
                   onClick={() => handleCardClick(product)}
+                  onMouseEnter={() => setHoveredProductId(product.id)}
+                  onMouseLeave={() => {
+                    setHoveredProductId(null);
+                    setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+                  }}
                 >
                   {product.offer_label && (
                     <div className="product-label">{product.offer_label}</div>
@@ -645,13 +776,9 @@ const Computers = () => {
 
                   <div className="product-actions">
                     <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                        firstImage
-                      }`}
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
                       alt={product.prod_name}
                       className="product-image"
-                    // loading="lazy"
-
                     />
                     <span
                       title={
@@ -659,9 +786,8 @@ const Computers = () => {
                           ? "Remove from Wishlist"
                           : "Add to Wishlist"
                       }
-                      className={`favorite-icon ${
-                        favorites[`${product.id}`] ? "filled" : ""
-                      }`}
+                      className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
+                        }`}
                       onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
                     >
                       {favorites[`${product.id}`] ? (
@@ -672,7 +798,7 @@ const Computers = () => {
                     </span>
                   </div>
 
-                  <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
+                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
                   <span className="product-subtitle2">{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}
@@ -683,12 +809,12 @@ const Computers = () => {
                       <span className="product-price">
                         ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
                       </span>
-                      <span style={{ marginRight: "5px", fontSize: "15px" }}>
+                      <span style={{ margin: "5px", fontSize: "15px" }}>
                         M.R.P
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through", color:'red' }}
+                        style={{ textDecoration: "line-through", color: 'red' }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -704,7 +830,7 @@ const Computers = () => {
                       {Math.round(
                         ((product.actual_price - (product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
-                          100
+                        100
                       )}
                       % OFF)
                     </p>

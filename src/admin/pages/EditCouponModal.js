@@ -39,7 +39,7 @@ const EditCouponModal = ({
       if (!couponCode || !expiryDate || !couponValue) {
         Swal.fire({
           icon: "warning",
-          title: "Validation Error",
+          title: "Invalid Input",
           text: "All fields are required.",
         });
         return;
@@ -48,7 +48,7 @@ const EditCouponModal = ({
       // if (!couponCode && !expiryDate) {
       //   Swal.fire({
       //     icon: "warning",
-      //     title: "Validation Error",
+      //     title: "Invalid Input",
       //     text: "Please enter a coupon code like this (OFF899).",
       //   });
       //   return;
@@ -58,7 +58,7 @@ const EditCouponModal = ({
       if (couponCode && !couponCode.trim()) {
         Swal.fire({
           icon: "warning",
-          title: "Validation Error",
+          title: "Invalid Input",
           text: "Coupon code cannot be just spaces.",
         });
         return;
@@ -68,7 +68,7 @@ const EditCouponModal = ({
       if (couponValue >= productPrice) {
         Swal.fire({
           icon: "warning",
-          title: "Validation Error",
+          title: "Invalid Input",
           text: `Coupon discount must be less than the product price. Product price is ${productPrice}`,
         });
         return;
@@ -81,7 +81,7 @@ const EditCouponModal = ({
       // if (!hasDigit || !hasLetter) {
       //   Swal.fire({
       //     icon: "warning",
-      //     title: "Validation Error",
+      //     title: "Invalid Input",
       //     text: "Coupon code must contain at least one letter and one digit. (e.g., OFF899)",
       //   });
       //   return;

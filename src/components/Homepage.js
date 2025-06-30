@@ -7,21 +7,27 @@ import "./css/Homepage.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
+
+//  Remove delay for production use
 const fetchHomepageData = async () => {
   const response = await axios.get(`${ApiUrl}/fetchedithomepage`);
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating delay
   return response.data || [];
 };
 
 const Homepage = () => {
-  const { data = [], isLoading, isError } = useQuery({
+  const {
+    data = [],
+    isLoading,
+    isError
+  } = useQuery({
     queryKey: ["homepageData"],
     queryFn: fetchHomepageData,
-    staleTime: Infinity, // Keeps data fresh until manual refetch
-    cacheTime: 100000, // 5 minutes before unused cache is garbage collected
-    refetchOnWindowFocus: false, // Prevents refetch when switching tabs
+    staleTime: 1000 * 60 * 10,     //  10 minutes: considered fresh
+    cacheTime: 1000 * 60 * 15,     //  15 minutes: kept in memory
+    refetchOnWindowFocus: false,  //  Prevent refetch on tab focus
+    refetchOnMount: false,        //  Don't refetch on remount
+    refetchOnReconnect: false     //  Don't refetch on network reconnect
   });
-  
 
   const CustomPrevArrow = useCallback(({ onClick }) => (
     <button className="slider-prev-arrow" onClick={onClick}>
@@ -36,19 +42,22 @@ const Homepage = () => {
   ), []);
 
   const sliderSettings = useMemo(() => ({
-    dots: true,
-    infinite: true,
+    dots: data.length > 1,
+    infinite: data.length > 1,
     speed: 500,
     slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
+    slidesToScroll: data.length > 1,
+    autoplay: data.length > 1,
+    draggable: data.length > 1,
     autoplaySpeed: 5000,
-    prevArrow: <CustomPrevArrow />,
-    nextArrow: <CustomNextArrow />,
-  }), [CustomPrevArrow, CustomNextArrow]);
+    arrows: data.length > 1,
+    prevArrow: data.length > 1 ? <CustomPrevArrow /> : null,
+    nextArrow: data.length > 1 ? <CustomNextArrow /> : null
+  }), [data.length, CustomPrevArrow, CustomNextArrow]);
+
 
   return (
-    <div className="box2">
+    <div className="box2" >
       <div className="homepage-container">
         {isLoading ? (
           <div className="skeleton-container">
@@ -59,13 +68,12 @@ const Homepage = () => {
         ) : data.length > 0 ? (
           <Slider {...sliderSettings}>
             {data.map((item, index) => (
-              <div key={index} className="slider-image-container">
+              <div key={index} className="slider-image-container" tabIndex={-1}>
                 <Link to={`/${item.category}`} className="shop-button-link">
                   <img
                     src={`${ApiUrl}/uploads/edithomepage/${item.image}`}
                     alt={`Ad ${index + 1}`}
                     className="slider-image"
-                    // loading="lazy"
                   />
                 </Link>
               </div>

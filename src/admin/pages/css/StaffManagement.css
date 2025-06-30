@@ -1,7 +1,8 @@
 .staff-management-container {
-    padding: 20px;
+    padding: 20px 10px 0px 20px;
+
     /* background-color: #f9f9f9; */
-    margin-left: 279px;
+    margin-left: 240px;
     margin-top: 50px;
   }
   
@@ -117,25 +118,51 @@
     background-color: #45a049;
   }
   
-  /* Table */
-  .staff-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  .staff-table th,
-  .staff-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
-  }
-  
-  .staff-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-  }
-  
+.staff-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.staff-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  min-width: 600px; /* Ensures horizontal scroll on small screens */
+}
+
+.staff-table th,
+.staff-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+  white-space: nowrap; /* Prevent text from breaking into multiple lines */
+}
+
+.staff-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+/* Optional: Style buttons for better touch UI */
+.staff-btn-edit,
+.staff-btn-delete {
+  padding: 6px 12px;
+  margin: 2px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.staff-btn-edit {
+  background-color: #4caf50;
+  color: white;
+}
+
+.staff-btn-delete {
+  background-color: #f44336;
+  color: white;
+}
+
   .staff-btn-edit,
   .staff-btn-delete {
     padding: 8px 12px;
@@ -187,3 +214,97 @@
     background-color: #ddd;
   }
   
+
+  @media (max-width: 768px) {
+  .staff-management-container {
+    margin-left: 0;
+    margin-top: 20px;
+    padding: 10px;
+  }
+
+  .staff-main-content {
+    padding: 15px;
+    border-radius: 8px;
+  }
+
+  .staff-form {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .staff-form-group {
+    width: 100%;
+  }
+
+  .staff-btn-submit {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+  }
+
+  .staff-btn-edit,
+  .staff-btn-delete {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .page-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .staff-form-group label {
+    font-size: 14px;
+  }
+
+  .staff-form-group input,
+  .staff-form-group select {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .staff-btn-submit {
+    font-size: 14px;
+  }
+
+  .staff-table {
+    font-size: 12px;
+  }
+
+  .staff-btn-edit,
+  .staff-btn-delete {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  .staff-main-content{
+    margin-top: 50px;
+  }
+}
+
+/* Apply to a specific container */
+.staff-table-wrapper::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+.staff-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.staff-table-wrapper::-webkit-scrollbar-thumb {
+  background-color: #4caf50;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+}
+
+.staff-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: #388e3c;
+}

@@ -5,7 +5,7 @@ import { ApiUrl } from "./ApiUrl";
 // import Header1 from './Header1';
 import Header2 from "./Header2";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaTimes, FaTruck, FaCheck, FaInfoCircle } from "react-icons/fa";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -108,7 +108,7 @@ const BuyNow = () => {
       }
     } catch (error) {
       console.error("Error fetching coupons:", error);
-      Swal.fire("Error", "Failed to fetch coupons. Please try again.", "error");
+      // Swal.fire("Error", "Failed to fetch coupons. Please try again.", "error");
     }
   };
 
@@ -227,9 +227,28 @@ const BuyNow = () => {
         setTotalAmount(newAmount);
 
         setIsCouponApplied(true);
-        setMessage("Coupon applied successfully!");
+        // setMessage("Coupon applied successfully!");
         setMessageType("success");
         setCoupon("");
+
+        Swal.fire({
+          title: "🎉 Coupon Applied! 🎉",
+          html: `
+                    <div style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                      <img src="https://cdn-icons-png.flaticon.com/512/879/879757.png" alt="Discount" width="80" style="margin-bottom: 10px;">
+                      <p style="color: #155724;">Your discount has been successfully applied. Enjoy your savings!</p>
+                      
+                    </div>
+                  `,
+          icon: "success",
+          showConfirmButton: false,
+          timer: 5000,
+          background: "#f0fff4",
+          color: "#155724",
+          customClass: {
+            popup: "animated bounceIn",
+          },
+        });
 
         setTimeout(() => setMessage(""), 5000);
       } else {
@@ -291,7 +310,7 @@ const BuyNow = () => {
   }, [fetchAddress]); // Add fetchAddress as a dependency
 
   const handleConfirm = async () => {
-    fetchAddress(); // Fetch the latest address data when the Confirm button is clicked
+    // fetchAddress(); // Fetch the latest address data when the Confirm button is clicked
 
     if (selectedAddress) {
       try {
@@ -299,11 +318,11 @@ const BuyNow = () => {
           userId: userId, // Ensure userId is set correctly
           addressId: selectedAddress,
         });
-        window.location.reload();
+        // window.location.reload();
         if (response.status === 200) {
           // Update the default address to the newly selected address
           setDefaultAddress(selectedAddress);
-
+          await fetchAddress(userId);
           toast.success("Address updated successfully", {
             position: "top-right",
             autoClose: 2000,
@@ -544,14 +563,14 @@ const BuyNow = () => {
         selectedPaymentMethod === "cod"
           ? "COD"
           : selectedPaymentMethod === "pickup"
-          ? "Pick Up From Store"
-          : "Online",
+            ? "Pick Up From Store"
+            : "Online",
       status:
         selectedPaymentMethod === "cod"
           ? "Pending"
           : selectedPaymentMethod === "pickup"
-          ? "Pending"
-          : "Paid",
+            ? "Pending"
+            : "Paid",
     };
 
     console.log("Order Data:", orderData);
@@ -591,9 +610,8 @@ const BuyNow = () => {
         Swal.fire({
           icon: "error",
           title: "Order Error",
-          text: `An error occurred: ${
-            error.response?.data?.message || error.message
-          }`,
+          text: `An error occurred: ${error.response?.data?.message || error.message
+            }`,
           timer: 5000,
           showConfirmButton: false,
         });
@@ -675,7 +693,7 @@ const BuyNow = () => {
                     <button
                       className="change-btn"
                       style={{ cursor: "pointer" }}
-                      // onClick={() => console.log("Redirect to login page")} // Replace with actual login logic
+                    // onClick={() => console.log("Redirect to login page")} // Replace with actual login logic
                     >
                       Login
                     </button>
@@ -689,9 +707,8 @@ const BuyNow = () => {
                 <ul>
                   {addressDetails.map((address) => (
                     <li
-                      className={`addr-list ${
-                        selectedAddress === address.address_id ? "selected" : ""
-                      }`}
+                      className={`addr-list ${selectedAddress === address.address_id ? "selected" : ""
+                        }`}
                       key={address.address_id}
                     >
                       <button
@@ -702,7 +719,7 @@ const BuyNow = () => {
                         } // Ensure this is calling the correct function
                       >
                         {isAddressSelected &&
-                        selectedAddress === address.address_id
+                          selectedAddress === address.address_id
                           ? "Change"
                           : "Change"}
                       </button>
@@ -910,7 +927,7 @@ const BuyNow = () => {
                 {/* <span style={{ color: "green" }}>FREE Delivery</span> */}
               </span>
             </div>
-            {parseFloat(calculateTotalPrice()) >= minPurchaseLimit && (
+            {minPurchaseLimit > 0 && parseFloat(calculateTotalPrice()) >= minPurchaseLimit && (
               <div className="summary-item">
                 <span>
                   (If you have coupon)
@@ -920,6 +937,7 @@ const BuyNow = () => {
                 <span style={{ color: "green" }}>- ₹{couponValue}</span>
               </div>
             )}
+
             <div className="summary-item">
               {/* Input for coupon code */}
               <input
@@ -945,8 +963,8 @@ const BuyNow = () => {
                     messageType === "success"
                       ? "green"
                       : messageType === "error"
-                      ? "red"
-                      : "orange", // Orange for warning (if coupon is already applied)
+                        ? "red"
+                        : "orange", // Orange for warning (if coupon is already applied)
                   // fontWeight: "bold",
                   marginTop: "5px",
                   marginBottom: "5px",
@@ -1021,9 +1039,8 @@ const BuyNow = () => {
             </center>
             <div className="payment-methods">
               <div
-                className={`summary-item2 ${
-                  selectedPaymentMethod === "cod" ? "selected" : ""
-                }`}
+                className={`summary-item2 ${selectedPaymentMethod === "cod" ? "selected" : ""
+                  }`}
               >
                 <FaMoneyBillWave
                   style={{ color: "green" }}
@@ -1060,9 +1077,8 @@ const BuyNow = () => {
               </div>
 
               <div
-                className={`summary-item2 ${
-                  selectedPaymentMethod === "card" ? "selected" : ""
-                }`}
+                className={`summary-item2 ${selectedPaymentMethod === "card" ? "selected" : ""
+                  }`}
               >
                 <FaCreditCard
                   style={{ color: "skyblue" }}
@@ -1128,9 +1144,8 @@ const BuyNow = () => {
               </div>
 
               <div
-                className={`summary-item2 ${
-                  selectedPaymentMethod === "pickup" ? "selected" : ""
-                }`}
+                className={`summary-item2 ${selectedPaymentMethod === "pickup" ? "selected" : ""
+                  }`}
               >
                 <FaStore style={{ color: "orange" }} className="payment-icon" />
                 <span className="methods">Pick Up From Store</span>
@@ -1224,6 +1239,7 @@ const BuyNow = () => {
         </div>
       </div>
       <Footer />
+      <ToastContainer />
     </>
   );
 };

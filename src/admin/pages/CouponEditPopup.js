@@ -23,7 +23,7 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
     if (!couponCode || !expiryDate || !couponValue) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "All fields are required.",
       });
       return;
@@ -32,7 +32,7 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
     if (couponValue >= prodPrice) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: `Coupon value must be less than the price ${prodPrice}`,
       });
       return;
@@ -41,7 +41,7 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
     if (!couponCode && !expiryDate) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Please enter a coupon code (e.g., OFF899).",
       });
       return;
@@ -51,7 +51,7 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
     // if (upperCouponCode.trim() === "" || !upperCouponCode.match(/[a-zA-Z]/) || !upperCouponCode.match(/\d/)) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon code must contain at least one letter and one digit.",
     //   });
     //   return;

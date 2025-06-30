@@ -8,6 +8,8 @@ import logo from "./img/logo3.png";
 import confetti from "canvas-confetti"; // Ensure you import confetti
 import axios from "axios";
 import { Link } from "react-router-dom";
+import './css/ClientSignUp.css'
+
 const SignupPage = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -21,30 +23,46 @@ const SignupPage = () => {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate(); // Initialize navigate function
-  const [backgroundImage, setBackgroundImage] = useState("");
+  // const [backgroundImage, setBackgroundImage] = useState("");
   const location = useLocation();
 
-  // Fetch the background image from the server
+  const [backgroundImage, setBackgroundImage] = useState(() => {
+    // Step 1: Immediately return cached image from localStorage on first render
+    return localStorage.getItem("cachedLoginBg") || "";
+  });
+
   useEffect(() => {
-    console.log("Fetching background image from:", `${ApiUrl}/fetchloginbg`); // Log the API URL being used
-
-    axios
-      .get(`${ApiUrl}/fetchloginbg`)
-      .then((response) => {
-        console.log("Response data:", response.data); // Log the data received from the server
-
+    const fetchAndCacheBackgroundImage = async () => {
+      try {
+        const response = await axios.get(`${ApiUrl}/fetchloginbg`);
         if (response.data.length > 0) {
-          console.log("Background image found:", response.data[0].image); // Log the image being used
-          setBackgroundImage(response.data[0].image); // Only set the filename, base path is handled in style
+          const image = response.data[0].image;
+          localStorage.setItem("cachedLoginBg", image);
+          preloadImage(`${ApiUrl}/uploads/singleadpage/${image}`);
+          setBackgroundImage(image);
         } else {
-          console.log("No background image found, using gradient instead");
-          setBackgroundImage(""); // No image, fallback to gradient
+          localStorage.removeItem("cachedLoginBg");
+          setBackgroundImage("");
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching background image:", error); // Log any errors that occur
-      });
+      } catch (error) {
+        console.error("Error fetching background image:", error);
+      }
+    };
+
+    // Only fetch if not already cached
+    if (!localStorage.getItem("cachedLoginBg")) {
+      fetchAndCacheBackgroundImage();
+    } else {
+      preloadImage(`${ApiUrl}/uploads/singleadpage/${localStorage.getItem("cachedLoginBg")}`);
+    }
   }, []);
+
+  // Image preload helper
+  const preloadImage = (src) => {
+    const img = new Image();
+    img.src = src;
+  };
+
 
   const validateForm = () => {
     const { username, email, password, confirmPassword, contactNumber } =
@@ -88,7 +106,7 @@ const SignupPage = () => {
   //     const timer = setTimeout(() => {
   //       setErrors({});
   //     }, 5000);
-  
+
   //     return () => clearTimeout(timer); // Cleanup function to avoid memory leaks
   //   }
   // }, [errors]);
@@ -183,8 +201,8 @@ const SignupPage = () => {
           },
           confirmButtonText: "OK",
         }).then(() => {
-// Example: redirecting user to login page from somewhere else
-navigate('/login', { state: { from: location.pathname } });
+          // Example: redirecting user to login page from somewhere else
+          navigate('/login', { state: { from: location.pathname } });
         });
 
         // Reset form data after success
@@ -285,146 +303,150 @@ navigate('/login', { state: { from: location.pathname } });
       )}
       <div style={styles.container}>
         <button style={styles.signOutButton}>
-          <Link to="/" style={{ color: "white" }}>
-            <FaSignOutAlt title="Exit"/>
+          <Link to="/login" style={{ color: "white" }}>
+            <FaSignOutAlt title="Exit" />
           </Link>
         </button>
         <center>
           <Link to="/">
-            <img src={logo} width={"200px"}  alt="Logo" />
+            <img src={logo} width={"200px"} alt="Logo" />
           </Link>
         </center>
         <h2 style={styles.title}>SignUp</h2>
         <form style={styles.form} onSubmit={handleSubmit} autoComplete="off">
-        <div style={styles.row}>
-        <div style={styles.inputContainer}>
-          <label style={styles.label} htmlFor="username">
-            Username
-          </label>
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange} 
-            style={styles.input}
-            className="staff-input"
+          <div style={styles.row}>
+            <div style={styles.inputContainer}>
+              <label style={styles.label} htmlFor="username">
+                Username
+              </label>
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleChange}
+                style={styles.input}
+                className="staff-input"
 
-          />
-          {errors.username && <p style={styles.error}>{errors.username}</p>}
+              />
+              {errors.username && <p style={styles.error}>{errors.username}</p>}
 
-          </div>
-          <div style={styles.inputContainer}>
-          <label style={styles.label} htmlFor="email">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            style={styles.input}
-            className="staff-input"
+            </div>
+            <div style={styles.inputContainer}>
+              <label style={styles.label} htmlFor="email">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                style={styles.input}
+                className="staff-input"
 
-          />
-          {errors.email && <p style={styles.error}>{errors.email}</p>}
-          </div>
+              />
+              {errors.email && <p style={styles.error}>{errors.email}</p>}
+            </div>
           </div>
 
           <div style={styles.row}>
-          <div style={styles.inputContainer}>
+            <div style={styles.inputContainer}>
 
-          <label style={styles.label} htmlFor="contactNumber">
-            WhatsApp Number <FaInfoCircle style={{cursor:'pointer', marginLeft:'5px'}} title="Use your WhatsApp number to get more updates and exclusive
-            coupons!" />
-          </label>
-        
-          <input
-            type="text"
-            name="contactNumber"
-            placeholder="WhatsApp Number"
-            value={formData.contactNumber}
-            onChange={handleChange}
-            style={styles.input}
-            className="staff-input"
+              <label style={styles.label} htmlFor="contactNumber">
+                <span>WhatsApp Number </span>
 
-          />
-          {errors.contactNumber && (
-            <p style={styles.error}>{errors.contactNumber}</p>
-          )}
+                <span className="tooltip-container2">
+                  <FaInfoCircle style={{ cursor: 'pointer', marginLeft: '5px', marginTop:'2px' }} />
+                  <span className="tooltip-text2">
+                    Use your WhatsApp number to get more updates and exclusive coupons!
+                  </span>
+                </span>
+              </label>
 
-          </div>
+              <input
+                type="text"
+                name="contactNumber"
+                placeholder="WhatsApp Number"
+                value={formData.contactNumber}
+                onChange={handleChange}
+                style={styles.input}
+                className="staff-input"
 
-          <div style={styles.inputContainer}>
+              />
+              {errors.contactNumber && (
+                <p style={styles.error}>{errors.contactNumber}</p>
+              )}
 
-          <label style={styles.label} htmlFor="password">
-            Password
-          </label>
-          <div style={styles.passwordContainer}>
-            <input
-              // type={passwordVisible ? "text" : "password"}
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              style={styles.passwordInput}
-              className={`staff-input ${
-                passwordVisible ? "" : "password-hidden"
-              }`}
-            />
-            <span
-              onClick={togglePasswordVisibility}
-              style={styles.eyeIcon}
-              className="eye-icon"
-            >
-              {passwordVisible ? <FaEye /> : <FaEyeSlash />}
-            </span>
-          </div>
-          {errors.password && <p style={styles.error}>{errors.password}</p>}
-          </div>
+            </div>
+
+            <div style={styles.inputContainer}>
+
+              <label style={styles.label} htmlFor="password">
+                Password
+              </label>
+              <div style={styles.passwordContainer}>
+                <input
+                  // type={passwordVisible ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  style={styles.passwordInput}
+                  className={`staff-input ${passwordVisible ? "" : "password-hidden"
+                    }`}
+                />
+                <span
+                  onClick={togglePasswordVisibility}
+                  style={styles.eyeIcon}
+                  className="eye-icon"
+                >
+                  {passwordVisible ? <FaEye /> : <FaEyeSlash />}
+                </span>
+              </div>
+              {errors.password && <p style={styles.error}>{errors.password}</p>}
+            </div>
           </div>
 
           <div style={styles.row}>
 
-    <div style={styles.inputContainer}>
-          <label style={styles.label} htmlFor="confirmPassword">
-            Confirm Password
-          </label>
-          <div style={styles.passwordContainer}>
-            <input
-              // type={confirmPasswordVisible ? "text" : "password"}
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              style={styles.passwordInput}
-              className={`staff-input ${
-                confirmPasswordVisible ? "" : "password-hidden"
-              }`}
-            />
-            <span
-              onClick={toggleConfirmPasswordVisibility}
-              style={styles.eyeIcon}
-              className="eye-icon"
-            >
-              {confirmPasswordVisible ? <FaEye /> : <FaEyeSlash />}
-            </span>
+            <div style={styles.inputContainer}>
+              <label style={styles.label} htmlFor="confirmPassword">
+                Confirm Password
+              </label>
+              <div style={styles.passwordContainer}>
+                <input
+                  // type={confirmPasswordVisible ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  style={styles.passwordInput}
+                  className={`staff-input ${confirmPasswordVisible ? "" : "password-hidden"
+                    }`}
+                />
+                <span
+                  onClick={toggleConfirmPasswordVisibility}
+                  style={styles.eyeIcon}
+                  className="eye-icon"
+                >
+                  {confirmPasswordVisible ? <FaEye /> : <FaEyeSlash />}
+                </span>
+              </div>
+              {errors.confirmPassword && (
+                <p style={styles.error}>{errors.confirmPassword}</p>
+              )}
+
+            </div>
+            <div style={styles.inputContainer}>
+
+              <button type="submit" style={styles.button}>
+                Sign Up
+              </button>
+            </div>
           </div>
-          {errors.confirmPassword && (
-            <p style={styles.error}>{errors.confirmPassword}</p>
-          )}
 
-</div>
-<div style={styles.inputContainer}>
 
-<button type="submit" style={styles.button}>
-            Sign Up
-          </button>
-</div>
-</div>
-
-          
         </form>
       </div>
     </div>
@@ -482,6 +504,7 @@ const styles = {
   label: {
     color: "white",
     marginTop: "5px",
+    display:'flex'
   },
   container: {
     maxWidth: "550px",
@@ -554,7 +577,7 @@ const styles = {
   eyeIcon: {
     position: "absolute",
     right: "15px", // Adjust position to fit smaller card
-    top: "60%", // Adjust top position for better alignment
+    top: "70%", // Adjust top position for better alignment
     transform: "translateY(-50%)",
     cursor: "pointer",
     color: "white",
@@ -568,7 +591,7 @@ const styles = {
     color: "#fff",
     fontSize: "16px", // Adjust button font size
     cursor: "pointer",
-    width:'100%'
+    width: '100%'
   },
   error: {
     color: "red",

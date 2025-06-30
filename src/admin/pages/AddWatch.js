@@ -2,17 +2,24 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes,FaImages } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes, FaImages } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick"; // Import Slider from react-slick
-import { FaInfoCircle, FaClone } from "react-icons/fa"; // Ensure to import any icons you need
+import { FaClone, FaInfoCircle } from "react-icons/fa"; // Ensure to import any icons you need
 import CouponEditPopup from "./CouponEditPopup";
 import EditCouponModal from "./EditCouponModal"; // Import the modal component
+// import CouponImage from './img/coupons.png'
+import ActiveCouponImage from './img/Active-coupon.png'
+import ExpiredCouponImage from './img/Expired-coupon.png'
+// import leftarrow from "./img/left.png";
+// import rightarrow from "./img/right.png";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import { SearchIcon } from "lucide-react";
+import FilterIcon from "./img/filter.png";
 
-import leftarrow from "./img/left.png";
-import rightarrow from "./img/right.png";
 // Set up the modal root element
 Modal.setAppElement("#root");
 
@@ -61,7 +68,56 @@ const Watch = () => {
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [modalProductId, setModalProductId] = useState(null);
 
- useEffect(() => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [lightboxImages, setLightboxImages] = useState([]);
+
+  const [couponProducts, setCouponProducts] = useState({});
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showOutOfStockOnly, setShowOutOfStockOnly] = useState(false);
+  const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
+  // const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
+
+  const fetchCouponStatus = async (productId) => {
+    console.log(`[INFO] Checking coupon for product ID: ${productId}`);
+
+    try {
+      const response = await axios.get(`${ApiUrl}/api/couponstatus/${productId}`);
+      const { hasCoupon, isExpired } = response.data;
+
+      console.log(`[SUCCESS] Product ${productId}: hasCoupon=${hasCoupon}, isExpired=${isExpired}`);
+      return { hasCoupon, isExpired };
+    } catch (error) {
+      console.error(`[ERROR] Failed to check coupon for product ${productId}:`, error.message);
+      return { hasCoupon: false, isExpired: false };
+    }
+  };
+
+  useEffect(() => {
+    const loadCouponStatuses = async () => {
+      const result = {};
+
+      for (const product of products) {
+        const { hasCoupon, isExpired } = await fetchCouponStatus(product.prod_id);
+        result[product.id] = { hasCoupon, isExpired };
+      }
+
+      setCouponProducts(result);
+    };
+
+    if (products.length > 0) {
+      loadCouponStatuses();
+    }
+  }, [products]);
+
+  const handleImageClick = (index, imageArray) => {
+    setPhotoIndex(index); // starting image
+    setLightboxImages(imageArray); // all images of this product
+    setIsOpen(true); // open lightbox
+  };
+
+  useEffect(() => {
     setTimeout(() => {
       const section = document.querySelector(".laptops-products-list");
       if (section) {
@@ -70,7 +126,7 @@ const Watch = () => {
       }
     }, 100);
   }, []);
-  
+
   // Handle opening modal and passing productId
 
   const openProductModal = (productId) => {
@@ -123,10 +179,10 @@ const Watch = () => {
 
   const handleChangePrice = (e, productPrice) => {
     const value = e.target.value;
-  
+
     // Allow only numbers (integer or decimal with up to 2 places), but no leading zero unless decimal.
     const regex = /^(0|[1-9]\d*)(\.\d{0,2})?$/;
-  
+
     if (regex.test(value) || value === "") {
       if (parseFloat(value) <= productPrice || value === "") {
         setOfferPrice(value);
@@ -266,15 +322,15 @@ const Watch = () => {
   const handleCouponUpdated = () => {
     console.log("Coupon updated successfully!");
   };
- const MAX_FILES = 5; // Set your file limit
+  const MAX_FILES = 5; // Set your file limit
 
   const handleFileChange = (productId, event) => {
     const files = Array.from(event.target.files);
-  
+
     // Get the existing files for this product (or an empty array)
     const existingFiles = newImages[productId] || [];
     const existingFileNames = existingFiles.map((file) => file.name);
-  
+
     // Check if adding new files exceeds the limit
     if (existingFiles.length + files.length > MAX_FILES) {
       Swal.fire({
@@ -286,69 +342,19 @@ const Watch = () => {
       });
       return;
     }
-  
+
     // Filter out duplicate files based on name
     const uniqueFiles = files.filter(
       (file) => !existingFileNames.includes(file.name)
     );
-  
+
     if (uniqueFiles.length === 0) return; // No new images
-  
-    const resizedFiles = [];
-  
-    uniqueFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        const img = new Image();
-        img.src = e.target.result;
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Maximum width for the image
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-  
-          const ctx = canvas.getContext("2d");
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
-          // Compress and convert to blob
-          canvas.toBlob(
-            (blob) => {
-              const processBlob = (finalBlob) => {
-                const processedFile = new File([finalBlob], file.name, {
-                  type: "image/jpeg",
-                });
-                resizedFiles.push(processedFile);
-  
-                if (resizedFiles.length === uniqueFiles.length) {
-                  setNewImages((prev) => ({
-                    ...prev,
-                    [productId]: [...(prev[productId] || []), ...resizedFiles],
-                  }));
-                }
-              };
-  
-              if (blob.size / 1024 < 50) {
-                processBlob(blob);
-              } else {
-                canvas.toBlob(
-                  (compressedBlob) => {
-                    processBlob(compressedBlob);
-                  },
-                  "image/jpeg",
-                  0.7
-                );
-              }
-            },
-            "image/jpeg",
-            0.8
-          );
-        };
-      };
-    });
+
+    // Directly add the unique original image files without resizing or compression
+    setNewImages((prev) => ({
+      ...prev,
+      [productId]: [...(prev[productId] || []), ...uniqueFiles],
+    }));
   };
 
   const handleUploadImages = async (productId) => {
@@ -462,7 +468,7 @@ const Watch = () => {
     //     // Optionally show an error message if the input is invalid
     //     Swal.fire({
     //       icon: "warning",
-    //       title: "Validation Error",
+    //       title: "Invalid Input",
     //       text: "Name and Label should only contain letters and spaces.",
     //     });
     //     return; // Prevent updating state if invalid
@@ -481,7 +487,7 @@ const Watch = () => {
         // Optionally show an error message if the input is invalid
         Swal.fire({
           icon: "warning",
-          title: "Validation Error",
+          title: "Invalid Input",
           text: "Price should only contain numbers.",
         });
         return; // Prevent updating state if invalid
@@ -495,85 +501,25 @@ const Watch = () => {
     });
   };
 
- const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    console.log("Selected image for upload:", file);
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (e) => {
-      const img = new Image();
-      img.src = e.target.result;
-      img.onload = () => {
-        console.log("Original image dimensions:", img.width, img.height);
+    if (file) {
+      console.log("Selected image for upload:", file);
 
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 500; // Define max width
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
+      // Generate unique filename with timestamp
+      const timestamp = new Date().toISOString().replace(/[-:.]/g, ""); // Format: YYYYMMDDTHHMMSS
+      const fileExtension = file.name.split(".").pop(); // Extract file extension
+      const newFileName = `image_${timestamp}.${fileExtension}`;
 
-        const ctx = canvas.getContext("2d");
+      // Create new File instance with original content
+      const newFile = new File([file], newFileName, { type: file.type });
 
-        const isPng = file.type === "image/png";
-        if (!isPng) {
-          // Only fill white if image is NOT PNG
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+      console.log("Prepared file for upload:", newFile);
+      setSelectedFile(newFile);
+    }
+  };
 
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        console.log("Resizing image to:", canvas.width, canvas.height);
-
-        // Generate unique filename with timestamp
-        const timestamp = new Date().toISOString().replace(/[-:.]/g, ""); // Format: YYYYMMDDTHHMMSS
-        const fileExtension = file.name.split(".").pop(); // Extract file extension
-        const newFileName = `image_${timestamp}.${fileExtension}`;
-
-        const mimeType = isPng ? "image/png" : "image/jpeg";
-
-        // Compress image
-        canvas.toBlob(
-          (blob) => {
-            console.log(
-              "Resized image size (KB):",
-              (blob.size / 1024).toFixed(2)
-            );
-
-            if (blob.size / 1024 < 50) {
-              console.log("Image is under 50 KB, ready for upload.");
-              const newFile = new File([blob], newFileName, { type: mimeType });
-              setSelectedFile(newFile);
-            } else {
-              console.log(
-                "Image still above 50 KB, applying further compression."
-              );
-              canvas.toBlob(
-                (compressedBlob) => {
-                  console.log(
-                    "Compressed image size (KB):",
-                    (compressedBlob.size / 1024).toFixed(2)
-                  );
-                  const compressedFile = new File(
-                    [compressedBlob],
-                    newFileName,
-                    { type: mimeType }
-                  );
-                  setSelectedFile(compressedFile);
-                },
-                mimeType,
-                0.7
-              );
-            }
-          },
-          mimeType,
-          0.8
-        );
-      };
-    };
-  }
-};
 
   // Your existing handleImageUpdate function
   const handleImageUpdate = () => {
@@ -665,9 +611,9 @@ const Watch = () => {
   //   });
   // };
 
-    const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-  
+
     // If more than 5 images are selected, show an alert and prevent upload
     if (files.length > 5) {
       Swal.fire({
@@ -679,89 +625,32 @@ const Watch = () => {
       e.target.value = ""; // Reset input to allow re-selection
       return;
     }
-  
-    // Resize images before adding them
-    const resizedImages = await Promise.all(files.map((file) => resizeImage(file)));
-  
+
+    // Filter out duplicates based on file name
     setNewProduct((prevProduct) => {
-      // Convert existing images to a comparable format
       const existingImages = prevProduct.images.map((img) => img.name || img);
-  
-      // Filter out duplicates
-      const newUniqueImages = resizedImages.filter(
-        (newImg) => !existingImages.includes(newImg.name || newImg)
+
+      const newUniqueImages = files.filter(
+        (file) => !existingImages.includes(file.name)
       );
-  
+
       return {
         ...prevProduct,
-        images: [...prevProduct.images, ...newUniqueImages], // Append only unique images
+        images: [...prevProduct.images, ...newUniqueImages],
       };
     });
-  
-    setImageCount(resizedImages.length);
-  
-    // Reset file input to allow selecting new files again
-    e.target.value = "";
+
+    setImageCount(files.length); // You can update this to only count unique if needed
+
+    e.target.value = ""; // Reset file input
   };
-  
- const resizeImage = (file) => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 500;
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
-
-        const ctx = canvas.getContext("2d");
-        const isPng = file.type === "image/png";
-
-        // Fill white background only for non-PNG images
-        if (!isPng) {
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        const mimeType = isPng ? "image/png" : "image/jpeg";
-
-        canvas.toBlob(
-          (blob) => {
-            if (blob.size / 1024 < 50) {
-              resolve(new File([blob], file.name, { type: mimeType }));
-            } else {
-              canvas.toBlob(
-                (compressedBlob) =>
-                  resolve(
-                    new File([compressedBlob], file.name, {
-                      type: mimeType,
-                    })
-                  ),
-                mimeType,
-                0.7
-              );
-            }
-          },
-          mimeType,
-          0.8
-        );
-      };
-    };
-  });
-};
 
 
   const handleAddProduct = async () => {
     if (newProduct.label && newProduct.label.replace(/\s/g, "").length > 15) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot exceed 30 characters.",
       });
       return;
@@ -771,7 +660,7 @@ const Watch = () => {
     if (newProduct.label && !newProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot be just spaces.",
       });
       return;
@@ -781,7 +670,7 @@ const Watch = () => {
     if (!newProduct.name.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Product name is required.",
       });
       return;
@@ -789,7 +678,7 @@ const Watch = () => {
     if (!newProduct.features.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Product features are required.",
       });
       return;
@@ -797,7 +686,7 @@ const Watch = () => {
     // if (!newProduct.category.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Product category is required.",
     //   });
     //   return;
@@ -809,7 +698,7 @@ const Watch = () => {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid product price is required.",
       });
       return;
@@ -821,7 +710,7 @@ const Watch = () => {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid actual price is required.",
       });
       return;
@@ -830,7 +719,7 @@ const Watch = () => {
       // Check for images array length
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "At least one product image is required.",
       });
       return;
@@ -840,7 +729,7 @@ const Watch = () => {
     if (Number(newProduct.actual_price) <= Number(newProduct.price)) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Actual price must be greater than the product price.",
       });
       return;
@@ -857,7 +746,7 @@ const Watch = () => {
     // ) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
     //   });
     //   return;
@@ -867,7 +756,7 @@ const Watch = () => {
     // if (couponCode && !couponCode.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon code cannot be just spaces.",
     //   });
     //   return;
@@ -881,7 +770,7 @@ const Watch = () => {
     // if (couponValue >= Number(newProduct.price)) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon discount must be less than the product price.",
     //   });
     //   return;
@@ -895,7 +784,7 @@ const Watch = () => {
     //   if (!hasDigit) {
     //     Swal.fire({
     //       icon: "warning",
-    //       title: "Validation Error",
+    //       title: "Invalid Input",
     //       text: "Coupon code must contain price value like OFFER599.",
     //     });
     //     return;
@@ -959,7 +848,7 @@ const Watch = () => {
         // coupon: "",
         effectiveprice: "",
         category: "", // Clear the category here
-});
+      });
       setImageCount(0);
       document.querySelector('input[type="file"]').value = ""; // Reset file input
     } catch (error) {
@@ -1011,7 +900,7 @@ const Watch = () => {
     if (editingProduct.label && !editingProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot be just spaces.Remove space",
       });
       return;
@@ -1020,7 +909,7 @@ const Watch = () => {
     // if (editingProduct.label && /\d/.test(editingProduct.label)) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Label cannot contain numeric values.",
     //   });
     //   return;
@@ -1029,7 +918,7 @@ const Watch = () => {
     if (editingProduct.label && editingProduct.label.length > 15) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot exceed 30 characters.",
       });
       return;
@@ -1039,7 +928,7 @@ const Watch = () => {
     if (editingProduct.label && !editingProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot be just spaces.",
       });
       return;
@@ -1048,7 +937,7 @@ const Watch = () => {
     if (Number(editingProduct.actual_price) <= Number(editingProduct.price)) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Actual price must be greater than the product price.",
       });
       return;
@@ -1058,7 +947,7 @@ const Watch = () => {
     if (!editingProduct.name.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Product name is required.",
       });
       return;
@@ -1066,7 +955,7 @@ const Watch = () => {
     if (!editingProduct.features.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Product features are required.",
       });
       return;
@@ -1074,7 +963,7 @@ const Watch = () => {
     // if (!editingProduct.category.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Product category is required.",
     //   });
     //   return;
@@ -1086,7 +975,7 @@ const Watch = () => {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid product price is required.",
       });
       return;
@@ -1098,7 +987,7 @@ const Watch = () => {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid product price is required.",
       });
       return;
@@ -1129,7 +1018,7 @@ const Watch = () => {
     // ) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
     //   });
     //   return;
@@ -1139,7 +1028,7 @@ const Watch = () => {
     // if (couponCode && !couponCode.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon code cannot be just spaces.",
     //   });
     //   return;
@@ -1151,7 +1040,7 @@ const Watch = () => {
     //   if (!hasDigit) {
     //     Swal.fire({
     //       icon: "warning",
-    //       title: "Validation Error",
+    //       title: "Invalid Input",
     //       text: "Coupon code must contain price value like OFFER599.",
     //     });
     //     return;
@@ -1166,7 +1055,7 @@ const Watch = () => {
     // if (couponValue >= Number(editingProduct.price)) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon discount must be less than the product price.",
     //   });
     //   return;
@@ -1429,7 +1318,7 @@ const Watch = () => {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${year}-${month}-${day}T${hours}:${minutes}`; // Format for datetime-local input
   };
-  
+
   const today = new Date();
   const minDate = getFormattedDate(today);
   const maxDate = getFormattedDate(new Date(today.setDate(today.getDate() + 10)));
@@ -1494,6 +1383,14 @@ const Watch = () => {
       });
     }
   };
+  // Compute stats
+  const totalProducts = products.length;
+
+  const inStock = products.filter(p => p.status !== "unavailable").length;
+  const outOfStock = totalProducts - inStock;
+
+  const withCoupons = products.filter(p => couponProducts[p.id]?.hasCoupon).length;
+  // const withAccessories = products.filter(p => accessoryCounts[p.id] > 0).length;
 
   return (
     <div className="laptops-page">
@@ -1561,7 +1458,7 @@ const Watch = () => {
 
             <label className="laptops-label">Product Image</label>
             <input
-              accept="image/jpeg, image/png"
+              accept="image/jpeg, image/png, image/webp"
               ref={fileInputRef}
               multiple
               onChange={handleImageChange}
@@ -1594,421 +1491,561 @@ const Watch = () => {
             </button>
           </div>
         </div>
+        <hr className="dotted-divider" />
+            <h2 className="laptops-page-title">Watch Product List</h2>
 
-        <div className="laptops-products-list">
-          {products.length > 0 &&
-            products.map((product, index) => (
-              <div className="laptops-product-card" key={product.id}>
-                {product.offer_label && (
-                  <div className="product-label">{product.offer_label}</div>
-                )}
+        {(totalProducts > 0 || inStock > 0 || outOfStock > 0 || withCoupons > 0) && (
+          <>
+            <div className="laptops-summary-stats-row">
+              <div className="laptops-stat-card">
+                <h5>Total Products</h5>
+                <p>{totalProducts}</p>
+              </div>
+              <div className="laptops-stat-card">
+                <h5>In Stock </h5>
+                <p>{inStock}</p>
+              </div>
+              <div className="laptops-stat-card">
+                <h5>Out of Stock </h5>
+                <p>{outOfStock}</p>
+              </div>
+              <div className="laptops-stat-card">
+                <h5>With Coupons 🎟️</h5>
+                <p>{withCoupons}</p>
+              </div>
 
-                {/* Display product image */}
-                <div className="laptops-product-image">
-                  <div className="slider-container">
-                    <Slider
-                        {...{
-                        ...settings,
-                        arrows: product.prod_img.length > 1,
-                        draggable: product.prod_img.length > 1, // Disable dragging if only one image exists
-                        swipe: product.prod_img.length > 1, // Disable swipe gestures on touch devices for one image
-                      }}
+            </div>
+
+            <div className="filters-card2">
+              <div className="filters-panel">
+                <div className="filter-label-title">
+                  <img src={FilterIcon} width={"20px"} />
+
+                  <span> Filter By </span>
+                  {/* <FilterIcon width={"20px"}/> */}
+                </div>
+                <label className="filter-label">
+                  <input
+                    type="checkbox"
+                    checked={showOutOfStockOnly}
+                    onChange={() => setShowOutOfStockOnly(!showOutOfStockOnly)}
+                  />
+                  Out of Stock
+                </label>
+
+                <label className="filter-label">
+                  <input
+                    type="checkbox"
+                    checked={showHasCouponOnly}
+                    onChange={() => setShowHasCouponOnly(!showHasCouponOnly)}
+                  />
+                  Coupon
+                </label>
+
+                <div className="filter-search-wrapper">
+                  <SearchIcon width={'18px'} className="search-icon-btn" />
+                  {/* <img src={SearchIcon} width={'20px'}/> */}
+                  <input
+                    type="text"
+                    placeholder="Search by name"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="filter-input"
+                  />
+                  {searchTerm && (
+                    <button
+                      className="filter-clear-btn"
+                      onClick={() => setSearchTerm("")}
+                      aria-label="Clear search"
                     >
-                      {product.prod_img.map((img, imgIndex) => (
-                        <div key={imgIndex} className="image-wrapper">
-                          <img
-                            src={`${ApiUrl}/uploads/watch/${img}`}
-                            alt={product.prod_name}
-                            className="laptops-product-image"
-                          />
-
-                          <div className="image-actions">
-                            <FaEdit
-                              onClick={() => openModal(product.id, imgIndex)} // Pass product ID and image index
-                              className="action-icon"
-                            />
-                            {product.prod_img.length > 1 && ( // Display trash icon only if there is more than one image
-                              <FaTrash
-                                onClick={() =>
-                                  handleDeleteImage(product.id, imgIndex)
-                                }
-                                className="action-icon"
-                              />
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </Slider>
-                  </div>
+                      ×
+                    </button>
+                  )}
                 </div>
+              </div>
+            </div>
+          </>
+        )}
+        <div className="laptops-products-list">
+          {products.length === 0 ? (
+            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some Watch.</div>
+          ) : (
+            (() => {
+              const filteredProducts = products
+                .filter((product) =>
+                  product.prod_name.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .filter((product) =>
+                  showOutOfStockOnly ? product.status === "unavailable" : true
+                )
+                .filter((product) =>
+                  showHasCouponOnly ? couponProducts[product.id]?.hasCoupon : true
+                );
+              return filteredProducts.length === 0 ? (
+                <div className="empty-state-message"><FaInfoCircle /> No products match your filters.</div>
+              ) : (
+                filteredProducts
+                  .map((product, index) => (
+                    <div className="laptops-product-card" key={product.id}>
+                      {product.status === "unavailable" && (
+                        <span className="out_of_stock_ribbon"></span>
+                      )}
+                      {product.offer_label && (
+                        <div className="product-label">{product.offer_label}</div>
+                      )}
 
-                {/* Display product name */}
-                <div className="laptops-product-details">
-                  <h3 className="laptops-product-name">
-                    {product.prod_name}
-                    {product.productStatus === "unapproved" && (
-                      <span style={{ color: "red" }}>
-                        ({product.productStatus})
-                      </span>
-                    )}
-                  </h3>
-
-                  {/* "View" button to trigger modal */}
-                </div>
-
-                <div>
-                  <span style={{textDecoration:"line-through", color:'red', fontSize:'14px'}}>₹{product.actual_price}</span>  <span style={{color:'green',marginLeft:'5px'}}>₹{product.prod_price}</span>
-                </div>
-                
-                <button
-                  className="view-details-btn"
-                  onClick={() => openProductModal(product.id)} // Pass product ID to open modal
-                >
-                  <FaEye /> View Details
-                </button>
-                <div className="laptops-product-actions">
-                  <button
-                    onClick={() => handleEditProduct(product)}
-                    className="laptops-action-btn"
-                  >
-                    <FaEdit /> Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProduct(product.id)}
-                    className="laptops-action-btn"
-                  >
-                    <FaTrash /> Delete
-                  </button>
-                </div>
-
-                {/* Modal for displaying product details */}
-                {isModalOpen2 && modalProductId === product.id && (
-                  <div className="product-details-modal">
-                    <div className="modal-overlay">
-                      <div className="modal-content3">
-                        <button
-                          onClick={closeProductModal}
-                          className="modal-close-btn"
-                        >
-                          &times; {/* Close button */}
-                        </button>
-                        <div className="laptops-modal-form-container">
-                          {/* <h3 className="modal-title">{product.prod_name}</h3> */}
-
-                          <div className="laptops-modal-content">
-                            <div className="laptops-modal-left-section">
-                              <p>
-                                <strong>Product Name</strong>
-                                <span>{product.prod_name}</span>
-                              </p>
-                              <p>
-                                <strong>Subtitle</strong>
-                                <span>{product.subtitle}</span>
-                              </p>
-                              <p>
-                                <strong>M.R.P Price</strong>
-                                <span>₹{product.actual_price}</span>
-                              </p>
-
-                              <p>
-                                <strong>Selling Price</strong>
-                                <span>₹{product.prod_price}</span>
-                              </p>
-                              <p>
-                                <strong>Delivery charge</strong>
-                                <span>₹{product.deliverycharge}</span>
-                              </p>
-                              <p>
-                                <strong>Features</strong>
-                                <span>{product.prod_features}</span>
-                              </p>
-                              <div className="laptops-product-actions">
-                                <button
-                                  onClick={() => handleEditProduct(product)}
-                                  className="laptops-action-btn"
-                                >
-                                  <FaEdit /> Edit
-                                </button>
-                                <button
+                      {/* Display product image */}
+                      <div className="laptops-product-image">
+                        <div className="slider-container">
+                          <Slider
+                            {...{
+                              ...settings,
+                              arrows: product.prod_img.length > 1,
+                              draggable: product.prod_img.length > 1, // Disable dragging if only one image exists
+                              swipe: product.prod_img.length > 1, // Disable swipe gestures on touch devices for one image
+                            }}
+                          >
+                            {product.prod_img.map((img, imgIndex) => (
+                              <div key={imgIndex} className="image-wrapper">
+                                <img
+                                  src={`${ApiUrl}/uploads/watch/${img}`}
+                                  alt={product.prod_name}
+                                  className="laptops-product-image"
                                   onClick={() =>
-                                    handleDeleteProduct(product.id)
-                                  }
-                                  className="laptops-action-btn"
-                                >
-                                  <FaTrash /> Delete
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="laptops-modal-right-section">
-                              <div
-                                onClick={() => handleOpenOfferModal(product.id)}
-                                className="offer-edit-btn"
-                              >
-                                <span className="offer-edit-text">
-                                  Edit Limited Time Offer
-                                </span>
-                                <FaEdit className="offer-edit-icon" />
-                              </div>
-
-                              {/* Modal Rendering */}
-                              {isOfferModalOpen && (
-                                <div className="offer-modal-overlay">
-                                  <div className="offer-modal-content">
-                                    <button
-                                      onClick={handleCloseOfferModal}
-                                      className="offer-close-btn"
-                                    >
-                                      &times;
-                                    </button>
-                                    <h3 className="offer-modal-title">
-                                      {isEditMode
-                                        ? "Edit Limited Time Price Offer"
-                                        : "Add Limited Time Price Offer"}
-                                    </h3>
-                                    <form
-                                      onSubmit={handleSubmit}
-                                      className="offer-form"
-                                    >
-                                      <label className="offer-label">
-                                        Offer Start Time
-                                      </label>
-                                      <input
-                                        type="datetime-local"
-                                        value={offerStartTime}
-                                        onChange={(e) =>
-                                          setOfferStartTime(e.target.value)
-                                        }
-                                        required
-                                        min={minDate}
-                                        className="offer-input"
-                                      />
-                                      <label className="offer-label">
-                                        Offer End Time
-                                      </label>
-                                      <input
-                                        type="datetime-local"
-                                        value={offerEndTime}
-                                        onChange={(e) =>
-                                          setOfferEndTime(e.target.value)
-                                        }
-                                        required
-                                        min={offerStartTime || minDate} // End date cannot be before start date
-                                        max={
-                                          offerStartTime
-                                            ? getFormattedDate(
-                                                new Date(
-                                                  new Date(
-                                                    offerStartTime
-                                                  ).getTime() +
-                                                    10 * 86400000
-                                                )
-                                              )
-                                            : maxDate
-                                        } // Max 10 days from start
-                                        className="offer-input"
-                                      />
-                                      <label className="offer-label">
-                                        Offer Price
-                                      </label>
-                                      <input
-                                        type="number"
-                                        value={offerPrice}
-                                        onChange={(e) => handleChangePrice(e, product.prod_price)} // Pass product.prod_price
-                                        required
-                                        className="offer-input"
-                                      />
-                                      <button
-                                        type="submit"
-                                        className="offer-submit-btn"
-                                      >
-                                        {isEditMode
-                                          ? "Update Offer"
-                                          : "Add Offer"}
-                                      </button>
-                                    </form>
-
-                                    {isEditMode && (
-                                      <button
-                                        onClick={handleDelete}
-                                        className="offer-delete-btn"
-                                      >
-                                        Delete Offer
-                                      </button>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Upload Section */}
-                              <div className="upload-container">
-                                Upload more images
-                                <input
-                                  style={{ marginTop: "10px" }}
-                                  className="file-input"
-                                  multiple
-                                  type="file"
-                                  onChange={(e) =>
-                                    handleFileChange(product.id, e)
-                                  }
-                                />
-                                <button
-                                  className="upload-button"
-                                  onClick={() => handleUploadImages(product.id)}
-                                >
-                                  Upload Images
-                                </button>
-                              </div>
-
-                              {/* Coupon Section */}
-                              <p className="laptops-product-coupon">
-                                Coupon Code:
-                                <span
-                                  onClick={() =>
-                                    openPopup(
-                                      product.prod_id,
-                                      product.prod_name,
-                                      product.prod_price
+                                    handleImageClick(
+                                      imgIndex, // Index of the clicked image in this product
+                                      product.prod_img.map(img => `${ApiUrl}/uploads/watch/${img}`) // Only current product's images
                                     )
                                   }
-                                  style={{ cursor: "pointer" }}
-                                >
+                                />
+
+                                <div className="image-actions">
                                   <FaEdit
-                                    className="faedit"
-                                    title="Edit Coupon"
+                                    title="Update this image"
+                                    onClick={() => openModal(product.id, imgIndex)} // Pass product ID and image index
+                                    className="action-icon"
                                   />
-                                </span>
-                                <span
-                                  onClick={() =>
-                                    fetchCoupons(
-                                      product.prod_id,
-                                      product.prod_name,
-                                      product.prod_price
-                                    )
-                                  }
-                                  style={{ cursor: "pointer" }}
-                                >
-                                  <FaEye
-                                    className="faedit"
-                                    title="View Coupon"
-                                  />
-                                </span>
-                              </p>
-
-                              <CouponEditPopup
-                                isOpen={isPopupOpen}
-                                onClose={closePopup}
-                                productId={selectedProductId}
-                                prodPrice={selectedProductPrice}
-                                onCouponUpdated={handleCouponUpdated}
-                              />
-
-                              {isViewingCoupons && (
-                                <div className="pop-overlay">
-                                  <div className="pop-content">
-                                    <button
-                                      onClick={() => setIsViewingCoupons(false)}
-                                      className="fatimes"
-                                    >
-                                      <FaTimes color="black" size={20} />
-                                    </button>
-                                    <h4 className="coupon-title">
-                                      Coupons for {productName}
-                                    </h4>
-                                    {coupons.length > 0 ? (
-                                      <ul className="coupons-list">
-                                        {coupons.map((coupon, index) => (
-                                          <li
-                                            key={coupon.coupon_id}
-                                            className="coupon-item"
-                                          >
-                                            <span className="serial-number">
-                                              {index + 1}.{" "}
-                                            </span>
-                                            <span className="coupon-code">
-                                              {coupon.coupon_code}
-                                            </span>{" "}
-                                            -
-                                            <span className="coupon-code">
-                                              {coupon.discount_value}
-                                            </span>{" "}
-                                            -
-                                            <span className="expiry-date">
-                                              Expires on:{" "}
-                                              {new Date(
-                                                coupon.expiry_date
-                                              ).toLocaleDateString("en-GB", {
-                                                day: "2-digit",
-                                                month: "short",
-                                                year: "numeric",
-                                              })}
-                                            </span>
-                                            <FaEdit
-                                              className="edit-icon"
-                                              title="Edit Expiry Date"
-                                              onClick={() =>
-                                                handleEditExpiry(
-                                                  coupon.coupon_id
-                                                )
-                                              }
-                                            />
-                                            <FaTrash
-                                              className="delete-icon"
-                                              title="Delete Coupon"
-                                              onClick={() =>
-                                                handleDeleteCoupon(
-                                                  coupon.coupon_id
-                                                )
-                                              }
-                                              style={{
-                                                marginLeft: "10px",
-                                                cursor: "pointer",
-                                              }}
-                                            />
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    ) : (
-                                      <p>
-                                        No coupons available for this product.
-                                      </p>
-                                    )}
-                                  </div>
+                                  {product.prod_img.length > 1 && ( // Display trash icon only if there is more than one image
+                                    <FaTrash
+                                      title="Delete this image"
+                                      onClick={() =>
+                                        handleDeleteImage(product.id, imgIndex)
+                                      }
+                                      className="action-icon"
+                                    />
+                                  )}
                                 </div>
-                              )}
-
-                              <EditCouponModal
-                                isOpen={isEditingCoupon}
-                                onClose={() => setIsEditingCoupon(false)}
-                                coupon={selectedCoupon}
-                                productId={selectedProductId}
-                                productPrice={selectedProductPrice}
-                                onCouponUpdated={() => {}}
-                              />
-
-                              <div
-                                className="frequently-buy"
-                                style={{ marginBottom: "10px" }}
-                              >
-                                <span className="frequently-buy-label">
-                                  Make a copy of this product
-                                </span>
-                                <FaClone
-                                  onClick={() => handleCopyProduct(product.id)}
-                                  className="copy-icon"
-                                />
                               </div>
-
-                              {/* Frequently Buy Section */}
-                            </div>
-                          </div>
+                            ))}
+                          </Slider>
                         </div>
                       </div>
+
+                      {/* Display product name */}
+                      <div className="laptops-product-details">
+                        <h3 className="laptops-product-name" title={product.prod_name}>
+                          {product.prod_name}
+                          {product.productStatus === "unapproved" && (
+                            <span style={{ color: "red" }}>
+                              ({product.productStatus})
+                            </span>
+                          )}
+                        </h3>
+
+                        {/* "View" button to trigger modal */}
+                      </div>
+
+                      <div>
+                        M.R.P <span style={{ textDecoration: "line-through", color: 'red', fontSize: '14px' }}>₹{product.actual_price}</span>  <span style={{ color: 'green', marginLeft: '5px' }}>₹{product.prod_price}</span>
+                      </div>
+
+                      <div className="product-extras">
+                        {couponProducts[product.id]?.hasCoupon && (
+                          <div className="coupon-wrapper">
+                            <div className="coupon-image-wrapper">
+                              {couponProducts[product.id].isExpired === true ?
+                                <img
+                                  src={ExpiredCouponImage}
+                                  width="35px"
+                                  alt="Coupon"
+                                  className="coupon-image"
+                                />
+                                :
+                                <img
+                                  src={ActiveCouponImage}
+                                  width="35px"
+                                  alt="Coupon"
+                                  className="coupon-image"
+                                />
+                              }
+                              <span className="tooltip-text">
+                                {couponProducts[product.id].isExpired ? "Coupon Expired" : "Coupon is active"}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+
+                        <button
+                          className="view-details-btn"
+                          title="View more details"
+                          onClick={() => openProductModal(product.id)} // Pass product ID to open modal
+                        >
+                          <FaEye /> View
+                        </button>
+
+
+
+                      </div>
+
+                      <div className="laptops-product-actions">
+                        <button
+                          onClick={() => handleEditProduct(product)}
+                          className="laptops-action-btn"
+                          title="Update this product"
+                        >
+                          <FaEdit /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(product.id)}
+                          className="laptops-action-btn"
+                          title="Delete this product"
+                        >
+                          <FaTrash /> Delete
+                        </button>
+                      </div>
+
+                      {/* Modal for displaying product details */}
+                      {isModalOpen2 && modalProductId === product.id && (
+                        <div className="product-details-modal">
+                          <div className="modal-overlay">
+                            <div className="modal-content3">
+                              <button
+                                onClick={closeProductModal}
+                                className="modal-close-btn"
+                              >
+                                &times; {/* Close button */}
+                              </button>
+                              <div className="laptops-modal-form-container">
+                                {/* <h3 className="modal-title">{product.prod_name}</h3> */}
+
+                                <div className="laptops-modal-content">
+                                  <div className="laptops-modal-left-section">
+                                    <p>
+                                      <strong>Product Name</strong>
+                                      <span>{product.prod_name}</span>
+                                    </p>
+                                    <p>
+                                      <strong>Subtitle</strong>
+                                      <span>{product.subtitle}</span>
+                                    </p>
+                                    <p>
+                                      <strong>M.R.P Price</strong>
+                                      <span>₹{product.actual_price}</span>
+                                    </p>
+
+                                    <p>
+                                      <strong>Selling Price</strong>
+                                      <span>₹{product.prod_price}</span>
+                                    </p>
+                                    <p>
+                                      <strong>Delivery charge</strong>
+                                      <span>₹{product.deliverycharge}</span>
+                                    </p>
+                                    <p>
+                                      <strong>Features</strong>
+                                      <span>{product.prod_features}</span>
+                                    </p>
+                                    <div className="laptops-product-actions">
+                                      <button
+                                        onClick={() => handleEditProduct(product)}
+                                        className="laptops-action-btn"
+                                      >
+                                        <FaEdit /> Edit
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          handleDeleteProduct(product.id)
+                                        }
+                                        className="laptops-action-btn"
+                                      >
+                                        <FaTrash /> Delete
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div className="laptops-modal-right-section">
+                                    <div
+                                      onClick={() => handleOpenOfferModal(product.id)}
+                                      className="offer-edit-btn"
+                                    >
+                                      <span className="offer-edit-text">
+                                        Edit Limited Time Offer
+                                      </span>
+                                      <FaEdit className="offer-edit-icon" />
+                                    </div>
+
+                                    {/* Modal Rendering */}
+                                    {isOfferModalOpen && (
+                                      <div className="offer-modal-overlay">
+                                        <div className="offer-modal-content">
+                                          <button
+                                            onClick={handleCloseOfferModal}
+                                            className="offer-close-btn"
+                                          >
+                                            &times;
+                                          </button>
+                                          <h3 className="offer-modal-title">
+                                            {isEditMode
+                                              ? "Edit Limited Time Price Offer"
+                                              : "Add Limited Time Price Offer"}
+                                          </h3>
+                                          <form
+                                            onSubmit={handleSubmit}
+                                            className="offer-form"
+                                          >
+                                            <label className="offer-label">
+                                              Offer Start Time
+                                            </label>
+                                            <input
+                                              type="datetime-local"
+                                              value={offerStartTime}
+                                              onChange={(e) =>
+                                                setOfferStartTime(e.target.value)
+                                              }
+                                              required
+                                              min={minDate}
+                                              className="offer-input"
+                                            />
+                                            <label className="offer-label">
+                                              Offer End Time
+                                            </label>
+                                            <input
+                                              type="datetime-local"
+                                              value={offerEndTime}
+                                              onChange={(e) =>
+                                                setOfferEndTime(e.target.value)
+                                              }
+                                              required
+                                              min={offerStartTime || minDate} // End date cannot be before start date
+                                              max={
+                                                offerStartTime
+                                                  ? getFormattedDate(
+                                                    new Date(
+                                                      new Date(
+                                                        offerStartTime
+                                                      ).getTime() +
+                                                      10 * 86400000
+                                                    )
+                                                  )
+                                                  : maxDate
+                                              } // Max 10 days from start
+                                              className="offer-input"
+                                            />
+                                            <label className="offer-label">
+                                              Offer Price
+                                            </label>
+                                            <input
+                                              type="number"
+                                              value={offerPrice}
+                                              onChange={(e) => handleChangePrice(e, product.prod_price)} // Pass product.prod_price
+                                              required
+                                              className="offer-input"
+                                            />
+                                            <button
+                                              type="submit"
+                                              className="offer-submit-btn"
+                                            >
+                                              {isEditMode
+                                                ? "Update Offer"
+                                                : "Add Offer"}
+                                            </button>
+                                          </form>
+
+                                          {isEditMode && (
+                                            <button
+                                              onClick={handleDelete}
+                                              className="offer-delete-btn"
+                                            >
+                                              Delete Offer
+                                            </button>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Upload Section */}
+                                    <div className="upload-container">
+                                      Upload more images
+                                      <input
+                                        style={{ marginTop: "10px" }}
+                                        className="file-input"
+                                        multiple
+                                        type="file"
+                                        onChange={(e) =>
+                                          handleFileChange(product.id, e)
+                                        }
+                                      />
+                                      <button
+                                        className="upload-button"
+                                        onClick={() => handleUploadImages(product.id)}
+                                      >
+                                        Upload Images
+                                      </button>
+                                    </div>
+
+                                    {/* Coupon Section */}
+                                    <p className="laptops-product-coupon">
+                                      Coupon Code:
+                                      <span
+                                        onClick={() =>
+                                          openPopup(
+                                            product.prod_id,
+                                            product.prod_name,
+                                            product.prod_price
+                                          )
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        <FaEdit
+                                          className="faedit"
+                                          title="Edit Coupon"
+                                        />
+                                      </span>
+                                      <span
+                                        onClick={() =>
+                                          fetchCoupons(
+                                            product.prod_id,
+                                            product.prod_name,
+                                            product.prod_price
+                                          )
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        <FaEye
+                                          className="faedit"
+                                          title="View Coupon"
+                                        />
+                                      </span>
+                                    </p>
+
+                                    <CouponEditPopup
+                                      isOpen={isPopupOpen}
+                                      onClose={closePopup}
+                                      productId={selectedProductId}
+                                      prodPrice={selectedProductPrice}
+                                      onCouponUpdated={handleCouponUpdated}
+                                    />
+
+                                    {isViewingCoupons && (
+                                      <div className="pop-overlay">
+                                        <div className="pop-content">
+                                          <button
+                                            onClick={() => setIsViewingCoupons(false)}
+                                            className="fatimes"
+                                          >
+                                            <FaTimes color="black" size={20} />
+                                          </button>
+                                          <h4 className="coupon-title">
+                                            Coupons for {productName}
+                                          </h4>
+                                          {coupons.length > 0 ? (
+                                            <ul className="coupons-list">
+                                              {coupons.map((coupon, index) => (
+                                                <li
+                                                  key={coupon.coupon_id}
+                                                  className="coupon-item"
+                                                >
+                                                  <span className="serial-number">
+                                                    {index + 1}.{" "}
+                                                  </span>
+                                                  <span className="coupon-code">
+                                                    {coupon.coupon_code}
+                                                  </span>{" "}
+                                                  -
+                                                  <span className="coupon-code">
+                                                    {coupon.discount_value}
+                                                  </span>{" "}
+                                                  -
+                                                  <span className="expiry-date">
+                                                    Expires on:{" "}
+                                                    {new Date(
+                                                      coupon.expiry_date
+                                                    ).toLocaleDateString("en-GB", {
+                                                      day: "2-digit",
+                                                      month: "short",
+                                                      year: "numeric",
+                                                    })}
+                                                  </span>
+                                                  <FaEdit
+                                                    className="edit-icon"
+                                                    title="Edit Expiry Date"
+                                                    onClick={() =>
+                                                      handleEditExpiry(
+                                                        coupon.coupon_id
+                                                      )
+                                                    }
+                                                  />
+                                                  <FaTrash
+                                                    className="delete-icon"
+                                                    title="Delete Coupon"
+                                                    onClick={() =>
+                                                      handleDeleteCoupon(
+                                                        coupon.coupon_id
+                                                      )
+                                                    }
+                                                    style={{
+                                                      marginLeft: "10px",
+                                                      cursor: "pointer",
+                                                    }}
+                                                  />
+                                                </li>
+                                              ))}
+                                            </ul>
+                                          ) : (
+                                            <p>
+                                              No coupons available for this product.
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    <EditCouponModal
+                                      isOpen={isEditingCoupon}
+                                      onClose={() => setIsEditingCoupon(false)}
+                                      coupon={selectedCoupon}
+                                      productId={selectedProductId}
+                                      productPrice={selectedProductPrice}
+                                      onCouponUpdated={() => { }}
+                                    />
+
+                                    <div
+                                      className="frequently-buy"
+                                      style={{ marginBottom: "10px" }}
+                                    >
+                                      <span className="frequently-buy-label">
+                                        Make a copy of this product
+                                      </span>
+                                      <FaClone
+                                        onClick={() => handleCopyProduct(product.id)}
+                                        className="copy-icon"
+                                      />
+                                    </div>
+
+                                    {/* Frequently Buy Section */}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  ))
+              );
+            })()
+          )}
         </div>
       </div>
       {/* Modal for Image Upload */}
@@ -2021,8 +2058,7 @@ const Watch = () => {
         <h2 style={titleStyle}>Update this image</h2>
         <input
           type="file"
-          accept="image/jpeg, image/png"
-
+          accept="image/jpeg, image/png, image/webp"
           onChange={handleImageUpload} // Keep this function for handling file selection
           style={inputStyle}
         />
@@ -2038,12 +2074,12 @@ const Watch = () => {
             onClick={() => handleImageUpdate(productId)} // Use the product ID here
             style={buttonStyle}
             onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonHoverStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonHoverStyle.backgroundColor)
             } // Hover effect
             onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonStyle.backgroundColor)
             } // Reset color
           >
             Update
@@ -2053,12 +2089,12 @@ const Watch = () => {
             onClick={closeModal}
             style={buttonStyle}
             onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonHoverStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonHoverStyle.backgroundColor)
             } // Hover effect
             onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonStyle.backgroundColor)
             } // Reset color
           >
             Close
@@ -2067,6 +2103,18 @@ const Watch = () => {
       </Modal>
 
       {/* Modal for editing a product */}
+      {isOpen && (
+        // Sample usage
+        <Lightbox
+          open={isOpen}
+          close={() => setIsOpen(false)}
+          slides={lightboxImages.map((src) => ({ src }))}
+          index={photoIndex}
+          on={{ view: ({ index }) => setPhotoIndex(index) }}
+          carousel={{ finite: true }}
+
+        />
+      )}
       {/* Modal for editing a product */}
       {editingProduct && (
         <Modal
@@ -2289,7 +2337,7 @@ const SampleNextArrow = (props) => {
         alignItems: "center",
         right: "10px",
         zIndex: 10,
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.5)", // Add box shadow
+        background: "rgba(0, 0, 0, 0.5)",
         borderRadius: "50%", // Round shape
         width: "30px", // Width for clickable area
         height: "30px", // Height for clickable area
@@ -2297,10 +2345,11 @@ const SampleNextArrow = (props) => {
       }}
       onClick={onClick}
     >
-      <img src={rightarrow} alt="Next" width="15px" height="15px" />
+      {/* <img src={rightarrow} alt="Next" width="15px" height="15px" /> */}
     </div>
   );
 };
+
 const SamplePrevArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -2313,8 +2362,7 @@ const SamplePrevArrow = (props) => {
         alignItems: "center",
         left: "10px",
         zIndex: 10,
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)", // Box shadow applied here
-        backgroundColor: "white",
+        background: "rgba(0, 0, 0, 0.5)",
         borderRadius: "50%", // Round shape
         width: "30px", // Width for clickable area
         height: "30px", // Height for clickable area
@@ -2322,7 +2370,7 @@ const SamplePrevArrow = (props) => {
       }}
       onClick={onClick}
     >
-      <img src={leftarrow} alt="Previous" width="15px" height="15px" />
+      {/* <img src={leftarrow} alt="Previous" width="15px" height="15px" /> */}
     </div>
   );
 };

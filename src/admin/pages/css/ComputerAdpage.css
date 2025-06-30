@@ -1,3 +1,99 @@
+.action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 58%;
+}
+
+.add-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 80px;
+}
+
+.circular-progress-wrapper {
+  width: 60px;
+  height: 60px;
+}
+
+.circular-progress {
+  width: 100%;
+  height: 100%;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #e6e6e6;
+  stroke-width: 3.8;
+}
+
+/* .circle {
+  fill: none;
+  stroke: #4CAF50;
+  stroke-width: 3.8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s ease;
+} */
+
+.percentage-text {
+  fill: #4CAF50;
+  font-size: 0.6em;
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+
+/* .progress-text {
+  font-size: 13px;
+  color: black;
+  font-weight: 500;
+} */
+.modal-upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1003;
+  border-radius: 10px;
+}
+
+.circular-progress-wrapper {
+  width: 70px;
+  height: 70px;
+}
+
+.circular-progress {
+  width: 100%;
+  height: 100%;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #e6e6e6;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke: #4CAF50;
+  stroke-width: 3.8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s ease;
+  filter: url(#shadow);
+}
+
 
 .ad-product-form {
   display: flex;
@@ -357,6 +453,19 @@
   cursor: pointer; /* Pointer cursor */
   transition: background-color 0.3s; /* Smooth transition */
 }
+
+.laptops-add-button {
+  padding: 10px 15px; /* Button padding */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Rounded corners */
+  background-color: #007bff; /* Button background color */
+  color: white; /* Text color */
+  cursor: pointer; /* Pointer cursor */
+  transition: background-color 0.3s; /* Smooth transition */
+  /* margin-left: 50px; */
+}
+
+
 
 .laptops-add-btn:hover {
   background-color: #0056b3; /* Darker background on hover */

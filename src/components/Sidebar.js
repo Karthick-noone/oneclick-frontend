@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaSearch, FaTimes, FaHome, FaLaptop, FaHeadphones, FaMobileAlt, FaPrint, FaTv, FaVolumeUp, FaClock, FaVideo, FaRecycle } from 'react-icons/fa';
+import {  FaTimes, FaHome, FaLaptop, FaHeadphones, FaMobileAlt, FaPrint, FaTv, FaVolumeUp,  FaVideo, FaRecycle } from 'react-icons/fa';
 import { useLocation, Link } from 'react-router-dom';  // Import useLocation hook
 import './css/Sidebar.css';
+import { Watch } from 'lucide-react';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -34,7 +35,7 @@ const Sidebar = () => {
                     <div style={{ display: isOpen ? 'block' : 'none' }} className="close-button" onClick={toggleSidebar}>
                         <FaTimes />
                     </div>
-                    
+
                     <h3>Browse by products</h3>
                     <ul>
                         <li>
@@ -82,7 +83,7 @@ const Sidebar = () => {
                                 <FaHeadphones /> Headphones
                             </Link>
                         </li>
-                       
+
                         <li>
                             <Link
                                 to="/Speakers"
@@ -105,9 +106,10 @@ const Sidebar = () => {
                             <Link
                                 to="/Watch"
                                 onClick={() => handleLinkClick('watch')}
-                                className={activeLink === 'watch' ? 'active' : ''} 
+                                className={activeLink === 'watch' ? 'active' : ''}
                             >
-                                <FaClock /> Wearable Tech
+                                <Watch
+                                />{" "} Wearable Tech
                             </Link>
                         </li>
                         <li>
@@ -137,7 +139,7 @@ const Sidebar = () => {
                                 <FaMobileAlt /> Mobile Accessories
                             </Link>
                         </li>
-                     
+
                         <li>
                             <Link
                                 to="/CCTVAccessories"

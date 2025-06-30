@@ -178,8 +178,9 @@ const MyAccount = () => {
             {address ? (
               <div>
                 <h3>Current Address</h3>
+                  <p className="addr-name">{address.name}</p>
                 <p>{address.street}, {address.city}, {address.state}, {address.postal_code}</p>
-                <p>{address.phone}</p>
+                <p> <strong>Phone:</strong>  {address.phone}</p>
               </div>
             ) : (
               <p className="ac-no-address">No address available</p>

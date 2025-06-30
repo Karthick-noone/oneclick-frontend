@@ -1,3 +1,43 @@
+.filter-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 1002; /* Below the filter sidebar (1002) */
+  transition: opacity 0.3s ease-in-out;
+}
+
+
+.breadcrumb-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.breadcrumb-text {
+  font-size: 16px;
+}
+
+.responsive-filter-icon {
+  display: none; /* hidden by default */
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #007bff;
+  cursor: pointer;
+}
+
+/* Show only on screens <= 768px */
+@media (max-width: 768px) {
+  .responsive-filter-icon {
+    display: inline-block;
+  }
+}
+
+
 /* Skeleton Loader */
 .skeleton-product-card {
   width: calc(25% - 20px);
@@ -139,7 +179,7 @@
 
   
   button:disabled {
-    background: #ccc;
+    background: transparent;
     cursor: not-allowed;
     box-shadow: none;
   }
@@ -234,7 +274,7 @@
 .product-card {
   position: relative;
   width: calc(25% - 20px); /* Ensures 4 cards in a row */
-  height: 420px; /* Fixed height for uniformity */
+  height: 380px; /* Fixed height for uniformity */
   max-height: 420px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   background-color: #fff;
@@ -244,7 +284,7 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Distributes content evenly */
+  /* justify-content: space-between;  */
   padding: 15px;
   transition: transform 0.2s ease-in-out;
 }
@@ -262,6 +302,7 @@
   font-size: 16px;
   font-weight: bold;
   color: #333;
+  /* text-align: justify; */
   /* margin: 1px 0; */
 }
 
@@ -272,17 +313,12 @@
 }
 
 .product-price {
-  font-size: 20px;
+  font-size: 16px;
   color: #27ae60;
   font-weight: bold;
   margin-right: 5px;
 }
 
-/* .product-actual-price {
-  font-size: 15px;
-  color: red;
-  text-decoration: line-through;
-} */
 
 .add-to-cart {
     background-color: #ff6600;
@@ -353,7 +389,9 @@
 @media (max-width: 480px) {
     .product-card {
         width: calc(50% - 10px); /* Fit 1 card in a row for very small screens */
+        height: 330px;
     }
+    
 
     .product-image {
       max-height: 100px;
@@ -391,8 +429,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%; /* Adjust width if needed */
-    line-height: 1.1em; /* Adjust line height based on font size */
-    height: calc(1.3em * 2); /* Ensures exactly 2 lines */
+    height: calc(1.3em * 1.3); /* Ensures exactly 2 lines */
     word-break: break-word; /* Prevents long words from breaking layout */
 }
 
@@ -403,8 +440,8 @@
     -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
     box-orient: vertical;              /* Fallback for other browsers */
     overflow: hidden;                   /* Hide overflow content */
-    -webkit-line-clamp: 2;             /* Limit to 2 lines in WebKit-based browsers */
-    line-clamp: 2;                     /* Future proofing for standard implementation */
+    -webkit-line-clamp: 1;             /* Limit to 2 lines in WebKit-based browsers */
+    line-clamp: 1;                     /* Future proofing for standard implementation */
     text-overflow: ellipsis;           /* Show ellipsis when text overflows */
   }
   

@@ -452,8 +452,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
         </head>
         <body>
           ${ReactDOMServer.renderToStaticMarkup(
-            <Invoice order={order} productDetails={details} />
-          )}
+      <Invoice order={order} productDetails={details} />
+    )}
         </body>
       </html>
     `);
@@ -468,6 +468,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
         text: "Do you really want to cancel this order? This action cannot be undone.",
         icon: "warning",
         showCancelButton: true,
+        cancelButtonText:'No',
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, cancel it!",
@@ -518,88 +519,29 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
         <div className="search-box2-container">
           {/* Radio Buttons Filter */}
           <div className="filters-container">
-            <div className="filter-radio-buttons">
-              <label>
-                <input
-                  type="radio"
-                  name="deliveryStatus"
-                  value="All"
-                  checked={filterDeliveryStatus === "All"}
-                  onChange={() => setFilterDeliveryStatus("All")}
-                />
-                All
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="deliveryStatus"
-                  value="Order Placed"
-                  checked={filterDeliveryStatus === "Order Placed"}
-                  onChange={() => setFilterDeliveryStatus("Order Placed")}
-                />
-                New Order
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="deliveryStatus"
-                  value="Shipped"
-                  checked={filterDeliveryStatus === "Shipped"}
-                  onChange={() => setFilterDeliveryStatus("Shipped")}
-                />
-                Shipped
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="deliveryStatus"
-                  value="Out of Delivery"
-                  checked={filterDeliveryStatus === "Out of Delivery"}
-                  onChange={() => setFilterDeliveryStatus("Out of Delivery")}
-                />
-                Out of Delivery
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="deliveryStatus"
-                  value="Delivered"
-                  checked={filterDeliveryStatus === "Delivered"}
-                  onChange={() => setFilterDeliveryStatus("Delivered")}
-                />
-                Delivered
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="deliveryStatus"
-                  value="Cancelled"
-                  checked={filterDeliveryStatus === "Cancelled"}
-                  onChange={() => setFilterDeliveryStatus("Cancelled")}
-                />
-                Cancelled
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="deliveryStatus"
-                  value="Refund Pending"
-                  checked={filterDeliveryStatus === "Refund Pending"}
-                  onChange={() => setFilterDeliveryStatus("Refund Pending")}
-                />
-                Refund Pending
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="deliveryStatus"
-                  value="Refunded"
-                  checked={filterDeliveryStatus === "Refunded"}
-                  onChange={() => setFilterDeliveryStatus("Refunded")}
-                />
-                Refunded
-              </label>
+            <div className="custom-radio-buttons">
+              {[
+                "All",
+                "Order Placed",
+                "Shipped",
+                "Out of Delivery",
+                "Delivered",
+                "Cancelled",
+                "Refund Pending",
+                "Refunded",
+              ].map((status, i) => (
+                <label className="custom-radio-container" key={i}>
+                  <input
+                    type="checkbox"
+                    checked={filterDeliveryStatus === status}
+                    onChange={() => setFilterDeliveryStatus(status)}
+                  />
+                  <div className="checkmark"></div>
+                  <span className="label-text">{status === "Order Placed" ? "New Order" : status}</span>
+                </label>
+              ))}
             </div>
+
           </div>
 
           {/* Month and Year Filter */}
@@ -694,8 +636,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                             order.delivery_status === "Cancelled"
                               ? "row-cancelled"
                               : order.delivery_status === "Delivered"
-                              ? "row-delivered"
-                              : ""
+                                ? "row-delivered"
+                                : ""
                           }
                         >
                           <td>
@@ -776,12 +718,15 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                             <div className="btn-container">
                               <button
                                 className="btn btn-view"
+                                title="View this order"
                                 onClick={() => openModal(order)}
                               >
                                 <FaEye />
                               </button>
                               <button
                                 className="btn btn-delete"
+                                title="Delete this order"
+
                                 onClick={() => deleteOrder(order.unique_id)}
                               >
                                 <FaTrash />
@@ -793,6 +738,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                               <button
                                 onClick={() => openModal2(order)}
                                 className="btn btn-view"
+                                title="View delivery status"
+
                               >
                                 <FaEye />
                               </button>
@@ -809,14 +756,14 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                                 order.delivery_status === "Order Placed"
                                   ? "status-new-order"
                                   : order.delivery_status === "Shipped"
-                                  ? "status-shipped"
-                                  : order.delivery_status === "Delivered"
-                                  ? "status-delivered"
-                                  : order.delivery_status === "Out of Delivery"
-                                  ? "status-Out-of-Delivery"
-                                  : order.delivery_status === "Cancelled"
-                                  ? "status-cancelled"
-                                  : "status-unknown"
+                                    ? "status-shipped"
+                                    : order.delivery_status === "Delivered"
+                                      ? "status-delivered"
+                                      : order.delivery_status === "Out of Delivery"
+                                        ? "status-Out-of-Delivery"
+                                        : order.delivery_status === "Cancelled"
+                                          ? "status-cancelled"
+                                          : "status-unknown"
                               }
                             >
                               {order.delivery_status === "Order Placed"
@@ -828,6 +775,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                           <td>
                             <button
                               className="btn btn-print"
+                              title="Print invoice for this order"
+
                               onClick={() =>
                                 printInvoice(order, productDetails)
                               }
@@ -837,6 +786,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                           </td>
                           <td>
                             <button
+                              title="Cancel this order"
+
                               className="btn btn-cancel"
                               onClick={() => cancelOrder(order.unique_id)}
                               disabled={
@@ -1006,9 +957,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                 onClick={() => {
                   if (page !== "...") handlePageChange(page);
                 }}
-                className={`pagination-button ${
-                  currentPage === page ? "active" : ""
-                }`}
+                className={`pagination-button ${currentPage === page ? "active" : ""
+                  }`}
                 disabled={page === "..."}
               >
                 {page}

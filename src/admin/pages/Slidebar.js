@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef  } from "react";
 import "./css/Slidebar.css"; // Ensure you create this CSS file
 import {
   FaHome,
@@ -29,6 +29,32 @@ const Slidebar = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const sidebarRef = useRef(null);
+
+
+  useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (
+      sidebarRef.current &&
+      !sidebarRef.current.contains(event.target) &&
+      window.innerWidth <= 768 // Apply only for mobile/tablet views
+    ) {
+      setIsOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
+// Collapse sidebar on navigation in mobile view
+useEffect(() => {
+  if (window.innerWidth <= 768) {
+    setIsOpen(false);
+  }
+}, [location.pathname]); // Trigger on every route change
 
   useEffect(() => {
     const loggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -184,11 +210,13 @@ const Slidebar = () => {
       <div
         className={`slidebar ${isOpen ? "open" : "collapsed"}`}
         onMouseEnter={() => setIsOpen(true)}
+          ref={sidebarRef}
+
       >
         <div className="slidebar-header">
           <button
             style={{ marginTop: "10px", color: "white" }}
-            className="close-btn"
+            className="close-button"
             onClick={toggleSidebar}
           >
             {isOpen ? "◁" : ""}

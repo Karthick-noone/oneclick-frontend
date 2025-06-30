@@ -5,7 +5,7 @@ import { ApiUrl } from "./ApiUrl";
 // import Header1 from './Header1';
 import Header2 from "./Header2";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaTrash, FaShoppingBag } from "react-icons/fa";
 import Swal from "sweetalert2";
@@ -63,7 +63,7 @@ const CartPage = () => {
         text: "Please select at least one item before clicking Buy Later.",
         icon: "warning",
         confirmButtonText: "OK",
-        timer: 3000,
+        timer: 5000,
       });
       return; // Stop execution
     }
@@ -82,7 +82,7 @@ const CartPage = () => {
           title: "Success!",
           text: "Items have been added to Buy Later.",
           icon: "success",
-          confirmButtonText: "OK",
+          showConfirmButton: false,
           timer: 3000,
         }).then(() => {
           window.location.reload();
@@ -129,7 +129,7 @@ const CartPage = () => {
               title: "Removed!",
               text: "Item has been removed from Buy Later.",
               icon: "success",
-              confirmButtonText: "OK",
+              confirmButtonText: false,
               timer: 3000,
             });
 
@@ -218,7 +218,7 @@ const CartPage = () => {
   // }, []);
 
   const handleConfirm = async () => {
-    fetchAddress(); // Fetch the latest address data when the Confirm button is clicked
+    // fetchAddress(); // Fetch the latest address data when the Confirm button is clicked
 
     if (selectedAddress) {
       try {
@@ -226,12 +226,11 @@ const CartPage = () => {
           userId: userId, // Ensure userId is set correctly
           addressId: selectedAddress,
         });
-        window.location.reload();
-
+        // window.location.reload();
         if (response.status === 200) {
           // Update the default address to the newly selected address
           setDefaultAddress(selectedAddress);
-
+          await fetchAddress(userId);
           toast.success("Address updated successfully", {
             position: "top-right",
             autoClose: 2000,
@@ -373,7 +372,7 @@ const CartPage = () => {
     return cartItems
       .reduce((total, item) => {
         const price = parseFloat(
-          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price
         );
         const deliveryCharge = parseFloat(item.deliverycharge || 0);
 
@@ -387,7 +386,7 @@ const CartPage = () => {
     return cartItems
       .reduce((total, item) => {
         const prod_price = parseFloat(
-          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price
         );
         return total + (isNaN(prod_price) ? 0 : prod_price * item.quantity);
       }, 0)
@@ -398,7 +397,7 @@ const CartPage = () => {
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
         const price = parseFloat(
-          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price
         );
         const discountPerItem = actual_price - price;
         return (
@@ -413,7 +412,7 @@ const CartPage = () => {
       .reduce((total, item) => {
         const actual_price = parseFloat(item.actual_price);
         const price = parseFloat(
-          item.offer_price > 0 && isOfferActive  ? item.offer_price : item.prod_price
+          item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price
         );
         const discountPerItem = actual_price - price;
         return (
@@ -623,7 +622,7 @@ const CartPage = () => {
     console.log("User Email:", email);
 
     if (!email) {
-      
+
       Swal.fire({
         icon: "error",
         title: "Login Required",
@@ -802,9 +801,8 @@ const CartPage = () => {
       Swal.fire({
         icon: "error",
         title: "Order Error",
-        text: `An error occurred: ${
-          error.response?.data?.message || error.message
-        }`,
+        text: `An error occurred: ${error.response?.data?.message || error.message
+          }`,
         timer: 2000,
         showConfirmButton: false,
       });
@@ -814,21 +812,21 @@ const CartPage = () => {
   const handleProductClick = (product) => {
     const slugify = (name) =>
       name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-  
+
     navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
-  
+
 
   return (
     <>
       {/* <Header1 /> */}
       {/* <Header2 /> */}
       <div className="cart-container">
-      <div className="cart-header">
-  <h1>
-    <i className="fas fa-shopping-cart"></i> Your Cart
-  </h1>
-</div>
+        <div className="cart-header">
+          <h1>
+            <i className="fas fa-shopping-cart"></i> Your Cart
+          </h1>
+        </div>
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
@@ -837,9 +835,8 @@ const CartPage = () => {
                 <ul>
                   {addressDetails.map((address) => (
                     <li
-                      className={`addr-list ${
-                        selectedAddress === address.address_id ? "selected" : ""
-                      }`}
+                      className={`addr-list ${selectedAddress === address.address_id ? "selected" : ""
+                        }`}
                       key={address.address_id}
                     >
                       <button
@@ -868,20 +865,22 @@ const CartPage = () => {
                 <div>
                   <p> Please add one address during checkout. </p>
                   <Link to="/Useraddress">
-                    <button style={{float:"right"}} className="change-btn">Add Address</button>
+                    <button style={{ float: "right" }} className="change-btn">Add Address</button>
                   </Link>
                 </div>
               )}
             </div>
             <div className="cart-product-cardd">
+                <strong style={{ fontSize: "1.0rem" }}>CART ITEMS</strong>
+
               <ul className="cart-list">
                 {cartItems.length === 0 ? (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <p style={{ marginTop: "5px" }}>Your cart is empty.</p>
-                <Link to="/">
-                  <button className="change-btn browse-btn">Browse Products</button>
-                </Link>
-              </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <p style={{ marginTop: "5px" }}>Your cart is empty.</p>
+                    <Link to="/">
+                      <button className="change-btn browse-btn">Browse Products</button>
+                    </Link>
+                  </div>
                 ) : (
                   cartItems.map((item) => {
                     // Check if image is a stringified array and parse it
@@ -896,30 +895,31 @@ const CartPage = () => {
                         key={item.id}
                         className="cart-product "
                       >
+                        
                         {/* <Link
                           style={{ textDecoration: "none" }}
                           to={`/product/${item.id}`}
                         > */}
-                       <div className="cart-product-header">
-  {firstImage ? (
-    <img
-      src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
-      alt={item.prod_name || "Product"}
-      loading="lazy"
-      className="cart-product-image"
-      onClick={() => handleProductClick(item)}
-      name="image"
-    />
-  ) : (
-    <div className="placeholder-image">No image available</div>
-  )}
-  <div
-    className="cart-product-details"
-    onClick={() => handleProductClick(item)}
-  >
-    <p className="cart-product-name">{item.prod_name}</p>
-  </div>
-</div>
+                        <div className="cart-product-header">
+                          {firstImage ? (
+                            <img
+                              src={`${ApiUrl}/uploads/${item.category.toLowerCase()}/${firstImage}`}
+                              alt={item.prod_name || "Product"}
+                              loading="lazy"
+                              className="cart-product-image"
+                              onClick={() => handleProductClick(item)}
+                              name="image"
+                            />
+                          ) : (
+                            <div className="placeholder-image">No image available</div>
+                          )}
+                          <div
+                            className="cart-product-details"
+                            onClick={() => handleProductClick(item)}
+                          >
+                            <p className="cart-product-name">{item.prod_name}</p>
+                          </div>
+                        </div>
                         <div className="cart-product-price">
                           <div className="cart-quantity-controls">
                             <button
@@ -943,7 +943,7 @@ const CartPage = () => {
                             >
                               +
                             </button>
-                            
+
                           </div>
                           <p
                             style={{
@@ -958,32 +958,38 @@ const CartPage = () => {
                           <p>
                             {" "}
                             ₹
-                            {item.offer_price > 0 && isOfferActive 
+                            {item.offer_price > 0 && isOfferActive
                               ? item.offer_price * item.quantity
                               : item.prod_price * item.quantity}
                           </p>
                           <FaTrash
-                              className="cart-remove-btn"
-                              title="Remove this item from cart"
-                              onClick={() =>
-                                removeFromCart(
-                                  item.id,
-                                  item.prod_name,
-                                  item.quantity
-                                )
-                              }
-                            />
+                            className="cart-remove-btn"
+                            title="Remove this item from cart"
+                            onClick={() =>
+                              removeFromCart(
+                                item.id,
+                                item.prod_name,
+                                item.quantity
+                              )
+                            }
+                          />
                           <div>
-                            <label>
+                            <label className="checkbox-container">
                               <input
-                                style={{ marginLeft: "10px" }}
                                 type="checkbox"
                                 checked={buyLaterItems.includes(item.id)}
                                 onChange={() => handleBuyLaterToggle(item.id)}
-                              />{" "}
-                              {/* Buy Later */}
+                              />
+                              <svg viewBox="0 0 64 64" height="2em" width="2em">
+                                <path
+                                  d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16"
+                                  pathLength="575.0541381835938"
+                                  className="path"
+                                ></path>
+                              </svg>
                             </label>
                           </div>
+
                         </div>
                       </li>
                     );
@@ -995,14 +1001,14 @@ const CartPage = () => {
                     onClick={handleBuyLaterSubmit}
                     className="Buy-later-btn"
                   >
-                    Buy Later
+                    Save For Later
                   </button>
                 )}
               </ul>
             </div>
             {buyLaterProducts.length > 0 && (
               <div className="cart-product-card">
-                <strong style={{ fontSize: "1.0rem" }}>BUY LATER ITEMS</strong>
+                <strong style={{ fontSize: "1.0rem" }}>SAVED FOR LATER</strong>
                 <div className="cart-list-container">
                   <ul className="cart-list">
                     {buyLaterProducts.map((product) => {
@@ -1017,44 +1023,44 @@ const CartPage = () => {
                           className="cart-product "
                         >
 
-<div className="cart-product-header">
+                          <div className="cart-product-header">
 
-                          {firstImage ? (
+                            {firstImage ? (
+                              <div
+                                key={product.id}
+                                onClick={() => handleProductClick(product)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <img
+                                  src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
+                                  alt={product.name}
+                                  loading="lazy"
+                                  className="cart-product-image"
+                                />
+                              </div>
+                            ) : (
+                              <div className="placeholder-image">
+                                No image available
+                              </div>
+                            )}
+
                             <div
+                              style={{ cursor: "pointer" }}
+                              className="cart-product-details"
                               key={product.id}
                               onClick={() => handleProductClick(product)}
-                              style={{ cursor: "pointer" }}
                             >
-                              <img
-                                src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
-                                alt={product.name}
-                                loading="lazy"
-                                className="cart-product-image"
-                              />
+                              <p className="cart-product-name">
+                                {product.prod_name}
+                              </p>
+                              <p className="cart-product-description">
+                                {product.prod_features}
+                              </p>
                             </div>
-                          ) : (
-                            <div className="placeholder-image">
-                              No image available
-                            </div>
-                          )}
-
-                          <div
-                            style={{ cursor: "pointer" }}
-                            className="cart-product-details"
-                            key={product.id}
-                            onClick={() => handleProductClick(product)}
-                          >
-                            <p className="cart-product-name">
-                              {product.prod_name}
-                            </p>
-                            <p className="cart-product-description">
-                              {product.prod_features}
-                            </p>
-                          </div>
                           </div>
 
                           <div className="cart-product-price">
-                           
+
                             <p
                               style={{
                                 color: "red",
@@ -1065,34 +1071,38 @@ const CartPage = () => {
                             >
                               ₹{product.actual_price}
                             </p>
-                            <p style={{marginRight:'5px'}}>
+                            <p style={{ marginRight: '5px' }}>
                               ₹
-                              {product.offer_price > 0 && isOfferActive 
+                              {product.offer_price > 0 && isOfferActive
                                 ? product.offer_price
                                 : product.prod_price}
                             </p>
 
                             <div className="cart-quantity-controls">
                               <FaTrash
-                              title="Remove this item "
+                                title="Remove this item "
                                 className="cart-remove-btn"
                                 onClick={() => handleRemoveBuyLater(product.id)}
                               />
                             </div>
 
                             <div>
-                              <label>
+                              <label className="checkbox-container">
                                 <input
                                   type="checkbox"
-                                  checked={selectedProducts.includes(
-                                    product.id
-                                  )}
-                                  onChange={() =>
-                                    handleCheckboxChange(product.id)
-                                  }
-                                />{" "}
+                                  checked={selectedProducts.includes(product.id)}
+                                  onChange={() => handleCheckboxChange(product.id)}
+                                />
+                                <svg viewBox="0 0 64 64" height="2em" width="2em">
+                                  <path
+                                    d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16"
+                                    pathLength="575.0541381835938"
+                                    className="path"
+                                  ></path>
+                                </svg>
                               </label>
                             </div>
+
                           </div>
                         </li>
                       );
@@ -1115,17 +1125,17 @@ const CartPage = () => {
           </div>
 
           <div className="cart-summary">
-          <h4 style={{ marginTop: "10px", marginBottom: "5px" }}>
+            <h4 style={{ marginTop: "10px", marginBottom: "5px" }}>
               Price Summary:
             </h4>
             <div className="summary-item">
               <span>
-                Price 
+                Price
                 {getTotalItemsCount() > 0 && (
-  getTotalItemsCount() === 1 ? " (1 item)" : ` (${getTotalItemsCount()} items)`
-)}
+                  getTotalItemsCount() === 1 ? " (1 item)" : ` (${getTotalItemsCount()} items)`
+                )}
 
-                
+
               </span>
               <span>₹{calculateSellingPrice()}</span>
             </div>
@@ -1158,15 +1168,15 @@ const CartPage = () => {
             <hr />
             <div className="summary-item">
               {save() > 0 &&
-              <span style={{ color: "green" }}>
-                You will save ₹{save()} on this order
-              </span>}
+                <span style={{ color: "green" }}>
+                  You will save ₹{save()} on this order
+                </span>}
               {/* <span>₹10000</span> */}
             </div>
             <button
               className="summary-place-order-btn"
               onClick={handleViewCheckout}
-              // onClick={handlePlaceOrder}
+            // onClick={handlePlaceOrder}
             >
               Checkout
             </button>
@@ -1230,6 +1240,8 @@ const CartPage = () => {
         </div>
       </div>
       <Footer />
+            <ToastContainer />
+      
     </>
   );
 };

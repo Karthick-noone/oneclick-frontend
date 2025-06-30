@@ -1,72 +1,98 @@
 /* Container for the dropdown menu */
 .dropdownnn-container {
-    position: absolute;
-    top: 50px; /* Adjust based on your layout */
-    right: 8px;
-    width: 200px; /* Adjust width as needed */
-    background-color: #fff;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border-radius: 5px;
-    z-index: 1002; /* Ensure it is above other elements */
-    overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
-    display: flex;
-    flex-direction: column;
-    max-height: 310px; /* Set a max height for the dropdown */
+  position: absolute;
+  top: 73px;
+  right: 110px;
+  width: 200px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  z-index: 1002 !important;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  max-height: 310px;
   border: 1px solid #ccc;
-
+  animation: slideDownFade 0.4s ease; /*  Adjusted animation name and duration */
 }
+
+.down-arrow {
+  transition: transform 0.3s ease;
+}
+
+.rotate {
+  transform: rotate(180deg);
+}
+
+/* 🔥 Slide down with fade-in */
+@keyframes slideDownFade {
+  from {
+    transform: translateY(-15px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 
 /* Dropdown menu content styles */
 .dropdownnn-content {
-    display: flex;
-    flex-direction: column;
-    padding: 0; /* Remove padding */
-    margin: 0; /* Remove margin */
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  /* Remove padding */
+  margin: 0;
+  /* Remove margin */
 }
 
 /* Dropdown menu items */
 .dropdownnn-content a {
-    display: flex;
-    align-items: center;
-    padding: 12px 25px;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-    transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  padding: 12px 25px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  transition: background-color 0.3s;
 }
 
-.dropdownnn-content i, .dropdownnn-content svg {
-    margin-right: 10px; /* Adjust space between icon and text */
-    font-size: 16px; /* Adjust icon size */
+.dropdownnn-content i,
+.dropdownnn-content svg {
+  margin-right: 10px;
+  font-size: 16px;
 }
 
 .dropdownnn-content a:hover {
-    background-color: #f0f0f0;
+  background-color: #e2e2e2;
 }
-
+.dropdownnn-content a.active {
+  background-color: #e0e0e0;
+  font-weight: 600;
+}
 /* Remove border from last item */
 .dropdownnn-content a:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 
 
 @media (max-width: 768px) {
-    .dropdownnn-container {
-        position: absolute;
-        top: 40px; /* Adjust based on your layout */
-        right: 63px;
-        width: 200px; /* Adjust width as needed */
-        background-color: #fff;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        border-radius: 5px;
-        z-index: 1003; /* Ensure it is above other elements */
-        overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
-        display: flex;
-        flex-direction: column;
-        max-height: 310px; /* Set a max height for the dropdown */
-      border: 1px solid #ccc;
-    
-    }
-}
+  .dropdownnn-container {
+    position: absolute;
+    top: 124px;
+    left: 3px;
+    width: 200px;
+    background-color: #fff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    /* border-radius: 5px; */
+    z-index: 1003;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    max-height: 310px;
+    border: 1px solid #ccc;
 
+  }
+}

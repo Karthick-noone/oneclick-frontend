@@ -51,31 +51,31 @@ const Dashboard = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`${ApiUrl}/fetchcategories`);
-  
+
         const totalCategories = response.data.length; // ✅ Get the total number of categories
 
         console.log(totalCategories)
-  
+
         setTotalCategories(totalCategories);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-  
+
     fetchCategories();
   }, []);
-  
+
   useEffect(() => {
     const fetchPendingPayments = async () => {
       try {
         const response = await axios.get(`${ApiUrl}/pending-payment`);
         const payments = response.data;
-        
+
         // Sum the total amount of pending payments
         const totalPendingAmount = payments.reduce(
           (sum, payment) => sum + payment.total_amount, 0
         );
-        
+
         setPendingPayments(
           new Intl.NumberFormat("en-IN").format(totalPendingAmount) // Format the amount
         );
@@ -83,11 +83,11 @@ const Dashboard = () => {
         console.error("Error fetching pending payments:", error);
       }
     };
-  
+
     fetchPendingPayments();
   }, []);
 
-  
+
 
   // Helper function to get last 6 months
   const getLast6Months = () => {
@@ -173,10 +173,16 @@ const Dashboard = () => {
         const categoriesResponse = await axios.get(
           `${ApiUrl}/fetchproductcategories`
         );
+
         const categoriesData = categoriesResponse.data;
+        console.log(categoriesData)
+
+        const filteredCategories = categoriesData.filter(
+          (cat) => cat.category && cat.category.trim().toLowerCase() !== "null"
+        );
 
         const pieData = {
-          labels: categoriesData.map((cat) => cat.category),
+          labels: filteredCategories.map((cat) => cat.category),
           datasets: [
             {
               label: "Category Distribution",

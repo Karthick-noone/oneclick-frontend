@@ -1,3 +1,64 @@
+.custom-radio-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.custom-radio-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  font-size: 16px;
+  user-select: none;
+}
+
+.custom-radio-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkmark {
+  height: 1.3em;
+  width: 1.3em;
+  background-color: #e8e8e8;
+  border-radius: 50%;
+  box-shadow: 2px 2px 5px #c5c5c5, -3px -3px 5px #ffffff;
+  transition: box-shadow 0.3s ease;
+  margin-right: 8px;
+  position: relative;
+}
+
+.custom-radio-container input:checked ~ .checkmark {
+  box-shadow: inset 3px 3px 5px #c5c5c5, inset -3px -3px 5px #ffffff;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  opacity: 0;
+}
+
+.custom-radio-container input:checked ~ .checkmark:after {
+  opacity: 1;
+}
+
+.checkmark:after {
+  left: 0.45em;
+  top: 0.25em;
+  width: 0.25em;
+  height: 0.5em;
+  border: solid black;
+  border-width: 0 0.15em 0.15em 0;
+  transform: rotate(45deg);
+}
+
+.label-text {
+  margin-left: 2px;
+}
+
+
 /* General Styles */
 .btn-print {
   background-color: transparent; /* Green background */
@@ -579,7 +640,7 @@
 
 .info-value {
   flex: 1;
-  text-align: left;
+  text-align: justify;
   margin-left: 20px; /* Adjust margin for spacing */
 }
 

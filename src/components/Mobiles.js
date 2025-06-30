@@ -25,8 +25,36 @@ const Mobiles = () => {
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [loading, setLoading] = useState(true);
 
+  const [hoveredProductId, setHoveredProductId] = useState(null);
+  const [hoverImageIndexes, setHoverImageIndexes] = useState({});
 
-  
+  useEffect(() => {
+    let interval;
+
+    if (hoveredProductId !== null) {
+      interval = setInterval(() => {
+        setHoverImageIndexes((prev) => {
+          const currentIndex = prev[hoveredProductId] || 0;
+          const product = products.find(p => p.id === hoveredProductId);
+          const images = Array.isArray(product?.prod_img)
+            ? product.prod_img
+            : JSON.parse(product?.prod_img || "[]");
+
+          const nextIndex = (currentIndex + 1) % images.length;
+          return {
+            ...prev,
+            [hoveredProductId]: nextIndex,
+          };
+        });
+      }, 1000); // change image every 1 second
+    }
+
+    return () => clearInterval(interval);
+  }, [hoveredProductId, products]);
+
+
+
+
   // const {
   //   cartItems,
   //   addToCart,
@@ -39,7 +67,7 @@ const Mobiles = () => {
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const searchQuery = queryParams.get("search");
+  const searchQuery = queryParams.get("search") || queryParams.get("brand");
 
   // Log the raw search query
   console.log("Search Query:", searchQuery);
@@ -55,7 +83,7 @@ const Mobiles = () => {
 
   // Filter products based on the normalized, concatenated prod_name and prod_features
   const filteredProducts = searchQuery
-  ? products.filter((product) => {
+    ? products.filter((product) => {
       // Get product details, or an empty string if undefined
       const prodName = product.prod_name || "";
       const prodFeatures = product.prod_features || "";
@@ -74,106 +102,118 @@ const Mobiles = () => {
       // Check if the combined string contains the normalized search query
       return combinedString.includes(normalizedSearchQuery);
     })
-  : products;
+    : products;
+
+
 
   const [coupons, setCoupons] = useState({}); // State to store coupons
+
+  const cacheRef = {
+    mobiles: null,
+    mobileCoupons: {},
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
+
       try {
+        //  Return from cache if available
+        if (cacheRef.mobiles) {
+          setProducts(cacheRef.mobiles);
+          setCoupons(cacheRef.mobileCoupons);
+          setLoading(false);
+          return;
+        }
+
+        //  Fetch product list
         const response = await axios.get(`${ApiUrl}/fetchmobiles`);
         const fetchedProducts = response.data;
-
-        // Set products to state
         setProducts(fetchedProducts);
+        cacheRef.mobiles = fetchedProducts;
 
-        // Fetch coupons for each product
-        for (const product of fetchedProducts) {
-          try {
-            const couponResponse = await axios.get(
-              `${ApiUrl}/coupons/${product.prod_id}`
-            );
-            // Assuming couponResponse.data.coupons returns an array of coupons
-            if (couponResponse.data.coupons.length > 0) {
-              // Set the first coupon code for the product
-              setCoupons((prev) => ({
-                ...prev,
-                [product.prod_id]: couponResponse.data.coupons[0].coupon_code, // Use coupon_code from the first coupon
-              }));
-              console.log(
-                `Set coupon code for product ${product.prod_id}: ${couponResponse.data.coupons[0].coupon_code}`
-              );
-            } else {
-              console.log(`No coupons found for product ${product.prod_id}`);
-            }
-          } catch (couponError) {
-            console.error(
-              `Failed to fetch coupon for product ${product.prod_id}:`,
-              couponError
-            );
+        // Fetch all coupons in parallel
+        const couponPromises = fetchedProducts.map((product) =>
+          axios
+            .get(`${ApiUrl}/coupons/${product.prod_id}`)
+            .then((res) => ({
+              prod_id: product.prod_id,
+              coupon_code: res.data?.coupons?.[0]?.coupon_code || null,
+            }))
+            .catch((err) => {
+              console.error(`Error fetching coupon for ${product.prod_id}`, err);
+              return { prod_id: product.prod_id, coupon_code: null };
+            })
+        );
+
+        const couponResults = await Promise.all(couponPromises);
+        const couponMap = {};
+
+        couponResults.forEach(({ prod_id, coupon_code }) => {
+          if (coupon_code) {
+            couponMap[prod_id] = coupon_code;
           }
-        }
+        });
+
+        setCoupons(couponMap); // Set once
+        cacheRef.mobileCoupons = couponMap;
       } catch (error) {
-        console.error("Error fetching products:", error);
-        toast.error("Failed to fetch products.", {
+        console.error("Error fetching mobiles:", error);
+        toast.error("Failed to fetch mobiles.", {
           position: "top-right",
           autoClose: 2000,
           hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
         });
-      }finally {
-        setLoading(false); // Stop loading regardless of success or failure
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchProducts();
   }, []);
 
-  const [isOfferActive, setIsOfferActive] = useState(true);
-    const [product, setProduct] = useState(null);
 
-     useEffect(() => {
-        const now = new Date();
-        // console.log("Current Time:", now.toLocaleString());
-      
-        const activeProduct = products.find((item) => {
-          if (!item.offer_start_time || !item.offer_end_time) {
-            // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
-            return false;
-          }
-      
-          const offerStartTime = new Date(item.offer_start_time);
-          const offerEndTime = new Date(item.offer_end_time);
-      
-          // console.log(
-          //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
-          // );
-      
-          return offerStartTime <= now && offerEndTime > now;
-        });
-      
-        if (activeProduct) {
-          // console.log("Active Product Found:", activeProduct);
-        } else {
-          // console.log("No active product with a valid offer.");
-        }
-      
-        setProduct(activeProduct || null);
-        setIsOfferActive(!!activeProduct);
-      
-        // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
-      }, [products]);
-  
+  const [isOfferActive, setIsOfferActive] = useState(true);
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    const now = new Date();
+    // console.log("Current Time:", now.toLocaleString());
+
+    const activeProduct = products.find((item) => {
+      if (!item.offer_start_time || !item.offer_end_time) {
+        // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
+        return false;
+      }
+
+      const offerStartTime = new Date(item.offer_start_time);
+      const offerEndTime = new Date(item.offer_end_time);
+
+      // console.log(
+      //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
+      // );
+
+      return offerStartTime <= now && offerEndTime > now;
+    });
+
+    if (activeProduct) {
+      // console.log("Active Product Found:", activeProduct);
+    } else {
+      // console.log("No active product with a valid offer.");
+    }
+
+    setProduct(activeProduct || null);
+    setIsOfferActive(!!activeProduct);
+
+    // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
+  }, [products]);
+
   const handleBuyNow = (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
 
     // Check if the user is logged in
     const email = localStorage.getItem("email");
-     if (!email) {
+    if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -227,47 +267,39 @@ const Mobiles = () => {
 
   const handleCardClick = (product) => {
     if (product && product.id) {
-      // Retrieve existing recently viewed products
-      let storedProductIds = localStorage.getItem("Recently-viewed");
-  
-      if (storedProductIds) {
-        try {
-          storedProductIds = JSON.parse(storedProductIds);
-          
-          // Ensure it's an array
-          if (!Array.isArray(storedProductIds)) {
-            storedProductIds = [storedProductIds]; 
-          }
-        } catch (error) {
-          console.error("Error parsing Recently Viewed data:", error);
-          storedProductIds = [];
-        }
-      } else {
-        storedProductIds = [];
+      const now = Date.now();
+
+      let storedData = localStorage.getItem("Recently-viewed");
+      let parsedData = [];
+
+      try {
+        parsedData = storedData ? JSON.parse(storedData) : [];
+      } catch (err) {
+        console.error("Failed to parse Recently-viewed:", err);
       }
-  
-      // Remove the product ID if it already exists (to avoid duplicates)
-      storedProductIds = storedProductIds.filter((id) => id !== product.id);
-  
-      // Add the new product ID to the beginning of the list
-      storedProductIds.unshift(product.id);
-  
-      // Keep only the last 10 recently viewed products
-      storedProductIds = storedProductIds.slice(0, 10);
-  
-      // Save back to localStorage
-      localStorage.setItem("Recently-viewed", JSON.stringify(storedProductIds));
-  
-      // Navigate to product details page
+
+      // Remove if already exists
+      parsedData = parsedData.filter((item) => item.id !== product.id);
+
+      // Add current item with timestamp
+      parsedData.unshift({
+        id: product.id,
+        timestamp: now,
+      });
+
+      // Keep only last 10
+      parsedData = parsedData.slice(0, 10);
+
+      localStorage.setItem("Recently-viewed", JSON.stringify(parsedData));
+
       const slugify = (name) =>
-        name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-      
+        name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
+
       navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
-    } else {
-      console.error("Product is undefined or missing ID:", product);
     }
   };
-  
+
+
 
   const handleCloseModal = () => {
     setSelectedProduct(null);
@@ -299,7 +331,7 @@ const Mobiles = () => {
     const email = localStorage.getItem("email");
 
     // Check if the user is logged in
-     if (!email) {
+    if (!email) {
       toast.error("User is not logged in!", {
         position: "top-right",
         autoClose: 2000,
@@ -325,7 +357,7 @@ const Mobiles = () => {
 
       // Handle the response
       if (response.status === 200) {
-        toast.success(`${product.prod_name} added to your cart!`, {
+        toast.success(`${product.prod_name.substring(0, 25) + '...'} added to your cart!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -375,7 +407,7 @@ const Mobiles = () => {
           `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.info(`${product.prod_name} removed from your wishlist!`, {
+        toast.info(`${product.prod_name.substring(0, 25) + '...'} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -396,7 +428,7 @@ const Mobiles = () => {
           `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.success(`${product.prod_name} added to your wishlist!`, {
+        toast.success(`${product.prod_name.substring(0, 25) + '...'} added to your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -455,7 +487,7 @@ const Mobiles = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  
+
 
   // Define the category variable
   const category = "mobiles";
@@ -476,7 +508,7 @@ const Mobiles = () => {
       {/* <Header2 category={category} /> */}
       {/* <Header3 /> */}
       <span style={{ marginLeft: "20px", padding: "10px" }}>
-         <Link style={{ textDecoration: "none", color: "black" }} to="/">
+        <Link style={{ textDecoration: "none", color: "black" }} to="/">
           Home{" "}
         </Link>
         &gt; Mobiles
@@ -485,17 +517,17 @@ const Mobiles = () => {
         <Sidebar />
         <div className="product-list">
           {loading ? (
-        // 1. Loading state
-         [...Array(8)].map((_, index) => (
-          <div key={index} className="skeleton-product-card">
-            <div className="skeleton-image"></div>
-            <div className="skeleton-text"></div>
-            <div className="skeleton-text short"></div>
-            <div className="skeleton-price"></div>
-            <div className="skeleton-buttons"></div>
-          </div>
-        ))
-      ) : products.length === 0 ? (
+            // 1. Loading state
+            [...Array(8)].map((_, index) => (
+              <div key={index} className="skeleton-product-card">
+                <div className="skeleton-image"></div>
+                <div className="skeleton-text"></div>
+                <div className="skeleton-text short"></div>
+                <div className="skeleton-price"></div>
+                <div className="skeleton-buttons"></div>
+              </div>
+            ))
+          ) : products.length === 0 ? (
             <div className="no-products-message">
               <h2>No products here yet...</h2>
               <p>
@@ -506,31 +538,37 @@ const Mobiles = () => {
           ) : filteredProducts.length === 0 ? (
             // If filteredProducts is empty, fallback to using all products
             products.map((product) => {
-              // Parse the prod_img if it's a JSON string; assuming it's an array
               const images = Array.isArray(product.prod_img)
                 ? product.prod_img
-                : JSON.parse(product.prod_img);
-              const firstImage = images[0]; // Get the first image
+                : JSON.parse(product.prod_img || "[]");
+
+              const activeIndex =
+                hoveredProductId === product.id
+                  ? hoverImageIndexes[product.id] || 0
+                  : 0;
+
+              const currentImage = images[activeIndex];
 
               return (
                 <div
                   key={product.id}
                   className="product-card"
                   onClick={() => handleCardClick(product)}
+                  onMouseEnter={() => setHoveredProductId(product.id)}
+                  onMouseLeave={() => {
+                    setHoveredProductId(null);
+                    setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+                  }}
                 >
-
-{product.offer_label && (
+                  {product.offer_label && (
                     <div className="product-label">{product.offer_label}</div>
                   )}
+
                   <div className="product-actions">
                     <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                        firstImage
-                      }`}
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
                       alt={product.prod_name}
                       className="product-image"
-                    // loading="lazy"
-
                     />
                     <span
                       title={
@@ -538,9 +576,8 @@ const Mobiles = () => {
                           ? "Remove from Wishlist"
                           : "Add to Wishlist"
                       }
-                      className={`favorite-icon ${
-                        favorites[`${product.id}`] ? "filled" : ""
-                      }`}
+                      className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
+                        }`}
                       onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
                     >
                       {favorites[`${product.id}`] ? (
@@ -551,7 +588,7 @@ const Mobiles = () => {
                     </span>
                   </div>
 
-                  <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
+                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
 
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
                   <span className="product-subtitle2">{product.subtitle}</span>
@@ -568,7 +605,7 @@ const Mobiles = () => {
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through", color:'red' }}
+                        style={{ textDecoration: "line-through", color: 'red' }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -584,7 +621,7 @@ const Mobiles = () => {
                       {Math.round(
                         ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
-                          100
+                        100
                       )}
                       % OFF)
                     </p>
@@ -642,14 +679,25 @@ const Mobiles = () => {
             filteredProducts.map((product) => {
               const images = Array.isArray(product.prod_img)
                 ? product.prod_img
-                : JSON.parse(product.prod_img);
-              const firstImage = images[0];
+                : JSON.parse(product.prod_img || "[]");
+
+              const activeIndex =
+                hoveredProductId === product.id
+                  ? hoverImageIndexes[product.id] || 0
+                  : 0;
+
+              const currentImage = images[activeIndex];
 
               return (
                 <div
                   key={product.id}
                   className="product-card"
                   onClick={() => handleCardClick(product)}
+                  onMouseEnter={() => setHoveredProductId(product.id)}
+                  onMouseLeave={() => {
+                    setHoveredProductId(null);
+                    setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+                  }}
                 >
                   {product.offer_label && (
                     <div className="product-label">{product.offer_label}</div>
@@ -657,13 +705,9 @@ const Mobiles = () => {
 
                   <div className="product-actions">
                     <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${
-                        firstImage
-                      }`}
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
                       alt={product.prod_name}
                       className="product-image"
-                    // loading="lazy"
-
                     />
                     <span
                       title={
@@ -671,9 +715,8 @@ const Mobiles = () => {
                           ? "Remove from Wishlist"
                           : "Add to Wishlist"
                       }
-                      className={`favorite-icon ${
-                        favorites[`${product.id}`] ? "filled" : ""
-                      }`}
+                      className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
+                        }`}
                       onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
                     >
                       {favorites[`${product.id}`] ? (
@@ -684,7 +727,7 @@ const Mobiles = () => {
                     </span>
                   </div>
 
-                  <h3 className="product-name">{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
+                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
                   <span className="product-subtitle2">{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}
@@ -700,7 +743,7 @@ const Mobiles = () => {
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through", color:'red' }}
+                        style={{ textDecoration: "line-through", color: 'red' }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -716,7 +759,7 @@ const Mobiles = () => {
                       {Math.round(
                         ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
-                          100
+                        100
                       )}
                       % OFF)
                     </p>

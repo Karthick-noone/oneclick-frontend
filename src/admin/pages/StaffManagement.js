@@ -3,7 +3,7 @@ import axios from "axios";
 import "./css/StaffManagement.css";
 import { ApiUrl } from "../../components/ApiUrl";
 import Swal from "sweetalert2";
-import {  FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const StaffManagementPage = () => {
   const [staffList, setStaffList] = useState([]);
@@ -34,11 +34,11 @@ const StaffManagementPage = () => {
     setCurrentPage(pageNumber);
   };
 
-    // Pagination controls (page buttons)
-    const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(staffList.length / rowsPerPage); i++) {
-      pageNumbers.push(i);
-    }
+  // Pagination controls (page buttons)
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(staffList.length / rowsPerPage); i++) {
+    pageNumbers.push(i);
+  }
 
   const validateForm = () => {
     const errors = {};
@@ -56,76 +56,76 @@ const StaffManagementPage = () => {
       errors.password = "Password must be at least 6 characters long.";
     }
 
-   
+
 
     setErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-// Fetch staff function defined outside useEffect
-const fetchStaff = async () => {
-  try {
-    const response = await axios.get(`${ApiUrl}/api/fetchstaff`);
-    const sortedData = response.data.sort((a, b) => b.id - a.id); // Sort in descending order by id
-    setStaffList(sortedData);
-  } catch (error) {
-    console.error("Error fetching staff data:", error);
-    Swal.fire("Error!", "Failed to fetch staff data.", "error");
-  }
-};
-
-// Fetch staff data on component mount
-useEffect(() => {
-  fetchStaff();
-}, []);
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  // Check for existing username in the staff list
-  const isUsernameTaken = staffList.some(
-    (staff) => staff.username === formData.username && staff.id !== formData.id
-  );
-
-  if (isUsernameTaken) {
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      username: "This username is already taken. Please choose a different one."
-    }));
-    return;
-  }
-
-  // Proceed with form validation
-  if (!validateForm()) return;
-
-  if (editingIndex !== null) {
-    const updatedList = [...staffList];
-    updatedList[editingIndex] = formData;
-    setStaffList(updatedList);
-    setEditingIndex(null);
-
+  // Fetch staff function defined outside useEffect
+  const fetchStaff = async () => {
     try {
-      await axios.put(`${ApiUrl}/api/updatestaff/${formData.id}`, formData);
-      Swal.fire("Updated!", "Staff details updated successfully.", "success");
-      await fetchStaff(); // Refresh staff list
+      const response = await axios.get(`${ApiUrl}/api/fetchstaff`);
+      const sortedData = response.data.sort((a, b) => b.id - a.id); // Sort in descending order by id
+      setStaffList(sortedData);
     } catch (error) {
-      console.error("Error updating staff:", error);
-      Swal.fire("Error!", "Failed to update staff.", "error");
+      console.error("Error fetching staff data:", error);
+      Swal.fire("Error!", "Failed to fetch staff data.", "error");
     }
-  } else {
-    try {
-      const response = await axios.post(`${ApiUrl}/api/addstaff`, formData);
-      setStaffList([...staffList, response.data]);
-      Swal.fire("Success!", "New staff added successfully.", "success");
-      await fetchStaff(); // Refresh staff list
-    } catch (error) {
-      console.error("Error adding staff:", error);
-      Swal.fire("Error!", "Failed to add staff.", "error");
-    }
-  }
+  };
 
-  setFormData({ staffname: "", username: "", password: "", status: "active" });
-};
+  // Fetch staff data on component mount
+  useEffect(() => {
+    fetchStaff();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Check for existing username in the staff list
+    const isUsernameTaken = staffList.some(
+      (staff) => staff.username === formData.username && staff.id !== formData.id
+    );
+
+    if (isUsernameTaken) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        username: "This username is already taken. Please choose a different one."
+      }));
+      return;
+    }
+
+    // Proceed with form validation
+    if (!validateForm()) return;
+
+    if (editingIndex !== null) {
+      const updatedList = [...staffList];
+      updatedList[editingIndex] = formData;
+      setStaffList(updatedList);
+      setEditingIndex(null);
+
+      try {
+        await axios.put(`${ApiUrl}/api/updatestaff/${formData.id}`, formData);
+        Swal.fire("Updated!", "Staff details updated successfully.", "success");
+        await fetchStaff(); // Refresh staff list
+      } catch (error) {
+        console.error("Error updating staff:", error);
+        Swal.fire("Error!", "Failed to update staff.", "error");
+      }
+    } else {
+      try {
+        const response = await axios.post(`${ApiUrl}/api/addstaff`, formData);
+        setStaffList([...staffList, response.data]);
+        Swal.fire("Success!", "New staff added successfully.", "success");
+        await fetchStaff(); // Refresh staff list
+      } catch (error) {
+        console.error("Error adding staff:", error);
+        Swal.fire("Error!", "Failed to add staff.", "error");
+      }
+    }
+
+    setFormData({ staffname: "", username: "", password: "", status: "active" });
+  };
 
   const handleDelete = (index) => {
     Swal.fire({
@@ -162,9 +162,9 @@ const handleSubmit = async (e) => {
   return (
     <div className="staff-management-container">
       <main className="staff-main-content">
-      <div className="orders-header">
-        <h2 className="orders-page-title">Staff Login</h2>
-      </div>
+        <div className="orders-header">
+          <h2 className="orders-page-title">Staff Login</h2>
+        </div>
         <form className="staff-form" onSubmit={handleSubmit}>
           <div className="staff-form-group">
             <label>Staff Name</label>
@@ -197,25 +197,25 @@ const handleSubmit = async (e) => {
             )}
           </div>
           <div className="staff-form-group">
-  <label>Password</label>
-  <div className="password-input-container">
-    <input
-      required
-      type="text" // Always "text" since we'll use CSS to control visibility
-      value={formData.password}
-      onChange={(e) =>
-        setFormData({ ...formData, password: e.target.value })
-      }
-      className={`staff-input ${showPassword ? "" : "password-hidden"}`}
-    />
-    <span onClick={togglePasswordVisibility} className="eye-icon">
-      {showPassword ? <FaEye /> : <FaEyeSlash />}
-    </span>
-  </div>
-  {errors.password && (
-    <small className="staff-error-text">{errors.password}</small>
-  )}
-</div>
+            <label>Password</label>
+            <div className="password-input-container">
+              <input
+                required
+                type="text" // Always "text" since we'll use CSS to control visibility
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                className={`staff-input ${showPassword ? "" : "password-hidden"}`}
+              />
+              <span onClick={togglePasswordVisibility} className="eye-icon">
+                {showPassword ? <FaEye /> : <FaEyeSlash />}
+              </span>
+            </div>
+            {errors.password && (
+              <small className="staff-error-text">{errors.password}</small>
+            )}
+          </div>
 
 
 
@@ -236,44 +236,46 @@ const handleSubmit = async (e) => {
             {editingIndex !== null ? "Update" : "Add"}
           </button>
         </form>
+        <div className="staff-table-wrapper">
+  <table className="staff-table">
+    <thead>
+      <tr>
+        <th>S.No</th>
+        <th>Staff Name</th>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {currentStaff.map((staff, index) => (
+        <tr key={index}>
+          <td>{indexOfFirstStaff + index + 1}</td>
+          <td>{staff.staffname}</td>
+          <td>{staff.username}</td>
+          <td>{staff.password}</td>
+          <td>{staff.status}</td>
+          <td>
+            <button
+              onClick={() => handleEdit(index)}
+              className="staff-btn-edit"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => handleDelete(index)}
+              className="staff-btn-delete"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
 
-        <table className="staff-table">
-          <thead>
-            <tr>
-              <th>S.No</th>
-              <th>Staff Name</th>
-              <th>Username</th>
-              <th>Password</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-          {currentStaff.map((staff, index) => (
-              <tr key={index}>
-                <td>{indexOfFirstStaff + index + 1}</td>
-                <td>{staff.staffname}</td>
-                <td>{staff.username}</td>
-                <td>{staff.password}</td>
-                <td>{staff.status}</td>
-                <td>
-                  <button
-                    onClick={() => handleEdit(index)}
-                    className="staff-btn-edit"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(index)}
-                    className="staff-btn-delete"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
         <div className="pagination">
           {pageNumbers.map((number) => (
             <button

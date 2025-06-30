@@ -5,22 +5,21 @@ import { ApiUrl } from "./ApiUrl";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useCart } from "../components/CartContext";
-import { Link } from "react-router-dom";
-import { useNavigate, useLocation } from "react-router-dom";
+// import { useCart } from "../components/CartContext";
+// import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const WishlistSidebar = ({
   isOpen,
   toggleWishlist,
   wishlistRef,
-  removeFromWishlist,
+  // removeFromWishlist,
 }) => {
   // const { addToCart } = useCart();
   const [wishlistItems, setWishlistItems] = useState([]);
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
-  const [product, setProduct] = useState(null);
-  const [isOfferActive, setIsOfferActive] = useState(true);
-  const [wishlistLoaded, setWishlistLoaded] = useState(false);
+  const [, setIsOfferActive] = useState(true);
+  const [, setWishlistLoaded] = useState(false);
   const navigate = useNavigate();
 
   const isOfferValid = (item) => {
@@ -133,7 +132,7 @@ const WishlistSidebar = ({
 
       // Handle the response
       if (response.status === 200) {
-        toast.success(`${product.prod_name} added to your cart!`, {
+        toast.success(`${product.prod_name.substring(0,25)+'...'} added to your cart!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -246,7 +245,7 @@ const WishlistSidebar = ({
                       }}
                     >
                       <h3 className="item-name">{product.prod_name}</h3>
-                      <p className="item-features">{product.prod_features}</p>
+                      {/* <p className="item-features">{product.prod_features}</p> */}
                     </div>
                   </div>
                   <div className="item-actions">

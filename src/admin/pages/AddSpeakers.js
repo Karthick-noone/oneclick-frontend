@@ -2,18 +2,24 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes,FaImages } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes, FaImages } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick"; // Import Slider from react-slick
-import { FaInfoCircle,FaClone } from "react-icons/fa"; // Ensure to import any icons you need
+import { FaInfoCircle, FaClone } from "react-icons/fa"; // Ensure to import any icons you need
 import CouponEditPopup from "./CouponEditPopup";
 import EditCouponModal from "./EditCouponModal"; // Import the modal component
-
-
+import CouponImage from './img/coupons.png'
+import ActiveCouponImage from './img/Active-coupon.png'
+import ExpiredCouponImage from './img/Expired-coupon.png'
+import { SearchIcon } from "lucide-react";
+import FilterIcon from "./img/filter.png";
 import leftarrow from './img/left.png';
 import rightarrow from './img/right.png';
+
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 // Set up the modal root element
 Modal.setAppElement("#root");
 
@@ -32,7 +38,7 @@ const Speakers = () => {
     coupon_expiry_date: "",
     actual_price: "", // Add actual price field
     effectiveprice: "", // Add actual price field
-    
+
   });
   const fileInputRef = useRef(null);
   const [imageCount, setImageCount] = useState(0);
@@ -61,32 +67,80 @@ const Speakers = () => {
   const [isEditMode, setIsEditMode] = useState(false);
 
 
-  
-    const [isModalOpen2, setIsModalOpen2] = useState(false);
-      const [modalProductId, setModalProductId] = useState(null);
 
-     useEffect(() => {
-        setTimeout(() => {
-          const section = document.querySelector(".laptops-products-list");
-          if (section) {
-            const offset = section.offsetTop - 70; // Adjust the margin (50px in this case)
-            window.scrollTo({ top: offset, behavior: "smooth" });
-          }
-        }, 100);
-      }, []);
-      
-        // Handle opening modal and passing productId
-      
-        const openProductModal = (productId) => {
-          setModalProductId(productId);
-          setIsModalOpen2(true);
-        };
-      
-        const closeProductModal = () => {
-          setIsModalOpen2(false);
-          setModalProductId(null);
-        };
-  
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [modalProductId, setModalProductId] = useState(null);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [lightboxImages, setLightboxImages] = useState([]);
+  const [couponProducts, setCouponProducts] = useState({});
+
+   const [searchTerm, setSearchTerm] = useState("");
+  const [showOutOfStockOnly, setShowOutOfStockOnly] = useState(false);
+  const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
+  // const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
+
+  const fetchCouponStatus = async (productId) => {
+    console.log(`[INFO] Checking coupon for product ID: ${productId}`);
+
+    try {
+      const response = await axios.get(`${ApiUrl}/api/couponstatus/${productId}`);
+      const { hasCoupon, isExpired } = response.data;
+
+      console.log(`[SUCCESS] Product ${productId}: hasCoupon=${hasCoupon}, isExpired=${isExpired}`);
+      return { hasCoupon, isExpired };
+    } catch (error) {
+      console.error(`[ERROR] Failed to check coupon for product ${productId}:`, error.message);
+      return { hasCoupon: false, isExpired: false };
+    }
+  };
+
+  useEffect(() => {
+    const loadCouponStatuses = async () => {
+      const result = {};
+
+      for (const product of products) {
+        const { hasCoupon, isExpired } = await fetchCouponStatus(product.prod_id);
+        result[product.id] = { hasCoupon, isExpired };
+      }
+
+      setCouponProducts(result);
+    };
+
+    if (products.length > 0) {
+      loadCouponStatuses();
+    }
+  }, [products]);
+
+  const handleImageClick = (index, imageArray) => {
+    setPhotoIndex(index); // starting image
+    setLightboxImages(imageArray); // all images of this product
+    setIsOpen(true); // open lightbox
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      const section = document.querySelector(".laptops-products-list");
+      if (section) {
+        const offset = section.offsetTop - 70; // Adjust the margin (50px in this case)
+        window.scrollTo({ top: offset, behavior: "smooth" });
+      }
+    }, 100);
+  }, []);
+
+  // Handle opening modal and passing productId
+
+  const openProductModal = (productId) => {
+    setModalProductId(productId);
+    setIsModalOpen2(true);
+  };
+
+  const closeProductModal = () => {
+    setIsModalOpen2(false);
+    setModalProductId(null);
+  };
+
 
 
   // Handle opening modal and passing productId
@@ -113,7 +167,7 @@ const Speakers = () => {
     try {
       const response = await axios.get(`${ApiUrl}/api/products/fetchoffer/${id}`);
       const { offer_start_time, offer_end_time, offer_price } = response.data;
-  
+
       // The dates are already in the correct format from the backend
       setOfferStartTime(offer_start_time || "");
       setOfferEndTime(offer_end_time || "");
@@ -122,13 +176,13 @@ const Speakers = () => {
       console.error("Error fetching offer data", error);
     }
   };
-  
+
   const handleChangePrice = (e, productPrice) => {
     const value = e.target.value;
-  
+
     // Allow only numbers (integer or decimal with up to 2 places), but no leading zero unless decimal.
     const regex = /^(0|[1-9]\d*)(\.\d{0,2})?$/;
-  
+
     if (regex.test(value) || value === "") {
       if (parseFloat(value) <= productPrice || value === "") {
         setOfferPrice(value);
@@ -144,8 +198,8 @@ const Speakers = () => {
     }
   };
 
-  
-  
+
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -157,14 +211,14 @@ const Speakers = () => {
         text: "Ensure all fields are filled out correctly before submitting.",
       });
       return;
-    } 
-  
+    }
+
     const offerData = {
       offer_start_time: offerStartTime,
       offer_end_time: offerEndTime,
       offer_price: offerPrice,
     };
-  
+
     try {
       if (isEditMode) {
         await axios.put(`${ApiUrl}/api/products/updateoffer/${productId}`, offerData);
@@ -179,7 +233,7 @@ const Speakers = () => {
       Swal.fire('Error!', 'There was an error processing your request. Please try again.', 'error');
     }
   };
-  
+
   // Handle deletion of offer with confirmation
   const handleDelete = async () => {
     Swal.fire({
@@ -203,19 +257,19 @@ const Speakers = () => {
     });
   };
 
-  
+
   const openPopup = (id, productName, prodPrice) => {
     // Set states
     setSelectedProductId(id);
     setSelectedProductPrice(prodPrice);
     setproductName(productName);
     setIsPopupOpen(true);
-  
+
     // Log the parameters passed
     console.log("Product ID passed:", id);
     console.log("Product Name passed:", productName);
     console.log("Product Price passed:", prodPrice);
-  
+
     // Use a timeout to log updated state after React processes the setState
     setTimeout(() => {
       console.log("Selected Product ID (state):", selectedProductId);
@@ -224,7 +278,7 @@ const Speakers = () => {
       console.log("Popup open status (state):", isPopupOpen);
     }, 100);
   };
-  
+
 
   const closePopup = () => {
     setIsPopupOpen(false);
@@ -258,15 +312,15 @@ const Speakers = () => {
   const handleCouponUpdated = () => {
     console.log("Coupon updated successfully!");
   };
- const MAX_FILES = 5; // Set your file limit
+  const MAX_FILES = 5; // Set your file limit
 
   const handleFileChange = (productId, event) => {
     const files = Array.from(event.target.files);
-  
+
     // Get the existing files for this product (or an empty array)
     const existingFiles = newImages[productId] || [];
     const existingFileNames = existingFiles.map((file) => file.name);
-  
+
     // Check if adding new files exceeds the limit
     if (existingFiles.length + files.length > MAX_FILES) {
       Swal.fire({
@@ -278,69 +332,19 @@ const Speakers = () => {
       });
       return;
     }
-  
+
     // Filter out duplicate files based on name
     const uniqueFiles = files.filter(
       (file) => !existingFileNames.includes(file.name)
     );
-  
+
     if (uniqueFiles.length === 0) return; // No new images
-  
-    const resizedFiles = [];
-  
-    uniqueFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        const img = new Image();
-        img.src = e.target.result;
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Maximum width for the image
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-  
-          const ctx = canvas.getContext("2d");
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  
-          // Compress and convert to blob
-          canvas.toBlob(
-            (blob) => {
-              const processBlob = (finalBlob) => {
-                const processedFile = new File([finalBlob], file.name, {
-                  type: "image/jpeg",
-                });
-                resizedFiles.push(processedFile);
-  
-                if (resizedFiles.length === uniqueFiles.length) {
-                  setNewImages((prev) => ({
-                    ...prev,
-                    [productId]: [...(prev[productId] || []), ...resizedFiles],
-                  }));
-                }
-              };
-  
-              if (blob.size / 1024 < 50) {
-                processBlob(blob);
-              } else {
-                canvas.toBlob(
-                  (compressedBlob) => {
-                    processBlob(compressedBlob);
-                  },
-                  "image/jpeg",
-                  0.7
-                );
-              }
-            },
-            "image/jpeg",
-            0.8
-          );
-        };
-      };
-    });
+
+    // Directly add the unique original image files without resizing or compression
+    setNewImages((prev) => ({
+      ...prev,
+      [productId]: [...(prev[productId] || []), ...uniqueFiles],
+    }));
   };
 
 
@@ -455,7 +459,7 @@ const Speakers = () => {
     //     // Optionally show an error message if the input is invalid
     //     Swal.fire({
     //       icon: "warning",
-    //       title: "Validation Error",
+    //       title: "Invalid Input",
     //       text: "Name and Label should only contain letters and spaces.",
     //     });
     //     return; // Prevent updating state if invalid
@@ -469,7 +473,7 @@ const Speakers = () => {
         // Optionally show an error message if the input is invalid
         Swal.fire({
           icon: "warning",
-          title: "Validation Error",
+          title: "Invalid Input",
           text: "Price should only contain numbers.",
         });
         return; // Prevent updating state if invalid
@@ -483,87 +487,27 @@ const Speakers = () => {
     });
   };
 
- const handleImageUpload = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    console.log("Selected image for upload:", file);
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (e) => {
-      const img = new Image();
-      img.src = e.target.result;
-      img.onload = () => {
-        console.log("Original image dimensions:", img.width, img.height);
+    if (file) {
+      console.log("Selected image for upload:", file);
 
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 500; // Define max width
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
+      // Generate unique filename with timestamp
+      const timestamp = new Date().toISOString().replace(/[-:.]/g, ""); // Format: YYYYMMDDTHHMMSS
+      const fileExtension = file.name.split(".").pop(); // Extract file extension
+      const newFileName = `image_${timestamp}.${fileExtension}`;
 
-        const ctx = canvas.getContext("2d");
+      // Create new File instance with original content
+      const newFile = new File([file], newFileName, { type: file.type });
 
-        const isPng = file.type === "image/png";
-        if (!isPng) {
-          // Only fill white if image is NOT PNG
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+      console.log("Prepared file for upload:", newFile);
+      setSelectedFile(newFile);
+    }
+  };
 
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        console.log("Resizing image to:", canvas.width, canvas.height);
 
-        // Generate unique filename with timestamp
-        const timestamp = new Date().toISOString().replace(/[-:.]/g, ""); // Format: YYYYMMDDTHHMMSS
-        const fileExtension = file.name.split(".").pop(); // Extract file extension
-        const newFileName = `image_${timestamp}.${fileExtension}`;
 
-        const mimeType = isPng ? "image/png" : "image/jpeg";
-
-        // Compress image
-        canvas.toBlob(
-          (blob) => {
-            console.log(
-              "Resized image size (KB):",
-              (blob.size / 1024).toFixed(2)
-            );
-
-            if (blob.size / 1024 < 50) {
-              console.log("Image is under 50 KB, ready for upload.");
-              const newFile = new File([blob], newFileName, { type: mimeType });
-              setSelectedFile(newFile);
-            } else {
-              console.log(
-                "Image still above 50 KB, applying further compression."
-              );
-              canvas.toBlob(
-                (compressedBlob) => {
-                  console.log(
-                    "Compressed image size (KB):",
-                    (compressedBlob.size / 1024).toFixed(2)
-                  );
-                  const compressedFile = new File(
-                    [compressedBlob],
-                    newFileName,
-                    { type: mimeType }
-                  );
-                  setSelectedFile(compressedFile);
-                },
-                mimeType,
-                0.7
-              );
-            }
-          },
-          mimeType,
-          0.8
-        );
-      };
-    };
-  }
-};
-
-  
 
   // Your existing handleImageUpdate function
   const handleImageUpdate = () => {
@@ -655,9 +599,9 @@ const Speakers = () => {
   //   });
   // };
 
-    const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-  
+
     // If more than 5 images are selected, show an alert and prevent upload
     if (files.length > 5) {
       Swal.fire({
@@ -669,89 +613,32 @@ const Speakers = () => {
       e.target.value = ""; // Reset input to allow re-selection
       return;
     }
-  
-    // Resize images before adding them
-    const resizedImages = await Promise.all(files.map((file) => resizeImage(file)));
-  
+
+    // Filter out duplicates based on file name
     setNewProduct((prevProduct) => {
-      // Convert existing images to a comparable format
       const existingImages = prevProduct.images.map((img) => img.name || img);
-  
-      // Filter out duplicates
-      const newUniqueImages = resizedImages.filter(
-        (newImg) => !existingImages.includes(newImg.name || newImg)
+
+      const newUniqueImages = files.filter(
+        (file) => !existingImages.includes(file.name)
       );
-  
+
       return {
         ...prevProduct,
-        images: [...prevProduct.images, ...newUniqueImages], // Append only unique images
+        images: [...prevProduct.images, ...newUniqueImages],
       };
     });
-  
-    setImageCount(resizedImages.length);
-  
-    // Reset file input to allow selecting new files again
-    e.target.value = "";
+
+    setImageCount(files.length); // You can update this to only count unique if needed
+
+    e.target.value = ""; // Reset file input
   };
-  
-  const resizeImage = (file) => {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 500;
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
 
-        const ctx = canvas.getContext("2d");
-        const isPng = file.type === "image/png";
 
-        // Fill white background only for non-PNG images
-        if (!isPng) {
-          ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        const mimeType = isPng ? "image/png" : "image/jpeg";
-
-        canvas.toBlob(
-          (blob) => {
-            if (blob.size / 1024 < 50) {
-              resolve(new File([blob], file.name, { type: mimeType }));
-            } else {
-              canvas.toBlob(
-                (compressedBlob) =>
-                  resolve(
-                    new File([compressedBlob], file.name, {
-                      type: mimeType,
-                    })
-                  ),
-                mimeType,
-                0.7
-              );
-            }
-          },
-          mimeType,
-          0.8
-        );
-      };
-    };
-  });
-};
-
-  
   const handleAddProduct = async () => {
     if (newProduct.label && newProduct.label.replace(/\s/g, "").length > 15) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot exceed 30 characters.",
       });
       return;
@@ -761,7 +648,7 @@ const Speakers = () => {
     if (newProduct.label && !newProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot be just spaces.",
       });
       return;
@@ -771,7 +658,7 @@ const Speakers = () => {
     if (!newProduct.name.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Product name is required.",
       });
       return;
@@ -779,7 +666,7 @@ const Speakers = () => {
     if (!newProduct.features.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Product features are required.",
       });
       return;
@@ -787,7 +674,7 @@ const Speakers = () => {
     // if (!newProduct.category.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Product category is required.",
     //   });
     //   return;
@@ -799,7 +686,7 @@ const Speakers = () => {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid product price is required.",
       });
       return;
@@ -811,7 +698,7 @@ const Speakers = () => {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid actual price is required.",
       });
       return;
@@ -820,7 +707,7 @@ const Speakers = () => {
       // Check for images array length
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "At least one product image is required.",
       });
       return;
@@ -830,7 +717,7 @@ const Speakers = () => {
     if (Number(newProduct.actual_price) <= Number(newProduct.price)) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Actual price must be greater than the product price.",
       });
       return;
@@ -847,7 +734,7 @@ const Speakers = () => {
     // ) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
     //   });
     //   return;
@@ -857,7 +744,7 @@ const Speakers = () => {
     // if (couponCode && !couponCode.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon code cannot be just spaces.",
     //   });
     //   return;
@@ -871,7 +758,7 @@ const Speakers = () => {
     // if (couponValue >= Number(newProduct.price)) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon discount must be less than the product price.",
     //   });
     //   return;
@@ -885,17 +772,17 @@ const Speakers = () => {
     //   if (!hasDigit) {
     //     Swal.fire({
     //       icon: "warning",
-    //       title: "Validation Error",
+    //       title: "Invalid Input",
     //       text: "Coupon code must contain price value like OFFER599.",
     //     });
     //     return;
     //   }
     // }
-// Fetch user role from localStorage
-const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+    // Fetch user role from localStorage
+    const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
-// Set product status based on user role
-const productStatus = userRole === "Admin" ? "approved" : "unapproved";
+    // Set product status based on user role
+    const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
     formData.append("name", newProduct.name);
@@ -910,7 +797,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     // formData.append("coupon_expiry_date", newProduct.coupon_expiry_date);
     // formData.append("coupon", newProduct.coupon);
     formData.append("category", newProduct.category); // Add category here
-    
+
     // Append each image file to the FormData
     newProduct.images.forEach((image, index) => {
       if (image instanceof File) {
@@ -949,7 +836,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
         // coupon: "",
         effectiveprice: "",
         category: "", // Clear the category here
-});
+      });
       setImageCount(0);
       document.querySelector('input[type="file"]').value = ""; // Reset file input
     } catch (error) {
@@ -1001,7 +888,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     if (editingProduct.label && !editingProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot be just spaces.Remove space",
       });
       return;
@@ -1010,7 +897,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     // if (editingProduct.label && /\d/.test(editingProduct.label)) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Label cannot contain numeric values.",
     //   });
     //   return;
@@ -1019,7 +906,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     if (editingProduct.label && editingProduct.label.length > 15) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot exceed 30 characters.",
       });
       return;
@@ -1029,7 +916,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     if (editingProduct.label && !editingProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Label cannot be just spaces.",
       });
       return;
@@ -1038,7 +925,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     if (Number(editingProduct.actual_price) <= Number(editingProduct.price)) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Actual price must be greater than the product price.",
       });
       return;
@@ -1048,7 +935,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     if (!editingProduct.name.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Product name is required.",
       });
       return;
@@ -1056,7 +943,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     if (!editingProduct.features.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "Product features are required.",
       });
       return;
@@ -1064,7 +951,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     // if (!editingProduct.category.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Product category is required.",
     //   });
     //   return;
@@ -1076,7 +963,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid product price is required.",
       });
       return;
@@ -1088,7 +975,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Validation Error",
+        title: "Invalid Input",
         text: "A valid product price is required.",
       });
       return;
@@ -1119,7 +1006,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     // ) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
     //   });
     //   return;
@@ -1129,7 +1016,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     // if (couponCode && !couponCode.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon code cannot be just spaces.",
     //   });
     //   return;
@@ -1141,7 +1028,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     //   if (!hasDigit) {
     //     Swal.fire({
     //       icon: "warning",
-    //       title: "Validation Error",
+    //       title: "Invalid Input",
     //       text: "Coupon code must contain price value like OFFER599.",
     //     });
     //     return;
@@ -1156,7 +1043,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     // if (couponValue >= Number(editingProduct.price)) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Validation Error",
+    //     title: "Invalid Input",
     //     text: "Coupon discount must be less than the product price.",
     //   });
     //   return;
@@ -1413,10 +1300,10 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
     const day = String(date.getDate()).padStart(2, "0");
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-  
+
     return `${year}-${month}-${day}T${hours}:${minutes}`; // Format for datetime-local input
   };
-  
+
   const today = new Date();
   const minDate = getFormattedDate(today);
   const maxDate = getFormattedDate(new Date(today.setDate(today.getDate() + 10)));
@@ -1444,44 +1331,52 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
   const role = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
 
-   const handleCopyProduct = async (productId) => {
-      try {
-        const response = await fetch(`${ApiUrl}/api/copy-product/${productId}`, {
-          method: 'POST',
-        });
-    
-        const data = await response.json();
-        if (response.ok) {
-          // Success alert using SweetAlert
-          Swal.fire({
-            title: 'Success!',
-            text: `Product copied successfully! New product ID: ${data.newProductId}`,
-            icon: 'success',
-            confirmButtonText: 'OK',
-          }).then(() => {
-            // After the alert closes, call the fetchProducts function
-           window.location.reload();
-          });
-        } else {
-          // Error alert using SweetAlert
-          Swal.fire({
-            title: 'Error!',
-            text: data.message,
-            icon: 'error',
-            confirmButtonText: 'OK',
-          });
-        }
-      } catch (error) {
-        console.error('Error copying product:', error);
-        // Generic error alert using SweetAlert
+  const handleCopyProduct = async (productId) => {
+    try {
+      const response = await fetch(`${ApiUrl}/api/copy-product/${productId}`, {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        // Success alert using SweetAlert
         Swal.fire({
-          title: 'Oops!',
-          text: 'Something went wrong. Please try again.',
+          title: 'Success!',
+          text: `Product copied successfully! New product ID: ${data.newProductId}`,
+          icon: 'success',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          // After the alert closes, call the fetchProducts function
+          window.location.reload();
+        });
+      } else {
+        // Error alert using SweetAlert
+        Swal.fire({
+          title: 'Error!',
+          text: data.message,
           icon: 'error',
           confirmButtonText: 'OK',
         });
       }
-    };
+    } catch (error) {
+      console.error('Error copying product:', error);
+      // Generic error alert using SweetAlert
+      Swal.fire({
+        title: 'Oops!',
+        text: 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+    }
+  };
+// Compute stats
+  const totalProducts = products.length;
+
+  const inStock = products.filter(p => p.status !== "unavailable").length;
+  const outOfStock = totalProducts - inStock;
+
+  const withCoupons = products.filter(p => couponProducts[p.id]?.hasCoupon).length;
+  // const withAccessories = products.filter(p => accessoryCounts[p.id] > 0).length;
 
   return (
     <div className="laptops-page">
@@ -1549,7 +1444,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
             <label className="laptops-label">Product Image</label>
             <input
-              accept="image/jpeg, image/png"
+              accept="image/jpeg, image/png, image/webp"
               ref={fileInputRef}
               multiple
               onChange={handleImageChange}
@@ -1582,11 +1477,106 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
             </button>
           </div>
         </div>
+        <hr className="dotted-divider" />
+          <h2 className="laptops-page-title">Speaker Product List</h2>
 
+        {(totalProducts > 0 || inStock > 0 || outOfStock > 0 || withCoupons > 0 ) && (
+  <>
+        <div className="laptops-summary-stats-row">
+          <div className="laptops-stat-card">
+            <h5>Total Products</h5>
+            <p>{totalProducts}</p>
+          </div>
+          <div className="laptops-stat-card">
+            <h5>In Stock </h5>
+            <p>{inStock}</p>
+          </div>
+          <div className="laptops-stat-card">
+            <h5>Out of Stock </h5>
+            <p>{outOfStock}</p>
+          </div>
+          <div className="laptops-stat-card">
+            <h5>With Coupons 🎟️</h5>
+            <p>{withCoupons}</p>
+          </div>
+       
+        </div>
+
+          <div className="filters-card2">
+          <div className="filters-panel">
+            <div className="filter-label-title">
+                <img src={FilterIcon} width={"20px"} />
+
+                <span> Filter By </span>
+                {/* <FilterIcon width={"20px"}/> */}
+              </div>
+            <label className="filter-label">
+              <input
+                type="checkbox"
+                checked={showOutOfStockOnly}
+                onChange={() => setShowOutOfStockOnly(!showOutOfStockOnly)}
+              />
+              Out of Stock
+            </label>
+
+            <label className="filter-label">
+              <input
+                type="checkbox"
+                checked={showHasCouponOnly}
+                onChange={() => setShowHasCouponOnly(!showHasCouponOnly)}
+              />
+              Coupon
+            </label>
+
+ 
+  <div className="filter-search-wrapper">
+                <SearchIcon width={'18px'} className="search-icon-btn" />
+                {/* <img src={SearchIcon} width={'20px'}/> */}
+                <input
+                  type="text"
+                  placeholder="Search by name"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="filter-input"
+                />
+                {searchTerm && (
+                  <button
+                    className="filter-clear-btn"
+                    onClick={() => setSearchTerm("")}
+                    aria-label="Clear search"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+          </div>
+        </div>
+</>
+)}
         <div className="laptops-products-list">
-          {products.length > 0 &&
-            products.map((product, index) => (
+        {products.length === 0 ? (
+            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some Speakers.</div>
+          ) : (
+            (() => {
+              const filteredProducts = products
+              .filter((product) =>
+                product.prod_name.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .filter((product) =>
+                showOutOfStockOnly ? product.status === "unavailable" : true
+              )
+              .filter((product) =>
+                showHasCouponOnly ? couponProducts[product.id]?.hasCoupon : true
+              );
+               return filteredProducts.length === 0 ? (
+                <div className="empty-state-message"><FaInfoCircle /> No products match your filters.</div>
+              ) : (
+                filteredProducts
+              .map((product, index) => (
               <div className="laptops-product-card" key={product.id}>
+                {product.status === "unavailable" && (
+                  <span className="out_of_stock_ribbon"></span>
+                )}
                 {product.offer_label && (
                   <div className="product-label">{product.offer_label}</div>
                 )}
@@ -1595,7 +1585,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                 <div className="laptops-product-image">
                   <div className="slider-container">
                     <Slider
-                        {...{
+                      {...{
                         ...settings,
                         arrows: product.prod_img.length > 1,
                         draggable: product.prod_img.length > 1, // Disable dragging if only one image exists
@@ -1608,15 +1598,23 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                             src={`${ApiUrl}/uploads/speakers/${img}`}
                             alt={product.prod_name}
                             className="laptops-product-image"
+                            onClick={() =>
+                              handleImageClick(
+                                imgIndex, // Index of the clicked image in this product
+                                product.prod_img.map(img => `${ApiUrl}/uploads/speakers/${img}`) // Only current product's images
+                              )
+                            }
                           />
 
                           <div className="image-actions">
                             <FaEdit
+                              title="Update this image"
                               onClick={() => openModal(product.id, imgIndex)} // Pass product ID and image index
                               className="action-icon"
                             />
                             {product.prod_img.length > 1 && ( // Display trash icon only if there is more than one image
                               <FaTrash
+                                title="Delete this image"
                                 onClick={() =>
                                   handleDeleteImage(product.id, imgIndex)
                                 }
@@ -1632,7 +1630,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
                 {/* Display product name */}
                 <div className="laptops-product-details">
-                  <h3 className="laptops-product-name">
+                  <h3 className="laptops-product-name" title={product.prod_name}>
                     {product.prod_name}
                     {product.productStatus === "unapproved" && (
                       <span style={{ color: "red" }}>
@@ -1642,28 +1640,63 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                   </h3>
 
                   {/* "View" button to trigger modal */}
-                 
+
                 </div>
 
                 <div>
-                  <span style={{textDecoration:"line-through", color:'red', fontSize:'14px'}}>₹{product.actual_price}</span>  <span style={{color:'green',marginLeft:'5px'}}>₹{product.prod_price}</span>
+                  M.R.P <span style={{ textDecoration: "line-through", color: 'red', fontSize: '14px' }}>₹{product.actual_price}</span>  <span style={{ color: 'green', marginLeft: '5px' }}>₹{product.prod_price}</span>
                 </div>
-                <button
+                <div className="product-extras">
+                  {couponProducts[product.id]?.hasCoupon && (
+                    <div className="coupon-wrapper">
+                      <div className="coupon-image-wrapper">
+                        {couponProducts[product.id].isExpired === true ?
+                          <img
+                            src={ExpiredCouponImage}
+                            width="35px"
+                            alt="Coupon"
+                            className="coupon-image"
+                          />
+                          :
+                          <img
+                            src={ActiveCouponImage}
+                            width="35px"
+                            alt="Coupon"
+                            className="coupon-image"
+                          />
+                        }
+                        <span className="tooltip-text">
+                          {couponProducts[product.id].isExpired ? "Coupon Expired" : "Coupon is active"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+
+                  <button
                     className="view-details-btn"
+                    title="View more details"
                     onClick={() => openProductModal(product.id)} // Pass product ID to open modal
                   >
-                    <FaEye /> View Details
+                    <FaEye /> View
                   </button>
+
+
+
+                </div>
+
                 <div className="laptops-product-actions">
                   <button
                     onClick={() => handleEditProduct(product)}
                     className="laptops-action-btn"
+                    title="Update this product"
                   >
                     <FaEdit /> Edit
                   </button>
                   <button
                     onClick={() => handleDeleteProduct(product.id)}
                     className="laptops-action-btn"
+                    title="Delete this product"
                   >
                     <FaTrash /> Delete
                   </button>
@@ -1673,8 +1706,8 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                 {isModalOpen2 && modalProductId === product.id && (
                   <div className="product-details-modal">
                     <div className="modal-overlay">
-                    <div className="modal-content3">
-                    <button
+                      <div className="modal-content3">
+                        <button
                           onClick={closeProductModal}
                           className="modal-close-btn"
                         >
@@ -1707,7 +1740,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                 <span>₹{product.deliverycharge}</span>
                               </p>
                               <p>
-                         
+
                                 <strong>Features</strong>
                                 <span>{product.prod_features}</span>
                               </p>
@@ -1786,13 +1819,13 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                         max={
                                           offerStartTime
                                             ? getFormattedDate(
+                                              new Date(
                                                 new Date(
-                                                  new Date(
-                                                    offerStartTime
-                                                  ).getTime() +
-                                                    10 * 86400000
-                                                )
+                                                  offerStartTime
+                                                ).getTime() +
+                                                10 * 86400000
                                               )
+                                            )
                                             : maxDate
                                         } // Max 10 days from start
                                         className="offer-input"
@@ -1972,24 +2005,24 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                                 coupon={selectedCoupon}
                                 productId={selectedProductId}
                                 productPrice={selectedProductPrice}
-                                onCouponUpdated={() => {}}
+                                onCouponUpdated={() => { }}
                               />
 
-                                <div
-                                                              className="frequently-buy"
-                                                              style={{ marginBottom: "10px" }}
-                                                            >
-                                                              <span className="frequently-buy-label">
-                                                                Make a copy of this product
-                                                              </span>
-                                                              <FaClone
-                                                                onClick={() => handleCopyProduct(product.id)}
-                                                                className="copy-icon"
-                                                              />
-                                                            </div>
+                              <div
+                                className="frequently-buy"
+                                style={{ marginBottom: "10px" }}
+                              >
+                                <span className="frequently-buy-label">
+                                  Make a copy of this product
+                                </span>
+                                <FaClone
+                                  onClick={() => handleCopyProduct(product.id)}
+                                  className="copy-icon"
+                                />
+                              </div>
 
                               {/* Frequently Buy Section */}
-                            
+
                             </div>
                           </div>
                         </div>
@@ -1998,7 +2031,10 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
                   </div>
                 )}
               </div>
-            ))}
+             ))
+      );
+    })()
+  )}
         </div>
       </div>
       {/* Modal for Image Upload */}
@@ -2011,7 +2047,7 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
         <h2 style={titleStyle}>Update this image</h2>
         <input
           type="file"
-          accept="image/jpeg, image/png"
+          accept="image/jpeg, image/png, image/webp"
 
           onChange={handleImageUpload} // Keep this function for handling file selection
           style={inputStyle}
@@ -2028,12 +2064,12 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
             onClick={() => handleImageUpdate(productId)} // Use the product ID here
             style={buttonStyle}
             onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonHoverStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonHoverStyle.backgroundColor)
             } // Hover effect
             onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonStyle.backgroundColor)
             } // Reset color
           >
             Update
@@ -2043,12 +2079,12 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
             onClick={closeModal}
             style={buttonStyle}
             onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonHoverStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonHoverStyle.backgroundColor)
             } // Hover effect
             onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                buttonStyle.backgroundColor)
+            (e.currentTarget.style.backgroundColor =
+              buttonStyle.backgroundColor)
             } // Reset color
           >
             Close
@@ -2057,217 +2093,229 @@ const productStatus = userRole === "Admin" ? "approved" : "unapproved";
       </Modal>
 
       {/* Modal for editing a product */}
+      {isOpen && (
+        // Sample usage
+        <Lightbox
+          open={isOpen}
+          close={() => setIsOpen(false)}
+          slides={lightboxImages.map((src) => ({ src }))}
+          index={photoIndex}
+          on={{ view: ({ index }) => setPhotoIndex(index) }}
+          carousel={{ finite: true }}
+
+        />
+      )}
       {/* Modal for editing a product */}
       {editingProduct && (
-                   <Modal
-                     isOpen={modalIsOpen}
-                     onRequestClose={() => setModalIsOpen(false)}
-                     contentLabel="Edit Product"
-                     className="editmodal"
-                     overlayClassName="adminmodal-overlay"
-                   >
-                     <div className="adminmodal-header">
-                       <h2>Edit Product</h2>
-                       <button
-                         onClick={() => setModalIsOpen(false)}
-                         className="adminmodal-close-btn"
-                       >
-                         &times;
-                       </button>
-                     </div>
-           
-                     <div className="adminmodal-body">
-                 <div className="part1">
-                         <div className="feature-item">
-                           <label className="feature-label">Name</label>
-                           <input
-                             type="text"
-                             name="name"
-                             value={editingProduct.name}
-                             onChange={(e) =>
-                               setEditingProduct({
-                                 ...editingProduct,
-                                 name: e.target.value,
-                               })
-                             }
-                             placeholder="Enter product name"
-                             className="adminmodal-input"
-                           />
-                         </div>
-                         <div className="feature-item">
-                           <label className="feature-label">Subtitle</label>
-           
-                           <input
-                             type="text"
-                             name="subtitle"
-                             value={editingProduct.subtitle}
-                             onChange={(e) =>
-                               setEditingProduct({
-                                 ...editingProduct,
-                                 subtitle: e.target.value,
-                               })
-                             }
-                             placeholder="Enter subtitle"
-                             className="adminmodal-input"
-                           />
-                         </div>
-           
-                         <div className="feature-item">
-                           <label className="feature-label">M.R.P Price</label>
-           
-                           <input
-                             type="text"
-                             name="actual_price"
-                             value={editingProduct.actual_price}
-                             onChange={(e) =>
-                               setEditingProduct({
-                                 ...editingProduct,
-                                 actual_price: e.target.value,
-                               })
-                             }
-                             placeholder="Enter actual price"
-                             className="adminmodal-input"
-                           />
-                         </div>
-           
-                         <div className="feature-item">
-                           <label className="feature-label">Price</label>
-           
-                           <input
-                             type="text"
-                             name="price"
-                             value={editingProduct.price}
-                             onChange={(e) =>
-                               setEditingProduct({
-                                 ...editingProduct,
-                                 price: e.target.value,
-                               })
-                             }
-                             placeholder="Enter product price"
-                             className="adminmodal-input"
-                           />
-                         </div>
-           
-                         <div className="feature-item">
-                           <label className="feature-label">Offer label</label>
-           
-                           <input
-                             type="text"
-                             name="label"
-                             value={editingProduct.label}
-                             onChange={(e) =>
-                               setEditingProduct({
-                                 ...editingProduct,
-                                 label: e.target.value,
-                               })
-                             }
-                             placeholder="Enter label"
-                             className="adminmodal-input"
-                           />
-                         </div>
-           
-                         <div className="feature-item">
-                           <label className="feature-label">Delivery charge</label>
-                           <input
-                             type="text"
-                             name="deliverycharge"
-                             value={editingProduct.deliverycharge}
-                             onChange={(e) =>
-                               setEditingProduct({
-                                 ...editingProduct,
-                                 deliverycharge: e.target.value,
-                               })
-                             }
-                             placeholder="Enter deliverycharge"
-                             className="adminmodal-input"
-                           />
-                         </div>
-      
-                       </div>
-           
-                       {/* Features Section */}
-                       <div className="part2">
-                         <div className="product-features-container">
-      
-                           {/* Others (Textarea) */}
-                           <div className="feature-item">
-                             <label className="feature-label">Features</label>
-                             <textarea
-                               name="others"
-                               value={editingProduct.features}
-                               onChange={(e) =>
-                                 setEditingProduct({
-                                   ...editingProduct,
-                                   features: e.target.value,
-                                 })
-                               }
-                               placeholder="Enter other features"
-                               className="feature-textarea"
-                               rows="4"
-                             />
-                           </div>
-           
-                           <div className="feature-item">
-                           <label className="feature-label">
-                             In Stock or Out Of Stock
-                           </label>
-           
-                           <select
-                             name="status"
-                             value={editingProduct.status}
-                             onChange={(e) =>
-                               setEditingProduct({
-                                 ...editingProduct,
-                                 status: e.target.value,
-                               })
-                             }
-                             className="adminmodal-input5"
-                           >
-                       <option value="available">In Stock</option>
-                       <option value="unavailable">Out Of Stock</option>
-                           </select>
-                           </div>
-           
-                           <div className="feature-item">
-           
-                   <label className="feature-label">Approve or Unapprove</label>
-           
-                   <select
-                              disabled={role === 'Staff'}
-           
-                       name="productStatus"
-                       value={editingProduct.productStatus}
-                       onChange={(e) =>
-                         setEditingProduct({ ...editingProduct, productStatus: e.target.value })
-                       }
-                       className="adminmodal-input5"
-                     >
-                       <option value="approved">Approve</option>
-                       <option value="unapproved">UnApprove</option>
-                     </select>
-                 
-                 </div>
-           
-                         <button
-                           onClick={handleUpdateProduct}
-                           className="adminmodal-update-btn"
-                         >
-                           Update
-                         </button>
-                         <button
-                           onClick={() => setModalIsOpen(false)}
-                           className="adminmodal-cancel-btn"
-                         >
-                           Cancel
-                         </button>
-                         </div>
-                       </div>
-                     </div>
-                   </Modal>
-                 )}
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={() => setModalIsOpen(false)}
+          contentLabel="Edit Product"
+          className="editmodal"
+          overlayClassName="adminmodal-overlay"
+        >
+          <div className="adminmodal-header">
+            <h2>Edit Product</h2>
+            <button
+              onClick={() => setModalIsOpen(false)}
+              className="adminmodal-close-btn"
+            >
+              &times;
+            </button>
           </div>
-        );
-      };
+
+          <div className="adminmodal-body">
+            <div className="part1">
+              <div className="feature-item">
+                <label className="feature-label">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={editingProduct.name}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      name: e.target.value,
+                    })
+                  }
+                  placeholder="Enter product name"
+                  className="adminmodal-input"
+                />
+              </div>
+              <div className="feature-item">
+                <label className="feature-label">Subtitle</label>
+
+                <input
+                  type="text"
+                  name="subtitle"
+                  value={editingProduct.subtitle}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      subtitle: e.target.value,
+                    })
+                  }
+                  placeholder="Enter subtitle"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">M.R.P Price</label>
+
+                <input
+                  type="text"
+                  name="actual_price"
+                  value={editingProduct.actual_price}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      actual_price: e.target.value,
+                    })
+                  }
+                  placeholder="Enter actual price"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">Price</label>
+
+                <input
+                  type="text"
+                  name="price"
+                  value={editingProduct.price}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      price: e.target.value,
+                    })
+                  }
+                  placeholder="Enter product price"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">Offer label</label>
+
+                <input
+                  type="text"
+                  name="label"
+                  value={editingProduct.label}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      label: e.target.value,
+                    })
+                  }
+                  placeholder="Enter label"
+                  className="adminmodal-input"
+                />
+              </div>
+
+              <div className="feature-item">
+                <label className="feature-label">Delivery charge</label>
+                <input
+                  type="text"
+                  name="deliverycharge"
+                  value={editingProduct.deliverycharge}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      deliverycharge: e.target.value,
+                    })
+                  }
+                  placeholder="Enter deliverycharge"
+                  className="adminmodal-input"
+                />
+              </div>
+
+            </div>
+
+            {/* Features Section */}
+            <div className="part2">
+              <div className="product-features-container">
+
+                {/* Others (Textarea) */}
+                <div className="feature-item">
+                  <label className="feature-label">Features</label>
+                  <textarea
+                    name="others"
+                    value={editingProduct.features}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        features: e.target.value,
+                      })
+                    }
+                    placeholder="Enter other features"
+                    className="feature-textarea"
+                    rows="4"
+                  />
+                </div>
+
+                <div className="feature-item">
+                  <label className="feature-label">
+                    In Stock or Out Of Stock
+                  </label>
+
+                  <select
+                    name="status"
+                    value={editingProduct.status}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        status: e.target.value,
+                      })
+                    }
+                    className="adminmodal-input5"
+                  >
+                    <option value="available">In Stock</option>
+                    <option value="unavailable">Out Of Stock</option>
+                  </select>
+                </div>
+
+                <div className="feature-item">
+
+                  <label className="feature-label">Approve or Unapprove</label>
+
+                  <select
+                    disabled={role === 'Staff'}
+
+                    name="productStatus"
+                    value={editingProduct.productStatus}
+                    onChange={(e) =>
+                      setEditingProduct({ ...editingProduct, productStatus: e.target.value })
+                    }
+                    className="adminmodal-input5"
+                  >
+                    <option value="approved">Approve</option>
+                    <option value="unapproved">UnApprove</option>
+                  </select>
+
+                </div>
+
+                <button
+                  onClick={handleUpdateProduct}
+                  className="adminmodal-update-btn"
+                >
+                  Update
+                </button>
+                <button
+                  onClick={() => setModalIsOpen(false)}
+                  className="adminmodal-cancel-btn"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+};
 // Custom next arrow component
 const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
@@ -2281,7 +2329,7 @@ const SampleNextArrow = (props) => {
         alignItems: "center",
         right: "10px",
         zIndex: 10,
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.5)", // Add box shadow
+        background: "rgba(0, 0, 0, 0.5)",
         borderRadius: "50%", // Round shape
         width: "30px", // Width for clickable area
         height: "30px", // Height for clickable area
@@ -2289,10 +2337,11 @@ const SampleNextArrow = (props) => {
       }}
       onClick={onClick}
     >
-      <img src={rightarrow} alt="Next" width="15px" height="15px" />
+      {/* <img src={rightarrow} alt="Next" width="15px" height="15px" /> */}
     </div>
   );
 };
+
 const SamplePrevArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -2305,8 +2354,7 @@ const SamplePrevArrow = (props) => {
         alignItems: "center",
         left: "10px",
         zIndex: 10,
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)", // Box shadow applied here
-        backgroundColor: "white",
+        background: "rgba(0, 0, 0, 0.5)",
         borderRadius: "50%", // Round shape
         width: "30px", // Width for clickable area
         height: "30px", // Height for clickable area
@@ -2314,7 +2362,7 @@ const SamplePrevArrow = (props) => {
       }}
       onClick={onClick}
     >
-      <img src={leftarrow} alt="Previous" width="15px" height="15px" />
+      {/* <img src={leftarrow} alt="Previous" width="15px" height="15px" /> */}
     </div>
   );
 };

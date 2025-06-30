@@ -6,7 +6,7 @@
   width: 250px;
   background-color: #001a35;
   color: #333;
-  transition: width 0.4s ease, transform 0.4s ease;
+  transition: width 0.4s ease, transform 0.6s ease;
   overflow: auto;
   z-index: 1001;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
@@ -53,11 +53,11 @@
   font-size: 1.5rem;
 }
 
-.close-btn {
+.close-btn1 {
   font-size: 24px;
   background: none;
   border: none;
-  color: rgb(82, 81, 81);
+  color: rgb(82, 81, 81); 
   cursor: pointer;
   top: 15px;
 }
@@ -107,6 +107,7 @@
   list-style: none;
   padding-left: 20px;
   display: none;
+  background-color: #2B3846;
 }
 
 /* .submenu-items li {
@@ -153,15 +154,16 @@
     left: 10px;
   }
 
-  .close-btn {
+  .close-btn1 {
     font-size: 20px;
     background: none;
     border: none;
-    color: rgb(82, 81, 81);
+    color: white !important;
     cursor: pointer;
     margin-left: 20px;
   }
 }
+
 
 @media (max-width: 480px) {
   .slidebar {
@@ -250,7 +252,7 @@
 }
 
 /* Close button styles */
-.close-btn {
+.close-btn1 {
   background: none;
   border: none;
   color: #ecf0f1;

@@ -15,8 +15,20 @@
     margin: 10px 0;
     background-color: #f9f9f9;
     border-radius: 5px;
+    position: relative;
   }
-  
+  .customer-search-box {
+  text-align: right;
+  margin-bottom: 15px;
+}
+
+.customer-search-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 280px;
+}
+
   .address-box p {
     margin: 5px 0;
   }

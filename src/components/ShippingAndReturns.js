@@ -1,6 +1,6 @@
 import React from "react";
 // import Header1 from "./Header1";
-import Header2 from "./Header2";
+// import Header2 from "./Header2";
 // import Header3 from "./Header3";
 import Footer from "./footer";
 // import aboutImage from './img/about.jpg'; // Replace with your image path
@@ -8,9 +8,7 @@ import Footer from "./footer";
 const ShippingAndReturns = () => {
   return (
     <div style={styles.pageContainer}>
-      {/* <Header1 /> */}
-      {/* <Header2 /> */}
-      {/* <Header3 /> */}
+     
       <div style={styles.container}>
         <div style={styles.textContainer}>
           <h2 style={styles.title}>Shipping And Returns</h2>
@@ -93,11 +91,6 @@ const ShippingAndReturns = () => {
           <h4 style={styles.subtitle}>'Out of Print'</h4>
           <p style={styles.paragraph}>
           This product is not available because it is no longer being published and has been permanently discontinued.</p>
-          <h4 style={styles.subtitle}>Does Oneclick deliver internationally?</h4>
-          <p style={styles.paragraph}>
-          As of now, Oneclick doesn't deliver items internationally.</p>
-          <p style={styles.paragraph}>
-          You will be able to make your purchases on our site from anywhere in the world with credit/debit cards issued in India and 21 other countries, but please ensure the delivery address is in India.</p>
         </div>
         {/* Optional: Add an image here if needed */}
         {/* <img src={aboutImage} alt="About" style={styles.image} /> */}

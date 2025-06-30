@@ -21,6 +21,11 @@ const EditFourImagesAd = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [category, setCategory] = useState(""); // Add a new state to track the selected category
 
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+const [isUpdating, setIsUpdating] = useState(false);
+const [updateProgress, setUpdateProgress] = useState(0); // optional if needed
+
   const [isOpen, setIsOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [lightboxImages, setLightboxImages] = useState([]);
@@ -69,59 +74,14 @@ const EditFourImagesAd = () => {
         img.src = event.target.result;
         img.onload = () => {
           console.log("Original image dimensions:", img.width, img.height);
-
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 800; // Max width for resizing
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          console.log("Resizing image to:", canvas.width, canvas.height);
-
-          // Function to compress image until under 2 MB
-          const compressImage = (quality) => {
-            return new Promise((resolve) => {
-              canvas.toBlob(
-                (blob) => {
-                  const sizeInKB = blob.size / 1024;
-                  console.log(
-                    `Compressed image at quality ${quality} has size: ${sizeInKB.toFixed(
-                      2
-                    )} KB`
-                  );
-
-                  if (sizeInKB <= 2048 || quality <= 0.8) {
-                    // Stop if size < 2 MB or min quality reached
-                    console.log(
-                      "Final image selected for upload:",
-                      sizeInKB < 2048
-                        ? "Under 2 MB"
-                        : "Minimum quality threshold reached"
-                    );
-                    resolve(blob);
-                  } else {
-                    resolve(compressImage(quality - 0.05)); // Gradually reduce quality if above 2 MB
-                  }
-                },
-                "image/jpeg",
-                quality
-              );
-            });
-          };
-
-          // Start compressing with an initial quality of 0.95
-          compressImage(0.95).then((finalBlob) => {
-            setNewImage(finalBlob);
-          });
+          setNewImage(file); // Set original image directly
         };
       };
     }
   };
 
-  const handleAddProduct = async () => {
+
+const handleAddProduct = async () => {
     if (!newImage || !category) {
       Swal.fire({
         icon: "error",
@@ -133,38 +93,50 @@ const EditFourImagesAd = () => {
 
     const formData = new FormData();
     formData.append("image", newImage);
-    formData.append("category", category); // Include category in the form data
+    formData.append("category", category);
+
+    setIsUploading(true); // Start loader
 
     try {
       await axios.post(`${ApiUrl}/doubleadpage`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percent);
+        },
       });
 
-      Swal.fire({
+      await Swal.fire({
         icon: "success",
         title: "Image Added",
         text: "The image has been uploaded successfully!",
-      })
-        .then(() => {
-          return axios.get(`${ApiUrl}/fetchdoubleadpage`);
-        })
-        .then((productsResponse) => {
-          setProducts(productsResponse.data);
-          setNewImage(null);
-          setCategory(""); // Clear the category
-          document.querySelector('input[type="file"]').value = ""; // Clear the input field
-        });
+        timer: 3000,
+      }).then(() => {
+        setIsUploading(false); //  Stop loader immediately
+        setUploadProgress(0);
+        // return axios.get(`${ApiUrl}/fetchedithomepage`);
+      });
+
+      const res = await axios.get(`${ApiUrl}/fetchdoubleadpage`);
+      setProducts(res.data);
+      setNewImage(null);
+      setCategory("");
+      document.querySelector('input[type="file"]').value = "";
     } catch (error) {
-      console.error("Error adding image:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
         text: "There was an error uploading the image. Please try again.",
       });
+    } finally {
+      setIsUploading(false); // Stop loader
     }
   };
+
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
@@ -222,122 +194,75 @@ const EditFourImagesAd = () => {
         img.src = event.target.result;
         img.onload = () => {
           console.log("Original image dimensions:", img.width, img.height);
-
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Define max width
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          console.log("Resizing image to:", canvas.width, canvas.height);
-
-          // Compress image
-          canvas.toBlob(
-            (blob) => {
-              console.log(
-                "Resized image size (in KB):",
-                (blob.size / 1024).toFixed(2)
-              );
-              if (blob.size / 1024 < 50) {
-                console.log("Image is under 50 KB, ready for update.");
-                setSelectedFile(blob); // Set resized image
-              } else {
-                console.log(
-                  "Image still above 50 KB, applying further compression."
-                );
-                // Further compress if above 50 KB
-                canvas.toBlob(
-                  (compressedBlob) => {
-                    console.log(
-                      "Compressed image size (in KB):",
-                      (compressedBlob.size / 1024).toFixed(2)
-                    );
-                    setSelectedFile(compressedBlob);
-                  },
-                  "image/jpeg",
-                  0.7
-                );
-              }
-            },
-            "image/jpeg",
-            0.8
-          );
+          setSelectedFile(file); // Set original image directly
         };
       };
     }
   };
 
+
   const handleUpdateImage = async () => {
-    // Check if both selectedFile and category are not set
-    if (!selectedFile && !editingProduct.category) {
-      Swal.fire({
-        icon: "error",
-        title: "No Changes Detected",
-        text: "Please select an image or a category to update.",
-      });
-      return;
-    }
+  if (!selectedFile && !editingProduct.category) {
+    Swal.fire({
+      icon: "error",
+      title: "No Changes Detected",
+      text: "Please select an image or a category to update.",
+    });
+    return;
+  }
 
-    const formData = new FormData();
+  const formData = new FormData();
+  if (selectedFile) formData.append("image", selectedFile);
+  if (editingProduct.category) formData.append("category", editingProduct.category);
 
-    // Append selected file if it exists
-    if (selectedFile) {
-      formData.append("image", selectedFile);
-    }
+  try {
+    setIsUpdating(true);
 
-    // Append category only if it has changed
-    if (editingProduct.category) {
-      formData.append("category", editingProduct.category);
-    }
-
-    try {
-      const response = await axios.put(
-        `${ApiUrl}/updatedoubleadpageimage/${editingProduct.id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+    const response = await axios.put(
+      `${ApiUrl}/updatedoubleadpageimage/${editingProduct.id}`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUpdateProgress(percentCompleted);
         }
-      );
+      }
+    );
 
-      Swal.fire({
-        icon: "success",
-        title: "Product Updated",
-        text: "The product has been updated successfully!",
-      });
+    Swal.fire({
+      icon: "success",
+      title: "Product Updated",
+      text: "The product has been updated successfully!",
+    });
 
-      // Update the product in the state with the new image or category if they were updated
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === editingProduct.id
-            ? {
-                ...product,
-                image: selectedFile
-                  ? response.data.updatedImage
-                  : product.image, // Update image only if selectedFile is present
-                category:
-                  editingProduct.category !== product.category
-                    ? editingProduct.category
-                    : product.category, // Update category only if it's changed
-              }
-            : product
-        )
-      );
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === editingProduct.id
+          ? {
+              ...product,
+              image: selectedFile ? response.data.updatedImage : product.image,
+              category: editingProduct.category !== product.category
+                ? editingProduct.category
+                : product.category,
+            }
+          : product
+      )
+    );
+    setModalIsOpen(false);
+  } catch (error) {
+    console.error("Error updating product:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Update Failed",
+      text: "There was an error updating the product. Please try again.",
+    });
+  } finally {
+    setIsUpdating(false);
+    setUpdateProgress(0);
+  }
+};
 
-      setModalIsOpen(false); // Close the modal after successful update
-    } catch (error) {
-      console.error("Error updating product:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Update Failed",
-        text: "There was an error updating the product. Please try again.",
-      });
-    }
-  };
 
   return (
     <div className="laptops-page">
@@ -345,7 +270,13 @@ const EditFourImagesAd = () => {
         <h2 className="laptops-page-title">Edit 4 Images Ad Page</h2>
         <div className="laptops-card">
           <div className="laptops-card-header">
-            <div className="laptops-card-item">Image(288 X 374)</div>
+            <div className="laptops-card-item">Image(288 X 374)
+              <FaInfoCircle
+                style={{ cursor: "pointer", fontSize: "16px", marginLeft: '5px', marginTop: '2px' }}
+                title="Add banner size image for better view (288 x 374)"
+              />
+
+            </div>
           </div>
           <div className="ad-product-form">
             <input
@@ -354,7 +285,7 @@ const EditFourImagesAd = () => {
               name="images"
               onChange={handleImageChange}
               className="ad-form-input"
-              accept="image/jpeg, image/png" // This allows all image types
+              accept="image/jpeg, image/png, image/webp" // This allows all image types
             />
 
             <select
@@ -380,14 +311,38 @@ const EditFourImagesAd = () => {
               <option value="CCTVAccessories">CCTV Accessories</option>
             </select>
 
-            <button onClick={handleAddProduct} className="ad-form-btn">
-              Add
-            </button>
+            <div className="action-row">
+              <button onClick={handleAddProduct} className="add-btn" disabled={isUploading}>
+                Add
+              </button>
 
-            <FaInfoCircle
-              style={{ cursor: "pointer", fontSize: "18px" }}
-              title="Add this image size for better view (288 X 374)"
-            />
+              {isUploading && (
+                <div className="circular-progress-wrapper">
+                  <svg className="circular-progress" viewBox="0 0 36 36">
+                    <g transform="rotate(-0 18 18)">
+                      <path
+                        className="circle-bg"
+                        d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="circle"
+                        strokeDasharray={`${uploadProgress}, 100`}
+                        d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </g>
+                    <text x="18" y="20.35" className="percentage-text">
+                      {uploadProgress}%
+                    </text>
+                  </svg>
+                </div>
+              )}
+            </div>
+
+
           </div>
         </div>
 
@@ -439,79 +394,101 @@ const EditFourImagesAd = () => {
       </div>
 
       {isOpen && (
-       // Sample usage
-      <Lightbox
-        open={isOpen}
-        close={() => setIsOpen(false)}
-        slides={lightboxImages.map((src) => ({ src }))}
-        index={photoIndex}
-        on={{ view: ({ index }) => setPhotoIndex(index) }}
-      />
+        // Sample usage
+        <Lightbox
+          open={isOpen}
+          close={() => setIsOpen(false)}
+          slides={lightboxImages.map((src) => ({ src }))}
+          index={photoIndex}
+          on={{ view: ({ index }) => setPhotoIndex(index) }}
+          carousel={{ finite: true }}
+
+        />
       )}
 
-      {editingProduct && (
-        <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={() => setModalIsOpen(false)}
-          contentLabel="Edit Image and Category"
-          className="adminmodal"
-          overlayClassName="adminmodal-overlay"
-        >
-          <div className="adminmodal-header">
-            <h2>Edit Image and Category</h2>
-            <button
-              onClick={() => setModalIsOpen(false)}
-              className="adminmodal-close-btn"
-            >
-              &times;
-            </button>
-          </div>
-
-          {/* Input for Image Upload */}
-          <input
-            type="file"
-            onChange={handleImageSelection}
-            className="adminmodal-input"
-            accept="image/jpeg, image/png"
-          />
-
-          {/* Dropdown for Category Selection */}
-          <select
-            name="category"
-            value={editingProduct.category || ""}
-            onChange={(e) =>
-              setEditingProduct({ ...editingProduct, category: e.target.value })
-            }
-            className="adminmodal-input"
-          >
-            <option value="">Select Category</option>
-            <option value="Computers">Computer</option>
-            <option value="Mobiles">Mobile</option>
-            <option value="Printers">Printers</option>
-            <option value="Headphones">Headphone</option>
-            <option value="Speakers">Speaker</option>
-            <option value="CCTV">CCTV</option>
-            <option value="TV">TV</option>
-            <option value="Watch">Watch</option>
-            <option value="ComputerAccessories">Computer Accessories</option>
-            <option value="MobileAccessories">Mobile Accessories</option>
-            <option value="PrinterAccessories">Printer Accessories</option>
-            <option value="CCTVAccessories">CCTV Accessories</option>
-          </select>
-
-          {/* Update and Cancel Buttons */}
-          <button onClick={handleUpdateImage} className="adminmodal-update-btn">
-            Update
-          </button>
-          {/* <button onClick={() => setModalIsOpen(false)} className="adminmodal-cancel-btn">Cancel</button> */}
-          <button
-            onClick={() => handleDeleteImage(editingProduct)}
-            className="adminmodal-cancel-btn"
-          >
-            Delete
-          </button>
-        </Modal>
-      )}
+     {editingProduct && (
+       <Modal
+         isOpen={modalIsOpen}
+         onRequestClose={() => setModalIsOpen(false)}
+         contentLabel="Edit Image and Category"
+         className="adminmodal"
+         overlayClassName="adminmodal-overlay"
+       >
+         {/* Overlay progress inside Modal */}
+         {isUpdating && (
+           <div className="modal-upload-overlay">
+             <div className="circular-progress-wrapper">
+               <svg className="circular-progress" viewBox="0 0 36 36">
+                 <g transform="rotate(-90 18 18)">
+                   <path
+                     className="circle-bg"
+                     d="M18 2.0845
+                         a 15.9155 15.9155 0 0 1 0 31.831
+                         a 15.9155 15.9155 0 0 1 0 -31.831"
+                   />
+                   <path
+                     className="circle"
+                     strokeDasharray={`${updateProgress}, 100`}
+                     d="M18 2.0845
+                         a 15.9155 15.9155 0 0 1 0 31.831
+                         a 15.9155 15.9155 0 0 1 0 -31.831"
+                   />
+                 </g>
+                 <text x="18" y="20.35" className="percentage-text">
+                   {updateProgress}%
+                 </text>
+               </svg>
+             </div>
+           </div>
+         )}
+     
+         {/* Modal content */}
+         <div className="adminmodal-header">
+           <h2>Edit Image and Category</h2>
+           <button onClick={() => setModalIsOpen(false)} className="adminmodal-close-btn">
+             &times;
+           </button>
+         </div>
+     
+         <input
+           type="file"
+           onChange={handleImageSelection}
+           className="adminmodal-input"
+           accept="image/jpeg, image/png, image/webp"
+         />
+     
+         <select
+           name="category"
+           value={editingProduct.category || ""}
+           onChange={(e) =>
+             setEditingProduct({ ...editingProduct, category: e.target.value })
+           }
+           className="adminmodal-input"
+         >
+           <option value="">Select Category</option>
+           <option value="Computers">Computer</option>
+           <option value="Mobiles">Mobile</option>
+           <option value="Printers">Printers</option>
+           <option value="Headphones">Headphone</option>
+           <option value="Speakers">Speaker</option>
+           <option value="CCTV">CCTV</option>
+           <option value="TV">TV</option>
+           <option value="Watch">Watch</option>
+           <option value="ComputerAccessories">Computer Accessories</option>
+           <option value="MobileAccessories">Mobile Accessories</option>
+           <option value="PrinterAccessories">Printer Accessories</option>
+           <option value="CCTVAccessories">CCTV Accessories</option>
+         </select>
+     
+         <button onClick={handleUpdateImage} className="adminmodal-update-btn">
+           Update
+         </button>
+         <button onClick={() => handleDeleteImage(editingProduct)} className="adminmodal-cancel-btn">
+           Delete
+         </button>
+       </Modal>
+     )}
+     
     </div>
   );
 };

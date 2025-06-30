@@ -294,4 +294,5 @@ const Invoice = ({ order, productDetails }) => {
   );
 };
 
+
 export default Invoice;
