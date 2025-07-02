@@ -1,5 +1,27 @@
 
 
+.shop-now-btn-link {
+  text-decoration: none;
+  color: white;
+}
+
+.shop-now-btn {
+  padding: 1.5vh 3vw;
+  background-color: #ff6600;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  font-size: 1.1vw;
+  font-weight: 200;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.shop-now-btn.hovered {
+  background-color: transparent;
+  border: 2px solid white;
+}
 .skeleton-container {
   display: flex;
   gap: 10px;
@@ -167,7 +189,7 @@
   margin-bottom: 15px;
 }
 
-.shop-now-button2 {
+.shop-now-btn2 {
   font-family: "calibri", sans-serif;
   color: #fff; /* Text color */
   border: 2px solid #fff; /* White border */
@@ -180,7 +202,7 @@
     border-color 0.3s ease;
 }
 
-.shop-now-button2:hover {
+.shop-now-btn2:hover {
   background-color: transparent;
   border: 2px solid white;
   color: white;

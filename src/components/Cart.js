@@ -830,7 +830,7 @@ const CartPage = () => {
         <div className="cart-content row">
           <div className="cart-products">
             <div className="cart-address">
-              {/* <h3>Select a Shipping Address</h3> */}
+              {/* <h3>Select Delivery Address</h3> */}
               {addressDetails.length > 0 ? (
                 <ul>
                   {addressDetails.map((address) => (
@@ -1183,7 +1183,7 @@ const CartPage = () => {
             {isModalOpen && (
               <div className="modal4-overlay">
                 <div className="modal4-content">
-                  <h3>Select a Shipping Address</h3>
+                  <h3>Select Delivery Address</h3>
                   <button
                     onClick={handleCloseModal}
                     className="modal4-close-btn"
@@ -1216,7 +1216,7 @@ const CartPage = () => {
                   )}
                   <div style={{ display: "flex" }}>
                     <button
-                      title="Set this address as current address"
+                      title="Set this address as delivery address"
                       onClick={handleConfirm}
                       className="modal4-confirm-btn"
                     >

@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import { ApiUrl } from './ApiUrl';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons
 import logo from './img/logo3.png';
+import { Link } from "react-router-dom";
 
 const ChangePasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -61,9 +62,9 @@ const ChangePasswordPage = () => {
   return (
     <div style={styles.container}>
        <center> 
-        <a href="/"> 
+        <Link to={"/"}>
           <img src={logo} width={'200px'} loading="lazy" alt="Logo" />
-        </a>
+          </Link>
       </center>
       <h2 style={styles.title}>Change Password</h2>
       <form style={styles.form} onSubmit={handleSubmit}>

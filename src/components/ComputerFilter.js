@@ -4,7 +4,7 @@ import './css/ComputerFilter.css';
 import axios from 'axios';
 import { ApiUrl } from './ApiUrl';
 
-const BRANDS = ['Dell', 'HP', 'Lenovo', 'Asus', 'Apple', 'Acer', 'MSI', 'Samsung', 'MI', 'Microsoft'];
+const BRANDS = ['Acer', 'Apple', 'Asus', 'Dell', 'HP', 'Lenovo','MI', 'Microsoft',  'MSI', 'Samsung'  ];
 const RAM_OPTIONS = ['4', '8', '16', '32'];
 const STORAGE_OPTIONS = ['128', '256', '512', '1024'];
 const PROCESSORS = ['i3', 'i5', 'i7', 'Ryzen 5', 'Ryzen 7'];

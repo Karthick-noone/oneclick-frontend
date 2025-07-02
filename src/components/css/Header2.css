@@ -267,9 +267,9 @@
 
 .clear-icon {
   font-size: 18px;
-  color: #999;
+  color: #333;
   cursor: pointer;
-  margin-right: 5px;
+  margin-right: 15px;
 }
 
 .clear-icon:hover {
@@ -867,13 +867,13 @@
   /* Center icon vertically */
   justify-content: center;
   /* Center icon horizontally */
-  background-color: #ffc68e;
+  background-color: #031b3440;
   /* Light orange background for the box */
   padding: 11px;
   /* Padding inside the box */
   cursor: pointer;
   /* Pointer cursor on hover */
-  margin-left: 8px;
+  /* margin-left: 8px; */
   /* Space between the input and the icon box */
 }
 
@@ -903,7 +903,7 @@
   /* Slightly rounded corners */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   list-style: none;
-  padding: 8px 0;
+  padding: 2px 0;
   margin: 0;
   max-height: 280px;
   overflow-y: auto;
@@ -912,14 +912,36 @@
 }
 
 .suggestions-dropdown li.highlighted {
-  background-color: #ffcb90;
+  background-color: #031b3440;
   cursor: pointer;
   align-items: center;
 }
 .suggestion-item {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Push text and image apart */
   gap: 10px;
+  padding: 2px;
+}
+
+.suggestion-content {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1; /* Allows text to take all available space */
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #555;
+}
+
+.suggestion-text {
+  font-size: 16px;
+  color: #333;
+  text-align: justify;
 }
 
 .suggestion-image {
@@ -927,16 +949,48 @@
   height: 50px;
   object-fit: contain;
   border-radius: 6px;
-  /* border: 1px solid #eee; */
+  flex-shrink: 0;
 }
 
-.suggestion-text {
-  font-size: 16px;
-  color: #333;
-}
 
 /* Hide dropdown on small screens until search is active */
 @media (max-width: 768px) {
+  .suggestion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Push text and image apart */
+  gap: 8px;
+  padding: 1px;
+}
+
+.suggestion-content {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1; /* Allows text to take all available space */
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #555;
+}
+
+.suggestion-text {
+  font-size: 14px;
+  color: #333;
+  text-align: justify;
+}
+
+.suggestion-image {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
   .suggestions-dropdown {
     width: 98%;
     max-width: 500px;
@@ -1057,19 +1111,19 @@
     visibility: visible;
   }
 
-  .clear-icon {
+  /* .clear-icon {
     margin-right: 70px;
-  }
+  } */
 
   .search-box.mobile-overlay input {
     flex: 1;
     font-size: 14px;
-    padding: 8px 40px 8px 15px;
+    padding: 8px 10px 8px 70px;
   }
 
   .search-box.mobile-overlay .search-icon-container {
     position: absolute;
-    right: 0px;
+    left: 0px;
     top: 50%;
     transform: translateY(-50%);
   }
@@ -1101,7 +1155,7 @@
 }
 
 .suggestions-dropdown li:hover {
-  background-color: #f0f0f0;
+  background-color: #031b3440;
 }
 
 
@@ -1140,7 +1194,7 @@
 }
 
 .search-icon {
-  margin-right: 12px;
+  margin-right: 5px;
 }
 
 .search-icon:hover {

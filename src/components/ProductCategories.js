@@ -57,7 +57,7 @@ const ProductList = () => {
       });
   }, []);
 
-   const handleToggleFavorite = async (product, event) => {
+  const handleToggleFavorite = async (product, event) => {
     event.stopPropagation();
 
     // Check if the user is logged in
@@ -91,7 +91,7 @@ const ProductList = () => {
           `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.info(`${product.prod_name.substring(0,25)+'...'} removed from your wishlist!`, {
+        toast.info(`${product.prod_name.substring(0, 25) + '...'} removed from your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -112,7 +112,7 @@ const ProductList = () => {
           `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.success(`${product.prod_name.substring(0,25)+'...'} added to your wishlist!`, {
+        toast.success(`${product.prod_name.substring(0, 25) + '...'} added to your wishlist!`, {
           position: "top-right",
           autoClose: 2000,
         });
@@ -203,7 +203,7 @@ const ProductList = () => {
 
     navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
-  const renderCategoryRow = (categoryName, isAccessoryRow = false) => {
+  const renderCategoryRow = (categoryName = false) => {
     // Combine products for the accessory row (Headphones + Speakers or all Accessories)
     const combinedProducts =
       categoryName === "HeadphonesAndSpeakers"
@@ -411,43 +411,13 @@ const ProductList = () => {
                           % OFF)
                         </span>
                       </p>
-                      {/* {product.status === "unavailable" ? (
-            <p 
-              style={{
-                color: "red",
-                fontWeight: "bold",
-                fontSize: "16px",
-                textAlign: "center",
-                marginTop: "10px",
-                padding: "10px",
-              }}
-              className="custom-slider-out-of-stock"
-            >
-              Out of Stock
-            </p>
-          ) : (
-            <button
-              onClick={(event) => handleAddToCart(product, event)}
-              className="custom-slider-add-to-cart"
-            >
-              Add to cart
-            </button>
-          )} */}
+                    
                     </div>
 
                     {combinedProducts.length > 5 &&
                       idx === combinedProducts.length - 1 && (
                         <div className="see-more-wrapper">
-                          {/* <button
-        onClick={() => {
-          const lastProductCategory =
-            combinedProducts[combinedProducts.length - 1].category;
-          navigate(`/${lastProductCategory}`);
-        }}
-        className="see-more-btn"
-      >
-        VIEW MORE
-      </button> */}
+                        
                           <button
                             class="animated-button"
                             onClick={() => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header2 from "./Header2";
 import Footer from "./footer";
-import fullad from "./img/banar.jpg";
+import fullad from "./img/banar3.png";
 import Logo from "./img/user.jpg";
 import { ApiUrl } from "./ApiUrl";
 import axios from "axios";
@@ -145,262 +145,277 @@ const MyAccount = () => {
     setSelectedProduct(productId);
   };
 
-    const [selectedProduct, setSelectedProduct] = useState(
-      orders[0]?.products?.[0]?.product_id
-    );
+  const [selectedProduct, setSelectedProduct] = useState(
+    orders[0]?.products?.[0]?.product_id
+  );
 
   return (
     <>
-    {/* <Header2 /> */}
-    <div className="ac-banner-container">
-      <img src={fullad} loading="lazy" alt="Banner" className="ac-banner-image" />
-      <div className="ac-banner-text-container">
-        <h2 className="ac-banner-text">
-          Welcome, {user.username ? capitalizeFirstLetter(user.username) : "N/A"}!
-        </h2>
-      </div>
-    </div>
-
-    <div className="ac-account-container">
-      <div className="ac-profile-card">
-        <div className="ac-profile-header">
-          <div className="ac-profile-left">
-            <img src={Logo} loading="lazy" alt="User Avatar" className="ac-avatar" />
-            <div>
-              <h2 className="ac-profile-name">
-                {user.username ? capitalizeFirstLetter(user.username) : "N/A"}
-              </h2>
-              <p className="ac-profile-email">{user.email}</p>
-            </div>
-          </div>
-
-          <div className="ac-address-card">
-            {address ? (
-              <div>
-                <h3>Current Address</h3>
-                  <p className="addr-name">{address.name}</p>
-                <p>{address.street}, {address.city}, {address.state}, {address.postal_code}</p>
-                <p> <strong>Phone:</strong>  {address.phone}</p>
-              </div>
-            ) : (
-              <p className="ac-no-address">No address available</p>
-            )}
-            <Link to="/UserAddress">
-              <button className="ac-button">Change/Add Address</button>
-            </Link>
-          </div>
+      {/* <Header2 /> */}
+      <div className="ac-banner-container">
+        <img src={fullad} loading="lazy" alt="Banner" className="ac-banner-image" />
+        <div className="ac-banner-text-container">
+          <span className="ac-banner-text">
+            Welcome, {user.username ? capitalizeFirstLetter(user.username) : "N/A"}!
+          </span>
         </div>
       </div>
 
-        {/* Recent Orders Section */}
-       
-      </div>
-      <div style={{paddingRight:'50px', paddingLeft:'50px'}}>
-      <div style={styles.infoSection}>
-          <h3 style={{marginBottom:'10px'}}>Recent Orders</h3>
-          {/* <p>No recent orders yet. Start shopping now!</p> */}
-          <div className="order-container">
-            {orders.length === 0 ? (
-              <p className="no-orders">No orders found.</p>
-            ) : (
-              // Slice the array to show only the first 3 orders
-              orders.slice(0, 3).map((order) => (
-                <div key={order.unique_id} className="order-card">
-                  <div className="order-header">
-                    <h3>Order #{order.unique_id}</h3>
-                    <span
-                    className={`order-status ${order.status.toLowerCase()}`}
-                  >
-                    {order.status.toLowerCase() === "pending"
-                      ? "Payment Pending"
-                      : order.status.toLowerCase() === "refund pending"
-                      ? "Refund Pending"
-                      : order.status.toLowerCase() === "refunded"
-                      ? "Refunded"
-                      : "Payment Paid"}
-                  </span>
-                  </div>
+      <div className="ac-account-container">
+        <div className="ac-profile-card">
+          <div className="ac-profile-header">
+            <div className="ac-profile-left">
+              <img src={Logo} loading="lazy" alt="User Avatar" className="ac-avatar" />
+              <div>
+                <h2 className="ac-profile-name">
+                  {user.username ? capitalizeFirstLetter(user.username) : "N/A"}
+                </h2>
+                <p className="ac-profile-email">{user.email}</p>
+              </div>
+            </div>
 
-                  <div className="products-list">
-                  {order.products && order.products.length > 1 ? (
-                    <select
-                      value={selectedProduct}
-                      onChange={handleProductChange}
-                      className="product-dropdown"
-                    >
-                      {order.products.map((product) => (
-                        <option
-                        // className="product-name"
+            <div className="ac-address-card">
+              {address ? (
+                <div className="delivery-address-box">
+                  <h3 className="section-title">
+                    <i className="fas fa-map-marker-alt"></i> Delivery Address
+                  </h3>
 
-                          key={product.product_id}
-                          value={product.product_id}
-                        >
-                         {product.name.split(" ").slice(0, 3).join(" ")}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    order.products &&
-                    order.products.length === 1 && (
-                      <span  className="product-name"  style={{ fontWeight: "bold" }}>
-                        {order.products[0].name.split(" ").slice(0, 4).join(" ")}
-                      </span>
-                    )
-                  )}
+                  <p className="addr-name">
+                    <i className="fas fa-user"></i> {address.name}
+                  </p>
+
+                  <p className="addr-line">
+                    <i className="fas fa-home"></i> {address.street}, {address.city}, {address.state} - {address.postal_code}
+                  </p>
+
+                  <p className="addr-phone">
+                    <i className="fas fa-phone"></i> {address.phone}
+                  </p>
                 </div>
-                  <p>Order Date: {formatDate(order.order_date)}</p>
-                  <p>Total Amount: ₹{order.total_amount}</p>
-                  <button
-                    onClick={() => openModal(order)}
-                    className="view-details-button"
-                  >
-                    View Details
-                  </button>
-                </div>
-              ))
-            )}
+
+              ) : (
+                <p className="ac-no-address">No address available</p>
+              )}
+              <Link to="/UserAddress">
+                <button className="ac-button">Change/Add Address</button>
+              </Link>
+            </div>
           </div>
-          {/* Modal for Product Details */}
-          <Modal
-            isOpen={modalIsOpen}
-            onRequestClose={closeModal}
-            contentLabel="Product Details"
-            className="custom-modal10"
-            overlayClassName="modal-overlay"
-          >
-            <h2>Order Details</h2>
-            <div className="order-details10">
-              <div className="details-and-image10">
-                <div className="product-info10">
-                  {currentProduct &&
-                    currentProduct.prod_img &&
-                    // Check if prod_img is a string and parse it if necessary
-                    (() => {
-                      const images = Array.isArray(currentProduct.prod_img)
-                        ? currentProduct.prod_img
-                        : JSON.parse(currentProduct.prod_img || "[]");
+        </div>
 
-                      // Display the first image if available
-                      const firstImage = images.length > 0 ? images[0] : null;
+        {/* Recent Orders Section */}
 
-                      return firstImage ? (
-                        <center>
-                          <img
-                            src={`${ApiUrl}/uploads/${currentProduct.category.toLowerCase()}/${firstImage}`}
-                            alt={currentProduct.prod_name}
-                            className="product-image10"
-                    loading="lazy"
+      </div>
 
-                          />
-                        </center>
+      {orders.length > 1 &&
+        <div style={{ paddingRight: '50px', paddingLeft: '50px' }}>
+          <div style={styles.infoSection}>
+            <h3 style={{ marginBottom: '10px' }}>Recent Orders</h3>
+            {/* <p>No recent orders yet. Start shopping now!</p> */}
+            <div className="order-container">
+              {orders.length === 0 ? (
+                <p className="no-orders">No orders found.</p>
+              ) : (
+                // Slice the array to show only the first 3 orders
+                orders.slice(0, 3).map((order) => (
+                  <div key={order.unique_id} className="order-card">
+                    <div className="order-header">
+                      <h3>Order #{order.unique_id}</h3>
+                      <span
+                        className={`order-status ${order.status.toLowerCase()}`}
+                      >
+                        {order.status.toLowerCase() === "pending"
+                          ? "Payment Pending"
+                          : order.status.toLowerCase() === "refund pending"
+                            ? "Refund Pending"
+                            : order.status.toLowerCase() === "refunded"
+                              ? "Refunded"
+                              : "Payment Paid"}
+                      </span>
+                    </div>
+
+                    <div className="products-list">
+                      {order.products && order.products.length > 1 ? (
+                        <select
+                          value={selectedProduct}
+                          onChange={handleProductChange}
+                          className="product-dropdown"
+                        >
+                          {order.products.map((product) => (
+                            <option
+                              // className="product-name"
+
+                              key={product.product_id}
+                              value={product.product_id}
+                            >
+                              {product.name.split(" ").slice(0, 3).join(" ")}
+                            </option>
+                          ))}
+                        </select>
                       ) : (
-                        <div>No image available</div> // Fallback message if no image is available
-                      );
-                    })()}
-                  {currentProduct && (
-                    <>
-                      <p className="info-row">
-                        <span className="info-label">Product Name</span>
-                        <span className="info-value product-namee">
-                          {currentProduct.prod_name}
-                        </span>
-                      </p>
-                      <p className="info-row">
-                        <span className="info-label">Price</span>
-                        <span className="info-value ">
-                          ₹{currentProduct.prod_price}
-                        </span>
-                      </p>
-                      {/* <p className="info-row">
+                        order.products &&
+                        order.products.length === 1 && (
+                          <span className="product-name" style={{ fontWeight: "bold" }}>
+                            {order.products[0].name.split(" ").slice(0, 4).join(" ")}
+                          </span>
+                        )
+                      )}
+                    </div>
+                    <p>Order Date: {formatDate(order.order_date)}</p>
+                    <p>Total Amount: ₹{order.total_amount}</p>
+                    <button
+                      onClick={() => openModal(order)}
+                      className="view-details-button"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+            {/* Modal for Product Details */}
+            <Modal
+              isOpen={modalIsOpen}
+              onRequestClose={closeModal}
+              contentLabel="Product Details"
+              className="custom-modal10"
+              overlayClassName="modal-overlay"
+            >
+              <h2>Order Details</h2>
+              <div className="order-details10">
+                <div className="details-and-image10">
+                  <div className="product-info10">
+                    {currentProduct &&
+                      currentProduct.prod_img &&
+                      // Check if prod_img is a string and parse it if necessary
+                      (() => {
+                        const images = Array.isArray(currentProduct.prod_img)
+                          ? currentProduct.prod_img
+                          : JSON.parse(currentProduct.prod_img || "[]");
+
+                        // Display the first image if available
+                        const firstImage = images.length > 0 ? images[0] : null;
+
+                        return firstImage ? (
+                          <center>
+                            <img
+                              src={`${ApiUrl}/uploads/${currentProduct.category.toLowerCase()}/${firstImage}`}
+                              alt={currentProduct.prod_name}
+                              className="product-image10"
+                              loading="lazy"
+
+                            />
+                          </center>
+                        ) : (
+                          <div>No image available</div> // Fallback message if no image is available
+                        );
+                      })()}
+                    {currentProduct && (
+                      <>
+                        <p className="info-row">
+                          <span className="info-label">Product Name</span>
+                          <span className="info-value product-namee">
+                            {currentProduct.prod_name}
+                          </span>
+                        </p>
+                        <p className="info-row">
+                          <span className="info-label">Price</span>
+                          <span className="info-value ">
+                            ₹{currentProduct.prod_price}
+                          </span>
+                        </p>
+                        {/* <p className="info-row">
                         <span className="info-label">Description</span>
                         <span className="info-value product-descriptionn">
                           {currentProduct.prod_features}
                         </span>
                       </p> */}
-                    </>
-                  )}
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {selectedOrder && (
-                <>
-                  <p className="info-row">
-                    <span className="info-label">Order ID</span>
-                    <span className="info-value">
-                      #{selectedOrder.unique_id}
-                    </span>
-                  </p>
-                  <p className="info-row">
-                    <span className="info-label">Ordered Date</span>
-                    <span className="info-value">
-                      {formatDate(selectedOrder.order_date)}
-                    </span>
-                  </p>
-                  {/* <p className="info-row">
+                {selectedOrder && (
+                  <>
+                    <p className="info-row">
+                      <span className="info-label">Order ID</span>
+                      <span className="info-value">
+                        #{selectedOrder.unique_id}
+                      </span>
+                    </p>
+                    <p className="info-row">
+                      <span className="info-label">Ordered Date</span>
+                      <span className="info-value">
+                        {formatDate(selectedOrder.order_date)}
+                      </span>
+                    </p>
+                    {/* <p className="info-row">
               <span className="info-label">Payment Status</span>
               <span className={`info-value status ${selectedOrder.status ? selectedOrder.status.toLowerCase() : 'unknown'}`}>
                 {selectedOrder.status}
               </span>
             </p> */}
-                  <p className="info-row">
-                    <span className="info-label">Total Amount</span>
-                    <span className="info-value">
-                      ₹{selectedOrder.total_amount}
-                    </span>
-                  </p>
-                  <p className="info-row">
-                    <span className="info-label">Shipping Address</span>
-                    <span className="info-value">
-                      {selectedOrder.shipping_address}
-                    </span>
-                  </p>
-                </>
-              )}
+                    <p className="info-row">
+                      <span className="info-label">Total Amount</span>
+                      <span className="info-value">
+                        ₹{selectedOrder.total_amount}
+                      </span>
+                    </p>
+                    <p className="info-row">
+                      <span className="info-label">Shipping Address</span>
+                      <span className="info-value">
+                        {selectedOrder.shipping_address}
+                      </span>
+                    </p>
+                  </>
+                )}
 
-              {/* Navigation Buttons */}
-              {productDetails && productDetails.length > 1 && (
-                <div className="navigation-buttons">
-                  <button
-                    className="add-to-cart"
-                    onClick={handlePreviousProduct}
-                    disabled={!hasProducts || currentProductIndex === 0}
-                  >
-                    &lt; Prev
-                  </button>
-                  <button
-                    style={{ marginLeft: "5px" }}
-                    className="add-to-cart"
-                    onClick={handleNextProduct}
-                    disabled={
-                      !hasProducts ||
-                      currentProductIndex === productDetails.length - 1
-                    }
-                  >
-                    Next &gt;
-                  </button>
-                </div>
-              )}
-            </div>
+                {/* Navigation Buttons */}
+                {productDetails && productDetails.length > 1 && (
+                  <div className="navigation-buttons">
+                    <button
+                      className="add-to-cart"
+                      onClick={handlePreviousProduct}
+                      disabled={!hasProducts || currentProductIndex === 0}
+                    >
+                      &lt; Prev
+                    </button>
+                    <button
+                      style={{ marginLeft: "5px" }}
+                      className="add-to-cart"
+                      onClick={handleNextProduct}
+                      disabled={
+                        !hasProducts ||
+                        currentProductIndex === productDetails.length - 1
+                      }
+                    >
+                      Next &gt;
+                    </button>
+                  </div>
+                )}
+              </div>
 
-            <button onClick={closeModal} className="modal-close-button10">
-              <FaTimes />
-            </button>
-          </Modal>
+              <button onClick={closeModal} className="modal-close-button10">
+                <FaTimes />
+              </button>
+            </Modal>
+          </div>
+
+          {/* Account Settings */}
+
+
         </div>
-
-        {/* Account Settings */}
-        {/* <div style={styles.infoSection}>
-          <h3>Account Settings</h3>
-          <p>
-            Manage your account, update your profile, and change your password.
-          </p>
-          <Link to="/ForgotPassword">
-            <button className="change-btn"> Change Password</button>
-          </Link>
-        </div> */}
-        
-        </div>
-
+      }
+      {/* <div style={styles.infoSection}>
+        <h3>Account Settings</h3>
+        <p>
+          Change your password.
+        </p>
+        <Link to="/ForgotPassword">
+          <button className="change-btn"> Change Password</button>
+        </Link>
+      </div> */}
       {/* Footer */}
       <Footer />
     </>
@@ -410,9 +425,6 @@ const MyAccount = () => {
 
 
 export default MyAccount;
-
-
-
 
 // Styles for the enhanced page
 const styles = {
@@ -438,7 +450,7 @@ const styles = {
   },
   bannerText: {
     fontSize: "2.5rem",
-    fontWeight: "bold",
+    // fontWeight: "bold",
   },
   accountContainer: {
     padding: "20px",
@@ -501,7 +513,7 @@ const styles = {
     borderRadius: "10px",
     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
     marginBottom: "20px",
-    
+
   },
   "@media (max-width: 768px)": {
     profileHeader: {

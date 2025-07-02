@@ -1374,11 +1374,7 @@
   max-width: 1180px;
   margin: 0 auto;
 }
-.similar-product-slide {
-  padding: 10px;
-  display: flex !important;
-  justify-content: flex-start;
-}
+
 .similar-products-title {
   font-size: 1.5rem;
   font-weight: 600;
@@ -1387,20 +1383,25 @@
   text-align: center;
 }
 
+.similar-product-slide {
+  padding: 0 5px; /* reduce horizontal padding */
+  display: flex !important;
+  justify-content: flex-start;
+}
 
 .similar-product-card {
-   width: 220px;
-  padding: 10px;
+  width: 220px;
+  padding: 8px; /* optional: slightly reduce internal padding */
+  margin: 0; /* remove default margin */
   border: 1px solid #ddd;
   border-radius: 8px;
   text-align: center;
   transition: transform 0.3s ease;
   position: relative;
-  box-sizing: border-box; /* Ensure padding doesn't affect width */
+  box-sizing: border-box;
   cursor: pointer;
-  margin-bottom: 20px;
-  /* border: 1px solid #333; */
 }
+
 
 .similar-product-card:hover {
   transform: translateY(-5px);

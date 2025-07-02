@@ -10,6 +10,50 @@
   background: linear-gradient(to right, #e3f2fd, #ffffff);
 
 }
+.coupon-title-with-image {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.coupon-product-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  /* margin-right: 8px; */
+  vertical-align: middle;
+}
+
+
+.coupon-product-name {
+  color: #333;
+  font-size: 13px;
+  text-align: justify;
+  margin-top: 10px;
+}
+.slick-prev::before,
+.slick-next::before {
+  color: #4b4b4b; /* arrow icon color */
+  font-size: 27px;
+  background-color: #ddd;
+  border-radius: 50%;
+  opacity: 1;
+  border: 1px solid #333;
+
+  width: 19px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  line-height: 1;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 .filters-card2 {
   background: #fff;
@@ -357,7 +401,10 @@
   margin-left: 270px;
   margin-bottom: 20px;
 }
-
+.faedit{
+  font-size: 16px;
+  margin-top: 4px;
+}
 .product-type-display {
   display: flex;
   align-items: center;
@@ -1373,7 +1420,7 @@
 
 
 .laptops-product-coupon {
-  display: inline-block;
+  display: flex;
   /* Makes the box only as wide as its content */
   padding: 8px 10px;
   /* Adds padding inside the box */
@@ -1392,6 +1439,8 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   /* Subtle shadow for depth */
   font-size: 14px;
+  align-items: center;
+  justify-content: center;
 }
 
 

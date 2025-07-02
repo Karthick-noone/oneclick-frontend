@@ -62,25 +62,27 @@ const AdPage = () => {
     }));
   }, [ads]);
 
-  return (
+ return (
+  processedAds.some(ad => ad.images && ad.images.length > 0) ? (
     <section className="ad-page">
-      {/* <div className="ad-first-page"> */}
-        <div className="ad-second-page">
-          <h2 className="text-center offer-heading">Exclusive Offers For You!</h2>
+      <div className="ad-second-page">
+        <h2 className="text-center offer-heading">Exclusive Offers For You!</h2>
 
-          <div className="ads-container">
-            {isLoading ? (
-              <AdSkeleton />
-            ) : isError ? (
-              <div className="error-message">Failed to load ads</div>
-            ) : isMobile ? (
-              <Swiper
-                spaceBetween={10}
-                slidesPerView={1}
-                onSwiper={(swiper) => (swiperRef.current = swiper)}
-                className="ads-slider"
-              >
-                {processedAds.map((ad, index) => (
+        <div className="ads-container">
+          {isLoading ? (
+            <AdSkeleton />
+          ) : isError ? (
+            <div className="error-message">Failed to load ads</div>
+          ) : isMobile ? (
+            <Swiper
+              spaceBetween={10}
+              slidesPerView={1}
+              onSwiper={(swiper) => (swiperRef.current = swiper)}
+              className="ads-slider"
+            >
+              {processedAds
+                .filter(ad => ad.images && ad.images.length > 0)
+                .map((ad, index) => (
                   <SwiperSlide key={ad.id || index}>
                     <div className="ad">
                       <div className="ad-image-card">
@@ -96,17 +98,18 @@ const AdPage = () => {
                         ))}
 
                         <div className="ad-bottom">
-                          <span className="ad-category">{ad.category}</span>
+                          {/* <span className="ad-category">{ad.category}</span> */}
                           <button className="shop-now-btn">Shop Now</button>
                         </div>
-
                       </div>
                     </div>
                   </SwiperSlide>
                 ))}
-              </Swiper>
-            ) : (
-              processedAds.map((ad, index) => (
+            </Swiper>
+          ) : (
+            processedAds
+              .filter(ad => ad.images && ad.images.length > 0)
+              .map((ad, index) => (
                 <div key={ad.id || index} className="ad">
                   <div className="ad-image-card">
                     {ad.images.map((img, imgIndex) => (
@@ -119,27 +122,31 @@ const AdPage = () => {
                         />
                       </Link>
                     ))}
+                    <div className="ad-bottom">
+                      {/* <span className="ad-category">{ad.category}</span> */}
+                      <button className="shop-now-btn">Shop Now</button>
+                    </div>
                   </div>
                 </div>
               ))
-            )}
+          )}
 
-            {/* Arrows for mobile swiper */}
-            {isMobile && swiperRef.current && (
-              <div className="swiper-arrows">
-                <button className="swiper-arrow prev" onClick={() => swiperRef.current.slidePrev()}>
-                  &#8249;
-                </button>
-                <button className="swiper-arrow next" onClick={() => swiperRef.current.slideNext()}>
-                  &#8250;
-                </button>
-              </div>
-            )}
-          </div>
+          {isMobile && swiperRef.current && (
+            <div className="swiper-arrows">
+              <button className="swiper-arrow prev" onClick={() => swiperRef.current.slidePrev()}>
+                &#8249;
+              </button>
+              <button className="swiper-arrow next" onClick={() => swiperRef.current.slideNext()}>
+                &#8250;
+              </button>
+            </div>
+          )}
         </div>
-      {/* </div> */}
+      </div>
     </section>
-  );
+  ) : null
+);
+
 };
 
 export default AdPage;

@@ -584,7 +584,7 @@ const styles = {
   },
   button: {
     padding: "8px", // Reduce button padding
-    margin: "30px 0px", // Reduce margin for a smaller card layout
+    margin: "34px 0px", // Reduce margin for a smaller card layout
     borderRadius: "5px",
     border: "none",
     backgroundColor: "#007BFF",

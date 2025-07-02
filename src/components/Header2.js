@@ -42,6 +42,7 @@ import usericon from "./img/user.png";
 import defaultUser from "./img/default-picture.png";
 import wishlisticon from "./img/wish-list.png";
 import carticon from "./img/shopping-cart3.png";
+import { Search, SearchIcon } from "lucide-react";
 
 const Header2 = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -299,52 +300,52 @@ const Header2 = () => {
     }
   };
 
- const handleSearch = async () => {
-  let finalQuery = searchQuery.trim().toLowerCase();
+  const handleSearch = async () => {
+    let finalQuery = searchQuery.trim().toLowerCase();
 
-  // If a suggestion is highlighted, prefer that
-  if (highlightedIndex >= 0 && suggestions[highlightedIndex]) {
-    const highlighted = suggestions[highlightedIndex];
-    finalQuery = (highlighted?.prod_name || highlighted)?.toLowerCase();
-  }
-
-  if (!finalQuery) {
-    console.warn("Search term is empty.");
-    return;
-  }
-
-  try {
-    const response = await fetch(
-      `${ApiUrl}/api/suggestions?query=${encodeURIComponent(finalQuery)}`
-    );
-    const data = await response.json();
-
-    if (response.ok && data.category) {
-      console.log(`Navigating to category: ${data.category}`);
-      navigate(
-        `/${encodeURIComponent(data.category)}?search=${encodeURIComponent(
-          finalQuery
-        )}`
-      );
-    } else {
-      console.warn("No category found.");
-      // Swal.fire({
-      //   title: "Product not found",
-      //   text: "We could not find any products matching your search.",
-      //   icon: "warning",
-      //   confirmButtonText: "OK",
-      // });
+    // If a suggestion is highlighted, prefer that
+    if (highlightedIndex >= 0 && suggestions[highlightedIndex]) {
+      const highlighted = suggestions[highlightedIndex];
+      finalQuery = (highlighted?.prod_name || highlighted)?.toLowerCase();
     }
-  } catch (error) {
-    console.error("Error during search:", error);
-    Swal.fire({
-      title: "Error",
-      text: "An error occurred while searching.",
-      icon: "error",
-      confirmButtonText: "OK",
-    });
-  }
-};
+
+    if (!finalQuery) {
+      console.warn("Search term is empty.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${ApiUrl}/api/suggestions?query=${encodeURIComponent(finalQuery)}`
+      );
+      const data = await response.json();
+
+      if (response.ok && data.category) {
+        console.log(`Navigating to category: ${data.category}`);
+        navigate(
+          `/${encodeURIComponent(data.category)}?search=${encodeURIComponent(
+            finalQuery
+          )}`
+        );
+      } else {
+        console.warn("No category found.");
+        // Swal.fire({
+        //   title: "Product not found",
+        //   text: "We could not find any products matching your search.",
+        //   icon: "warning",
+        //   confirmButtonText: "OK",
+        // });
+      }
+    } catch (error) {
+      console.error("Error during search:", error);
+      Swal.fire({
+        title: "Error",
+        text: "An error occurred while searching.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
 
 
   const handleKeyPress = (e) => {
@@ -983,6 +984,9 @@ const Header2 = () => {
 
           className={`search-box ${showMobileSearch ? "mobile-overlay show" : "mobile-overlay"}`}
         >
+          <div className="search-icon-container" onClick={handleSearch}>
+            <FaSearch className="search-icon" />
+          </div>
           <input
             type="text"
             className="searchboxinput"
@@ -1000,9 +1004,7 @@ const Header2 = () => {
               onClick={handleClearInput}
             />
           )}
-          <div className="search-icon-container" onClick={handleSearch}>
-            <FaSearch className="search-icon" />
-          </div>
+
         </div>
 
         {showSuggestions && (
@@ -1019,6 +1021,11 @@ const Header2 = () => {
                     className={index === highlightedIndex ? "highlighted" : ""}
                   >
                     <div className="suggestion-item">
+                      <div className="suggestion-content">
+                        <SearchIcon className="search-icon" />
+                        <div className="suggestion-text">{prodName}</div>
+                      </div>
+
                       {suggestion.prod_img && JSON.parse(suggestion.prod_img)?.[0] && (
                         <img
                           src={`${ApiUrl}/uploads/${suggestion.category.toLowerCase()}/${JSON.parse(suggestion.prod_img)[0]}`}
@@ -1026,8 +1033,8 @@ const Header2 = () => {
                           className="suggestion-image"
                         />
                       )}
-                      <div className="suggestion-text">{prodName}</div>
                     </div>
+
                   </li>
                 );
               })

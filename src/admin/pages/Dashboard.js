@@ -7,6 +7,20 @@ import {
   FaTag,
   FaMoneyBillWave,
 } from "react-icons/fa";
+import {
+  FaDesktop,
+  FaMobileAlt,
+  FaVideo,
+  FaHeadphones,
+  FaVolumeUp,
+  FaTv,
+  FaPrint,
+  FaClock,
+  FaTools,
+  FaCogs,
+  FaTags,
+  FaStore
+} from "react-icons/fa";
 import axios from "axios";
 import { Bar, Line, Pie } from "react-chartjs-2";
 import {
@@ -22,6 +36,7 @@ import {
   ArcElement,
 } from "chart.js";
 import { ApiUrl } from "../../components/ApiUrl";
+import { Link } from "react-router-dom";
 
 ChartJS.register(
   Title,
@@ -45,6 +60,31 @@ const Dashboard = () => {
   const [totalCategories, setTotalCategories] = useState(0);
   const [pendingPayments, setPendingPayments] = useState(0);
   const [monthlySales, setMonthlySales] = useState([]);
+
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [categoryCounts, setCategoryCounts] = useState([]);
+  const [staffCount, setStaffCounts] = useState(0);
+
+  useEffect(() => {
+    // Fetch total products
+    fetch(`${ApiUrl}/total-products`)
+      .then(res => res.json())
+      .then(data => setTotalProducts(data.total_products))
+      .catch(err => console.error("Error fetching total products", err));
+
+    // Fetch total staff
+    fetch(`${ApiUrl}/total-staff`)
+      .then(res => res.json())
+      .then(data => setStaffCounts(data.staffCount))
+      .catch(err => console.error("Error fetching total staff", err));
+
+    // Fetch product counts by category
+    fetch(`${ApiUrl}/product-count-by-category`)
+      .then(res => res.json())
+      .then(data => setCategoryCounts(data))
+      .catch(err => console.error("Error fetching category counts", err));
+  }, []);
+
 
   // Fetch pending payments from the backend
   useEffect(() => {
@@ -229,20 +269,114 @@ const Dashboard = () => {
     fetchOrderData();
   }, []);
 
+  const categoryIcons = {
+    Computers: <FaDesktop />,
+    Mobiles: <FaMobileAlt />,
+    CCTV: <FaVideo />,
+    Headphones: <FaHeadphones />,
+    Speakers: <FaVolumeUp />,
+    TV: <FaTv />,
+    Printers: <FaPrint />,
+    Watch: <FaClock />,
+    ComputerAccessories: <FaTools />,
+    MobileAccessories: <FaCogs />,
+    CCTVAccessories: <FaCogs />,
+    PrinterAccessories: <FaTools />,
+    secondhandproducts: <FaStore />
+  };
+
+  const categoryLabels = {
+    secondhandproducts: "Secondhand Products",
+    CCTVAccessories: "CCTV Accessories",
+    ComputerAccessories: "Computer Accessories",
+    MobileAccessories: "Mobile Accessories",
+    PrinterAccessories: "Printer Accessories"
+  };
+
+  const categoryOrder = [
+    "Computers",
+    "Mobiles",
+    "CCTV",
+    "Headphones",
+    "Speakers",
+    "TV",
+    "Printers",
+    "Watch",
+    "ComputerAccessories",
+    "MobileAccessories",
+    "CCTVAccessories",
+    "PrinterAccessories",
+    "secondhandproducts"
+  ];
+
+
   return (
     <div className="dashboard">
       <div className="dashboard-header">
         <h1>Dashboard</h1>
       </div>
       <div className="dashboard-content">
+        <h3>Product Summary</h3>
+
+        {/* ---------- SECTION 1: Products & Categories ---------- */}
         <div className="dashboard-summary">
-          <div className="summary-card">
+          <div className="product-summary-card">
             <FaBox className="summary-icon" />
             <div className="summary-info">
-              <h3>Total Orders</h3>
-              <p>{totalOrders}</p>
+              <h3>Total Products</h3>
+              <p>{totalProducts}</p>
             </div>
           </div>
+
+          {categoryCounts
+            .filter(item => (item.total_products || item.total_category || item.total_amount) > 0)
+            .sort((a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category))
+            .map((item, index) => {
+              const label = categoryLabels[item.category] || item.category;
+              const icon = categoryIcons[item.category] || <FaTags />;
+              return (
+                <Link
+                  to={`/Admin/${item.category === "TV" ? "TVHomeCinema" : item.category}`}
+                  key={index}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <div className="product-summary-card">
+                    <div className="summary-icon">{icon}</div>
+                    <div className="summary-info">
+                      <h3>{label}</h3>
+                      <p>{item.total_products || item.total_category || item.total_amount}</p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+
+          <div className="product-summary-card">
+            <FaTag className="summary-icon" />
+            <div className="summary-info">
+              <h3>Product Categories</h3>
+              <p>13</p>
+            </div>
+          </div>
+        </div>
+
+        <h3>Other Reports</h3>
+
+        {/* ---------- SECTION 2: Orders, Customers, Staffs, etc. ---------- */}
+        <div className="dashboard-summary">
+          <Link to={"/Admin/orders"}
+            style={{ textDecoration: "none", color: "inherit" }}
+
+          >
+            <div className="summary-card">
+              <FaBox className="summary-icon" />
+              <div className="summary-info">
+                <h3>Total Orders</h3>
+                <p>{totalOrders}</p>
+              </div>
+            </div>
+          </Link>
+
           <div className="summary-card">
             <FaChartLine className="summary-icon" />
             <div className="summary-info">
@@ -250,21 +384,8 @@ const Dashboard = () => {
               <p>₹{totalSales}</p>
             </div>
           </div>
-          <div className="summary-card">
-            <FaUsers className="summary-icon" />
-            <div className="summary-info">
-              <h3>Total Customers</h3>
-              <p>{totalCustomers}</p>
-            </div>
-          </div>
-          <div className="summary-card">
-            <FaTag className="summary-icon" />
-            <div className="summary-info">
-              <h3>Product Categories</h3>
-              {/* <p>{totalCategories}</p> */}
-              <p>13</p>
-            </div>
-          </div>
+
+
           <div className="summary-card">
             <FaMoneyBillWave className="summary-icon" />
             <div className="summary-info">
@@ -272,7 +393,33 @@ const Dashboard = () => {
               <p>₹{pendingPayments}</p>
             </div>
           </div>
+          <Link to={"/Admin/customers"}
+            style={{ textDecoration: "none", color: "inherit" }}
+
+          >
+            <div className="summary-card">
+              <FaUsers className="summary-icon" />
+              <div className="summary-info">
+                <h3>Total Customers</h3>
+                <p>{totalCustomers}</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link to={"/Admin/StaffManagement"}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <div className="summary-card">
+              <FaUsers className="summary-icon" />
+              <div className="summary-info">
+                <h3>Total Staffs</h3>
+                <p>{staffCount}</p>
+              </div>
+            </div>
+          </Link>
         </div>
+
+
         <div className="dashboard-charts">
           <div className="chart small-chart">
             <h2>Sales Overview (Last 6 Months)</h2>

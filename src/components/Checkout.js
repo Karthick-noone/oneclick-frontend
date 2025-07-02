@@ -1160,7 +1160,7 @@ const Checkout = () => {
               )}
             </div>
             <div className="cart-address">
-              {/* <h3>Select a Shipping Address</h3> */}
+              {/* <h3>Select Delivery Address</h3> */}
               {addressDetails.length > 0 ? (
                 <ul>
                   {addressDetails.map((address) => (
@@ -1868,7 +1868,7 @@ const Checkout = () => {
             {isModalOpen && (
               <div className="modal4-overlay">
                 <div className="modal4-content">
-                  <h3>Select a Shipping Address</h3>
+                  <h3>Select Delivery Address</h3>
                   <button
                     onClick={handleCloseModal}
                     className="modal4-close-btn"
@@ -1902,7 +1902,7 @@ const Checkout = () => {
                   <center>
                     <div className="modal4c">
                       <button
-                        title="Set this address as current address"
+                        title="Set this address as delivery address"
                         onClick={handleConfirm}
                         className="modal4-confirm-btn"
                       >

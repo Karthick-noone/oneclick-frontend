@@ -7,7 +7,7 @@ import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick"; // Import Slider from react-slick
-import { FaInfoCircle, FaClone } from "react-icons/fa"; // Ensure to import any icons you need
+import { FaInfoCircle, FaClone, FaPlusCircle } from "react-icons/fa"; // Ensure to import any icons you need
 import CouponEditPopup from "./CouponEditPopup";
 import EditCouponModal from "./EditCouponModal"; // Import the modal component
 import CouponImage from './img/coupons.png'
@@ -1923,9 +1923,9 @@ const CCTVAccessories = () => {
                                         }
                                         style={{ cursor: "pointer" }}
                                       >
-                                        <FaEdit
+                                        <FaPlusCircle
                                           className="faedit"
-                                          title="Edit Coupon"
+                                          title="Add Coupon"
                                         />
                                       </span>
                                       <span
@@ -1962,9 +1962,19 @@ const CCTVAccessories = () => {
                                           >
                                             <FaTimes color="black" size={20} />
                                           </button>
-                                          <h4 className="coupon-title">
-                                            Coupons for {productName}
-                                          </h4>
+                                          <h4>Coupon list for this product</h4>
+                                          <span className="coupon-title-with-image">
+                                            {product.prod_img?.[0] && (
+                                              <img
+                                                src={`${ApiUrl}/uploads/cctvaccessories/${product.prod_img[0]}`}
+                                                alt={product.prod_name}
+                                                className="coupon-product-image"
+                                              />
+                                            )}
+                                            <span className="coupon-product-name">
+                                              {productName}
+                                            </span>
+                                          </span>
                                           {coupons.length > 0 ? (
                                             <ul className="coupons-list">
                                               {coupons.map((coupon, index) => (
@@ -2367,20 +2377,8 @@ const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
     <div
-      className={`${className} custom-arrow next-arrow`}
-      style={{
-        ...style,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        right: "10px",
-        zIndex: 10,
-        background: "rgba(0, 0, 0, 0.5)",
-        borderRadius: "50%", // Round shape
-        width: "30px", // Width for clickable area
-        height: "30px", // Height for clickable area
-        cursor: "pointer", // Cursor pointer
-      }}
+      className={`${className} `}
+ 
       onClick={onClick}
     >
       {/* <img src={rightarrow} alt="Next" width="15px" height="15px" /> */}
@@ -2392,20 +2390,8 @@ const SamplePrevArrow = (props) => {
   const { className, style, onClick } = props;
   return (
     <div
-      className={`${className} custom-arrow prev-arrow`}
-      style={{
-        ...style,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        left: "10px",
-        zIndex: 10,
-        background: "rgba(0, 0, 0, 0.5)",
-        borderRadius: "50%", // Round shape
-        width: "30px", // Width for clickable area
-        height: "30px", // Height for clickable area
-        cursor: "pointer", // Cursor pointer
-      }}
+      className={`${className}`}
+    
       onClick={onClick}
     >
       {/* <img src={leftarrow} alt="Previous" width="15px" height="15px" /> */}

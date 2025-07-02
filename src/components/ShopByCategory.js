@@ -8,11 +8,11 @@ const categories = [
   { name: "CCTV", img: "cctv.jpg", link: "/CCTVAd" },
   { name: "Headphones", img: "headphones.jpg", link: "/Headphones" },
   { name: "Speakers", img: "speaker.jpg", link: "/Speakers" },
-  { name: "T.V & Home Cinema", img: "tv.jpg", link: "/TV" },
+  { name: "T.V & Home Cinema", img: "LED-Tv.jpg", link: "/TV" },
   { name: "Wearable Tech", img: "watch.jpg", link: "/Watch" },
-  { name: "Printers", img: "printer.jpg", link: "/Printers" },
+  { name: "Printers", img: "printers.jpg", link: "/Printers" },
   { name: "Computer Accessories", img: "cmp.jpg", link: "/ComputerAccessories" },
-  { name: "Mobile Accessories", img: "cmp.jpg", link: "/MobileAccessories" },
+  { name: "Mobile Accessories", img: "mobile-accessories.jpg", link: "/MobileAccessories" },
 ];
 
 // Dynamic import of images

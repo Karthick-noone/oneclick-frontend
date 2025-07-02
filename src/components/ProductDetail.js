@@ -887,19 +887,7 @@ const ProductDetail = () => {
     return (
       <div
         className={className}
-        style={{
-          ...style,
-          display: "block",
-          right: 0,
-          background: "rgba(0, 0, 0, 0.5)",
-          borderRadius: "50%",
-          width: "26px",
-          height: "26px",
-          lineHeight: "23px",
-          textAlign: "center",
-          color: "#fff",
-          zIndex: 2,
-        }}
+       
         onClick={onClick}
       >
         {/* &#8594; */}
@@ -912,19 +900,7 @@ const ProductDetail = () => {
     return (
       <div
         className={className}
-        style={{
-          ...style,
-          display: "block",
-          left: 0,
-          background: "rgba(0, 0, 0, 0.5)",
-          borderRadius: "50%",
-          width: "26px",
-          height: "26px",
-          lineHeight: "23px",
-          textAlign: "center",
-          color: "#333",
-          zIndex: 2,
-        }}
+       
         onClick={onClick}
       >
         {/* &#8592; */}
@@ -939,45 +915,45 @@ const ProductDetail = () => {
       onClick={onClick}
     />
   );
-const similarSliderSettings = {
-  dots: false,
-  infinite: false,
-  speed: 500,
-  slidesToShow: s.length < 5 ? s.length : 5,
-  slidesToScroll: 1,
-  arrows: s.length > 5,
-  prevArrow: <CustomArrow src={leftarrow} className="prev" />,
-  nextArrow: <CustomArrow src={rightarrow} className="next" />,
-  centerMode: false,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        slidesToShow: Math.min(s.length, 3),
-        arrows: s.length > 3,
-        prevArrow: <CustomArrow src={leftarrow} className="prev" />,
-        nextArrow: <CustomArrow src={rightarrow} className="next" />,
+  const similarSliderSettings = {
+    dots: false,
+    infinite: false,
+    speed: 500,
+    slidesToShow: 5,
+    slidesToScroll: 1,
+    arrows: s.length > 5,
+    prevArrow: <CustomArrow src={leftarrow} className="prev" />,
+    nextArrow: <CustomArrow src={rightarrow} className="next" />,
+    centerMode: false,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: Math.min(s.length, 3),
+          arrows: s.length > 3,
+          prevArrow: <CustomArrow src={leftarrow} className="prev" />,
+          nextArrow: <CustomArrow src={rightarrow} className="next" />,
+        },
       },
-    },
-    {
-      breakpoint: 768,
-      settings: {
-        slidesToShow: Math.min(s.length, 2),
-        arrows: s.length > 2,
-        prevArrow: <CustomArrow src={leftarrow} className="prev" />,
-        nextArrow: <CustomArrow src={rightarrow} className="next" />,
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: Math.min(s.length, 2),
+          arrows: s.length > 2,
+          prevArrow: <CustomArrow src={leftarrow} className="prev" />,
+          nextArrow: <CustomArrow src={rightarrow} className="next" />,
+        },
       },
-    },
-    {
-      breakpoint: 480,
-      settings: {
-        slidesToShow: 1,
-        arrows: false,
-        dots: true,
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          arrows: false,
+          dots: true,
+        },
       },
-    },
-  ],
-};
+    ],
+  };
 
   const relatedAccessoriesSliderSettings = {
     dots: false,
@@ -1048,15 +1024,14 @@ const similarSliderSettings = {
                   Home{" "}
                 </Link>{" "}
                 <span style={{ color: "grey" }}>&gt; </span>
-                <a
+
+                <Link to={`/${product.category === "TV" ? "TV" : product.category
+                  }`}
                   style={{ textDecoration: "none", color: "grey" }}
-                  href={`/${product.category === "TV" ? "TeleVision" : product.category
-                    }`} // Conditional URL
-                // Dynamically set the category in the URL
                 >
-                  {" "}
                   {product.category}{" "}
-                </a>
+
+                </Link>
               </div>
               <div className="product-detail-image-container">
                 <div className="carousel-container">
@@ -1159,22 +1134,18 @@ const similarSliderSettings = {
                         <Skeleton width={150} height={20} />
                       ) : (
                         <>
-                          <a
-                            style={{ textDecoration: "none", color: "grey" }}
-                            href="/"
-                          >
-                            Home
-                          </a>{" "}
-                          <span style={{ color: "grey" }}>&gt; </span>
-                          <a
-                            style={{ textDecoration: "none", color: "grey" }}
-                            href={`/${product.category === "TV"
-                              ? "TV"
-                              : product.category
-                              }`}
-                          >
-                            {product.category}
-                          </a>
+                           <Link style={{ textDecoration: "none", color: "grey" }} to="/">
+                  Home{" "}
+                </Link>{" "}
+                <span style={{ color: "grey" }}>&gt; </span>
+
+                <Link to={`/${product.category === "TV" ? "TV" : product.category
+                  }`}
+                  style={{ textDecoration: "none", color: "grey" }}
+                >
+                  {product.category}{" "}
+
+                </Link>
                         </>
                       )}
                     </div>

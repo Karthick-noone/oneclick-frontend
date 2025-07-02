@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes, FaImages } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes, FaImages, FaPlus } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -385,6 +385,7 @@ const Computers = () => {
           response.data.coupons
         ); // Log successful response
         setCoupons(response.data.coupons); // Assuming your response has this structure
+        console.log("coupon_data", response.data.coupons)
         setIsViewingCoupons(true); // Set to true to display the coupons
         setproductName(productName);
         setSelectedProductPrice(productPrice); // Set the product price for use
@@ -508,7 +509,7 @@ const Computers = () => {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    arrows: false, // Show arrows
+    // arrows: false, // Show arrows
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
   };
@@ -2284,9 +2285,9 @@ const Computers = () => {
                                         }
                                         style={{ cursor: "pointer" }}
                                       >
-                                        <FaEdit
+                                        <FaPlusCircle
                                           className="faedit"
-                                          title="Edit Coupon"
+                                          title="Add Coupon"
                                         />
                                       </span>
                                       <span
@@ -2323,9 +2324,20 @@ const Computers = () => {
                                           >
                                             <FaTimes color="black" size={20} />
                                           </button>
-                                          <h4 className="coupon-title">
-                                            Coupons for {productName}
-                                          </h4>
+                                          <h4>Coupon list for this product</h4>
+                                          <span className="coupon-title-with-image">
+                                            {product.prod_img?.[0] && (
+                                              <img
+                                                src={`${ApiUrl}/uploads/computers/${product.prod_img[0]}`}
+                                                alt={product.prod_name}
+                                                className="coupon-product-image"
+                                              />
+                                            )}
+                                            <span className="coupon-product-name">
+                                              {productName}
+                                            </span>
+                                          </span>
+
                                           {coupons.length > 0 ? (
                                             <ul className="coupons-list">
                                               {coupons.map((coupon, index) => (
@@ -3061,23 +3073,11 @@ const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
     <div
-      className={`${className} custom-arrow next-arrow`}
-      style={{
-        ...style,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        right: "10px",
-        zIndex: 10,
-        background: "rgba(0, 0, 0, 0.5)",
-        borderRadius: "50%", // Round shape
-        width: "30px", // Width for clickable area
-        height: "30px", // Height for clickable area
-        cursor: "pointer", // Cursor pointer
-      }}
+      className={`${className} `}
+   
       onClick={onClick}
     >
-      {/* <img src={rightarrow} alt="Next" width="15px" height="15px" /> */}
+      
     </div>
   );
 };
@@ -3086,23 +3086,11 @@ const SamplePrevArrow = (props) => {
   const { className, style, onClick } = props;
   return (
     <div
-      className={`${className} custom-arrow prev-arrow`}
-      style={{
-        ...style,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        left: "10px",
-        zIndex: 10,
-        background: "rgba(0, 0, 0, 0.5)",
-        borderRadius: "50%", // Round shape
-        width: "30px", // Width for clickable area
-        height: "30px", // Height for clickable area
-        cursor: "pointer", // Cursor pointer
-      }}
+      className={`${className} `}
+     
       onClick={onClick}
     >
-      {/* <img src={leftarrow} alt="Previous" width="15px" height="15px" /> */}
+     
     </div>
   );
 };

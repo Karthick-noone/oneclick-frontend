@@ -55,7 +55,7 @@
 .search-icon {
     font-size: 18px;
     color: rgb(53, 50, 50);
-    margin-left: 10px; /* Adjust spacing between input and icon */
+    margin-left: 5px; /* Adjust spacing between input and icon */
 }
 
 .topbar-actions {

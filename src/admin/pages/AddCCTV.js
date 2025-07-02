@@ -1530,91 +1530,91 @@ const CCTV = () => {
         </div>
 
         <hr className="dotted-divider" />
-        
+
         <h2 className="laptops-page-title">CCTV Product List</h2>
         {(totalProducts > 0 || inStock > 0 || outOfStock > 0 || withCoupons > 0 || withAccessories > 0) && (
-  <>
-        <div className="laptops-summary-stats-row">
-          <div className="laptops-stat-card">
-            <h5>Total Products</h5>
-            <p>{totalProducts}</p>
-          </div>
-          <div className="laptops-stat-card">
-            <h5>In Stock </h5>
-            <p>{inStock}</p>
-          </div>
-          <div className="laptops-stat-card">
-            <h5>Out of Stock </h5>
-            <p>{outOfStock}</p>
-          </div>
-          <div className="laptops-stat-card">
-            <h5>With Coupons 🎟️</h5>
-            <p>{withCoupons}</p>
-          </div>
-          <div className="laptops-stat-card">
-            <h5>With Accessories</h5>
-            <p>{withAccessories}</p>
-          </div>
-        </div>
-        <div className="filters-card">
-          <div className="filters-panel">
-            <div className="filter-label-title">
-              <img src={FilterIcon} width={"20px"} />
-
-              <span> Filter By </span>
-              {/* <FilterIcon width={"20px"}/> */}
+          <>
+            <div className="laptops-summary-stats-row">
+              <div className="laptops-stat-card">
+                <h5>Total Products</h5>
+                <p>{totalProducts}</p>
+              </div>
+              <div className="laptops-stat-card">
+                <h5>In Stock </h5>
+                <p>{inStock}</p>
+              </div>
+              <div className="laptops-stat-card">
+                <h5>Out of Stock </h5>
+                <p>{outOfStock}</p>
+              </div>
+              <div className="laptops-stat-card">
+                <h5>With Coupons 🎟️</h5>
+                <p>{withCoupons}</p>
+              </div>
+              <div className="laptops-stat-card">
+                <h5>With Accessories</h5>
+                <p>{withAccessories}</p>
+              </div>
             </div>
-            <label className="filter-label">
-              <input
-                type="checkbox"
-                checked={showOutOfStockOnly}
-                onChange={() => setShowOutOfStockOnly(!showOutOfStockOnly)}
-              />
-              Out of Stock
-            </label>
+            <div className="filters-card">
+              <div className="filters-panel">
+                <div className="filter-label-title">
+                  <img src={FilterIcon} width={"20px"} />
 
-            <label className="filter-label">
-              <input
-                type="checkbox"
-                checked={showHasCouponOnly}
-                onChange={() => setShowHasCouponOnly(!showHasCouponOnly)}
-              />
-              Coupon
-            </label>
+                  <span> Filter By </span>
+                  {/* <FilterIcon width={"20px"}/> */}
+                </div>
+                <label className="filter-label">
+                  <input
+                    type="checkbox"
+                    checked={showOutOfStockOnly}
+                    onChange={() => setShowOutOfStockOnly(!showOutOfStockOnly)}
+                  />
+                  Out of Stock
+                </label>
 
-            <label className="filter-label">
-              <input
-                type="checkbox"
-                checked={showHasAccessoriesOnly}
-                onChange={() => setShowHasAccessoriesOnly(!showHasAccessoriesOnly)}
-              />
-              Frequently Bought Accessories
-            </label>
+                <label className="filter-label">
+                  <input
+                    type="checkbox"
+                    checked={showHasCouponOnly}
+                    onChange={() => setShowHasCouponOnly(!showHasCouponOnly)}
+                  />
+                  Coupon
+                </label>
 
-            <div className="filter-search-wrapper">
-              <SearchIcon width={'18px'} className="search-icon-btn" />
-              {/* <img src={SearchIcon} width={'20px'}/> */}
-              <input
-                type="text"
-                placeholder="Search by name"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="filter-input"
-              />
-              {searchTerm && (
-                <button
-                  className="filter-clear-btn"
-                  onClick={() => setSearchTerm("")}
-                  aria-label="Clear search"
-                >
-                  ×
-                </button>
-              )}
+                <label className="filter-label">
+                  <input
+                    type="checkbox"
+                    checked={showHasAccessoriesOnly}
+                    onChange={() => setShowHasAccessoriesOnly(!showHasAccessoriesOnly)}
+                  />
+                  Frequently Bought Accessories
+                </label>
+
+                <div className="filter-search-wrapper">
+                  <SearchIcon width={'18px'} className="search-icon-btn" />
+                  {/* <img src={SearchIcon} width={'20px'}/> */}
+                  <input
+                    type="text"
+                    placeholder="Search by name"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="filter-input"
+                  />
+                  {searchTerm && (
+                    <button
+                      className="filter-clear-btn"
+                      onClick={() => setSearchTerm("")}
+                      aria-label="Clear search"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        </>
-)}
+          </>
+        )}
         <div className="laptops-products-list">
           {products.length === 0 ? (
             <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some CCTV products.</div>
@@ -1988,9 +1988,9 @@ const CCTV = () => {
                                         }
                                         style={{ cursor: "pointer" }}
                                       >
-                                        <FaEdit
+                                        <FaPlusCircle
                                           className="faedit"
-                                          title="Edit Coupon"
+                                          title="Add Coupon"
                                         />
                                       </span>
                                       <span
@@ -2027,9 +2027,19 @@ const CCTV = () => {
                                           >
                                             <FaTimes color="black" size={20} />
                                           </button>
-                                          <h4 className="coupon-title">
-                                            Coupons for {productName}
-                                          </h4>
+                                          <h4>Coupon list for this product</h4>
+                                          <span className="coupon-title-with-image">
+                                            {product.prod_img?.[0] && (
+                                              <img
+                                                src={`${ApiUrl}/uploads/cctv/${product.prod_img[0]}`}
+                                                alt={product.prod_name}
+                                                className="coupon-product-image"
+                                              />
+                                            )}
+                                            <span className="coupon-product-name">
+                                              {productName}
+                                            </span>
+                                          </span>
                                           {coupons.length > 0 ? (
                                             <ul className="coupons-list">
                                               {coupons.map((coupon, index) => (
@@ -2519,20 +2529,8 @@ const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
     <div
-      className={`${className} custom-arrow next-arrow`}
-      style={{
-        ...style,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        right: "10px",
-        zIndex: 10,
-        background: "rgba(0, 0, 0, 0.5)",
-        borderRadius: "50%", // Round shape
-        width: "30px", // Width for clickable area
-        height: "30px", // Height for clickable area
-        cursor: "pointer", // Cursor pointer
-      }}
+      className={`${className} `}
+      
       onClick={onClick}
     >
       {/* <img src={rightarrow} alt="Next" width="15px" height="15px" /> */}
@@ -2544,20 +2542,8 @@ const SamplePrevArrow = (props) => {
   const { className, style, onClick } = props;
   return (
     <div
-      className={`${className} custom-arrow prev-arrow`}
-      style={{
-        ...style,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        left: "10px",
-        zIndex: 10,
-        background: "rgba(0, 0, 0, 0.5)",
-        borderRadius: "50%", // Round shape
-        width: "30px", // Width for clickable area
-        height: "30px", // Height for clickable area
-        cursor: "pointer", // Cursor pointer
-      }}
+      className={`${className} `}
+ 
       onClick={onClick}
     >
       {/* <img src={leftarrow} alt="Previous" width="15px" height="15px" /> */}

@@ -622,20 +622,40 @@ const AddressPage = () => {
 
                 />
               </div>
+
+                <div className="form-group2">
+              <label htmlFor="phone">Phone Number</label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                value={address.phone}
+                onChange={handleChange}
+                pattern="[0-9]{10}"
+                title="Phone number should be exactly 10 digits"
+                required
+                className="staff-input"
+
+              />
+            </div>
+            </div>
+
+            <div className="form-group2-row">
               <div className="form-group2">
-                <label htmlFor="street">Street Address</label>
-                <input
+                <label htmlFor="street">Door No, Street Address, Land Mark</label>
+                <textarea
                   type="text"
                   id="street"
                   name="street"
                   value={address.street}
                   onChange={handleChange}
                   required
-                  className="staff-input"
-
-                />
+                  className="staff-text-area"
+                >
+                  </textarea>
               </div>
-            </div>
+              </div>
+
             <div className="form-group2-row">
               <div className="form-group2">
                 <label htmlFor="city">City</label>
@@ -694,25 +714,10 @@ const AddressPage = () => {
                   title="Country should only contain letters and spaces"
                   required
                   className="staff-input"
-
                 />
               </div>
             </div>
-            <div className="form-group2">
-              <label htmlFor="phone">Phone Number</label>
-              <input
-                type="text"
-                id="phone"
-                name="phone"
-                value={address.phone}
-                onChange={handleChange}
-                pattern="[0-9]{10}"
-                title="Phone number should be exactly 10 digits"
-                required
-                className="staff-input"
-
-              />
-            </div>
+          
             <button className="submit-btn" type="submit">
               Save Address
             </button>
@@ -722,7 +727,7 @@ const AddressPage = () => {
         <div className="submitted-addresses-container">
           {submittedAddresses.length > 0 && (
             <h2 className="headerrr-container">
-              Saved Addresses:
+              Delivery Addresses
               <div className="headerrr-controls">
                 {submittedAddresses.length > 0 && (
                   <button

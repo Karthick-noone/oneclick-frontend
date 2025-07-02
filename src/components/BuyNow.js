@@ -702,7 +702,7 @@ const BuyNow = () => {
               )}
             </div>
             <div className="cart-address">
-              {/* <h3>Select a Shipping Address</h3> */}
+              {/* <h3>Select Delivery Address</h3> */}
               {addressDetails.length > 0 ? (
                 <ul>
                   {addressDetails.map((address) => (
@@ -1181,7 +1181,7 @@ const BuyNow = () => {
             {isModalOpen && (
               <div className="modal4-overlay">
                 <div className="modal4-content">
-                  <h3>Select a Shipping Address</h3>
+                  <h3>Select Delivery Address</h3>
                   <button
                     onClick={handleCloseModal}
                     className="modal4-close-btn"

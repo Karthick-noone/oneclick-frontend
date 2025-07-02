@@ -18,13 +18,19 @@ const EditCouponModal = ({
 
   console.log("productPricehjghjghkhgk", productPrice);
   console.log("productId", productId);
-  useEffect(() => {
-    if (coupon) {
-      setExpiryDate(coupon.expiry_date);
-      setCouponCode(coupon.coupon_code);
-      setCouponValue(coupon.discount_value);
-    }
-  }, [coupon]);
+useEffect(() => {
+  if (coupon) {
+    const dateObj = new Date(coupon.expiry_date);
+    const yyyy = dateObj.getFullYear();
+    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const dd = String(dateObj.getDate()).padStart(2, '0');
+    const formattedDate = `${yyyy}-${mm}-${dd}`; // Local time without timezone shift
+
+    setExpiryDate(formattedDate);
+    setCouponCode(coupon.coupon_code);
+    setCouponValue(coupon.discount_value);
+  }
+}, [coupon]);
 
   const handleUpdateCoupon = async () => {
     try {
@@ -45,14 +51,7 @@ const EditCouponModal = ({
         return;
       }
 
-      // if (!couponCode && !expiryDate) {
-      //   Swal.fire({
-      //     icon: "warning",
-      //     title: "Invalid Input",
-      //     text: "Please enter a coupon code like this (OFF899).",
-      //   });
-      //   return;
-      // }
+
 
       // Check if coupon code is provided and not just spaces
       if (couponCode && !couponCode.trim()) {
