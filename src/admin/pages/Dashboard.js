@@ -215,7 +215,7 @@ const Dashboard = () => {
         );
 
         const categoriesData = categoriesResponse.data;
-        console.log(categoriesData)
+        console.log("categoriesData", categoriesData)
 
         const filteredCategories = categoriesData.filter(
           (cat) => cat.category && cat.category.trim().toLowerCase() !== "null"
@@ -261,6 +261,7 @@ const Dashboard = () => {
         };
 
         setPieData(pieData);
+        console.log("Pie data", pieData)
       } catch (error) {
         console.error("Error fetching data:", error);
       }

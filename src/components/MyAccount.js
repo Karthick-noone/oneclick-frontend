@@ -9,6 +9,7 @@ import Modal from "react-modal"; // Install if needed using `npm install react-m
 import { FaTimes } from "react-icons/fa";
 import "./css/MyAccount.css"
 import { Link } from "react-router-dom";
+import stamp2 from "./img/cancelled-stamp.png";
 
 const MyAccount = () => {
   const [user, setUser] = useState({ username: "", email: "" });
@@ -219,20 +220,18 @@ const MyAccount = () => {
               ) : (
                 // Slice the array to show only the first 3 orders
                 orders.slice(0, 3).map((order) => (
-                  <div key={order.unique_id} className="order-card">
+                  <div key={order.unique_id} className={`order-card ${order.delivery_status === "Cancelled"
+                    ? "cancelled-order-card"
+                    : ""
+                    }`}
+                  >
                     <div className="order-header">
                       <h3>Order #{order.unique_id}</h3>
-                      <span
-                        className={`order-status ${order.status.toLowerCase()}`}
-                      >
-                        {order.status.toLowerCase() === "pending"
-                          ? "Payment Pending"
-                          : order.status.toLowerCase() === "refund pending"
-                            ? "Refund Pending"
-                            : order.status.toLowerCase() === "refunded"
-                              ? "Refunded"
-                              : "Payment Paid"}
-                      </span>
+                      {order.delivery_status && (
+                        <span className={`delivery-status ${order.delivery_status.toLowerCase().replace(/\s+/g, "-")}`}>
+                          {order.delivery_status}
+                        </span>
+                      )}
                     </div>
 
                     <div className="products-list">
@@ -270,9 +269,18 @@ const MyAccount = () => {
                     >
                       View Details
                     </button>
+
+                    {/* {order.delivery_status === "Cancelled" && (
+                      <div className="cancelled-seal">
+                        <img src={stamp2} loading="lazy" width={"85px"} alt="" />
+                      </div>
+                    )} */}
                   </div>
                 ))
+                
               )}
+
+
             </div>
             {/* Modal for Product Details */}
             <Modal

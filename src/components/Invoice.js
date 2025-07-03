@@ -197,244 +197,23 @@ const Invoice = ({ order, productDetails }) => {
             <p style={{ margin: "0 0 5px 0" }}>
               <strong>Order ID:</strong> #{order.unique_id}
             </p>
-            <p style={{ margin: "0 0 5px 0" }}>
+             <p style={{ margin: "0 0 5px 0" }}>
               <strong>Order Date:</strong> {formatDate(order.order_date)}
             </p>
           </div>
 
           {/* Right Block */}
-          <div
-            style={{
-              textAlign: "left",
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              fontSize: "15px",
-              marginTop: "10px",
-            }}
-          >
-            {/* Total Products */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <span style={{marginRight:'5px'}}><strong>Total Products:</strong></span>
-              <span>{totalQuantity}</span>
-            </div>
-
-            {/* Delivery Charge */}
-            {products.reduce(
-              (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
-              0
-            ) > 0 && (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <span style={{marginRight:'5px'}}><strong>Delivery Charge:</strong></span>
-                  <span>
-                    ₹
-                    {products.reduce(
-                      (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
-                      0
-                    )}
-                  </span>
-                </div>
-              )}
-
-            {/* Grand Total */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                // borderTop: "1px solid #333",
-                // paddingTop: "5px",
-                // marginTop: "5px",
-                fontWeight: "bold",
-              }}
-            >
-              <span><strong>Grand Total:</strong></span>
-              <span>
-                ₹
-                {(() => {
-                  const accessoriesCategories = [
-                    "ComputerAccessories",
-                    "MobileAccessories",
-                    "PrinterAccessories",
-                    "CCTVAccessories",
-                  ];
-
-                  const total = products.reduce((acc, product) => {
-                    const quantity = product.quantity || 1;
-                    const isAccessory = accessoriesCategories.includes(product.category);
-
-                    let price;
-                    if (isAccessory) {
-                      if (product.effectiveprice === 0) {
-                        price = 0;
-                      } else if (product.effectiveprice > 0) {
-                        price = product.effectiveprice;
-                      } else {
-                        price = product.prod_price;
-                      }
-                    } else {
-                      price = product.prod_price;
-                    }
-
-                    const delivery = parseInt(product.deliverycharge, 10) || 0;
-
-                    return acc + price * quantity + delivery;
-                  }, 0);
-
-                  return total;
-                })()}
-              </span>
-            </div>
-          </div>
-
-        </div>
-
-
-
-
-
-        {/* Total Quantity and Grand Total */}
-        {/* <div
-          style={{
-            padding: "10px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "20px",
-          }}
-        >
-      
-
-          <div style={{ textAlign: "right" }}>
-            {products.reduce(
-              (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
-              0
-            ) > 0 && (
-                <p style={{ fontSize: '15px' }}>
-                  <strong>Delivery Charge: </strong> ₹
-                  {products.reduce(
-                    (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
-                    0
-                  )}
-                </p>
-              )}
-
-            
-          </div>
-
-        </div> */}
-        <hr />
-        <p style={{ fontSize: "12px", fontFamily: "dancing, cursive", padding: '5px', textAlign: 'left' }}>
-          This is a computer generated invoice, no signature required.
-        </p>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: "10px",
-
-        }}
-      >
-        <hr
-          style={{
-            flex: "1",
-            borderTop: "1px dotted #333",
-          }}
-        />
-        <HiScissors style={{ fontSize: "20px", color: "#333" }} />
-        <hr
-          style={{
-            flex: "1",
-            borderTop: "1px dotted #333",
-          }}
-        />
-      </div>
-
-      {/* Products Table Container */}
-      <div
-        style={{
-          paddingTop: "20px",
-          fontFamily: "Calibri",
-          border: "1px solid black",
-          marginBottom: "30px",
-
-        }}
-      >
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between", // Keeps left & right blocks apart
-            alignItems: "flex-start",
-            padding: "10px",
-            fontSize: "14px",
-            marginBottom: "10px",
-          }}
-        >
-          {/* Left Block */}
-          <div style={{ flex: "1", textAlign: "left" }}>
+          {/* <div style={{ textAlign: "right" }}>
             <p style={{ margin: "0 0 5px 0" }}>
-              <strong>Order By:</strong> {order.payment_method}
-            </p>
-            <p style={{ margin: "0 0 5px 0" }}>
-              <strong>Order ID:</strong> #{order.unique_id}
-            </p>
-            {/* <p style={{ margin: "0 0 5px 0" }}>
               <strong>Order Date:</strong> {formatDate(order.order_date)}
-            </p> */}
-          </div>
-
-          {/* Right Block */}
-           <div
-            style={{
-              textAlign: "left",
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              fontSize: "15px",
-              marginTop: "10px",
-            }}
-          >
-            {/* Total Products */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <span ><strong>Order Date:</strong></span>
-              <span>{formatDate(order.order_date)}</span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <span style={{marginRight:'5px'}}><strong>Invoice Date:</strong></span>
-              <span>{formatDate(new Date().toLocaleDateString())}</span>
-            </div>
-
-            {/* Delivery Charge */}
-           
-
-            {/* Grand Total */}
-           
-          </div>
-         
+            </p>
+            <p style={{ margin: "0 0 5px 0" }}>
+              <strong>Invoice Date:</strong> {formatDate(new Date().toLocaleDateString())}
+            </p>
+          </div> */}
         </div>
+
+
 
         <table
           style={{
@@ -505,6 +284,8 @@ const Invoice = ({ order, productDetails }) => {
 
         </table>
 
+
+        {/* Total Quantity and Grand Total */}
         <div
           style={{
             padding: "10px",
@@ -514,106 +295,106 @@ const Invoice = ({ order, productDetails }) => {
             marginBottom: "20px",
           }}
         >
-          <div style={{ textAlign: "left" }}>
-            <p style={{ fontSize: '15px' }}>
-              <strong>Total Products: </strong> {totalQuantity}
-            </p>
+          {/* Left Side - Total Products */}
+          <p style={{ fontSize: '15px' }}>
+            <strong>Total Products: </strong> {totalQuantity}
+          </p>
 
-
-          </div>
-
-           <div
-            style={{
-              textAlign: "left",
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-              fontSize: "15px",
-              marginTop: "10px",
-            }}
-          >
-          
-
-            {/* Delivery Charge */}
+          {/* Right Side - Delivery Charge & Grand Total */}
+          <div style={{ textAlign: "right" }}>
             {products.reduce(
               (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
               0
             ) > 0 && (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <span><strong>Delivery Charge:</strong></span>
-                  <span>
-                    ₹
-                    {products.reduce(
-                      (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
-                      0
-                    )}
-                  </span>
-                </div>
+                <p style={{ fontSize: '15px' }}>
+                  <strong>Delivery Charge: </strong> ₹
+                  {products.reduce(
+                    (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
+                    0
+                  )}
+                </p>
               )}
 
-            {/* Grand Total */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                // borderTop: "1px solid #333",
-                // paddingTop: "5px",
-                // marginTop: "5px",
-                fontWeight: "bold",
-              }}
-            >
-              <span><strong>Grand Total:</strong></span>
-              <span>
-                ₹
-                {(() => {
-                  const accessoriesCategories = [
-                    "ComputerAccessories",
-                    "MobileAccessories",
-                    "PrinterAccessories",
-                    "CCTVAccessories",
-                  ];
+            <p style={{ fontSize: '15px' }}>
+              <strong>Grand Total: </strong> ₹
+              {(() => {
+                const accessoriesCategories = [
+                  "ComputerAccessories",
+                  "MobileAccessories",
+                  "PrinterAccessories",
+                  "CCTVAccessories"
+                ];
 
-                  const total = products.reduce((acc, product) => {
-                    const quantity = product.quantity || 1;
-                    const isAccessory = accessoriesCategories.includes(product.category);
+                const total = products.reduce((acc, product) => {
+                  const quantity = product.quantity || 1;
+                  const isAccessory = accessoriesCategories.includes(product.category);
 
-                    let price;
-                    if (isAccessory) {
-                      if (product.effectiveprice === 0) {
-                        price = 0;
-                      } else if (product.effectiveprice > 0) {
-                        price = product.effectiveprice;
-                      } else {
-                        price = product.prod_price;
-                      }
+                  let price;
+
+                  if (isAccessory) {
+                    if (product.effectiveprice === 0) {
+                      price = 0;
+                    } else if (product.effectiveprice > 0) {
+                      price = product.effectiveprice;
                     } else {
                       price = product.prod_price;
                     }
+                  } else {
+                    price = product.prod_price;
+                  }
 
-                    const delivery = parseInt(product.deliverycharge, 10) || 0;
+                  const delivery = parseInt(product.deliverycharge, 10) || 0;
 
-                    return acc + price * quantity + delivery;
-                  }, 0);
+                  return acc + price * quantity + delivery;
+                }, 0);
 
-                  return total;
-                })()}
-              </span>
-            </div>
+                return total;
+              })()}
+            </p>
           </div>
 
         </div>
+      </div>
 
+      {/* <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: "10px",
+        }}
+      >
+        <hr
+          style={{
+            flex: "1",
+            borderTop: "1px dotted #333",
+          }}
+        />
+        <HiScissors style={{ fontSize: "20px", color: "#333" }} />
+        <hr
+          style={{
+            flex: "1",
+            borderTop: "1px dotted #333",
+          }}
+        />
+      </div> */}
+
+      {/* Products Table Container */}
+      {/* <div
+        style={{
+          paddingTop: "20px",
+          fontFamily: "Arial, sans-serif",
+          border: "1px solid black",
+          marginBottom: "30px",
+        }}
+      >
+      
 
         <hr />
-        <p style={{ fontSize: "12px", fontFamily: "dancing, cursive", padding: '5px', textAlign: 'left' }}>
+        <p style={{ fontSize: "12px", fontFamily: "dancing, cursive" }}>
           This is a computer generated invoice, no signature required.
         </p>
-      </div>
+      </div> */}
     </div >
   );
 };

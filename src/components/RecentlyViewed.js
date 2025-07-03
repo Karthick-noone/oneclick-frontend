@@ -107,8 +107,8 @@ const RecentlyViewed = () => {
           alt={product.prod_name}
           className="recently-viewed-image"
         />
-        <h3 className="recent-product-name" title={product.prod_name}>{product.prod_name}</h3>
-        <span className="recent-product-subtitle">{product.subtitle}</span>
+        <h3 className="recent-product-name" title={product.prod_name}>{product.prod_name.substring(0, 20) + "..."}</h3>
+        {/* <span className="recent-product-subtitle">{product.subtitle}</span> */}
         <p>
           <span style={{ marginRight: "5px", fontSize: "15px", color:'#888' }}>M.R.P</span>
           <span className="product-actual-price" style={{ textDecoration: "line-through", color: "red" }}>

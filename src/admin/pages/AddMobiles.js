@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
+import ApproveImage from './img/approve.png';
 import { ApiUrl } from "./../../components/ApiUrl";
 import { FaEdit, FaTrash, FaEye, FaTimes, FaImages } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
@@ -96,6 +97,55 @@ const Mobiles = () => {
   const [showOutOfStockOnly, setShowOutOfStockOnly] = useState(false);
   const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
   const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
+
+ const [loadingProductId, setLoadingProductId] = useState(null);
+
+  const handleStatusUpdate = async (prodId) => {
+  try {
+    console.log(`Updating productStatus for prod_id=${prodId}`);
+    setLoadingProductId(prodId); // Mark this product as loading
+
+    const newStatus = "approved"; // Always set to approved
+
+    // Update product status with a timeout of 5 seconds
+    const response = await axios.post(
+      `${ApiUrl}/product-status/update`,
+      {
+        prod_id: prodId,
+        productStatus: newStatus,
+      },
+      { timeout: 5000 } // 5-second timeout
+    );
+
+    if (response.status === 200) {
+      console.log(`Product ${prodId} approved`);
+      alert("Product status updated successfully");
+
+      // Refresh product list with a timeout of 5 seconds
+      const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
+        timeout: 5000,
+      });
+      console.log("Refreshed product list:", refreshedProducts.data);
+
+      // Update the product list in state
+      setProducts(refreshedProducts.data);
+    } else {
+      console.warn(`Failed to update product ${prodId}`);
+      alert("Failed to update product status");
+    }
+  } catch (error) {
+    console.error(`Error updating product ${prodId}:`, error.message);
+    if (error.code === "ECONNABORTED") {
+      alert("Request timed out. Please try again.");
+    } else {
+      alert("An error occurred while updating product status");
+    }
+  } finally {
+    setLoadingProductId(null); // Clear loading state
+    console.log(`Status update finished for prod_id: ${prodId}`);
+  }
+};
+
 
   useEffect(() => {
     const loadAccessoryCounts = async () => {
@@ -1950,19 +2000,38 @@ const Mobiles = () => {
                       </div>
 
                       {/* Display product name */}
-                      <div className="laptops-product-details">
-                        <h3 className="laptops-product-name" title={product.prod_name}>
-                          {product.prod_name}
-                          {product.productStatus === "unapproved" && (
-                            <span style={{ color: "red" }}>
-                              ({product.productStatus})
-                            </span>
-                          )}
-                        </h3>
-
-                        {/* "View" button to trigger modal */}
-
-                      </div>
+                     <div className="laptops-product-details">
+                                            <h3 className="laptops-product-name" title={product.prod_name}>
+                                              {product.prod_name}
+                                            </h3>
+                    
+                                            {product.productStatus === "unapproved" && (
+                                              <>
+                                                {/* <span style={{ color: "red" }}>({product.productStatus})</span> */}
+                                                <img src={ApproveImage} width={"50px"}
+                                                style={{cursor:'pointer'}}
+                                                
+                                                  onClick={() => handleStatusUpdate(product.prod_id)} // Pass prod_id
+                                                />
+                                                {/* <button
+                                                  disabled={loadingProductId === product.prod_id} // Disable only this product's button
+                                                  style={{
+                                                    marginTop: "8px",
+                                                    padding: "6px 12px",
+                                                    borderRadius: "6px",
+                                                    background: "linear-gradient(to right, #f44336, #e57373)", // red gradient
+                                                    color: "#fff",
+                                                    border: "none",
+                                                    cursor: "pointer",
+                                                    opacity: loadingProductId === product.prod_id ? 0.7 : 1, // Only fade this button
+                                                  }}
+                                                >
+                                                  {loadingProductId === product.prod_id ? "Updating..." : "Approve"}
+                                                </button> */}
+                                              </>
+                                            )}
+                    
+                                          </div>
                       <div>
                         M.R.P <span style={{ textDecoration: "line-through", color: 'red', fontSize: '14px' }}>₹{product.actual_price}</span>
                         <span style={{ color: 'green', marginLeft: '5px' }}>  ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}</span>

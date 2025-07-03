@@ -6,6 +6,10 @@ import { ApiUrl } from "../../components/ApiUrl";
 import Modal from "react-modal"; // Install if needed using `npm install react-modal`
 import Swal from "sweetalert2"; // For better confirmation, install with `npm install sweetalert2`
 import OrderTrackingModal from "./OrderTrackingModal";
+import logo from "./img/logo3.png"; // Ensure the path is correct
+import PrintModal from "./PrintModal";
+import Invoice from "./Invoice"; // Your invoice component
+
 import {
   FaEye,
   FaTimes,
@@ -16,7 +20,7 @@ import {
 } from "react-icons/fa";
 
 import ReactDOMServer from "react-dom/server"; // Add this import at the top
-import Invoice from "./Invoice";
+
 const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +39,29 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
   const [filterDeliveryStatus, setFilterDeliveryStatus] = useState("All");
   const [editingRow, setEditingRow] = useState(null); // Track the row being edited
   const [selectedStatus, setSelectedStatus] = useState("");
+
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState({ order: null, productDetails: [] });
+
+  const handlePrintClick = async (order) => {
+    console.log("Preparing invoice for order:", order);
+
+    const details = await fetchProductDetails(order.unique_id);
+
+    if (!details || details.length === 0) {
+      console.error("No product details available to print.");
+      return;
+    }
+
+    // Set modal data
+    setModalData({ order, productDetails: details });
+    setModalOpen(true);
+  };
+
+  const handlePrintModal = () => {
+    window.print();
+  };
+
 
   const handleStatusChange = (e) => {
     const newStatus = e.target.value;
@@ -208,6 +235,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
 
       // Set product details directly from the response
       setProductDetails(productResponse.data);
+
+      // console.log("log for effective price",productResponse.data)
       // printInvoice(order, productResponse.data); // Pass the product details to printInvoice
     } catch (error) {
       console.error("Error fetching product details:", error);
@@ -468,7 +497,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
         text: "Do you really want to cancel this order? This action cannot be undone.",
         icon: "warning",
         showCancelButton: true,
-        cancelButtonText:'No',
+        cancelButtonText: 'No',
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, cancel it!",
@@ -777,9 +806,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                               className="btn btn-print"
                               title="Print invoice for this order"
 
-                              onClick={() =>
-                                printInvoice(order, productDetails)
-                              }
+                              onClick={() => handlePrintClick(order)}
                             >
                               <FaPrint style={{ fontSize: "16px" }} />
                             </button>
@@ -814,6 +841,15 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                   )}
                 </tbody>
               </table>
+              <PrintModal
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+              >
+                <Invoice
+                  order={modalData.order}
+                  productDetails={modalData.productDetails}
+                />
+              </PrintModal>
             </div>
           )}
 
@@ -976,6 +1012,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
       </main>
     </div>
   );
+
 };
 
 export default Orders;

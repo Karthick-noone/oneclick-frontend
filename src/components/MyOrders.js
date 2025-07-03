@@ -9,10 +9,12 @@ import { FaTimes, FaPrint } from "react-icons/fa";
 import OrderTrackingModal from "./TrackingModal";
 import Swal from "sweetalert2";
 
+import PrintModal from "../admin/pages/PrintModal";
+import Invoice from "./Invoice";
+
 import stamp2 from "./img/cancelled-stamp.png";
 
 import ReactDOMServer from "react-dom/server"; // Add this import at the top
-import Invoice from "../admin/pages/Invoice";
 // import RecentlyViewed from "./RecentlyViewed";
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -27,16 +29,35 @@ const MyOrders = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Month is 0-indexed
   const [filteredOrders, setFilteredOrders] = useState(orders);
 
-useEffect(() => {
-  const filtered = orders.filter((order) => {
-    const orderDate = new Date(order.order_date);
-    const orderYear = orderDate.getFullYear();
-    const orderMonth = orderDate.getMonth() + 1;
-    return orderYear === selectedYear && orderMonth === selectedMonth;
-  });
 
-  setFilteredOrders(filtered);
-}, [selectedYear, selectedMonth, orders]);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState({ order: null, productDetails: [] });
+
+  const handlePrintClick = async (order) => {
+    console.log("Preparing invoice for order:", order);
+
+    const details = await fetchProductDetails(order.unique_id);
+
+    if (!details || details.length === 0) {
+      console.error("No product details available to print.");
+      return;
+    }
+
+    // Set modal data
+    setModalData({ order, productDetails: details });
+    setModalOpen(true);
+  };
+
+  useEffect(() => {
+    const filtered = orders.filter((order) => {
+      const orderDate = new Date(order.order_date);
+      const orderYear = orderDate.getFullYear();
+      const orderMonth = orderDate.getMonth() + 1;
+      return orderYear === selectedYear && orderMonth === selectedMonth;
+    });
+
+    setFilteredOrders(filtered);
+  }, [selectedYear, selectedMonth, orders]);
 
 
   useEffect(() => {
@@ -87,6 +108,7 @@ useEffect(() => {
 
       // Set product details directly from the response
       setProductDetails(productResponse.data);
+      console.log("Payment MOde",productResponse.data)
     } catch (error) {
       console.error("Error fetching product details:", error);
     }
@@ -285,8 +307,8 @@ useEffect(() => {
         </head>
         <body>
           ${ReactDOMServer.renderToStaticMarkup(
-            <Invoice order={order} productDetails={details} />
-          )}
+      <Invoice order={order} productDetails={details} />
+    )}
         </body>
       </html>
     `);
@@ -351,27 +373,35 @@ useEffect(() => {
             filteredOrders.map((order) => (
               <div
                 key={order.unique_id}
-                className={`order-card ${
-                  order.delivery_status === "Cancelled"
-                    ? "cancelled-order-card"
-                    : ""
-                }`}
+                className={`order-card ${order.delivery_status === "Cancelled"
+                  ? "cancelled-order-card"
+                  : ""
+                  }`}
               >
                 {" "}
                 <div className="order-header">
-                  <h3>Order #{order.unique_id}</h3>
-                  <span
+                  <h3> {formatDate(order.order_date)}</h3>
+                  {/* <span
                     className={`order-status ${order.status.toLowerCase()}`}
                   >
                     {order.status.toLowerCase() === "pending"
                       ? "Payment Pending"
                       : order.status.toLowerCase() === "refund pending"
-                      ? "Refund Pending"
-                      : order.status.toLowerCase() === "refunded"
-                      ? "Refunded"
-                      : "Payment Paid"}
-                  </span>
+                        ? "Refund Pending"
+                        : order.status.toLowerCase() === "refunded"
+                          ? "Refunded"
+                          : "Payment Paid"}
+                  </span> */}
+                  {order.delivery_status && (
+                    <span className={`delivery-status ${order.delivery_status.toLowerCase().replace(/\s+/g, "-")}`}>
+                      {order.delivery_status}
+                    </span>
+                  )}
+
+                     
+                  <span className="payment-method" style={{fontSize:'12px'}}> {order.payment_method}</span>
                 </div>
+
                 {/* Row Layout: Left Side (Details) & Right Side (Cancelled Seal) */}
                 <div className="order-details">
                   {/* Left Side: Order Information */}
@@ -389,7 +419,7 @@ useEffect(() => {
                               key={product.product_id}
                               value={product.product_id}
                             >
-                              {product.name.split(" ").slice(0, 4).join(" ")}
+                              {product.name.split(" ").slice(0, 24).join(" ")}
                             </option>
                           ))}
                         </select>
@@ -400,21 +430,27 @@ useEffect(() => {
                             className="product-namee"
                             style={{ fontWeight: "bold", marginLeft: "10px" }}
                           >
-                            {order.products[0].name
-                              .split(" ")
-                              .slice(0, 3)
-                              .join(" ")}
+                            {order.products[0].name}
                           </span>
                         )
                       )}
                     </div>{" "}
+                    <div  style={{backgroundColor:'#e7e7e7'}}>
                     <p>
-                      <strong>Order Date:</strong>{" "}
-                      {formatDate(order.order_date)}
+                      <strong>Order ID:</strong>{" "}
+                      #{order.unique_id}
+                    </p>
+                    <p>
+                      <strong>Payment Method:</strong>{" "}
+                      {order.payment_method}
                     </p>
                     <p>
                       <strong>Total Amount:</strong> ₹{order.total_amount}
                     </p>
+                    <p>
+                      <strong>No of item:</strong> {order.products.length}
+                    </p></div>
+
                   </div>
 
                   {/* Right Side: Cancelled Seal */}
@@ -432,22 +468,34 @@ useEffect(() => {
                   >
                     View Order
                   </button>
-                  <button
-                    onClick={() => openModal2(order)}
-                    className="view-details-button"
-                  >
-                    Track Order
-                  </button>
+                  {order.delivery_status !== "Cancelled" && (
+                    <button
+                      onClick={() => openModal2(order)}
+                      className="view-details-button"
+                    >
+                      Track Order
+                    </button>
+                  )}
+
                   {order.delivery_status !== "Cancelled" && (
                     <button
                       title="Print Invoice"
                       className="btn btn-print"
-                      onClick={() => printInvoice(order, productDetails)}
+                      onClick={() => handlePrintClick(order)}
                     >
                       <FaPrint style={{ fontSize: "16px" }} />
                     </button>
                   )}
                 </div>
+                <PrintModal
+                  isOpen={isModalOpen}
+                  onClose={() => setModalOpen(false)}
+                >
+                  <Invoice
+                    order={modalData.order}
+                    productDetails={modalData.productDetails}
+                  />
+                </PrintModal>
                 <OrderTrackingModal
                   isOpen={isModalOpen2}
                   onRequestClose={closeModal2}
@@ -502,15 +550,16 @@ useEffect(() => {
                         {currentProduct.prod_name}
                       </span>
                     </p>
+
                     <p className="info-row">
                       <span className="info-label">Price</span>
                       <span className="info-value ">
                         {" "}
                         {currentProduct.is_buy_together
-  ? currentProduct.effectiveprice === 0
-    ? "Free"
-    : `₹${currentProduct.effectiveprice}`
-  : `₹${currentProduct.prod_price}`}
+                          ? currentProduct.effectiveprice === 0
+                            ? "Free"
+                            : `₹${currentProduct.effectiveprice}`
+                          : `₹${currentProduct.prod_price}`}
 
                       </span>
                     </p>
@@ -533,6 +582,12 @@ useEffect(() => {
                   <span className="info-label">Ordered Date</span>
                   <span className="info-value">
                     {formatDate(selectedOrder.order_date)}
+                  </span>
+                </p>
+                <p className="info-row">
+                  <span className="info-label">Payment Method</span>
+                  <span className="info-value">
+                    {selectedOrder.payment_method}
                   </span>
                 </p>
                 {/* <p className="info-row">

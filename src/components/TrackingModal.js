@@ -15,7 +15,7 @@ import Lottie from "lottie-react";
 import truckAnimation from "./css/truck2.json"; // Import your Lottie animation
 import delivery_truck from "./css/delivery_truck2.json"; // Import your Lottie animation
 import cityBG from "./css/city-bg-2.json"; // Import your Lottie animation
-// import citybg from "./img/city.jpg"
+import citybg from "./img/city.jpg"
 
 const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   const [deliveryStatus, setDeliveryStatus] = useState("");
@@ -101,100 +101,137 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onRequestClose={handleModalClose}
-      className="trackorder-modal"
-      overlayClassName="trackorder-overlay"
-      ariaHideApp={false}
-    >
+   <Modal
+  isOpen={isOpen}
+  onRequestClose={handleModalClose}
+  className="trackorder-modal"
+  overlayClassName="trackorder-overlay"
+  ariaHideApp={false}
+>
+  {/* Background Layer */}
+  <div
+    style={{
+      position: "absolute",
+      inset: 0,
+      zIndex: 0, // background z-index
+      pointerEvents: "none", // make sure background doesn’t block content
+    }}
+  >
+    {deliveryStatus === "Delivered" ? (
+      <img
+        src={citybg}
+        alt="Delivered Background"
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
+      />
+    ) : (
+      <Lottie
+        animationData={cityBG}
+        loop
+        autoplay
+        style={{
+          objectFit: "cover",
+        }}
+      />
+    )}
+  </div>
 
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+  {/* Modal Close Button */}
+  <button onClick={handleModalClose} className="trackorder-close-button">
+    <FaTimes />
+  </button>
+
+  {/* Modal Title */}
+  <h2
+    className="trackorder-title"
+    style={{
+      marginBottom: deliveryStatus === "Delivered" ? "242px" : "",
+      position: "relative", // ensure it appears above background
+      zIndex: 1,
+    }}
+  >
+    Track Order
+  </h2>
+
+  {/* Progress Bar */}
+  <div className="trackorder-progress-wrapper" style={{ position: "relative", zIndex: 1 }}>
+    <div
+      className={`trackorder-progress-bar ${deliveryStatus === "Delivered" ? "no-animation" : ""}`}
+    >
+      <div
+        className="trackorder-progress-fill"
+        style={{ width: `${fillPercentage}%` }}
+      ></div>
+    </div>
+
+    {/* Truck Animations */}
+    {deliveryStatus !== "Cancelled" && deliveryStatus !== "Delivered" && (
+      <div
+        className="trackorder-truck"
+        style={{ left: `${fillPercentage}%` }}
+      >
         <Lottie
-          animationData={cityBG}
-          loop
-          autoplay
-          style={{
-            // width: '100%',
-            // height: '100%',
-            objectFit: 'cover',
-          }}
+          animationData={truckAnimation}
+          style={{ width: 55, height: 55 }}
         />
       </div>
+    )}
 
-      <button onClick={handleModalClose} className="trackorder-close-button">
-        <FaTimes />
-      </button>
-      <h2 className="trackorder-title">Track Order</h2>
-
-      {/* <img src={citybg} width={'100%'} /> */}
-
-      <div className="trackorder-progress-wrapper">
-        <div
-          className={`trackorder-progress-bar ${deliveryStatus === 'Delivered' ? 'no-animation' : ''
-            }`}
-        >
-          <div
-            className="trackorder-progress-fill"
-            style={{ width: `${fillPercentage}%` }}
-          ></div>
-        </div>
-
-        {deliveryStatus !== "Cancelled" && deliveryStatus !== "Delivered" && (
-          <div
-            className="trackorder-truck"
-            style={{ left: `${fillPercentage}%` }}
-          >
-            <Lottie
-              animationData={truckAnimation}
-              style={{ width: 55, height: 55 }}
-            />
-          </div>
-        )}
-        {deliveryStatus !== "Cancelled" && deliveryStatus === "Delivered" && (
-          <div
-            className="trackorder-truck"
-            style={{ left: `${fillPercentage}%` }}
-          >
-            <Lottie
-              animationData={delivery_truck}
-              style={{ width: 70, height: 70, transform: "rotateY(180deg)" }}
-            />
-          </div>
-        )}
-
-        <div className="trackorder-statuses">
-          {statuses.map((status, index) => {
-            const IconComponent = statusIcons[status];
-            const isActive = index < currentIndex;
-            // Blink only for the current status (unless delivered)
-            const isCurrent =
-              index === currentIndex &&
-              deliveryStatus !== "Delivered" &&
-              deliveryStatus !== "Cancelled";
-            return (
-              <div key={index} className="trackorder-status-item">
-                <IconComponent
-                  // style={{color:'red'}}
-                  className={`trackorder-status-icon ${isActive || index === currentIndex ? "active" : ""
-                    } ${isCurrent ? "current" : ""}`}
-                />
-                <span className="trackorder-status-label">{status}</span>
-              </div>
-            );
-          })}
-        </div>
+    {deliveryStatus !== "Cancelled" && deliveryStatus === "Delivered" && (
+      <div
+        className="trackorder-truck"
+        style={{ left: `${fillPercentage}%` }}
+      >
+        <Lottie
+          animationData={delivery_truck}
+          style={{ width: 70, height: 70, transform: "rotateY(180deg)" }}
+        />
       </div>
+    )}
 
-      {deliveryDate && (
-        <p className="trackorder-delivery-date">
-          {deliveryStatus === "Delivered"
-            ? "Product delivered on: "
-            : "Expected delivery: "}
-          {formatDeliveryDate(deliveryDate)}
-        </p>
-      )}
-    </Modal>
+    {/* Status Labels */}
+    <div className="trackorder-statuses">
+      {statuses.map((status, index) => {
+        const IconComponent = statusIcons[status];
+        const isActive = index < currentIndex;
+        const isCurrent =
+          index === currentIndex &&
+          deliveryStatus !== "Delivered" &&
+          deliveryStatus !== "Cancelled";
+        return (
+          <div key={index} className="trackorder-status-item">
+            <IconComponent
+              className={`trackorder-status-icon ${
+                isActive || index === currentIndex ? "active" : ""
+              } ${isCurrent ? "current" : ""}`}
+            />
+            <span className="trackorder-status-label">{status}</span>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  {/* Delivery Date */}
+  {deliveryDate && (
+    <p
+      className="trackorder-delivery-date"
+      style={{
+        position: "relative",
+        zIndex: 1, // ensure date text appears above background
+      }}
+    >
+      {deliveryStatus === "Delivered"
+        ? "Product delivered on "
+        : "Expected delivery: "}
+      {formatDeliveryDate(deliveryDate)}
+    </p>
+  )}
+</Modal>
+
   );
 };
 
