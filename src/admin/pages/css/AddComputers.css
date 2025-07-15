@@ -1,3 +1,92 @@
+
+.dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Custom arrow */
+.select-dropdown-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  /* Allows clicks on dropdown */
+  font-size: 14px;
+  color: #555;
+}
+
+/* Optional: On hover */
+.status-dropdown:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.status-dropdown {
+  appearance: none;
+  /* Remove default browser styles */
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+
+
+.status-dropdown option {
+  background: #fff;
+  color: #333;
+}
+
+
+/* For In Stock */
+.In-stock {
+  margin-top: 10px;
+  padding: 15px;
+  /* background: linear-gradient(135deg, #43cea2, #185a9d);  */
+  background-image: linear-gradient(90deg, #43cea2 0%, #185a9d 51%, #43cea2 100%);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.In-stock:hover {
+  background: linear-gradient(135deg, #2bc48a, #104e8b);
+  /* slightly darker */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  /* more prominent shadow */
+  /* transform: translateY(-2px);  */
+}
+
+/* For Out of Stock */
+.Out-of-stock {
+  margin-top: 10px;
+  padding: 15px;
+  background-image: linear-gradient(45deg, #ff3e3e 0%, #f8931f 51%, #ff3e3e 100%);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.Out-of-stock:hover {
+  background: linear-gradient(135deg, #e04e4e, #de8612);
+  /* slightly darker */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  /* more prominent shadow */
+  /* transform: translateY(-2px);  */
+}
+
+
 .filters-card {
   background: #fff;
   border: 1px solid #e0e0e0;
@@ -10,6 +99,7 @@
   background: linear-gradient(to right, #e3f2fd, #ffffff);
 
 }
+
 .coupon-title-with-image {
   display: flex;
   align-items: center;
@@ -35,9 +125,11 @@
   text-align: justify;
   margin-top: 10px;
 }
+
 .slick-prev::before,
 .slick-next::before {
-  color: #4b4b4b; /* arrow icon color */
+  color: #4b4b4b;
+  /* arrow icon color */
   font-size: 27px;
   background-color: #ddd;
   border-radius: 50%;
@@ -401,10 +493,12 @@
   margin-left: 270px;
   margin-bottom: 20px;
 }
-.faedit{
+
+.faedit {
   font-size: 16px;
   margin-top: 4px;
 }
+
 .product-type-display {
   display: flex;
   align-items: center;
@@ -609,7 +703,7 @@
   border-radius: 8px;
   width: 600px;
   /* Fixed width */
-  height: 440px;
+  height: 500px;
   /* Fixed height */
   position: relative;
   text-align: center;
@@ -765,28 +859,70 @@
 .laptops-product-coupon span {
   cursor: pointer;
 }
-
 .coupons-list {
   list-style: none;
-  padding: 0;
+  padding: 5px !important;
+  margin: 20px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .coupon-item {
-  padding: 10px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin: 5px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease;
+}
+
+.coupon-item:last-child {
+  border-bottom: none;
 }
 
 .coupon-item:hover {
-  background-color: #f1f1f1;
+  background-color: #f5f5f5;
 }
 
-.coupon-code,
-.expiry-date {
+.serial-number {
   font-weight: bold;
+  color: #555;
+  margin-right: 6px;
 }
+
+.coupon-code {
+  font-family: monospace;
+  background-color: #eef6ff;
+  color: #333;
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin: 0 6px;
+}
+
+.expiry-date {
+  font-size: 0.9rem;
+  color: #888;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.edit-icon,
+.delete-icon {
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: color 0.2s ease;
+}
+
+.edit-icon:hover {
+  color: #3498db;
+}
+
+.delete-icon:hover {
+  color: #e74c3c;
+}
+
 
 .frequently-buy-label {
   font-size: 16px;
@@ -1631,60 +1767,96 @@
   /* Adjust based on sidebar width */
   padding: 20px;
 }
-
+/* 
 .product-label {
   position: absolute;
-  /* Use absolute positioning */
   top: 10px;
-  /* Distance from the top */
   left: 10px;
-  /* Distance from the left */
   background-color: #00A098;
-  /* Background color */
   color: white;
-  /* Text color */
   padding: 5px 10px;
-  /* Padding around the label */
   border-radius: 3px;
-  /* Rounded corners */
   font-size: 12px;
-  /* Font size */
   font-weight: bold;
-  /* Bold text */
   z-index: 1;
-  /* Ensure label is on top of the image */
   box-shadow: 0 4px 15px rgba(0, 160, 152, 0.75);
-  /* Glow effect */
   text-transform: uppercase;
-  /* Make label uppercase */
   letter-spacing: 1px;
-  /* Add letter spacing for style */
-  /* transform: rotate(-30deg);  */
+ 
   animation: shine 2s infinite linear;
-  /* Add a shine animation */
 }
 
-/* Create a shining effect */
 @keyframes shine {
   0% {
     background-color: #00A098;
-    /* Starting color */
     box-shadow: 0 0 10px rgba(0, 160, 152, 0.5), 0 0 20px rgba(0, 160, 152, 0.3);
   }
 
   50% {
     background-color: #00D6C1;
-    /* Lighter shining color */
     box-shadow: 0 0 20px rgba(0, 214, 193, 0.8), 0 0 30px rgba(0, 214, 193, 0.6);
   }
 
   100% {
     background-color: #00A098;
-    /* Back to original color */
     box-shadow: 0 4px 15px rgba(0, 160, 152, 0.75);
   }
+} */
+/* red color text */
+.product-label {
+
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #f14949; 
+  color: white; 
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 1;
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: red-shine 2s infinite linear;
+} 
+
+ @keyframes red-shine {
+  /* 0% {
+    background-color: #D32F2F;
+    box-shadow: 0 0 10px rgba(211, 47, 47, 0.5), 0 0 20px rgba(211, 47, 47, 0.3);
+  } */
+  50% {
+    background-color: #FF5252;
+    box-shadow: 0 0 20px rgba(255, 82, 82, 0.8), 0 0 30px rgba(255, 82, 82, 0.6);
+  }
+  /* 100% {
+    background-color: #D32F2F; 
+    box-shadow: 0 4px 15px rgba(211, 47, 47, 0.75);
+  } */
+} 
+
+/* .product-label::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%; 
+  width: 150%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  ); 
+  animation: skeleton-shine 1.3s linear infinite;
 }
 
+@keyframes skeleton-shine {
+  100% {
+    left: 100%; 
+  }
+} */
 .laptops-page-title {
   text-align: center;
   margin-bottom: 20px;

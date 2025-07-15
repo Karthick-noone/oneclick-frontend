@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 // import Header1 from "./Header1";
-import Header2 from "./Header2";
+// import Header2 from "./Header2";
 // import Header3 from "./Header3";
 import Footer from "./footer";
-import Sidebar from "./Sidebar";
-import Modal from "./Modal";
+import MobileFilter from "./MobileFilter";
+// import Modal from "./Modal";
 import "./css/Computers.css";
-import { useCart } from "../components/CartContext";
+// import { useCart } from "../components/CartContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaFilter } from "react-icons/fa";
 import { ApiUrl } from "./ApiUrl";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
-
+import FilterIcon from './img/settings.png'
+import Swal from "sweetalert2";
 // Define a fallback image URL
 // const fallbackImage = require('./img/laptop.jpg'); // Replace with a valid fallback image
 
@@ -24,6 +25,10 @@ const Mobiles = () => {
   const [favorites, setFavorites] = useState({});
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [loading, setLoading] = useState(true);
+  const [isOfferActive, setIsOfferActive] = useState(true);
+  const [product, setProduct] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [showFilters, setShowFilters] = useState(window.innerWidth > 768);
 
   const [hoveredProductId, setHoveredProductId] = useState(null);
   const [hoverImageIndexes, setHoverImageIndexes] = useState({});
@@ -53,7 +58,32 @@ const Mobiles = () => {
   }, [hoveredProductId, products]);
 
 
+  //  const [showFilters, setShowFilters] = useState(true);
+  // const openFilters = () => {
+  //   setShowFilters(true); // This triggers the .show class
+  // };
 
+  const closeFilters = () => {
+    setShowFilters(false); // This removes the .show class
+  };
+
+  const toggleFilters = () => {
+    setShowFilters(prev => !prev);
+  };
+  // Handle resize to toggle filter visibility responsively
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      setShowFilters(!mobile);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  // Toggle filter visibility, simple toggle - only one update per click
+  const toggleFilter = () => {
+    setShowFilters(prev => !prev);
+  };
 
   // const {
   //   cartItems,
@@ -62,49 +92,84 @@ const Mobiles = () => {
   //   addToWishlist,
   //   removeFromWishlist,
   // } = useCart();
-
   const navigate = useNavigate();
-
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const searchQuery = queryParams.get("search") || queryParams.get("brand");
 
-  // Log the raw search query
-  console.log("Search Query:", searchQuery);
+  // Extract filters from URL
+  const searchQuery = queryParams.get("search");
+  const maxPrice = parseInt(queryParams.get("price")) || 100000;
+  const selectedRAM = queryParams.getAll("memory") || [];
+  const selectedStorage = queryParams.getAll("storage") || [];
+  const selectedBrand = queryParams.getAll("brand");
+  const selectedProcessor = queryParams.getAll("processor");
 
-  // Normalize a string by trimming, lowercasing, and removing all spaces
+  // Helper to normalize strings
   const normalizeString = (str) =>
-    str.trim().toLowerCase().replace(/\s+/g, "");
+    str?.trim().toLowerCase().replace(/\s+/g, "");
 
-  // Normalize the search query (if it exists)
-  const normalizedSearchQuery = searchQuery
-    ? normalizeString(searchQuery)
-    : "";
+  // Normalize search input
+  const normalizedSearchQuery = searchQuery ? normalizeString(searchQuery) : "";
 
-  // Filter products based on the normalized, concatenated prod_name and prod_features
-  const filteredProducts = searchQuery
-    ? products.filter((product) => {
-      // Get product details, or an empty string if undefined
-      const prodName = product.prod_name || "";
-      const prodFeatures = product.prod_features || "";
-      const prodSubtitle = product.subtitle || "";
+  const filteredProducts = products.filter((product) => {
+    const prodName = product.prod_name || "";
+    const productPrice = parseInt(product.prod_price) || 0;
+    const productMemory = normalizeString(product.memory || "");
+    const productStorage = normalizeString(product.storage || "");
+    const productProcessor = normalizeString(product.processor || "");
 
-      // Concatenate and normalize the strings
-      const combinedString = normalizeString(
-        prodName + " " + prodFeatures + " " + prodSubtitle
-      );
+    const normalizedName = normalizeString(prodName);
 
-      // Log the combined string for debugging
-      console.log(
-        `Combined string for product "${prodName}": ${combinedString}`
-      );
+    // 1. Search filter (searching across all fields)
+    const matchesSearch = normalizedSearchQuery
+      ? (normalizedName + productMemory + productStorage + productProcessor).includes(normalizedSearchQuery)
+      : true;
 
-      // Check if the combined string contains the normalized search query
-      return combinedString.includes(normalizedSearchQuery);
-    })
-    : products;
+    // 2. Price
+    const matchesPrice = productPrice <= maxPrice;
+
+    // 3. Brand (extract from prod_name)
+    const matchesBrand = selectedBrand.length
+      ? selectedBrand.some((brand) =>
+        normalizedName.startsWith(normalizeString(brand))
+      )
+      : true;
+
+    // 4. RAM
+    const matchesRAM = selectedRAM.length
+      ? selectedRAM.some((ram) => productMemory === `${normalizeString(ram)}gb`)
+      : true;
+
+    // 5. Storage
+    const matchesStorage = selectedStorage.length
+      ? selectedStorage.some((storage) => {
+        const normalizedStorage = normalizeString(storage);
+        return (
+          productStorage === `${normalizedStorage}gb` ||
+          (normalizedStorage === "1024" && productStorage === "1tb")
+        );
+      })
+      : true;
+
+    // 6. Processor
+    const matchesProcessor = selectedProcessor.length
+      ? selectedProcessor.some((proc) =>
+        productProcessor.includes(normalizeString(proc))
+      )
+      : true;
 
 
+    return (
+      matchesSearch &&
+      matchesPrice &&
+      matchesBrand &&
+      matchesRAM &&
+      matchesStorage &&
+      matchesProcessor
+    );
+  });
+
+  // If no search query, return all products // If no search query, return all products
 
   const [coupons, setCoupons] = useState({}); // State to store coupons
 
@@ -115,33 +180,43 @@ const Mobiles = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      console.log("[INFO] Fetching mobiles...");
       setLoading(true);
 
       try {
-        //  Return from cache if available
+        // Return from cache if available
         if (cacheRef.mobiles) {
+          console.log("[CACHE] Using cached mobile products");
+          console.log(`[CACHE] Product count: ${cacheRef.mobiles.length}`);
           setProducts(cacheRef.mobiles);
           setCoupons(cacheRef.mobileCoupons);
           setLoading(false);
           return;
         }
 
-        //  Fetch product list
+        // Fetch product list
         const response = await axios.get(`${ApiUrl}/fetchmobiles`);
         const fetchedProducts = response.data;
+        console.log(`[API] Fetched ${fetchedProducts.length} mobile products`);
+
         setProducts(fetchedProducts);
+        console.log("Fetched Mobiles", fetchedProducts)
         cacheRef.mobiles = fetchedProducts;
 
         // Fetch all coupons in parallel
         const couponPromises = fetchedProducts.map((product) =>
           axios
             .get(`${ApiUrl}/coupons/${product.prod_id}`)
-            .then((res) => ({
-              prod_id: product.prod_id,
-              coupon_code: res.data?.coupons?.[0]?.coupon_code || null,
-            }))
+            .then((res) => {
+              const code = res.data?.coupons?.[0]?.coupon_code || null;
+              console.log(`[COUPON] Product ${product.prod_id} => Coupon: ${code}`);
+              return {
+                prod_id: product.prod_id,
+                coupon_code: code,
+              };
+            })
             .catch((err) => {
-              console.error(`Error fetching coupon for ${product.prod_id}`, err);
+              console.error(`[ERROR] Fetching coupon for product ${product.prod_id}`, err.message);
               return { prod_id: product.prod_id, coupon_code: null };
             })
         );
@@ -155,10 +230,11 @@ const Mobiles = () => {
           }
         });
 
-        setCoupons(couponMap); // Set once
+        console.log(`[INFO] Total products with coupons: ${Object.keys(couponMap).length}`);
+        setCoupons(couponMap);
         cacheRef.mobileCoupons = couponMap;
       } catch (error) {
-        console.error("Error fetching mobiles:", error);
+        console.error("[ERROR] Fetching mobiles:", error.message);
         toast.error("Failed to fetch mobiles.", {
           position: "top-right",
           autoClose: 2000,
@@ -172,9 +248,6 @@ const Mobiles = () => {
     fetchProducts();
   }, []);
 
-
-  const [isOfferActive, setIsOfferActive] = useState(true);
-  const [product, setProduct] = useState(null);
 
   useEffect(() => {
     const now = new Date();
@@ -207,6 +280,9 @@ const Mobiles = () => {
 
     // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
   }, [products]);
+
+
+
 
   const handleBuyNow = (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
@@ -357,11 +433,23 @@ const Mobiles = () => {
 
       // Handle the response
       if (response.status === 200) {
-        toast.success(`${product.prod_name.substring(0, 25) + '...'} added to your cart!`, {
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item added to your cart!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
+        });
+        window.dispatchEvent(new Event("cart-updated"));
+      } else {
+        toast.error(response.data.message || "Failed to add item to cart", {
           position: "top-right",
           autoClose: 2000,
         });
       }
+
     } catch (error) {
       console.error("Error adding item to cart:", error);
       toast.error("Failed to add item to cart", {
@@ -373,6 +461,8 @@ const Mobiles = () => {
       setIsAdding(false);
     }
   };
+
+
   const handleToggleFavorite = async (product, event) => {
     event.stopPropagation();
 
@@ -407,9 +497,14 @@ const Mobiles = () => {
           `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.info(`${product.prod_name.substring(0, 25) + '...'} removed from your wishlist!`, {
-          position: "top-right",
-          autoClose: 2000,
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item removed from your wishlist!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
         });
       } else {
         // If not in wishlist, call add API
@@ -428,9 +523,14 @@ const Mobiles = () => {
           `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.success(`${product.prod_name.substring(0, 25) + '...'} added to your wishlist!`, {
-          position: "top-right",
-          autoClose: 2000,
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item added to your wishlist!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
         });
       }
     } catch (error) {
@@ -447,12 +547,6 @@ const Mobiles = () => {
       const email = localStorage.getItem("email");
       const username = localStorage.getItem("username");
 
-      // if (!email || !username) {
-      //   console.log("User not logged in");
-      //   return;
-      // }
-
-
       try {
         const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
           email,
@@ -463,29 +557,33 @@ const Mobiles = () => {
           const wishlist = response.data.wishlist;
           const favoritesMap = {};
 
-          // Set the favorites map based on product IDs in the wishlist
           wishlist.forEach((item) => {
-            favoritesMap[`${item}`] = true; // Mark product ID as in wishlist
+            favoritesMap[`${item}`] = true;
           });
 
-          setFavorites(favoritesMap); // Update the favorites state
+          setFavorites(favoritesMap);
         }
       } catch (error) {
         console.error("Error fetching wishlist:", error);
       }
     };
 
-    // Fetch wishlist immediately
+    // Fetch once on mount
     fetchWishlist();
 
-    // Set an interval to fetch the wishlist every second
-    const intervalId = setInterval(() => {
+    //  Listen for wishlist updates
+    const handleWishlistUpdate = () => {
+      console.log("Wishlist updated event received.");
       fetchWishlist();
-    }, 1000); // Update every second (1000ms)
+    };
 
-    // Cleanup the interval when the component unmounts
-    return () => clearInterval(intervalId);
+    window.addEventListener("wishlist-updated", handleWishlistUpdate);
+
+    return () => {
+      window.removeEventListener("wishlist-updated", handleWishlistUpdate);
+    };
   }, []);
+
 
 
 
@@ -494,27 +592,24 @@ const Mobiles = () => {
 
   // offerPercentage = ((actual_price - prod_price) / actual_price) * 100
 
-  // if (loading) {
-  //   return (
-  //     <div className="loading-message">
-  //       <h2>Loading products...</h2>
-  //     </div>
-  //   );
-  // }
-
   return (
-    <div className="computers-page">
-      {/* <Header1 /> */}
-      {/* <Header2 category={category} /> */}
-      {/* <Header3 /> */}
-      <span style={{ marginLeft: "20px", padding: "10px" }}>
-        <Link style={{ textDecoration: "none", color: "black" }} to="/">
-          Home{" "}
-        </Link>
-        &gt; Mobiles
-      </span>
+    <div className="Computers-page">
+
+      <div className="breadcrumb-wrapper">
+        <span className="breadcrumb-text">
+          <Link to="/" style={{ textDecoration: "none", color: "black" }}>
+            Home{" "}
+          </Link>
+          &gt; Mobiles
+        </span>
+
+
+        <img className="responsive-filter-icon" width="30" onClick={toggleFilters} src={FilterIcon} alt="Filter icon" />
+      </div>
       <div className="main-content">
-        <Sidebar />
+
+        <MobileFilter showFilters={showFilters} closeFilters={closeFilters} />
+
         <div className="product-list">
           {loading ? (
             // 1. Loading state
@@ -554,11 +649,7 @@ const Mobiles = () => {
                   key={product.id}
                   className="product-card"
                   onClick={() => handleCardClick(product)}
-                  onMouseEnter={() => setHoveredProductId(product.id)}
-                  onMouseLeave={() => {
-                    setHoveredProductId(null);
-                    setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
-                  }}
+
                 >
                   {product.offer_label && (
                     <div className="product-label">{product.offer_label}</div>
@@ -569,6 +660,11 @@ const Mobiles = () => {
                       src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
                       alt={product.prod_name}
                       className="product-image"
+                      onMouseEnter={() => setHoveredProductId(product.id)}
+                      onMouseLeave={() => {
+                        setHoveredProductId(null);
+                        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+                      }}
                     />
                     <span
                       title={
@@ -591,7 +687,7 @@ const Mobiles = () => {
                   <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
 
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
-                  <span className="product-subtitle2">{product.subtitle}</span>
+                  <span className="product-subtitle2" title={product.subtitle}>{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}
                           </p> */}
@@ -600,7 +696,7 @@ const Mobiles = () => {
                       <span className="product-price">
                         ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
                       </span>
-                      <span style={{ marginRight: "5px", fontSize: "15px" }}>
+                      <span style={{ margin: "5px", fontSize: "15px" }}>
                         M.R.P
                       </span>
                       <span
@@ -619,7 +715,7 @@ const Mobiles = () => {
                     >
                       (
                       {Math.round(
-                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
+                        ((product.actual_price - (product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
                         100
                       )}
@@ -693,11 +789,7 @@ const Mobiles = () => {
                   key={product.id}
                   className="product-card"
                   onClick={() => handleCardClick(product)}
-                  onMouseEnter={() => setHoveredProductId(product.id)}
-                  onMouseLeave={() => {
-                    setHoveredProductId(null);
-                    setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
-                  }}
+
                 >
                   {product.offer_label && (
                     <div className="product-label">{product.offer_label}</div>
@@ -708,6 +800,11 @@ const Mobiles = () => {
                       src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
                       alt={product.prod_name}
                       className="product-image"
+                      onMouseEnter={() => setHoveredProductId(product.id)}
+                      onMouseLeave={() => {
+                        setHoveredProductId(null);
+                        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+                      }}
                     />
                     <span
                       title={
@@ -728,7 +825,7 @@ const Mobiles = () => {
                   </div>
 
                   <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
-                  <span className="product-subtitle2">{product.subtitle}</span>
+                  <span className="product-subtitle2" title={product.subtitle}>{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}
                           </p> */}
@@ -738,7 +835,7 @@ const Mobiles = () => {
                       <span className="product-price">
                         ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
                       </span>
-                      <span style={{ marginRight: "5px", fontSize: "15px" }}>
+                      <span style={{ margin: "5px", fontSize: "15px" }}>
                         M.R.P
                       </span>
                       <span
@@ -757,7 +854,7 @@ const Mobiles = () => {
                     >
                       (
                       {Math.round(
-                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
+                        ((product.actual_price - (product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
                         100
                       )}
@@ -819,7 +916,7 @@ const Mobiles = () => {
       </div>
 
       <Footer />
-      {selectedProduct && (
+      {/* {selectedProduct && (
         <Modal
           isOpen={true}
           onClose={handleCloseModal}
@@ -828,7 +925,7 @@ const Mobiles = () => {
           onPrev={handlePrevProduct}
           category={category} // Pass the category to the Modal
         />
-      )}
+      )} */}
       <ToastContainer />
     </div>
   );

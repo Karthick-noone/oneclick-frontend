@@ -101,7 +101,7 @@ const SalesReport = () => {
     </span>
     <input
       type="text"
-      placeholder="Search by Product Name or Category"
+      placeholder="Search by Product Name "
       value={searchQuery}
       onChange={(e) => setSearchQuery(e.target.value)}
       className="product-search-input"

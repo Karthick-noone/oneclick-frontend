@@ -97,10 +97,9 @@ const AdPage = () => {
                           </Link>
                         ))}
 
-                        <div className="ad-bottom">
-                          {/* <span className="ad-category">{ad.category}</span> */}
+                        {/* <div className="ad-bottom">
                           <button className="shop-now-btn">Shop Now</button>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </SwiperSlide>
@@ -122,10 +121,10 @@ const AdPage = () => {
                         />
                       </Link>
                     ))}
-                    <div className="ad-bottom">
-                      {/* <span className="ad-category">{ad.category}</span> */}
+                    {/* <div className="ad-bottom">
+                      <span className="ad-category">{ad.category}</span>
                       <button className="shop-now-btn">Shop Now</button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               ))

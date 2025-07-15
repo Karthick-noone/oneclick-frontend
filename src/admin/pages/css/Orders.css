@@ -1,11 +1,50 @@
 
+.info-tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.info-tooltip-text {
+  visibility: hidden;
+  width: max-content;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%; /* Position above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap; /* Prevent text wrap */
+}
+
+.info-tooltip-container:hover .info-tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
 
 .modal-content {
   background: white;
   padding: 20px;
   border-radius: 8px;
-  width: 794px; /* A4 width in pixels at 96dpi (~210mm) */
-  height: 1123px; /* A4 height in pixels at 96dpi (~297mm) */
+  width: 794px;
+  /* A4 width in pixels at 96dpi (~210mm) */
+  height: 1123px;
+  /* A4 height in pixels at 96dpi (~297mm) */
   max-width: 100%;
   max-height: 90vh;
   overflow-y: auto;
@@ -45,6 +84,16 @@
   flex-wrap: wrap;
   gap: 15px;
 }
+.current-filters {
+  background-color: #f2f2f2;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+}
+.current-filters p {
+  margin: 2px 0;
+}
 
 .custom-radio-container {
   display: flex;
@@ -72,7 +121,7 @@
   position: relative;
 }
 
-.custom-radio-container input:checked ~ .checkmark {
+.custom-radio-container input:checked~.checkmark {
   box-shadow: inset 3px 3px 5px #c5c5c5, inset -3px -3px 5px #ffffff;
 }
 
@@ -82,7 +131,7 @@
   opacity: 0;
 }
 
-.custom-radio-container input:checked ~ .checkmark:after {
+.custom-radio-container input:checked~.checkmark:after {
   opacity: 1;
 }
 
@@ -103,8 +152,10 @@
 
 /* General Styles */
 .btn-print {
-  background-color: transparent; /* Green background */
-  color: #45a049; /* White text */
+  background-color: transparent;
+  /* Green background */
+  color: #45a049;
+  /* White text */
   border: none;
   padding: 8px 12px;
   cursor: pointer;
@@ -129,27 +180,36 @@
 
 
 .row-cancelled {
-  background-color: #ffe6e6; /* Light red background */
-  color: #585858; /* Dark red text */
+  background-color: #ffe6e6;
+  /* Light red background */
+  color: #585858;
+  /* Dark red text */
 }
 
 .row-delivered {
-  background-color: #e8ffe6; /* Light red background */
-  color: #585858; /* Dark red text */
+  background-color: #e8ffe6;
+  /* Light red background */
+  color: #585858;
+  /* Dark red text */
 }
 
 
 .orders-page {
-  margin-left: 250px; /* Adjust according to the width of the sidebar */
-  margin-top: 60px;   /* Adjust according to the height of the top bar */
+  margin-left: 250px;
+  /* Adjust according to the width of the sidebar */
+  margin-top: 60px;
+  /* Adjust according to the height of the top bar */
   padding: 20px;
-  overflow-x: auto; /* Add horizontal scrolling to the page if needed */
-  background-color: #f9f9f9; /* Light background for better contrast */
+  overflow-x: auto;
+  /* Add horizontal scrolling to the page if needed */
+  background-color: #f9f9f9;
+  /* Light background for better contrast */
 }
 
 @media (max-width: 1024px) {
   .orders-page {
-    margin-left: 0; /* Adjust for smaller screens */
+    margin-left: 0;
+    /* Adjust for smaller screens */
   }
 }
 
@@ -165,8 +225,10 @@
 }
 
 .search-box2-container {
-  margin-bottom: 20px; /* Space between search and table */
-  text-align: right;   /* Align inline/inline-block children to the right */
+  margin-bottom: 20px;
+  /* Space between search and table */
+  text-align: right;
+  /* Align inline/inline-block children to the right */
   width: 100%;
   position: relative;
 }
@@ -200,7 +262,7 @@
 .filter-radio-buttons input[type="radio"] {
   margin-right: 3px;
   accent-color: #007bff;
-  
+
 }
 
 /* Month-Year container */
@@ -227,13 +289,32 @@
 }
 
 .filter-select:hover {
-  border-color: #0056b3; 
-  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); 
+  border-color: #0056b3;
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6);
+}
+.payment-select {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 1px;
+  font-size: 13px;
+  margin-right: 10px;
+  /* width: fit-content; */
+}
+
+.payment-select:focus,
+.payment-select.selected {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.payment-select:hover {
+  border-color: #0056b3;
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6);
 }
 
 /* Search box styles */
 .search-box2 {
-  padding: 8px 12px;
+  padding: 8px 27px 8px 35px !important;
   width: 250px;
   font-size: 14px;
   border: 1px solid #ddd;
@@ -249,15 +330,22 @@
 }
 
 .search-box2:hover {
-  border-color: #0056b3; 
-  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); 
+  border-color: #0056b3;
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6);
+}
+
+.SearchIcon {
+  position: absolute;
+  left: 10px;
+  top: 6px;
+
 }
 
 /* Clear button */
 .clear-button {
   position: absolute;
-  right: 10px;
-  top: 70px;
+  right: 15px;
+  top: 17px;
   transform: translateY(-50%);
   background-color: transparent;
   border: none;
@@ -272,161 +360,198 @@
 
 /* Responsive Styles - These styles will only apply for smaller screens */
 @media (max-width: 768px) {
-  .search-box2-container {
-    display: flex;
-    flex-direction: column; /* Stack the filters and search box vertically */
-    margin-bottom: 15px; /* Adjust margin for better spacing */
-    width: 100%; /* Ensure it takes full width */
-  }
+  .SearchIcon {
+    position: absolute;
+    left: 20px;
+    top: 16px;
 
+  }
   /* Row 1: Filters */
   .filters-container {
     display: flex;
-    justify-content: space-between; /* Space the filters evenly */
-    gap: 10px; /* Add space between filter items */
+    justify-content: space-between;
+    /* Space the filters evenly */
+    gap: 10px;
+    /* Add space between filter items */
     margin-bottom: 15px;
-    flex-wrap: wrap; /* Ensure wrapping if items overflow */
+    flex-wrap: wrap;
+    /* Ensure wrapping if items overflow */
     margin-top: 5px;
   }
 
-  /* Row 2: Month and Year */
-  .month-year-container {
-    display: flex;
-    gap: 10px; /* Space between month and year dropdown */
-    margin-bottom: 15px;
-  }
-
-  /* Row 3: Search Box */
-  .search-box2-container {
-    display: flex;
-    justify-content: flex-start; /* Align search input */
-    width: 100%;
-  }
-
-  .search-box2 {
-    width: 100%; /* Make search box take full width on smaller screens */
-    margin-top: 10px; /* Add space between search and other elements */
-  }
-
+  /* Clear button */
   .clear-button {
-    font-size: 14px; /* Adjust clear button size */
+    position: absolute;
+    right: 5px;
+    top: -77px;
+    transform: translateY(-50%);
+    background-color: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 16px !important;
   }
 
-  /* Filters layout in a row */
-  .filter-radio-buttons {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    width: 100%; /* Ensure the radio buttons fill the container */
-  }
+  /* Outer container stacks vertically in responsive */
+.search-box2-container {
+  display: flex;
+  flex-direction: column; /* Stack rows vertically */
+  margin-bottom: 15px;
+  width: 100%;
+}
 
-  .filter-radio-buttons label {
-    font-size: 14px; /* Adjust font size */
-    display: flex;
-    align-items: center; /* Align radio button and label */
-  }
+/* ✅ Month & Year dropdowns stay in same row */
+.month-year-container {
+  display: flex;
+  gap: 10px; /* Space between dropdowns */
+  margin-bottom: 10px; /* Space below month-year row */
+}
 
-  .filter-select {
-    width: 100%; /* Make dropdowns take full width */
-  }
+.month-year-container .filter-select {
+  flex: 1 1 50%; /* Each dropdown takes 50% width */
+  min-width: 120px;
+}
+
+/* ✅ Search Box moves to next row */
+.search-container {
+  display: flex;
+  width: 100%; /* Full width */
+  margin-top: 8px; /* Space above search box */
+}
+
+.search-box2 {
+  width: 100%; /* Stretch search input */
+}
+
+.clear-button {
+  font-size: 14px; /* Adjust clear button size */
+}
+
 }
 
 @media (max-width: 480px) {
   .search-box2 {
-    width: 97% !important; /* Ensure search box is responsive on very small screens */
+    width: 97% !important;
+    /* Ensure search box is responsive on very small screens */
   }
 
   .filter-radio-buttons label {
-    font-size: 12px; /* Adjust font size of radio button labels */
+    font-size: 12px;
+    /* Adjust font size of radio button labels */
   }
 
   .clear-button {
-    font-size: 12px; /* Adjust clear button size for small screens */
+    font-size: 12px;
+    /* Adjust clear button size for small screens */
     margin-top: 105px;
     margin-right: 10px;
   }
-} 
+}
 
 
 .status-new-order {
-  color: #007bff; /* Bright Blue for New Order */
+  color: #007bff;
+  /* Bright Blue for New Order */
 }
 
 .status-shipped {
-  color: #ff6f00; /* Vibrant Orange for Shipped */
+  color: #ff6f00;
+  /* Vibrant Orange for Shipped */
 }
 
 .status-Out-of-Delivery {
-  color: #ffbf00; /* Warm Yellow-Orange for Out for Delivery */
+  color: #ffbf00;
+  /* Warm Yellow-Orange for Out for Delivery */
 }
 
 .status-delivered {
-  color: #28a745; /* Bright Green for Delivered */
+  color: #28a745;
+  /* Bright Green for Delivered */
 }
 
 .status-cancelled {
-  color: #dc3545; /* Bold Red for Cancelled */
+  color: #dc3545;
+  /* Bold Red for Cancelled */
 }
 
 .status-unknown {
-  color: #6c757d; /* Muted Gray for Unknown */
+  color: #6c757d;
+  /* Muted Gray for Unknown */
 }
 
 /* Styling for the search box */
 .search-box2 {
   padding: 8px 12px;
-  width: 250px; /* Adjust the width as needed */
+  width: 250px;
+  /* Adjust the width as needed */
   font-size: 14px;
   border: 1px solid #ddd;
   border-radius: 1px;
   outline: none;
   height: 36px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Adds light shadow */
-  transition: all 0.3s ease; /* Smooth transition for focus */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  /* Adds light shadow */
+  transition: all 0.3s ease;
+  /* Smooth transition for focus */
 }
 
 /* Focus state for the search box */
 .search-box2:focus {
   border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Focus effect */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  /* Focus effect */
 }
 
 .table-wrapper {
-  overflow-x: auto; /* Add horizontal scrolling to the table container */
-  margin-top: 20px; /* Space from search box */
+  overflow-x: auto;
+  /* Add horizontal scrolling to the table container */
+  margin-top: 20px;
+  /* Space from search box */
 
 }
 
 .table-wrapper::-webkit-scrollbar {
-  width: 10px !important; /* Width of the vertical scrollbar */
-  height: 10px !important; /* Height of the horizontal scrollbar */
+  width: 10px !important;
+  /* Width of the vertical scrollbar */
+  height: 10px !important;
+  /* Height of the horizontal scrollbar */
 }
 
 .table-wrapper::-webkit-scrollbar-thumb {
-  background-color: #e91e63; /* Scrollbar thumb color */
-  border-radius: 10px; /* Round the corners of the scrollbar thumb */
-  border: 2px solid #f4f4f4; /* Optional: Add padding effect around thumb */
+  background-color: #e91e63;
+  /* Scrollbar thumb color */
+  border-radius: 10px;
+  /* Round the corners of the scrollbar thumb */
+  border: 2px solid #f4f4f4;
+  /* Optional: Add padding effect around thumb */
 }
 
 .table-wrapper::-webkit-scrollbar-thumb:hover {
-  background-color: #c2185b; /* Darker color on hover */
+  background-color: #c2185b;
+  /* Darker color on hover */
 }
 
 .table-wrapper::-webkit-scrollbar-track {
-  background-color: #f4f4f4; /* Scrollbar track color */
-  border-radius: 10px; /* Match thumb border-radius */
+  background-color: #f4f4f4;
+  /* Scrollbar track color */
+  border-radius: 10px;
+  /* Match thumb border-radius */
 }
 
 /* Custom scrollbar for Firefox */
 .table-wrapper {
-  scrollbar-width: thin; /* Make scrollbar thin */
-  scrollbar-color: #e91e63 #f4f4f4; /* Set thumb and track colors */
+  scrollbar-width: thin;
+  /* Make scrollbar thin */
+  scrollbar-color: #e91e63 #f4f4f4;
+  /* Set thumb and track colors */
 }
 
 /* Optional: Table-specific styles for better appearance */
 .orders-table {
-  width: 100%; /* Make the table fill the wrapper */
-  border-collapse: collapse; /* Remove spacing between table cells */
+  width: 100%;
+  /* Make the table fill the wrapper */
+  border-collapse: collapse;
+  /* Remove spacing between table cells */
 }
 
 
@@ -434,12 +559,13 @@
   width: 100%;
   border-collapse: collapse;
   background-color: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  /* Add shadow for depth */
 }
 
 .orders-table th,
 .orders-table td {
-  padding: 12px;
+  padding: 5px;
   text-align: left;
   border: 1px solid #ddd;
 }
@@ -454,7 +580,8 @@
 } */
 
 .orders-table tbody tr:hover {
-  background-color: #f0f0f0; /* Highlight row on hover */
+  background-color: #f0f0f0;
+  /* Highlight row on hover */
 }
 
 .orders-table .status {
@@ -486,14 +613,19 @@
   transition: background-color 0.3s, transform 0.3s;
 }
 
-.btn-view, .btn-delete {
+.btn-view,
+.btn-delete {
   background-color: transparent;
-  display: inline-flex; /* Ensure buttons stay inline */
-  align-items: center; /* Align icon with text */
+  display: inline-flex;
+  /* Ensure buttons stay inline */
+  align-items: center;
+  /* Align icon with text */
   justify-content: center;
   color: inherit;
-  border: none; /* Remove button borders if any */
-  padding: 5px 10px; /* Adjust padding */
+  border: none;
+  /* Remove button borders if any */
+  padding: 5px 10px;
+  /* Adjust padding */
   cursor: pointer;
 }
 
@@ -509,8 +641,10 @@
 }
 
 .btn-container {
-  display: inline-flex; /* Flex container for the buttons */
-  gap: 5px; /* Space between the buttons */
+  display: inline-flex;
+  /* Flex container for the buttons */
+  gap: 5px;
+  /* Space between the buttons */
 }
 
 .btn-edit {
@@ -534,15 +668,20 @@
 
 /* Responsive Styles */
 @media (max-width: 768px) {
+
   .orders-table th,
   .orders-table td {
-    font-size: 12px; /* Adjust font size for smaller screens */
-    padding: 8px; /* Adjust padding for smaller screens */
+    font-size: 12px;
+    /* Adjust font size for smaller screens */
+    padding: 8px;
+    /* Adjust padding for smaller screens */
   }
 
   .btn {
-    font-size: 12px; /* Adjust button font size for smaller screens */
-    padding: 4px 8px; /* Adjust button padding for smaller screens */
+    font-size: 12px;
+    /* Adjust button font size for smaller screens */
+    padding: 4px 8px;
+    /* Adjust button padding for smaller screens */
   }
 
   .orders-page {
@@ -597,36 +736,52 @@
 
 
 .details-and-image10 {
-  display: flex; /* Flex layout to align details and image */
-  justify-content: space-between; /* Space between details and image */
-  align-items: center; /* Center items vertically */
+  display: flex;
+  /* Flex layout to align details and image */
+  justify-content: space-between;
+  /* Space between details and image */
+  align-items: center;
+  /* Center items vertically */
 }
 
 .product-info10 {
-  flex: 1; /* Allow the details to take available space */
-  margin-right: 20px; /* Space between details and image */
+  flex: 1;
+  /* Allow the details to take available space */
+  margin-right: 20px;
+  /* Space between details and image */
 }
 
 .product-image10 {
   width: 150px;
-  height: 150px; /* Maintain aspect ratio */
+  height: 150px;
+  /* Maintain aspect ratio */
   object-fit: contain;
 }
 
 .modal-close-button10 {
-  position: absolute; /* Position the button absolutely within the modal */
-  top: 15px; /* Adjust as needed */
-  right: 15px; /* Adjust as needed */
-  background: transparent; /* No background */
-  border: none; /* No border */
-  font-size: 24px; /* Size of the icon */
-  cursor: pointer; /* Pointer cursor on hover */
-  color: #333; /* Color of the icon */
-  z-index: 1000; /* Ensure it is above other elements */
+  position: absolute;
+  /* Position the button absolutely within the modal */
+  top: 15px;
+  /* Adjust as needed */
+  right: 15px;
+  /* Adjust as needed */
+  background: transparent;
+  /* No background */
+  border: none;
+  /* No border */
+  font-size: 24px;
+  /* Size of the icon */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  color: #333;
+  /* Color of the icon */
+  z-index: 1000;
+  /* Ensure it is above other elements */
 }
 
 .modal-close-button10:hover {
-  color: #e74c3c; /* Change color on hover for feedback */
+  color: #e74c3c;
+  /* Change color on hover for feedback */
 }
 
 
@@ -669,29 +824,36 @@
 
 
 .info-row {
-  flex: 1 1 45%; /* Take up to 45% of width, adjust as necessary */
+  flex: 1 1 45%;
+  /* Take up to 45% of width, adjust as necessary */
   display: flex;
-  justify-content: space-between; /* Space out label and value */
-  padding: 3px 0; /* Vertical padding */
+  justify-content: space-between;
+  /* Space out label and value */
+  padding: 3px 0;
+  /* Vertical padding */
 }
 
 .info-label {
   font-weight: bold;
-  width: 150px; /* Adjust width as needed for alignment */
+  width: 150px;
+  /* Adjust width as needed for alignment */
 }
 
 .info-value {
   flex: 1;
   text-align: justify;
-  margin-left: 20px; /* Adjust margin for spacing */
+  margin-left: 20px;
+  /* Adjust margin for spacing */
 }
 
 /* Responsive Styles */
 @media (max-width: 768px) {
   .custom-modal10 {
     max-width: 90%;
-    margin-top: 20px; /* Reduced top margin for smaller screens */
-    padding: 15px; /* Reduced padding for better fit */
+    margin-top: 20px;
+    /* Reduced top margin for smaller screens */
+    padding: 15px;
+    /* Reduced padding for better fit */
   }
 
   .details-and-image10 {
@@ -705,8 +867,10 @@
   }
 
   .product-image10 {
-    width: 100px; /* Adjusted image width for smaller screens */
-    margin-bottom: 15px; /* Added margin for spacing */
+    width: 100px;
+    /* Adjusted image width for smaller screens */
+    margin-bottom: 15px;
+    /* Added margin for spacing */
   }
 
   .info-row {
@@ -717,14 +881,18 @@
 
   .info-label {
     font-weight: bold;
-  width: 150px; /* Adjust width as needed for alignment */
+    width: 150px;
+    /* Adjust width as needed for alignment */
   }
 
   .info-value {
-    margin-left: 0; /* Reset margin for smaller screens */
-    padding-left: 20px; /* Added padding for spacing */
+    margin-left: 0;
+    /* Reset margin for smaller screens */
+    padding-left: 20px;
+    /* Added padding for spacing */
   }
 }
-.statuss{
+
+.statuss {
   color: #2c2c2e;
 }

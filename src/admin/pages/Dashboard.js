@@ -144,8 +144,8 @@ const Dashboard = () => {
     try {
       const response = await axios.get(`${ApiUrl}/api/users`);
 
-      const totalCustomers = response.data.length; // ✅ Assign to variable first
-      setTotalCustomers(totalCustomers); // ✅ Then update state
+      const totalCustomers = response.data.length; //  Assign to variable first
+      setTotalCustomers(totalCustomers); //  Then update state
     } catch (error) {
       console.error("Error fetching sales report:", error);
     }

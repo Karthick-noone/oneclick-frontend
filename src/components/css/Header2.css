@@ -835,7 +835,7 @@
   /* Maximum width for the search box */
   margin: 0 auto;
   /* Center the search box in its container */
-  border-radius: 5px;
+  /* border-radius: 5px; */
   /* Rounded corners for the rectangular shape */
   overflow: hidden;
   /* Hide overflow for rounded corners */
@@ -889,7 +889,7 @@
   position: absolute;
   top: 79.5%;
   /* Push dropdown below the search box */
-  left: 50.1%;
+  left: 50.15%;
   transform: translateX(-50%);
   /* Center it below the search bar */
   width: 100%;
@@ -899,7 +899,7 @@
   background: #fff;
   /* White background */
   border: 1px solid #ddd;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   /* Slightly rounded corners */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   list-style: none;

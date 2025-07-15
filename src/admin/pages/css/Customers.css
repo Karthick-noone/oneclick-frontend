@@ -157,10 +157,10 @@
     border-radius: 8px;
     max-width: 500px;
     margin: auto;
-    margin-top: 150px;
+    margin-top: 100px;
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
-    max-height: 450px; /* Fixed height for modal */
+    max-height: 550px; /* Fixed height for modal */
     overflow-y: auto; /* Enables vertical scrolling */
   }
   

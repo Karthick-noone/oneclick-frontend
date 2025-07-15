@@ -6,11 +6,13 @@
     justify-content: center;
     padding: 10px;
     background-color: #001a35;
-    min-height: 10vh; /* Ensure it covers the full screen */
+    min-height: 10vh;
+    /* Ensure it covers the full screen */
 }
 
 .payment-methods-page h2 {
-    font-size: 14px; /* Larger font for better readability */
+    font-size: 14px;
+    /* Larger font for better readability */
     font-weight: bold;
     margin-bottom: 30px;
     color: #ddd;
@@ -25,48 +27,61 @@
 }
 
 .payment-images img {
-    width: 65px; /* Set width slightly larger for better visibility */
-    height: auto; /* Maintain aspect ratio */
-    object-fit: contain; /* Ensure the images fit within the given dimensions */
+    width: 65px;
+    /* Set width slightly larger for better visibility */
+    height: auto;
+    /* Maintain aspect ratio */
+    object-fit: contain;
+    /* Ensure the images fit within the given dimensions */
     transition: transform 0.3s ease;
-    image-rendering: crisp-edges; /* Ensure clear images */
-    padding: 5px; /* Add slight padding around images */
+    image-rendering: crisp-edges;
+    /* Ensure clear images */
+    padding: 5px;
+    /* Add slight padding around images */
 }
 
 .payment-images img:hover {
-    transform: scale(1.15); /* Slightly larger hover effect */
+    transform: scale(1.15);
+    /* Slightly larger hover effect */
 }
 
 /* Responsive design for tablets */
 @media (max-width: 1024px) {
     .payment-images {
-        gap: 30px; /* Adjust gap for better spacing */
+        gap: 30px;
+        /* Adjust gap for better spacing */
     }
 
     .payment-images img {
-        width: 55px; /* Adjust image width for smaller screens */
+        width: 55px;
+        /* Adjust image width for smaller screens */
     }
 }
 
 /* Responsive design for mobile devices */
 @media (max-width: 768px) {
     .payment-methods-page h2 {
-        font-size: 20px; /* Reduce font size */
+        font-size: 20px;
+        /* Reduce font size */
     }
+
+ 
 
     .payment-images {
         gap: 20px;
     }
 
     .payment-images img {
-        width: 45px; /* Adjust image size for mobile */
+        width: 45px;
+        /* Adjust image size for mobile */
     }
 }
 
 /* Further adjustments for very small screens */
 @media (max-width: 480px) {
     .payment-methods-page h2 {
-        font-size: 18px; /* Smaller font for smaller screens */
+        font-size: 18px;
+        /* Smaller font for smaller screens */
     }
 
     .payment-images {
@@ -74,7 +89,8 @@
     }
 
     .payment-images img {
-        width: 40px; /* Smaller image size for very small screens */
+        width: 40px;
+        /* Smaller image size for very small screens */
     }
 }
 

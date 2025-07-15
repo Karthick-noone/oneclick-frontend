@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import ApproveImage from './img/approve.png';
+import ApprovalWaitingImage from './img/approval_waiting.png';
+
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes, FaImages, FaPlusCircle } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes, FaImages, FaPlusCircle, FaChevronDown } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -11,14 +13,14 @@ import Slider from "react-slick"; // Import Slider from react-slick
 import { FaInfoCircle, FaClone } from "react-icons/fa"; // Ensure to import any icons you need
 import CouponEditPopup from "./CouponEditPopup";
 import EditCouponModal from "./EditCouponModal"; // Import the modal component
-import CouponImage from './img/coupons.png'
+// import CouponImage from './img/coupons.png'
 import ActiveCouponImage from './img/Active-coupon.png'
 import ExpiredCouponImage from './img/Expired-coupon.png'
 import { SearchIcon } from "lucide-react";
 import FilterIcon from "./img/filter.png";
-import leftarrow from './img/left.png';
-import rightarrow from './img/right.png';
-
+// import leftarrow from './img/left.png';
+// import rightarrow from './img/right.png';
+import { toast } from "react-toastify";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 // Set up the modal root element
@@ -82,8 +84,50 @@ const Speakers = () => {
   const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
   // const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
  const [loadingProductId, setLoadingProductId] = useState(null);
+    const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
-  const handleStatusUpdate = async (prodId) => {
+     const handleStatusChange = async (newStatus, productId) => {
+    try {
+      const res = await axios.post(
+        `${ApiUrl}/api/products/status`,
+        {
+          productId,
+          status: newStatus,
+        }
+      );
+
+      if (res.data.success) {
+        // Show success toast with config
+        toast.success("Product status updated successfully", {
+          position: "top-right",
+          autoClose: 3000,        // Close after 3 seconds
+          hideProgressBar: true,  // No progress bar
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+
+        //  Refresh product list
+        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchspeakers`, {
+          timeout: 5000,
+        });
+        console.log("Refreshed product list:", refreshedProducts.data);
+
+        // Update the product list in state
+        setProducts(refreshedProducts.data);
+
+
+      } else {
+        //  Show error toast
+        toast.error("Failed to update product status");
+      }
+    } catch (err) {
+      console.error("Error updating product status:", err);
+      toast.error("Something went wrong while updating status");
+    }
+  };
+
+const handleStatusUpdate = async (prodId) => {
   try {
     console.log(`Updating productStatus for prod_id=${prodId}`);
     setLoadingProductId(prodId); // Mark this product as loading
@@ -102,10 +146,17 @@ const Speakers = () => {
 
     if (response.status === 200) {
       console.log(`Product ${prodId} approved`);
-      alert("Product status updated successfully");
+      toast.success("Product approved successfully", {
+        position: "top-right",
+        autoClose: 3000, // Close after 3 seconds
+        hideProgressBar: true, //  No progress bar
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
 
-      // Refresh product list with a timeout of 5 seconds
-      const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
+      // Refresh product list
+      const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchspeakers`, {
         timeout: 5000,
       });
       console.log("Refreshed product list:", refreshedProducts.data);
@@ -114,20 +165,36 @@ const Speakers = () => {
       setProducts(refreshedProducts.data);
     } else {
       console.warn(`Failed to update product ${prodId}`);
-      alert("Failed to update product status");
+      toast.error(" Failed to update product status", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   } catch (error) {
     console.error(`Error updating product ${prodId}:`, error.message);
     if (error.code === "ECONNABORTED") {
-      alert("Request timed out. Please try again.");
+      toast.error(" Request timed out. Please try again.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+      });
     } else {
-      alert("An error occurred while updating product status");
+      toast.error(" An error occurred while updating product status", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+      });
     }
   } finally {
     setLoadingProductId(null); // Clear loading state
     console.log(`Status update finished for prod_id: ${prodId}`);
   }
 };
+
   const fetchCouponStatus = async (productId) => {
     console.log(`[INFO] Checking coupon for product ID: ${productId}`);
 
@@ -168,7 +235,7 @@ const Speakers = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      const section = document.querySelector(".laptops-products-list");
+      const section = document.querySelector(".dotted-divider");
       if (section) {
         const offset = section.offsetTop - 70; // Adjust the margin (50px in this case)
         window.scrollTo({ top: offset, behavior: "smooth" });
@@ -1682,30 +1749,21 @@ const Speakers = () => {
                                               </h3>
                       
                                               {product.productStatus === "unapproved" && (
-                                                <>
-                                                  {/* <span style={{ color: "red" }}>({product.productStatus})</span> */}
-                                                  <img src={ApproveImage} width={"50px"}
-                                                  style={{cursor:'pointer'}}
-                                                  
-                                                    onClick={() => handleStatusUpdate(product.prod_id)} // Pass prod_id
-                                                  />
-                                                  {/* <button
-                                                    disabled={loadingProductId === product.prod_id} // Disable only this product's button
-                                                    style={{
-                                                      marginTop: "8px",
-                                                      padding: "6px 12px",
-                                                      borderRadius: "6px",
-                                                      background: "linear-gradient(to right, #f44336, #e57373)", // red gradient
-                                                      color: "#fff",
-                                                      border: "none",
-                                                      cursor: "pointer",
-                                                      opacity: loadingProductId === product.prod_id ? 0.7 : 1, // Only fade this button
-                                                    }}
-                                                  >
-                                                    {loadingProductId === product.prod_id ? "Updating..." : "Approve"}
-                                                  </button> */}
-                                                </>
-                                              )}
+                          <>
+                            <img
+                              src={userRole === "Admin" ? ApproveImage : ApprovalWaitingImage}
+                              width={userRole === "Admin" ? "50px" : "60px"}
+                              style={{
+                                cursor: userRole === "Admin" ? "pointer" : "not-allowed",
+                              }}
+                              onClick={
+                                userRole === "Admin"
+                                  ? () => handleStatusUpdate(product.prod_id) //  Only for Admin
+                                  : undefined //  Disabled for non-admin
+                              }
+                            />
+                          </>
+                        )}
                       
                                             </div>
 
@@ -2032,7 +2090,7 @@ const Speakers = () => {
                                                   </span>{" "}
                                                   -
                                                   <span className="expiry-date">
-                                                    Expires on:{" "}
+                                                    {/* Expires on:{" "} */}{" "}
                                                     {new Date(
                                                       coupon.expiry_date
                                                     ).toLocaleDateString("en-GB", {
@@ -2095,6 +2153,28 @@ const Speakers = () => {
                                         onClick={() => handleCopyProduct(product.id)}
                                         className="copy-icon"
                                       />
+                                    </div>
+
+                                    <div
+                                      className={`${product.status === "available" ? "In-stock" : "Out-of-stock"
+                                        } status-container`}
+                                    >
+                                      <div className="dropdown-wrapper">
+                                        <select
+                                          className="status-dropdown"
+                                          value={product.status}
+                                          onChange={(e) =>
+                                            handleStatusChange(
+                                              e.target.value, // New status
+                                              product.id      // Product ID
+                                            )
+                                          }
+                                        >
+                                          <option value="available">In Stock</option>
+                                          <option value="unavailable">Out of Stock</option>
+                                        </select>
+                                        <FaChevronDown className="select-dropdown-arrow" />
+                                      </div>
                                     </div>
 
                                     {/* Frequently Buy Section */}
@@ -2331,7 +2411,7 @@ const Speakers = () => {
                   />
                 </div>
 
-                <div className="feature-item">
+                {/* <div className="feature-item">
                   <label className="feature-label">
                     In Stock or Out Of Stock
                   </label>
@@ -2350,7 +2430,7 @@ const Speakers = () => {
                     <option value="available">In Stock</option>
                     <option value="unavailable">Out Of Stock</option>
                   </select>
-                </div>
+                </div> */}
 
                 <div className="feature-item">
 

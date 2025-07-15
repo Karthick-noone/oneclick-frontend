@@ -37,135 +37,138 @@ const ProductList = () => {
   };
 
   useEffect(() => {
-    axios
-      .get(`${ApiUrl}/api/products`)
-      .then((response) => {
-        const categories = response.data.reduce((acc, category) => {
-          const categoryName = category[0]?.category;
-          if (categoryName) {
-            acc[categoryName] = category;
+  axios
+    .get(`${ApiUrl}/api/products`)
+    .then((response) => {
+      // Group products by category
+      const categories = response.data.reduce((acc, product) => {
+        const categoryName = product.category;
+        if (categoryName) {
+          if (!acc[categoryName]) {
+            acc[categoryName] = []; // Initialize array for category
           }
-          return acc;
-        }, {});
-        setProductsByCategory(categories);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching products:", error);
-        setError("Failed to fetch products. Please try again later.");
-        setLoading(false);
-      });
-  }, []);
+          acc[categoryName].push(product); // Add product to the category array
+        }
+        return acc;
+      }, {}); // Initial accumulator is an empty object
+
+      setProductsByCategory(categories);
+      console.log("Grouped Product Categories", categories);
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error("Error fetching products:", error);
+      setError("Failed to fetch products. Please try again later.");
+      setLoading(false);
+    });
+}, []);
 
   const handleToggleFavorite = async (product, event) => {
-    event.stopPropagation();
+  event.stopPropagation();
 
-    // Check if the user is logged in
+  const email = localStorage.getItem("email");
+  const username = localStorage.getItem("username");
+
+  if (!email || !username) {
+    toast.error("User is not logged in!", {
+      position: "top-right",
+      autoClose: 2000,
+    });
+    window.location.href = "/login";
+    return;
+  }
+
+  try {
+    const isFavorite = favorites[`${product.id}`];
+
+    if (isFavorite) {
+      // Optimistically update UI
+      setFavorites((prev) => {
+        const updated = { ...prev };
+        delete updated[`${product.id}`];
+        return updated;
+      });
+
+      await axios.post(`${ApiUrl}/remove-from-wishlist`, {
+        email,
+        productId: product.id,
+      });
+
+      window.dispatchEvent(new Event("wishlist-updated"));
+      toast.info(`${product.prod_name.substring(0, 25)}... removed from your wishlist!`, {
+        position: "top-right",
+        autoClose: 2000,
+      });
+    } else {
+      // Optimistically update UI
+      setFavorites((prev) => ({
+        ...prev,
+        [`${product.id}`]: true,
+      }));
+
+      await axios.post(`${ApiUrl}/update-user-wishlist`, {
+        email,
+        username,
+        action: "add",
+        prod_id: product.id,
+      });
+
+      window.dispatchEvent(new Event("wishlist-updated"));
+      toast.success(`${product.prod_name.substring(0, 25)}... added to your wishlist!`, {
+        position: "top-right",
+        autoClose: 2000,
+      });
+    }
+  } catch (error) {
+    console.error("Error updating wishlist:", error);
+    toast.error("An error occurred while updating wishlist.", {
+      position: "top-right",
+      autoClose: 2000,
+    });
+  }
+};
+useEffect(() => {
+  const fetchWishlist = async () => {
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
 
-    if (!email || !username) {
-      toast.error("User is not logged in!", {
-        position: "top-right",
-        autoClose: 2000,
-      });
-      window.location.href = "/login";
-      return;
-    }
-
     try {
-      const isFavorite = favorites[`${product.id}`]; // Check if product is already in the wishlist
+      const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
+        email,
+        username,
+      });
 
-      if (isFavorite) {
-        // If already in wishlist, call remove API
-        console.log(
-          `${product.prod_name} (ID: ${product.id}) is in the wishlist. Removing it.`
-        );
+      if (response.data.wishlist) {
+        const wishlist = response.data.wishlist;
+        const favoritesMap = {};
 
-        await axios.post(`${ApiUrl}/remove-from-wishlist`, {
-          email,
-          productId: product.id,
+        wishlist.forEach((item) => {
+          favoritesMap[`${item}`] = true;
         });
 
-        console.log(
-          `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
-        );
-        window.dispatchEvent(new Event("wishlist-updated"));
-        toast.info(`${product.prod_name.substring(0, 25) + '...'} removed from your wishlist!`, {
-          position: "top-right",
-          autoClose: 2000,
-        });
-      } else {
-        // If not in wishlist, call add API
-        console.log(
-          `${product.prod_name} (ID: ${product.id}) is not in the wishlist. Adding it.`
-        );
-
-        await axios.post(`${ApiUrl}/update-user-wishlist`, {
-          email,
-          username,
-          action: "add",
-          prod_id: product.id,
-        });
-
-        console.log(
-          `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
-        );
-        window.dispatchEvent(new Event("wishlist-updated"));
-        toast.success(`${product.prod_name.substring(0, 25) + '...'} added to your wishlist!`, {
-          position: "top-right",
-          autoClose: 2000,
-        });
+        setFavorites(favoritesMap);
       }
     } catch (error) {
-      console.error("Error updating wishlist:", error);
-      toast.error("An error occurred while updating wishlist.", {
-        position: "top-right",
-        autoClose: 2000,
-      });
+      console.error("Error fetching wishlist:", error);
     }
   };
 
-  useEffect(() => {
-    const fetchWishlist = async () => {
-      const email = localStorage.getItem("email");
-      const username = localStorage.getItem("username");
+  // Fetch wishlist immediately on mount
+  fetchWishlist();
 
-
-
-      try {
-        const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
-          email,
-          username,
-        });
-
-        if (response.data.wishlist) {
-          const wishlist = response.data.wishlist;
-          const favoritesMap = {};
-
-          // Set the favorites map based on product IDs in the wishlist
-          wishlist.forEach((item) => {
-            favoritesMap[`${item}`] = true; // Mark product ID as in wishlist
-          });
-
-          setFavorites(favoritesMap); // Update the favorites state
-        }
-      } catch (error) {
-        console.error("Error fetching wishlist:", error);
-      }
-    };
-
-    // Fetch wishlist immediately
+  // Listen for wishlist updates
+  const handleWishlistUpdate = () => {
+    console.log("[Event] Wishlist updated, fetching...");
     fetchWishlist();
+  };
 
-    // Set an interval to fetch the wishlist every second
-    const intervalId = setInterval(() => {
-      fetchWishlist();
-    }, 1000); // Update every second (1000ms)
+  window.addEventListener("wishlist-updated", handleWishlistUpdate);
 
-    // Cleanup the interval when the component unmounts
-    return () => clearInterval(intervalId);
-  }, []);
+  // Cleanup on unmount
+  return () => {
+    window.removeEventListener("wishlist-updated", handleWishlistUpdate);
+  };
+}, []);
 
   // useEffect(() => {
   //   const updateFavorites = () => {

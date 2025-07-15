@@ -3,7 +3,7 @@ import React from "react";
 import Header2 from "./Header2";
 // import Header3 from './Header3';
 import Footer from "./footer";
-import aboutImage from "./img/about.jpg"; // Replace with your image path
+import aboutImage from "./img/about_img.png"; // Replace with your image path
 import "./css/About.css"; // Import the CSS file for styling
 import CareersForm from "./CareersForm"; // Import the new component
 

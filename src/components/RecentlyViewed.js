@@ -102,6 +102,11 @@ const RecentlyViewed = () => {
         className="recently-viewed-card"
         onClick={() => handleProductClick(product)}
       >
+        {/* {product.offer_label && (
+                                <div className="product-label">
+                                  {product.offer_label}
+                                </div>
+                              )} */}
         <img
           src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${firstImage}`}
           alt={product.prod_name}

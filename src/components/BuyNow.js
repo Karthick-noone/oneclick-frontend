@@ -425,9 +425,11 @@ const BuyNow = () => {
       name: "One Click",
       description: "Order Payment",
       handler: async function (response) {
+        const paymentId = response.razorpay_payment_id;
+
         try {
           // Handle the order placement based on the payment method
-          await handlePlaceOrder(response);
+          await handlePlaceOrder(paymentId);
         } catch (error) {
           console.error("Error while placing order after payment:", error);
           Swal.fire({
@@ -468,7 +470,7 @@ const BuyNow = () => {
     });
   };
 
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = async (paymentId = null) => {
     console.log("handlePlaceOrder function called");
 
     // Use the selected address if available, otherwise fall back to the default address
@@ -571,6 +573,8 @@ const BuyNow = () => {
           : selectedPaymentMethod === "pickup"
             ? "Pending"
             : "Paid",
+      payment_id: paymentId,
+
     };
 
     console.log("Order Data:", orderData);
@@ -1100,8 +1104,17 @@ const BuyNow = () => {
                       class="pay-btn"
                       onClick={() => handlePayment("Online")}
                     >
-                      <span class="btn-text">Pay Now</span>
-                      <div class="icon-container">
+                      {isOrdering ? (
+                        <img
+                          src={orderTruck}
+                          alt="Ordering..."
+                          style={{ height: "100px", padding: "1px" }}
+                        />
+                      ) : (
+                        "Pay Now"
+                      )}
+                      {/* <span class="btn-text">Pay Now</span> */}
+                      {/* <div class="icon-container">
                         <svg viewBox="0 0 24 24" class="icon5 card-icon">
                           <path
                             d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18C2,19.11 2.89,20 4,20H20C21.11,20 22,19.11 22,18V6C22,4.89 21.11,4 20,4Z"
@@ -1137,7 +1150,7 @@ const BuyNow = () => {
                             fill="currentColor"
                           ></path>
                         </svg>
-                      </div>
+                      </div> */}
                     </button>
                   </div>
                 )}

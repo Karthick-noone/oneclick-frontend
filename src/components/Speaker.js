@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 // import Header1 from "./Header1";
-// import Header2 from "./Header2";
+import Header2 from "./Header2";
 // import Header3 from "./Header3";
 import Footer from "./footer";
 import Sidebar from "./Sidebar";
-import Modal from "./Modal";
+// import Modal from "./Modal";
 import "./css/Computers.css";
-// import { useCart } from "../components/CartContext";
+import { useCart } from "../components/CartContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { ApiUrl } from "./ApiUrl";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
-
+import Swal from "sweetalert2";
 // Define a fallback image URL
 // const fallbackImage = require('./img/laptop.jpg'); // Replace with a valid fallback image
 
@@ -22,37 +22,37 @@ const Speakers = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [favorites, setFavorites] = useState({});
-   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
+  const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [loading, setLoading] = useState(true);
-const [hoveredProductId, setHoveredProductId] = useState(null);
-const [hoverImageIndexes, setHoverImageIndexes] = useState({});
+  const [hoveredProductId, setHoveredProductId] = useState(null);
+  const [hoverImageIndexes, setHoverImageIndexes] = useState({});
 
-useEffect(() => {
-  let interval;
+  useEffect(() => {
+    let interval;
 
-  if (hoveredProductId !== null) {
-    interval = setInterval(() => {
-      setHoverImageIndexes((prev) => {
-        const currentIndex = prev[hoveredProductId] || 0;
-        const product = products.find(p => p.id === hoveredProductId);
-        const images = Array.isArray(product?.prod_img)
-          ? product.prod_img
-          : JSON.parse(product?.prod_img || "[]");
+    if (hoveredProductId !== null) {
+      interval = setInterval(() => {
+        setHoverImageIndexes((prev) => {
+          const currentIndex = prev[hoveredProductId] || 0;
+          const product = products.find(p => p.id === hoveredProductId);
+          const images = Array.isArray(product?.prod_img)
+            ? product.prod_img
+            : JSON.parse(product?.prod_img || "[]");
 
-        const nextIndex = (currentIndex + 1) % images.length;
-        return {
-          ...prev,
-          [hoveredProductId]: nextIndex,
-        };
-      });
-    }, 1000); // change image every 1 second
-  }
+          const nextIndex = (currentIndex + 1) % images.length;
+          return {
+            ...prev,
+            [hoveredProductId]: nextIndex,
+          };
+        });
+      }, 1000); // change image every 1 second
+    }
 
-  return () => clearInterval(interval);
-}, [hoveredProductId, products]);
+    return () => clearInterval(interval);
+  }, [hoveredProductId, products]);
 
 
-  
+
   // const {
   //   cartItems,
   //   addToCart,
@@ -82,118 +82,121 @@ useEffect(() => {
   // Filter products based on the normalized, concatenated prod_name and prod_features
   const filteredProducts = searchQuery
     ? products.filter((product) => {
-        // Concatenate prod_name and prod_features
-        const prodName = product.prod_name || "";
-        const prodFeatures = product.prod_features || "";
-        const combinedString = normalizeString(prodName + " " + prodFeatures);
+      // Concatenate prod_name and prod_features
+      const prodName = product.prod_name || "";
+      const prodFeatures = product.prod_features || "";
+      const combinedString = normalizeString(prodName + " " + prodFeatures);
 
-        // Log the combined string for debugging
-        console.log(
-          `Combined string for product: ${prodName} => ${combinedString}`
-        );
-
-        // Check if the combined string contains the normalized search query
-        return combinedString.includes(normalizedSearchQuery);
-      })
-    : products; // If no search query, return all products // If no search query, return all products
-
-  const [, setCoupons] = useState({}); // State to store coupons
-
-  const cacheRef = useRef({
-  speakers: null,
-  speakersCoupons: {},
-});
-
-useEffect(() => {
-  const fetchProducts = async () => {
-    setLoading(true);
-
-    try {
-      // Return from cache if available
-      if (cacheRef.current.speakers) {
-        setProducts(cacheRef.current.speakers);
-        setCoupons(cacheRef.current.speakersCoupons);
-        setLoading(false);
-        return;
-      }
-
-      const response = await axios.get(`${ApiUrl}/fetchspeakers`);
-      const fetchedProducts = response.data;
-      setProducts(fetchedProducts);
-      cacheRef.current.speakers = fetchedProducts;
-
-      const couponPromises = fetchedProducts.map((product) =>
-        axios
-          .get(`${ApiUrl}/coupons/${product.prod_id}`)
-          .then((res) => ({
-            prod_id: product.prod_id,
-            coupon_code: res.data?.coupons?.[0]?.coupon_code || null,
-          }))
-          .catch(() => ({
-            prod_id: product.prod_id,
-            coupon_code: null,
-          }))
+      // Log the combined string for debugging
+      console.log(
+        `Combined string for product: ${prodName} => ${combinedString}`
       );
 
-      const couponResults = await Promise.all(couponPromises);
-      const couponMap = {};
+      // Check if the combined string contains the normalized search query
+      return combinedString.includes(normalizedSearchQuery);
+    })
+    : products; // If no search query, return all products // If no search query, return all products
 
-      couponResults.forEach(({ prod_id, coupon_code }) => {
-        if (coupon_code) {
-          couponMap[prod_id] = coupon_code;
-        }
-      });
+  const [coupons, setCoupons] = useState({}); // State to store coupons
 
-      setCoupons(couponMap);
-      cacheRef.current.speakersCoupons = couponMap;
-    } catch (error) {
-      console.error("Error fetching speakers:", error);
-      toast.error("Failed to fetch speakers.");
-    } finally {
-      setLoading(false);
-    }
+  const cacheRef = {
+    speakers: null,
+    headphoneCoupons: {},
   };
 
-  fetchProducts();
-}, []);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
 
+      try {
+        //  Return from cache if available
+        if (cacheRef.speakers) {
+          setProducts(cacheRef.speakers);
+          setCoupons(cacheRef.headphoneCoupons);
+          setLoading(false);
+          return;
+        }
 
+        //  Fetch product list
+        const response = await axios.get(`${ApiUrl}/fetchspeakers`);
+        const fetchedProducts = response.data;
+        setProducts(fetchedProducts);
+        cacheRef.speakers = fetchedProducts;
 
+        // Fetch all coupons in parallel
+        const couponPromises = fetchedProducts.map((product) =>
+          axios
+            .get(`${ApiUrl}/coupons/${product.prod_id}`)
+            .then((res) => ({
+              prod_id: product.prod_id,
+              coupon_code: res.data?.coupons?.[0]?.coupon_code || null,
+            }))
+            .catch((err) => {
+              console.error(`Error fetching coupon for ${product.prod_id}`, err);
+              return { prod_id: product.prod_id, coupon_code: null };
+            })
+        );
 
-    const [isOfferActive, setIsOfferActive] = useState(true);
-      const [, setProduct] = useState(null);
-  
-       useEffect(() => {
-          const now = new Date();
-          // console.log("Current Time:", now.toLocaleString());
-        
-          const activeProduct = products.find((item) => {
-            if (!item.offer_start_time || !item.offer_end_time) {
-              // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
-              return false;
-            }
-        
-            const offerStartTime = new Date(item.offer_start_time);
-            const offerEndTime = new Date(item.offer_end_time);
-        
-            // console.log(
-            //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
-            // );
-        
-            return offerStartTime <= now && offerEndTime > now;
-          });
-        
-          if (activeProduct) {
-            // console.log("Active Product Found:", activeProduct);
-          } else {
-            // console.log("No active product with a valid offer.");
+        const couponResults = await Promise.all(couponPromises);
+        const couponMap = {};
+
+        couponResults.forEach(({ prod_id, coupon_code }) => {
+          if (coupon_code) {
+            couponMap[prod_id] = coupon_code;
           }
-        
-          setProduct(activeProduct || null);
-          setIsOfferActive(!!activeProduct);
-        
-          // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
-        }, [products]);
+        });
+
+        setCoupons(couponMap); // Set once
+        cacheRef.headphoneCoupons = couponMap;
+      } catch (error) {
+        console.error("Error fetching speakers:", error);
+        toast.error("Failed to fetch speakers.", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const [isOfferActive, setIsOfferActive] = useState(true);
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    const now = new Date();
+    // console.log("Current Time:", now.toLocaleString());
+
+    const activeProduct = products.find((item) => {
+      if (!item.offer_start_time || !item.offer_end_time) {
+        // console.log(`Skipping product ${item.prod_name} due to missing offer times.`);
+        return false;
+      }
+
+      const offerStartTime = new Date(item.offer_start_time);
+      const offerEndTime = new Date(item.offer_end_time);
+
+      // console.log(
+      //   `Checking product: ${item.prod_name}, Offer Start: ${offerStartTime.toLocaleString()}, Offer End: ${offerEndTime.toLocaleString()}`
+      // );
+
+      return offerStartTime <= now && offerEndTime > now;
+    });
+
+    if (activeProduct) {
+      // console.log("Active Product Found:", activeProduct);
+    } else {
+      // console.log("No active product with a valid offer.");
+    }
+
+    setProduct(activeProduct || null);
+    setIsOfferActive(!!activeProduct);
+
+    // console.log(`Is Offer Active: ${!!activeProduct ? "Yes" : "No"}`);
+  }, [products]);
 
   const handleBuyNow = (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
@@ -253,40 +256,40 @@ useEffect(() => {
   // };
 
   const handleCardClick = (product) => {
-  if (product && product.id) {
-    const now = Date.now();
+    if (product && product.id) {
+      const now = Date.now();
 
-    let storedData = localStorage.getItem("Recently-viewed");
-    let parsedData = [];
+      let storedData = localStorage.getItem("Recently-viewed");
+      let parsedData = [];
 
-    try {
-      parsedData = storedData ? JSON.parse(storedData) : [];
-    } catch (err) {
-      console.error("Failed to parse Recently-viewed:", err);
+      try {
+        parsedData = storedData ? JSON.parse(storedData) : [];
+      } catch (err) {
+        console.error("Failed to parse Recently-viewed:", err);
+      }
+
+      // Remove if already exists
+      parsedData = parsedData.filter((item) => item.id !== product.id);
+
+      // Add current item with timestamp
+      parsedData.unshift({
+        id: product.id,
+        timestamp: now,
+      });
+
+      // Keep only last 10
+      parsedData = parsedData.slice(0, 10);
+
+      localStorage.setItem("Recently-viewed", JSON.stringify(parsedData));
+
+      const slugify = (name) =>
+        name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
+
+      navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
     }
+  };
 
-    // Remove if already exists
-    parsedData = parsedData.filter((item) => item.id !== product.id);
 
-    // Add current item with timestamp
-    parsedData.unshift({
-      id: product.id,
-      timestamp: now,
-    });
-
-    // Keep only last 10
-    parsedData = parsedData.slice(0, 10);
-
-    localStorage.setItem("Recently-viewed", JSON.stringify(parsedData));
-
-    const slugify = (name) =>
-      name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
-
-    navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
-  }
-};
-
-  
 
   const handleCloseModal = () => {
     setSelectedProduct(null);
@@ -344,11 +347,23 @@ useEffect(() => {
 
       // Handle the response
       if (response.status === 200) {
-        toast.success(`${product.prod_name.substring(0,25)+'...'} added to your cart!`, {
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item added to your cart!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
+        });
+        window.dispatchEvent(new Event("cart-updated"));
+      } else {
+        toast.error(response.data.message || "Failed to add item to cart", {
           position: "top-right",
           autoClose: 2000,
         });
       }
+
     } catch (error) {
       console.error("Error adding item to cart:", error);
       toast.error("Failed to add item to cart", {
@@ -360,6 +375,7 @@ useEffect(() => {
       setIsAdding(false);
     }
   };
+
   const handleToggleFavorite = async (product, event) => {
     event.stopPropagation();
 
@@ -393,9 +409,15 @@ useEffect(() => {
         console.log(
           `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
         );
-        toast.info(`${product.prod_name.substring(0,25)+'...'} removed from your wishlist!`, {
-          position: "top-right",
-          autoClose: 2000,
+        window.dispatchEvent(new Event("wishlist-updated"));
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item removed from your wishlist!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
         });
       } else {
         // If not in wishlist, call add API
@@ -413,9 +435,15 @@ useEffect(() => {
         console.log(
           `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
         );
-        toast.success(`${product.prod_name.substring(0,25)+'...'} added to your wishlist!`, {
-          position: "top-right",
-          autoClose: 2000,
+        window.dispatchEvent(new Event("wishlist-updated"));
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item added to your wishlist!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
         });
       }
     } catch (error) {
@@ -432,11 +460,6 @@ useEffect(() => {
       const email = localStorage.getItem("email");
       const username = localStorage.getItem("username");
 
-      if (!email || !username) {
-        console.log("User not logged in");
-        return;
-      }
-
       try {
         const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
           email,
@@ -447,54 +470,36 @@ useEffect(() => {
           const wishlist = response.data.wishlist;
           const favoritesMap = {};
 
-          // Set the favorites map based on product IDs in the wishlist
           wishlist.forEach((item) => {
-            favoritesMap[`${item}`] = true; // Mark product ID as in wishlist
+            favoritesMap[`${item}`] = true;
           });
 
-          setFavorites(favoritesMap); // Update the favorites state
+          setFavorites(favoritesMap);
         }
       } catch (error) {
         console.error("Error fetching wishlist:", error);
       }
     };
 
-    // Fetch wishlist immediately
+    // Fetch once on mount
     fetchWishlist();
 
-    // Set an interval to fetch the wishlist every second
-    const intervalId = setInterval(() => {
+    //  Listen for wishlist updates
+    const handleWishlistUpdate = () => {
+      console.log("Wishlist updated event received.");
       fetchWishlist();
-    }, 1000); // Update every second (1000ms)
+    };
 
-    // Cleanup the interval when the component unmounts
-    return () => clearInterval(intervalId);
+    window.addEventListener("wishlist-updated", handleWishlistUpdate);
+
+    return () => {
+      window.removeEventListener("wishlist-updated", handleWishlistUpdate);
+    };
   }, []);
 
-  // const handleRemoveFromWishlist = async (productId) => {
-  //   const email = localStorage.getItem("email");
 
-  //   if (!email) {
-  //     toast.error("User is not logged in!");
-  //     return;
-  //   }
 
-  //   try {
-  //     const response = await axios.post(`${ApiUrl}/remove-from-wishlist`, {
-  //       email,
-  //       productId,
-  //     });
 
-  //     if (response.status === 200) {
-  //       toast.success("Item removed from wishlist");
-  //       // Update the wishlist in the state
-  //       // setWishlistItems((prevItems) => prevItems.filter((item) => item.id !== productId));
-  //     }
-  //   } catch (error) {
-  //     console.error("Error removing item from wishlist:", error);
-  //     toast.error("Failed to remove item from wishlist");
-  //   }
-  // };
 
   // Define the category variable
   const category = "speakers";
@@ -507,7 +512,7 @@ useEffect(() => {
       {/* <Header2 category={category} /> */}
       {/* <Header3 /> */}
       <span style={{ marginLeft: "20px", padding: "10px" }}>
-         <Link style={{ textDecoration: "none", color: "black" }} to="/">
+        <Link style={{ textDecoration: "none", color: "black" }} to="/">
           Home{" "}
         </Link>
         &gt; Speakers
@@ -516,17 +521,17 @@ useEffect(() => {
         <Sidebar />
         <div className="product-list">
           {loading ? (
-        // 1. Loading state
-         [...Array(8)].map((_, index) => (
-          <div key={index} className="skeleton-product-card">
-            <div className="skeleton-image"></div>
-            <div className="skeleton-text"></div>
-            <div className="skeleton-text short"></div>
-            <div className="skeleton-price"></div>
-            <div className="skeleton-buttons"></div>
-          </div>
-        ))
-      ) : products.length === 0 ? (
+            // 1. Loading state
+            [...Array(8)].map((_, index) => (
+              <div key={index} className="skeleton-product-card">
+                <div className="skeleton-image"></div>
+                <div className="skeleton-text"></div>
+                <div className="skeleton-text short"></div>
+                <div className="skeleton-price"></div>
+                <div className="skeleton-buttons"></div>
+              </div>
+            ))
+          ) : products.length === 0 ? (
             <div className="no-products-message">
               <h2>No products here yet...</h2>
               <p>
@@ -537,47 +542,47 @@ useEffect(() => {
           ) : filteredProducts.length === 0 ? (
             // If filteredProducts is empty, fallback to using all products
             products.map((product) => {
-  const images = Array.isArray(product.prod_img)
-    ? product.prod_img
-    : JSON.parse(product.prod_img || "[]");
+              const images = Array.isArray(product.prod_img)
+                ? product.prod_img
+                : JSON.parse(product.prod_img || "[]");
 
-  const activeIndex =
-    hoveredProductId === product.id
-      ? hoverImageIndexes[product.id] || 0
-      : 0;
+              const activeIndex =
+                hoveredProductId === product.id
+                  ? hoverImageIndexes[product.id] || 0
+                  : 0;
 
-  const currentImage = images[activeIndex];
+              const currentImage = images[activeIndex];
 
-  return (
-    <div
-      key={product.id}
-      className="product-card"
-      onClick={() => handleCardClick(product)}
-      onMouseEnter={() => setHoveredProductId(product.id)}
-      onMouseLeave={() => {
-        setHoveredProductId(null);
-        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
-      }}
-    >
-      {product.offer_label && (
-        <div className="product-label">{product.offer_label}</div>
-      )}
+              return (
+                <div
+                  key={product.id}
+                  className="product-card"
+                  onClick={() => handleCardClick(product)}
 
-      <div className="product-actions">
-        <img
-          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
-          alt={product.prod_name}
-          className="product-image"
-        />
+                >
+                  {product.offer_label && (
+                    <div className="product-label">{product.offer_label}</div>
+                  )}
+
+                  <div className="product-actions">
+                    <img
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
+                      alt={product.prod_name}
+                      className="product-image"
+                      onMouseEnter={() => setHoveredProductId(product.id)}
+                      onMouseLeave={() => {
+                        setHoveredProductId(null);
+                        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+                      }}
+                    />
                     <span
                       title={
                         favorites[`${product.id}`]
                           ? "Remove from Wishlist"
                           : "Add to Wishlist"
                       }
-                      className={`favorite-icon ${
-                        favorites[`${product.id}`] ? "filled" : ""
-                      }`}
+                      className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
+                        }`}
                       onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
                     >
                       {favorites[`${product.id}`] ? (
@@ -588,10 +593,10 @@ useEffect(() => {
                     </span>
                   </div>
 
-                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
+                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
 
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
-                  <span className="product-subtitle2">{product.subtitle}</span>
+                  <span className="product-subtitle2" title={product.subtitle}>{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}
                           </p> */}
@@ -605,7 +610,7 @@ useEffect(() => {
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through", color:'red' }}
+                        style={{ textDecoration: "line-through", color: 'red' }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -621,7 +626,7 @@ useEffect(() => {
                       {Math.round(
                         ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
-                          100
+                        100
                       )}
                       % OFF)
                     </p>
@@ -676,48 +681,48 @@ useEffect(() => {
             })
           ) : (
             // If filteredProducts has results, display them
-              filteredProducts.map((product) => {
-  const images = Array.isArray(product.prod_img)
-    ? product.prod_img
-    : JSON.parse(product.prod_img || "[]");
+            filteredProducts.map((product) => {
+              const images = Array.isArray(product.prod_img)
+                ? product.prod_img
+                : JSON.parse(product.prod_img || "[]");
 
-  const activeIndex =
-    hoveredProductId === product.id
-      ? hoverImageIndexes[product.id] || 0
-      : 0;
+              const activeIndex =
+                hoveredProductId === product.id
+                  ? hoverImageIndexes[product.id] || 0
+                  : 0;
 
-  const currentImage = images[activeIndex];
+              const currentImage = images[activeIndex];
 
-  return (
-    <div
-      key={product.id}
-      className="product-card"
-      onClick={() => handleCardClick(product)}
-      onMouseEnter={() => setHoveredProductId(product.id)}
-      onMouseLeave={() => {
-        setHoveredProductId(null);
-        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
-      }}
-    >
-      {product.offer_label && (
-        <div className="product-label">{product.offer_label}</div>
-      )}
+              return (
+                <div
+                  key={product.id}
+                  className="product-card"
+                  onClick={() => handleCardClick(product)}
 
-      <div className="product-actions">
-        <img
-          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
-          alt={product.prod_name}
-          className="product-image"
-        />
+                >
+                  {product.offer_label && (
+                    <div className="product-label">{product.offer_label}</div>
+                  )}
+
+                  <div className="product-actions">
+                    <img
+                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
+                      alt={product.prod_name}
+                      className="product-image"
+                      onMouseEnter={() => setHoveredProductId(product.id)}
+                      onMouseLeave={() => {
+                        setHoveredProductId(null);
+                        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+                      }}
+                    />
                     <span
                       title={
                         favorites[`${product.id}`]
                           ? "Remove from Wishlist"
                           : "Add to Wishlist"
                       }
-                      className={`favorite-icon ${
-                        favorites[`${product.id}`] ? "filled" : ""
-                      }`}
+                      className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
+                        }`}
                       onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
                     >
                       {favorites[`${product.id}`] ? (
@@ -728,8 +733,8 @@ useEffect(() => {
                     </span>
                   </div>
 
-                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase()+product.prod_name.slice(1)}</h3>
-                  <span className="product-subtitle2">{product.subtitle}</span>
+                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
+                  <span className="product-subtitle2" title={product.subtitle}>{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}
                           </p> */}
@@ -744,7 +749,7 @@ useEffect(() => {
                       </span>
                       <span
                         className="product-actual-price"
-                        style={{ textDecoration: "line-through", color:'red' }}
+                        style={{ textDecoration: "line-through", color: 'red' }}
                       >
                         ₹{product.actual_price}
                       </span>
@@ -760,7 +765,7 @@ useEffect(() => {
                       {Math.round(
                         ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
                           product.actual_price) *
-                          100
+                        100
                       )}
                       % OFF)
                     </p>
@@ -820,7 +825,7 @@ useEffect(() => {
       </div>
 
       <Footer />
-      {selectedProduct && (
+      {/* {selectedProduct && (
         <Modal
           isOpen={true}
           onClose={handleCloseModal}
@@ -829,7 +834,7 @@ useEffect(() => {
           onPrev={handlePrevProduct}
           category={category} // Pass the category to the Modal
         />
-      )}
+      )} */}
       <ToastContainer />
     </div>
   );

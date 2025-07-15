@@ -2,6 +2,7 @@ import React from "react";
 import "./css/Footer.css"; // Adjust path as needed
 import PaymentMethods from "./PaymentMethods"; // Import the PaymentMethods page
 import { Link } from "react-router-dom";
+import PlayStore from './img/Play-Store.png';
 
 // Import icons from react-icons
 import { FaMapMarkerAlt, FaHeadset, FaShareAlt, FaGavel } from "react-icons/fa";
@@ -15,7 +16,7 @@ import {
 
 const Footer = () => {
   return (
-    <>
+    <div className="footer-bg">
       <footer className="footer">
         <div className="footer-section">
           <h4>
@@ -27,6 +28,9 @@ const Footer = () => {
           <Link to="tel:+9092206677">
             <p>+91-9092206677</p>
           </Link>
+          <a href="https://play.google.com/store/apps/details?id=com.oneclick.seasense" target="_blank" rel="noopener noreferrer">
+            <img loading='lazy' src={PlayStore} alt="Visa" className='play-store-image' />
+          </a>
         </div>
 
         <div className="footer-section">
@@ -105,11 +109,13 @@ const Footer = () => {
             <p style={{ color: "white", textDecoration: "none" }}>ADMIN</p>
           </Link>
         </div>
+
+
       </footer>
 
       <PaymentMethods />
 
-    </>
+    </div>
   );
 };
 

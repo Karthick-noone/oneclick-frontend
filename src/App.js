@@ -23,15 +23,15 @@ import Watch from "./components/Watch";
 import Sidebar from "./components/Sidebar";
 import ComputerFilter from "./components/ComputerFilter";
 import BrandsPage from "./components/BrandsPage";
-import Modal from "./components/Modal";
+// import Modal from "./components/Modal";
 import ProductDetail from "./components/ProductDetail";
 import Login from "./components/AdminLogin";
-import Adminregister from "./components/AdminSignup";
+// import Adminregister from "./components/AdminSignup";
 import ClientLogin from "./components/ClientLogin";
 import ClientSignup from "./components/ClientSignup";
 import ForgotPassword from "./components/ForgotPassword";
 import ChangePassword from "./components/ChangePassword";
-import AdminForgotPassword from "./components/AdminForgotPassword";
+// import AdminForgotPassword from "./components/AdminForgotPassword";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import HelpCenter from "./components/HelpCenter";
@@ -106,15 +106,15 @@ const App = () => {
             <Route path="/Sidebar" element={<Sidebar />} />
             <Route path="/ComputerFilter" element={<ComputerFilter />} />
             <Route path="/BrandsPage" element={<BrandsPage />} />
-            <Route path="/Modal" element={<Modal />} />
+            {/* <Route path="/Modal" element={<Modal />} /> */}
             <Route path="/shop/:id" element={<ProductDetail />} />
             <Route path="/AdminLogin" element={<Login />} />
-            <Route path="/Adminregister" element={<Adminregister />} />
+            {/* <Route path="/Adminregister" element={<Adminregister />} /> */}
             <Route path="/Login" element={<ClientLogin />} />
             <Route path="/Signup" element={<ClientSignup />} />
             <Route path="/ForgotPassword" element={<ForgotPassword />} />
             <Route path="/ChangePassword" element={<ChangePassword />} />
-            <Route path="/AdminForgotPassword" element={<AdminForgotPassword />} />
+            {/* <Route path="/AdminForgotPassword" element={<AdminForgotPassword />} /> */}
             <Route path="/About" element={<About />} />
             <Route path="/Contact" element={<Contact />} />
             <Route path="/HelpCenter" element={<HelpCenter />} />

@@ -113,8 +113,9 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
     style={{
       position: "absolute",
       inset: 0,
-      zIndex: 0, // background z-index
+      zIndex: 1, // background z-index
       pointerEvents: "none", // make sure background doesn’t block content
+      // zIndex:1
     }}
   >
     {deliveryStatus === "Delivered" ? (
@@ -150,7 +151,7 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
     style={{
       marginBottom: deliveryStatus === "Delivered" ? "242px" : "",
       position: "relative", // ensure it appears above background
-      zIndex: 1,
+      zIndex: deliveryStatus === "Delivered" ? 1 : 0,
     }}
   >
     Track Order

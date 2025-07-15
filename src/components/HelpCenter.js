@@ -22,35 +22,35 @@ const HelpCenter = () => {
 
   return (
     <div>
-      {/* <Header1 /> */}
-      {/* <Header2 /> */}
-      {/* <Header3 /> */}
+
       <div style={styles.container}>
         <h2 style={styles.title}>TechShed Help Center</h2>
 
-    <h4 style={{textAlign: 'center',fontSize: '1.3em',marginBottom:'30px'}}>Frequently asked questions</h4>
+        <h4 style={{ textAlign: 'center', fontSize: '1.3em', marginBottom: '30px' }}>Frequently asked questions</h4>
         <div style={styles.headerContainer}>
-          <h3 
+          <button
             style={activeSection === 'general' ? styles.activeHeader : styles.header}
             onClick={() => toggleSection('general')}
+            disabled={activeSection === 'general'}
           >
             General
-          </h3>
-          <h3 
+          </button>
+          <button
             style={activeSection === 'setup' ? styles.activeHeader : styles.header}
             onClick={() => toggleSection('setup')}
+            disabled={activeSection === 'setup'}
           >
-            Setting up FAQs
-          </h3>
+            Account Setup
+          </button>
         </div>
         <div style={styles.faqContainer}>
           {activeSection === 'general' && faqGeneral.map((faq, index) => (
             <div key={index}>
-              <div 
-                style={styles.questionContainer} 
+              <div
+                style={styles.questionContainer}
                 onClick={() => toggleQuestion(index, 'general')}
               >
-              
+
                 <h3 style={styles.question}>{faq.question}</h3>
                 {activeQuestion.general === index ? (
                   <FaChevronDown style={styles.icon} />
@@ -68,11 +68,11 @@ const HelpCenter = () => {
           ))}
           {activeSection === 'setup' && faqSetup.map((faq, index) => (
             <div key={index}>
-              <div 
-                style={styles.questionContainer} 
+              <div
+                style={styles.questionContainer}
                 onClick={() => toggleQuestion(index, 'setup')}
               >
-               
+
                 <h3 style={styles.question}>{faq.question}</h3>
                 {activeQuestion.setup === index ? (
                   <FaChevronDown style={styles.icon} />
@@ -98,62 +98,50 @@ const HelpCenter = () => {
 // General FAQs
 const faqGeneral = [
   {
-    question: 'What is an FAQ section?',
-    answer: 'An FAQ section can be used to quickly answer common questions about your business like "Where do you ship to?", "What are your opening hours?", or "How can I book a service?".'
+    question: 'How do I track my order?',
+    answer: 'Go to “My Orders” in your account dashboard to view the live status of your order.'
   },
   {
-    question: 'Why do FAQs matter?',
-    answer: 'FAQs are a great way to help site visitors find quick answers to common questions about your business and create a better navigation experience.'
+    question: 'What payment methods are accepted?',
+    answer: 'We accept credit/debit cards, UPI, NetBanking, and major digital wallets.'
   },
   {
-    question: 'Where can I add my FAQs?',
-    answer: 'FAQs can be added to any page on your site or to your mobile app, giving access to members on the go.'
+    question: 'What are your customer support hours?',
+    answer: 'Our support team is available 24/7 via chat and email, and from 9 AM to 9 PM on calls.'
   },
-  // {
-  //   question: 'What is the return policy?',
-  //   answer: 'Our return policy allows you to return items within 30 days of receipt. Please check our Returns & Exchanges page for more details.'
-  // },
-  // {
-  //   question: 'How can I track my order?',
-  //   answer: 'You can track your order by logging into your account and visiting the "Order History" section. You will also receive tracking updates via email.'
-  // },
-  // // {
-  // //   question: 'Do you offer international shipping?',
-  // //   answer: 'Yes, we offer international shipping to most countries. Shipping rates and delivery times vary based on the destination.'
-  // // },
-  // {
-  //   question: 'How do I contact customer support?',
-  //   answer: 'You can contact our customer support team via email at enquiryoneclick@gmail.com or through our contact form on the website.'
-  // },
-  // {
-  //   question: 'Are there any ongoing promotions?',
-  //   answer: 'Please visit our Promotions page to see the latest offers and discounts available on our site.'
-  // }
+  {
+    question: 'How can I contact customer service?',
+    answer: 'You can contact us via email, phone, or by using the contact form on our website.'
+  },
+  {
+    question: 'Can I pick up my order from the store?',
+    answer: 'Yes, you can pick up your order from the store. During checkout, select the “Pick Up From Store” option.'
+  },
+  {
+    question: 'How can I get coupons?',
+    answer: 'You can get coupons by logging in. Our team will send coupons to your WhatsApp number.'
+  },
 ];
-
-// Setup FAQs
 const faqSetup = [
   {
-    question: 'How do I add a new question & answer?',
-    answer: 'To add a new FAQ follow these steps: \n\n1. Manage FAQs from your site dashboard or in the Editor \n\n2. Add a new question & answer \n\n3. Assign your FAQ to a category \n\n4. Save and publish.\n\nYou can always come back and edit your FAQs.'
+    question: 'How do I set up my account?',
+    answer: 'Click “Log In” at the top right, fill in your details, and get started.'
   },
   {
-    question: 'Can I insert an image, video, or GIF in my FAQ?',
-    answer: 'Yes. To add media follow these steps: \n\n1. Manage FAQs from your site dashboard or in the Editor \n\n2. Create a new FAQ or edit an existing one \n\n3. From the answer text box click on the video, image or GIF icon \n\n4. Add media from your library and save.'
+    question: 'How can I manage my saved addresses?',
+    answer: 'Go to “Saved Addresses” in your account to add, edit, or remove delivery addresses.'
   },
   {
-    question: 'How do I edit or remove the "Frequently Asked Questions" title?',
-    answer: 'You can edit the title from the FAQ "Settings" tab in the Editor. \nTo remove the title from your mobile app go to the "Site & App" tab in your Owner\'s app and customize.'
+    question: 'How do I apply a coupon or promo code?',
+    answer: 'Enter your coupon code during checkout in the “Apply Coupon” field.'
   },
   {
-    question: 'Can I change the layout of the FAQ section?',
-    answer: 'Yes, you can customize the layout and appearance of the FAQ section through the design settings in your site editor.'
+    question: 'Can I reset my account password?',
+    answer: 'Yes, you can reset your password by clicking “Log In > Forgot Password.”'
   },
-  {
-    question: 'How do I add or remove categories for FAQs?',
-    answer: 'Categories can be managed through the FAQ settings in the site editor. You can add new categories or remove existing ones as needed.'
-  }
 ];
+
+
 
 const styles = {
   container: {
@@ -178,12 +166,18 @@ const styles = {
     fontWeight: 'bold',
     cursor: 'pointer',
     color: '#555',
+    border:"none",
+    backgroundColor:'white'
+    
   },
   activeHeader: {
     fontSize: '1.5em',
     fontWeight: 'bold',
     cursor: 'pointer',
-    color: '#ff6600',
+    color: '#ff4800ff',
+    border:"none",
+    backgroundColor:'white'
+
   },
   faqContainer: {
     marginTop: '20px',

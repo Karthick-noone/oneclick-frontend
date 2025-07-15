@@ -69,8 +69,13 @@ const SignupPage = () => {
       formData;
     const newErrors = {};
 
-    if (!username) newErrors.username = "Username is required";
-    if (!email) {
+    if (!username) {
+      newErrors.username = "Username is required";
+    } else if (username.length < 3) {
+      // Check if username is at least 5 characters long
+      newErrors.username = "Name should have at least 3 characters";
+
+    } if (!email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = "Email is invalid";
@@ -81,7 +86,7 @@ const SignupPage = () => {
       newErrors.password = "Password is required";
     } else if (password.length < 5) {
       // Check if password is at least 5 characters long
-      newErrors.password = "Password should be at least 5 characters";
+      newErrors.password = "Password should have at least 5 characters";
     }
 
     if (!confirmPassword) {
@@ -94,7 +99,7 @@ const SignupPage = () => {
     } else if (!/^[6-9]\d{9}$/.test(contactNumber)) {
       // Validate the contact number format
       newErrors.contactNumber =
-        "Contact number must be a valid 10-digit number starting with 6-9";
+        "Contact number must be a valid 10-digit number.";
     }
 
     setErrors(newErrors);
@@ -303,8 +308,8 @@ const SignupPage = () => {
       )}
       <div style={styles.container}>
         <button style={styles.signOutButton}>
-          <Link to="/login" style={{ color: "white" }}>
-            <FaSignOutAlt title="Exit" />
+          <Link to="/login" style={{ color: "white" }} title="Back to login">
+            <FaSignOutAlt  />
           </Link>
         </button>
         <center>
@@ -317,12 +322,12 @@ const SignupPage = () => {
           <div style={styles.row}>
             <div style={styles.inputContainer}>
               <label style={styles.label} htmlFor="username">
-                Username
+                Name
               </label>
               <input
                 type="text"
                 name="username"
-                placeholder="Username"
+                placeholder="Name"
                 value={formData.username}
                 onChange={handleChange}
                 style={styles.input}
@@ -357,7 +362,7 @@ const SignupPage = () => {
                 <span>WhatsApp Number </span>
 
                 <span className="tooltip-container2">
-                  <FaInfoCircle style={{ cursor: 'pointer', marginLeft: '5px', marginTop:'2px' }} />
+                  <FaInfoCircle style={{ cursor: 'pointer', marginLeft: '5px', marginTop: '2px' }} />
                   <span className="tooltip-text2">
                     Use your WhatsApp number to get more updates and exclusive coupons!
                   </span>
@@ -504,7 +509,7 @@ const styles = {
   label: {
     color: "white",
     marginTop: "5px",
-    display:'flex'
+    display: 'flex'
   },
   container: {
     maxWidth: "550px",

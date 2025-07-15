@@ -11,6 +11,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCheck, FaShoppingCart } from "react-icons/fa";
 import checkIcon from './img/check-mark.png'
+import AddressIcon from './img/map.png'
+
 const AddressPage = () => {
   const [userId, setUserId] = useState(null);
   const [address, setAddress] = useState({
@@ -342,10 +344,14 @@ const AddressPage = () => {
 
       if (response.ok) {
         Swal.fire({
-          title: "Success",
+          toast:true,
+          timer: 3000,
+          position:'top-end',
+          // title: "Success",
           text: "Address updated successfully...",
           icon: "success",
-          confirmButtonText: "OK",
+          // confirmButtonText: "OK",
+          showConfirmButton:false,
         });
 
         setSubmittedAddresses(
@@ -418,10 +424,14 @@ const AddressPage = () => {
 
       if (response.ok) {
         Swal.fire({
-          title: "Deleted!",
+          // title: "Deleted!",
+          toast:true,
+          timer: 3000,
+          position:'top-end',
           text: "Address deleted successfully",
           icon: "success",
-          confirmButtonText: "OK",
+          // confirmButtonText: "OK",
+          showConfirmButton:false,
         });
 
         // Update the state to reflect the deletion
@@ -510,11 +520,15 @@ const AddressPage = () => {
       const allResponsesOk = responses.every((response) => response.ok);
 
       if (allResponsesOk) {
-        Swal.fire({
-          title: "Deleted!",
-          text: "Selected addresses deleted successfully",
+         Swal.fire({
+          toast:true,
+          timer: 3000,
+          position:'top-end',
+          // title: "Success",
+          text: "Selected addresses deleted successfully...",
           icon: "success",
           confirmButtonText: "OK",
+          showConfirmButton:false,
         });
 
         // Update the state to reflect the deletion
@@ -568,14 +582,15 @@ const AddressPage = () => {
       });
 
       if (response.status === 200) {
-        toast.success("Address updated successfully", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
+         Swal.fire({
+          toast:true,
+          timer: 3000,
+          position:'top-end',
+          // title: "Success",
+          text: "Address updated successfully...",
+          icon: "success",
+          confirmButtonText: "OK",
+          showConfirmButton:false,
         });
         // window.location.reload();
         fetchAddresses(userId);
@@ -623,21 +638,21 @@ const AddressPage = () => {
                 />
               </div>
 
-                <div className="form-group2">
-              <label htmlFor="phone">Phone Number</label>
-              <input
-                type="text"
-                id="phone"
-                name="phone"
-                value={address.phone}
-                onChange={handleChange}
-                pattern="[0-9]{10}"
-                title="Phone number should be exactly 10 digits"
-                required
-                className="staff-input"
+              <div className="form-group2">
+                <label htmlFor="phone">Phone Number</label>
+                <input
+                  type="text"
+                  id="phone"
+                  name="phone"
+                  value={address.phone}
+                  onChange={handleChange}
+                  pattern="[0-9]{10}"
+                  title="Phone number should be exactly 10 digits"
+                  required
+                  className="staff-input"
 
-              />
-            </div>
+                />
+              </div>
             </div>
 
             <div className="form-group2-row">
@@ -652,9 +667,9 @@ const AddressPage = () => {
                   required
                   className="staff-text-area"
                 >
-                  </textarea>
+                </textarea>
               </div>
-              </div>
+            </div>
 
             <div className="form-group2-row">
               <div className="form-group2">
@@ -717,7 +732,7 @@ const AddressPage = () => {
                 />
               </div>
             </div>
-          
+
             <button className="submit-btn" type="submit">
               Save Address
             </button>
@@ -729,6 +744,14 @@ const AddressPage = () => {
             <h2 className="headerrr-container">
               Delivery Addresses
               <div className="headerrr-controls">
+                {isSelecting && (
+                  <button
+                    className="adr-btn delete"
+                    onClick={handleDeleteSelected}
+                  >
+                    Delete Selected Addresses
+                  </button>
+                )}
                 {submittedAddresses.length > 0 && (
                   <button
                     className="select-toggle-btn"
@@ -758,10 +781,12 @@ const AddressPage = () => {
               >
                 {isSelecting && (
                   <input
+                    className="check-box"
+                    title="Click to checkbox"
                     type="checkbox"
                     checked={selectedAddresses.has(addr.address_id)}
                     onChange={() => handleCheckboxChange(addr.address_id)}
-                    style={{ float: 'right' }}
+                  // style={{ float: 'right', top:'10px' }}
                   />
                 )}
                 <div className="address-details">
@@ -806,16 +831,13 @@ const AddressPage = () => {
               </div>
             ))
           ) : (
-            <p>No addresses added yet.</p>
+            <div className="no-address-wrapper">
+              {/* <FaBoxOpen className="no-orders-icon" /> */}
+              <img src={AddressIcon} width={"130px"} />
+              <p className="no-address-text">No address added yet</p>
+            </div>
           )}
-          {isSelecting && (
-            <button
-              className="delete-selected-btn"
-              onClick={handleDeleteSelected}
-            >
-              Delete Selected Addresses
-            </button>
-          )}
+
         </div>
 
         {editingAddress && (
@@ -841,18 +863,35 @@ const AddressPage = () => {
                     />
                   </div>
                   <div className="form-group2">
-                    <label htmlFor="street">Street Address</label>
+
+                    <label htmlFor="phone">Phone Number</label>
                     <input
                       type="text"
-                      id="street"
-                      name="street"
-                      value={editingAddress.street}
+                      id="phone"
+                      name="phone"
+                      value={editingAddress.phone}
                       onChange={handleChange2}
                       required
                       className="staff-input3"
 
                     />
+
                   </div>
+                </div>
+
+                <div className="form-group2">
+                  <label htmlFor="street">Door No, Street Address, Land Mark</label>
+                  <textarea
+                    type="text"
+                    id="street"
+                    name="street"
+                    value={editingAddress.street}
+                    onChange={handleChange2}
+                    required
+                    className="staff-text-area"
+
+                  >
+                  </textarea>
                 </div>
                 <div className="form-group2-row">
                   <div className="form-group2">
@@ -910,19 +949,7 @@ const AddressPage = () => {
                     />
                   </div>
                 </div>
-                <div className="form-group2">
-                  <label htmlFor="phone">Phone Number</label>
-                  <input
-                    type="text"
-                    id="phone"
-                    name="phone"
-                    value={editingAddress.phone}
-                    onChange={handleChange2}
-                    required
-                    className="staff-input3"
 
-                  />
-                </div>
                 <button className="submit-btn" type="submit">
                   Update Address
                 </button>

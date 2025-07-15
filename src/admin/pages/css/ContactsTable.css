@@ -1,3 +1,100 @@
+.tick-icon {
+  margin-left: 8px;
+  font-size: 16px;
+}
+
+.tick-icon.unread {
+  color: grey;
+}
+
+.tick-icon.read {
+  color: #007bff; /* Blue tick */
+}
+
+
+.popup-overlay-unique {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup-content-unique {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 30px;
+  width: 400px;
+  max-height: 500px;
+  overflow-y: auto;
+  max-width: 90%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: popupFadeIn 0.3s ease-in-out;
+}
+
+.popup-heading {
+  display: inline-block; /* allows background around text */
+ background-color: #e6f0fa; /* very light blue */
+  color: #1e88e5;     
+ border: 1px solid #90caf9; /* light blue border */
+ display: block;
+width: 100%;
+text-align: center;
+
+
+
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: 6px 12px; /* spacing around text */
+  border-radius: 6px; /* rounded edges */
+  text-align: justify;
+  margin-top: 0;
+  margin-bottom: 10px; /* spacing below heading */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* subtle shadow */
+}
+
+
+.popup-message {
+  margin: 10px 0;
+  font-size: 1rem;
+  color: #555;
+  text-align: justify;
+}
+
+.popup-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.popup-close-btn:hover {
+  color: #e74c3c; /* red on hover */
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
 .contacts-table-container {
     margin-top: 78px;
     margin-left: 255px; /* Adjust this for larger screens */

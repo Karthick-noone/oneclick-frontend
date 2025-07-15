@@ -5,7 +5,8 @@ import { ApiUrl } from "../../components/ApiUrl";
 import { FaTrash } from "react-icons/fa";
 // import { FaDownload } from 'react-icons/fa';
 import Swal from "sweetalert2";
-
+import BlackTick from './img/check.png'
+import BlueTick from './img/double-check.png'
 
 const ContactsTable = () => {
   const [contacts, setContacts] = useState([]);
@@ -32,11 +33,27 @@ const ContactsTable = () => {
       });
   }, []);
 
-  const handleMessageClick = (contact) => {
-    setSelectedSubject(contact.subject); // Assuming the contact object has a subject
-    setSelectedMessage(contact.message); // Assuming the contact object has a message
+const handleMessageClick = async (contact) => {
+  try {
+    // 1 Call API to mark enquiry as read
+    await axios.patch(`${ApiUrl}/api/enquiries/mark-read/${contact.id}`);
+
+    // 2 Update frontend state to show blue tick
+    const updatedContacts = contacts.map((c) =>
+      c.id === contact.id ? { ...c, isRead: 1 } : c
+    );
+    setContacts(updatedContacts);
+
+    // 3 Set modal data and show popup
+    setSelectedSubject(contact.subject);
+    setSelectedMessage(contact.message);
     setShowPopup(true);
-  };
+  } catch (err) {
+    console.error("Failed to mark enquiry as read", err);
+    alert("Could not mark as read. Please try again.");
+  }
+};
+
 
   const handleClosePopup = () => {
     setShowPopup(false);
@@ -127,7 +144,7 @@ const ContactsTable = () => {
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
     });
-  
+
     if (result.isConfirmed) {
       try {
         const response = await axios.delete(`${ApiUrl}/api/deletecontact/${id}`);
@@ -140,7 +157,7 @@ const ContactsTable = () => {
             timer: 2000,
             showConfirmButton: true,
           });
-  
+
           // Update state to remove deleted career
           setContacts(contacts.filter((career) => career.id !== id));
         } else {
@@ -174,6 +191,7 @@ const ContactsTable = () => {
               <th>Email</th>
               <th>Phone</th>
               <th>Date</th> {/* Add Date column */}
+              <th>Subject</th>
               <th>Message</th>
               <th>Delete</th>
             </tr>
@@ -191,15 +209,35 @@ const ContactsTable = () => {
                     month: "short",
                     year: "numeric",
                   }).format(new Date(contact.created_at))}
+                  <br />
+                  {new Intl.DateTimeFormat("en-GB", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true, // 12-hour format with AM/PM
+                  }).format(new Date(contact.created_at))}
                 </td>
-                <td>
+
+
+                <td title={contact.subject}>
+                  {contact.subject.length > 25
+                    ? contact.subject.substring(0, 25) + "..."
+                    : contact.subject}
+                </td>
+
+                <td style={{display:'flex', alignItems:'center'}}>
                   <button
                     className="message-btn"
                     onClick={() => handleMessageClick(contact)}
                   >
                     View
                   </button>
+                  {contact.isRead ? (
+                    <img src={BlueTick} title="Seen" style={{marginLeft:'5px'}} width={'20px'}/> // Blue tick
+                  ) : (
+                    <img src={BlackTick} title="Unseen"  style={{marginLeft:'5px'}} width={'18px'}/> // Grey tick
+                  )}
                 </td>
+
                 <td>
                   <button
                     className="resume-btn"
@@ -246,20 +284,21 @@ const ContactsTable = () => {
         </div>
         {/* Popup for Messages */}
         {showPopup && (
-          <div className="popuppp-overlay">
-            <div className="popuppp-content">
-              <h2>Subject: {selectedSubject}</h2>
-              <p>Message: {selectedMessage}</p>
+          <div className="popup-overlay-unique">
+            <div className="popup-content-unique">
               <button
-                style={{ background: "red" }}
-                className="changee-btn"
+                className="popup-close-btn"
                 onClick={handleClosePopup}
+                title="Close"
               >
-                Close
+                &times;
               </button>
+              <span className="popup-heading">{selectedSubject}</span>
+              <p className="popup-message"><strong> </strong>{selectedMessage}</p>
             </div>
           </div>
         )}
+
       </main>
     </div>
   );

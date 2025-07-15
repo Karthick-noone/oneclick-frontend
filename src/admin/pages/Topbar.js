@@ -194,28 +194,49 @@ const Topbar = () => {
 
   return (
     <div className="topbar">
+
       <div className="topbar-content">
-        <button className="action-btn bell-btn" onClick={toggleNotification}>
-          {notifications.filter((notification) => !notification.read).length >
-            0 && (
-            <span className="notification-count">
-              {
-                notifications.filter((notification) => !notification.read)
-                  .length
-              }
-            </span>
-          )}
-          <FaBell
-            style={{ fontSize: "24px", color: "white"}}
-          />
-        </button>
-        <button className="action-btn">
-          <FaUserCircle
-            onClick={toggleMenu}
-            style={{ fontSize: "24px", color: "white" }}
-          />
-        </button>
-      </div>
+  {/* Role/Username badge */}
+  <div
+    className="user-info-badge"
+    style={{
+      backgroundColor: role === "Admin" ? "#4CAF50" : "#2196F3", // Green for Admin, Blue for User
+      color: "white",
+      padding: "6px 12px",
+      borderRadius: "20px",
+      fontWeight: "500",
+      fontSize: "14px",
+      boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+      display: "flex",
+      alignItems: "center",
+      gap: "6px",
+      marginTop:'6px',
+      marginRight:'10px'
+    }}
+  >
+    {/* <FaUserCircle style={{ fontSize: "16px" }} /> */}
+    <span className="user-role">{role === "Admin" ? role : `${role} - ${username}`}</span>
+  </div>
+
+  {/* Notification Bell */}
+  {/* <button className="action-btn bell-btn" onClick={toggleNotification}>
+    {notifications.filter((notification) => !notification.read).length > 0 && (
+      <span className="notification-count">
+        {notifications.filter((notification) => !notification.read).length}
+      </span>
+    )}
+    <FaBell style={{ fontSize: "24px", color: "white" }} />
+  </button> */}
+
+  {/* Profile Icon */}
+  <button className="action-btn">
+    <FaUserCircle
+      onClick={toggleMenu}
+      style={{ fontSize: "24px", color: "white" }}
+    />
+  </button>
+</div>
+
 
       {/* Notification Dropdown */}
       {isNotificationOpen && (

@@ -9,7 +9,7 @@ import { ApiUrl } from "./ApiUrl"; // Adjust the import path accordingly
 import "./css/ProductDetail.css"; // Ensure you create this CSS file
 // import Header2 from "./Header2";
 // import Sidebar from "./Sidebar";
-import { FaHeart, FaRegHeart, } from "react-icons/fa"; // Import the heart icon from react-icons
+import { FaBolt, FaHeart, FaRegHeart, } from "react-icons/fa"; // Import the heart icon from react-icons
 import Footer from "./footer";
 import { useNavigate } from "react-router-dom"; // Import useNavigate at the top
 import Slider from "react-slick"; // Import the slider component
@@ -19,6 +19,8 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css"; // Ensure styles are applied
 import RecentlyViewed from "./RecentlyViewed";
 // import ZoomInCursor from './img/zoom-in.cur'
+
+// import {} from "react-icons/fa";
 
 import {
   FaMemory,
@@ -34,6 +36,7 @@ import {
 // import { useCart } from "../components/CartContext";
 import leftarrow from "./img/left.png";
 import rightarrow from "./img/right.png";
+import Swal from "sweetalert2";
 // import pricetag from "./img/check-mark.png";
 // import tag from "./img/percent.png";
 // import offertag from "./img/sale.png";
@@ -431,8 +434,6 @@ const ProductDetail = () => {
       return;
     }
 
-    // const prod_price = isOfferActive ? product.offer_price : product.prod_price;
-
     // Set isAdding to true to disable the button while the request is in progress
     setIsAdding(true);
 
@@ -443,14 +444,20 @@ const ProductDetail = () => {
         quantity: 1,
       });
 
-
       // Handle the response
       if (response.status === 200) {
-        const shortName = product.prod_name.length > 30
-          ? product.prod_name.substring(0, 27) + "..."
-          : product.prod_name;
-
-        toast.success(`${shortName} added to your cart!`, {
+       Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item added to your cart!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
+        });
+        window.dispatchEvent(new Event("cart-updated"));
+      } else {
+        toast.error(response.data.message || "Failed to add item to cart", {
           position: "top-right",
           autoClose: 2000,
         });
@@ -499,11 +506,9 @@ const ProductDetail = () => {
     });
     console.log("product", product);
   };
-
   const handleToggleFavorite = async (product, event) => {
     event.stopPropagation();
 
-    // Check if the user is logged in
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
 
@@ -516,61 +521,110 @@ const ProductDetail = () => {
       return;
     }
 
-    // Optimistically update the UI
-    setFavorites((prev) => ({
-      ...prev,
-      [product.id]: !prev[product.id],
-    }));
-
     try {
-      const isFavorite = favorites[product.id];
+      const isFavorite = favorites[`${product.id}`];
 
       if (isFavorite) {
-        // Call remove API
+        // Optimistically update UI
+        setFavorites((prev) => {
+          const updated = { ...prev };
+          delete updated[`${product.id}`];
+          return updated;
+        });
+
         await axios.post(`${ApiUrl}/remove-from-wishlist`, {
           email,
           productId: product.id,
         });
+
         window.dispatchEvent(new Event("wishlist-updated"));
-        const shortName =
-          product.prod_name.length > 30
-            ? product.prod_name.substring(0, 27) + "..."
-            : product.prod_name;
-        toast.info(`${shortName} removed from your wishlist!`, {
-          position: "top-right",
-          autoClose: 2000,
+
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item removed from your wishlist!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
         });
+
       } else {
-        // Call add API
+        // Optimistically update UI
+        setFavorites((prev) => ({
+          ...prev,
+          [`${product.id}`]: true,
+        }));
+
         await axios.post(`${ApiUrl}/update-user-wishlist`, {
           email,
           username,
           action: "add",
           prod_id: product.id,
         });
-        window.dispatchEvent(new Event("wishlist-updated"));
-        const shortName =
-          product.prod_name.length > 30
-            ? product.prod_name.substring(0, 27) + "..."
-            : product.prod_name;
 
-        toast.success(`${shortName} added to your wishlist!`, {
-          position: "top-right",
-          autoClose: 2000,
+        window.dispatchEvent(new Event("wishlist-updated"));
+         Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item added to your wishlist!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
         });
       }
     } catch (error) {
-      // Revert the UI change if the API call fails
-      setFavorites((prev) => ({
-        ...prev,
-        [product.id]: favorites[product.id],
-      }));
+      console.error("Error updating wishlist:", error);
       toast.error("An error occurred while updating wishlist.", {
         position: "top-right",
         autoClose: 2000,
       });
     }
   };
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      const email = localStorage.getItem("email");
+      const username = localStorage.getItem("username");
+
+      try {
+        const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
+          email,
+          username,
+        });
+
+        if (response.data.wishlist) {
+          const wishlist = response.data.wishlist;
+          const favoritesMap = {};
+
+          wishlist.forEach((item) => {
+            favoritesMap[`${item}`] = true;
+          });
+
+          setFavorites(favoritesMap);
+        }
+      } catch (error) {
+        console.error("Error fetching wishlist:", error);
+      }
+    };
+
+    // Fetch wishlist immediately on mount
+    fetchWishlist();
+
+    // Listen for wishlist updates
+    const handleWishlistUpdate = () => {
+      console.log("[Event] Wishlist updated, fetching...");
+      fetchWishlist();
+    };
+
+    window.addEventListener("wishlist-updated", handleWishlistUpdate);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("wishlist-updated", handleWishlistUpdate);
+    };
+  }, []);
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -799,7 +853,7 @@ const ProductDetail = () => {
       left: `${clampedX}px`,
       width: `${lensWidth}px`,
       height: `${lensHeight}px`,
-      backgroundImage: "radial-gradient(silver .3px, transparent .3px)", // Visible dots
+      backgroundImage: "radial-gradient(lightblue .3px, transparent .3px)", // Visible dots
       backgroundSize: "3px 3px", // Tight spacing
       pointerEvents: "none",
       zIndex: 11,
@@ -812,7 +866,7 @@ const ProductDetail = () => {
 
     setZoomStyle({
       backgroundImage: `url(${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[selectedImage]})`,
-      backgroundSize: "250%", // 2x zoom
+      backgroundSize: "300%", // Higher zoom ratio for sharpness
       backgroundPosition: `${percentX}% ${percentY}%`,
       position: "absolute",
       top: 0,
@@ -823,8 +877,11 @@ const ProductDetail = () => {
       zIndex: 10,
       backgroundRepeat: "no-repeat",
       border: "1px solid rgba(0, 0, 0, 0.1)",
-      // cursor: "zoom-in",
+      imageRendering: "auto", /* Or 'crisp-edges' */
+      transform: "scale(1)",
+      transition: "background-position 0.1s ease",
     });
+
 
     setShowLensBox(true);
     setShowZoom(true);
@@ -887,7 +944,7 @@ const ProductDetail = () => {
     return (
       <div
         className={className}
-       
+
         onClick={onClick}
       >
         {/* &#8594; */}
@@ -900,7 +957,7 @@ const ProductDetail = () => {
     return (
       <div
         className={className}
-       
+
         onClick={onClick}
       >
         {/* &#8592; */}
@@ -1034,20 +1091,21 @@ const ProductDetail = () => {
                 </Link>
               </div>
               <div className="product-detail-image-container">
+                {loading && product.offer_label ? (
+                  <Skeleton
+                    width={100}
+                    height={30}
+                    className="product-label-skeleton"
+                  />
+                ) : (
+                  product.offer_label && (
+                    <div className="product-label2">
+                      {product.offer_label}
+                    </div>
+                  )
+                )}
                 <div className="carousel-container">
-                  {loading && product.offer_label ? (
-                    <Skeleton
-                      width={100}
-                      height={30}
-                      className="product-label-skeleton"
-                    />
-                  ) : (
-                    product.offer_label && (
-                      <div className="product-label2">
-                        {product.offer_label}
-                      </div>
-                    )
-                  )}
+
 
                   <div className="big-image-container"
                     onMouseMove={handleMouseMove}
@@ -1072,7 +1130,7 @@ const ProductDetail = () => {
                           src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[selectedImage]}`}
                           alt={product.prod_name}
                           className="product-detail-image"
-                          style={{ cursor: 'zoom-in' }}
+                          style={{ cursor: 'crosshair' }}
                         />
                         {showLensBox && <div style={lensBoxStyle}></div>}
                       </div>
@@ -1134,18 +1192,18 @@ const ProductDetail = () => {
                         <Skeleton width={150} height={20} />
                       ) : (
                         <>
-                           <Link style={{ textDecoration: "none", color: "grey" }} to="/">
-                  Home{" "}
-                </Link>{" "}
-                <span style={{ color: "grey" }}>&gt; </span>
+                          <Link style={{ textDecoration: "none", color: "grey" }} to="/">
+                            Home{" "}
+                          </Link>{" "}
+                          <span style={{ color: "grey" }}>&gt; </span>
 
-                <Link to={`/${product.category === "TV" ? "TV" : product.category
-                  }`}
-                  style={{ textDecoration: "none", color: "grey" }}
-                >
-                  {product.category}{" "}
+                          <Link to={`/${product.category === "TV" ? "TV" : product.category
+                            }`}
+                            style={{ textDecoration: "none", color: "grey" }}
+                          >
+                            {product.category}{" "}
 
-                </Link>
+                          </Link>
                         </>
                       )}
                     </div>
@@ -1233,7 +1291,17 @@ const ProductDetail = () => {
                                   ? product.offer_price
                                   : product.prod_price)}
                             </span>
+                            <div className="secure-delivery" style={{ color: "#28a745", marginTop: "5px" }}>
+                              🚚 Secure delivery in 10 days, &nbsp;
 
+                              {new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US", {
+                                weekday: "long",
+                              })}
+
+                              {/* (
+                              {new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                              ) */}
+                            </div>
                             {product.offer_price > 0 &&
                               isOfferActive &&
                               product.offer_price &&
@@ -1385,7 +1453,8 @@ const ProductDetail = () => {
                           className="product-detail-buy-now"
                         >
                           BUY NOW{" "}
-                          <span style={{ marginLeft: "10px" }}>&gt;</span>
+
+                          <span style={{ marginLeft: "10px" }}><FaBolt /></span>
                         </button>
 
                         {/* Wishlist Heart Icon */}

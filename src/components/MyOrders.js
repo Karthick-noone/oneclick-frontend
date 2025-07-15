@@ -5,7 +5,7 @@ import "./css/MyOrders.css"; // Add CSS for styles
 import Footer from "./footer";
 import { ApiUrl } from "./ApiUrl";
 import Modal from "react-modal"; // Install if needed using `npm install react-modal`
-import { FaTimes, FaPrint } from "react-icons/fa";
+import { FaTimes, FaPrint, FaBoxOpen } from "react-icons/fa";
 import OrderTrackingModal from "./TrackingModal";
 import Swal from "sweetalert2";
 
@@ -13,6 +13,7 @@ import PrintModal from "../admin/pages/PrintModal";
 import Invoice from "./Invoice";
 
 import stamp2 from "./img/cancelled-stamp.png";
+import BoxIcon from "./img/box.png";
 
 import ReactDOMServer from "react-dom/server"; // Add this import at the top
 // import RecentlyViewed from "./RecentlyViewed";
@@ -53,7 +54,13 @@ const MyOrders = () => {
       const orderDate = new Date(order.order_date);
       const orderYear = orderDate.getFullYear();
       const orderMonth = orderDate.getMonth() + 1;
-      return orderYear === selectedYear && orderMonth === selectedMonth;
+
+      const yearMatches =
+        selectedYear === "all" || orderYear === selectedYear;
+      const monthMatches =
+        selectedMonth === "all" || orderMonth === selectedMonth;
+
+      return yearMatches && monthMatches;
     });
 
     setFilteredOrders(filtered);
@@ -108,7 +115,7 @@ const MyOrders = () => {
 
       // Set product details directly from the response
       setProductDetails(productResponse.data);
-      console.log("Payment MOde",productResponse.data)
+      console.log("Payment MOde", productResponse.data)
     } catch (error) {
       console.error("Error fetching product details:", error);
     }
@@ -332,8 +339,9 @@ const MyOrders = () => {
               className="filter-dropdown"
               id="year"
               value={selectedYear}
-              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              onChange={(e) => setSelectedYear(e.target.value === "all" ? "all" : Number(e.target.value))}
             >
+              <option value="all">All Years</option> {/* 🔥 Added "All Years" */}
               {Array.from(
                 { length: 5 },
                 (_, i) => new Date().getFullYear() - i
@@ -353,8 +361,9 @@ const MyOrders = () => {
               className="filter-dropdown"
               id="month"
               value={selectedMonth}
-              onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              onChange={(e) => setSelectedMonth(e.target.value === "all" ? "all" : Number(e.target.value))}
             >
+              <option value="all">All Months</option> {/*  Added "All Months" */}
               {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                 <option key={month} value={month}>
                   {new Date(0, month - 1).toLocaleString("en-US", {
@@ -364,11 +373,17 @@ const MyOrders = () => {
               ))}
             </select>
           </div>
+
         </div>
 
         <div className="order-container">
           {filteredOrders.length === 0 ? (
-            <p className="no-orders">No orders found.</p>
+            <div className="no-orders-wrapper">
+              {/* <FaBoxOpen className="no-orders-icon" /> */}
+              <img src={BoxIcon} width={"150px"}/>
+              <p className="no-orders-text">No orders found</p>
+            </div>
+
           ) : (
             filteredOrders.map((order) => (
               <div
@@ -393,13 +408,17 @@ const MyOrders = () => {
                           : "Payment Paid"}
                   </span> */}
                   {order.delivery_status && (
-                    <span className={`delivery-status ${order.delivery_status.toLowerCase().replace(/\s+/g, "-")}`}>
+                    <span
+                      title={order.delivery_status === "Order Placed" ? "Your order has been placed" : order.delivery_status === "Shipped" ? "Your order packed and shipped" : order.delivery_status === "Out of Delivery" ? "Your order out of delivery" : "Your order delivered"}
+                      className={`delivery-status ${order.delivery_status.toLowerCase().replace(/\s+/g, "-")}`}>
                       {order.delivery_status}
                     </span>
                   )}
 
-                     
-                  <span className="payment-method" style={{fontSize:'12px'}}> {order.payment_method}</span>
+
+                  <span className="payment-method" style={{ fontSize: '12px' }}
+                    title={order.payment_method === "COD" ? "Cash On Delivery" : order.payment_method}
+                  > {order.payment_method}</span>
                 </div>
 
                 {/* Row Layout: Left Side (Details) & Right Side (Cancelled Seal) */}
@@ -435,21 +454,25 @@ const MyOrders = () => {
                         )
                       )}
                     </div>{" "}
-                    <div  style={{backgroundColor:'#e7e7e7'}}>
-                    <p>
-                      <strong>Order ID:</strong>{" "}
-                      #{order.unique_id}
-                    </p>
-                    <p>
-                      <strong>Payment Method:</strong>{" "}
-                      {order.payment_method}
-                    </p>
-                    <p>
-                      <strong>Total Amount:</strong> ₹{order.total_amount}
-                    </p>
-                    <p>
-                      <strong>No of item:</strong> {order.products.length}
-                    </p></div>
+                    <div
+                      style={{
+                        backgroundColor: "#e7e7e7",
+                        padding: "10px",
+                        display: "grid",
+                        gridTemplateColumns: "100px auto", // Align labels and values
+                        rowGap: "5px",
+                      }}
+                    >
+                      <p style={{ margin: 0, fontWeight: "bold" }}>Order ID:</p>
+                      <p style={{ margin: 0 }}>#{order.unique_id}</p>
+
+                      <p style={{ margin: 0, fontWeight: "bold" }}>Total Amount:</p>
+                      <p style={{ margin: 0 }}>₹{order.total_amount}</p>
+
+                      <p style={{ margin: 0, fontWeight: "bold" }}>No of items:</p>
+                      <p style={{ margin: 0 }}>{order.products.length}</p>
+                    </div>
+
 
                   </div>
 
@@ -546,7 +569,7 @@ const MyOrders = () => {
                   <>
                     <p className="info-row">
                       <span className="info-label">Product Name</span>
-                      <span className="info-value product-namee">
+                      <span className="info-value ">
                         {currentProduct.prod_name}
                       </span>
                     </p>
@@ -603,13 +626,13 @@ const MyOrders = () => {
                   </span>
                 </p>
                 <p className="info-row">
-                  <span className="info-label">Shipping Address</span>
+                  <span className="info-label">Delivery Address</span>
                   <span className="info-value">
                     {selectedOrder.shipping_address}
                   </span>
                 </p>
 
-                {selectedOrder.delivery_status !== "Delivered" && (
+                {selectedOrder.delivery_status !== "Delivered" && selectedOrder.delivery_status !== "Out of Delivery" && (
                   <p>
                     <button
                       className="btn btn-cancel"

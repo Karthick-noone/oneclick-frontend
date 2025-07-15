@@ -79,8 +79,10 @@ const CartPage = () => {
 
         // Show success alert
         Swal.fire({
-          title: "Success!",
-          text: "Items have been added to Buy Later.",
+          toast: true,
+          position:'top-right',
+          title: false,
+          text: "Selected items added to Buy Later.",
           icon: "success",
           showConfirmButton: false,
           timer: 3000,
@@ -130,6 +132,7 @@ const CartPage = () => {
               text: "Item has been removed from Buy Later.",
               icon: "success",
               confirmButtonText: false,
+              showConfirmButton: false,
               timer: 3000,
             });
 
@@ -303,35 +306,43 @@ const CartPage = () => {
   const email = localStorage.getItem("email");
 
   useEffect(() => {
-    if (email) {
-      // Function to fetch the cart items
-      const fetchCartItems = async () => {
-        try {
-          const response = await axios.post(`${ApiUrl}/get-cart-items`, {
-            email,
-            username: localStorage.getItem("username"), // Send username if needed
-          });
+    if (!email) return; // Exit early if no user
 
-          if (response.data.products) {
-            setCartItems(response.data.products); // Set the fetched products to state
-          }
-        } catch (error) {
-          console.error("Error fetching cart items:", error);
-        } finally {
-          setIsLoading(false);
+    // Function to fetch the cart items
+    const fetchCartItems = async () => {
+      try {
+        const response = await axios.post(`${ApiUrl}/get-cart-items`, {
+          email,
+          username: localStorage.getItem("username"), // Send username if needed
+        });
+
+        if (response.data.products) {
+          setCartItems(response.data.products); // Set the fetched products to state
         }
-      };
+      } catch (error) {
+        console.error("Error fetching cart items:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      // Fetch cart items immediately
+    // Fetch cart items immediately on mount
+    fetchCartItems();
+
+    //  Listen for cart-updated events
+    const handleCartUpdate = () => {
+      console.log("[Event] Cart updated, fetching fresh cart data...");
       fetchCartItems();
+    };
 
-      // Set an interval to fetch cart items every 5 seconds
-      const intervalId = setInterval(fetchCartItems, 1000); // 5000ms = 5 seconds
+    window.addEventListener("cart-updated", handleCartUpdate);
 
-      // Clean up the interval on component unmount or when `email` changes
-      return () => clearInterval(intervalId);
-    }
-  }, [email]); // Dependency on `email` so it will trigger fetch when email changes
+    // Cleanup: Remove event listener on unmount
+    return () => {
+      window.removeEventListener("cart-updated", handleCartUpdate);
+    };
+  }, [email]);
+  // Dependency on `email` so it will trigger fetch when email changes
 
   // useEffect(() => {
   //   const fetchLocalStorageData = () => {
@@ -517,38 +528,43 @@ const CartPage = () => {
   //     }
   //   }
   // };
-
   const updateCartItemQuantity = async (itemId, newQuantity) => {
-    if (newQuantity <= 0) return; // Prevent reducing quantity below 1
+    if (newQuantity <= 0) return;
+
+    const previousCartItems = [...cartItems];
+
+    // Optimistically update UI
+    const updatedCartItems = cartItems.map((item) =>
+      item.id === itemId ? { ...item, quantity: newQuantity } : item
+    );
+    setCartItems(updatedCartItems);
 
     try {
-      // Update the cart item in the local state immediately for responsiveness
-      const updatedCartItems = cartItems.map((item) =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      );
-      setCartItems(updatedCartItems);
-
-      // Send the updated quantity to the server
       const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
         email,
         itemId,
         quantity: newQuantity,
       });
 
-      // if (response.status === 200) {
-      //   toast.success(`Quantity updated to ${newQuantity}!`, {
-      //     position: "top-right",
-      //     autoClose: 2000,
-      //   });
-      // } else {
-      //   console.error("Failed to update item quantity");
-      //   toast.error("Failed to update item quantity", {
-      //     position: "top-right",
-      //     autoClose: 2000,
-      //   });
-      // }
+      console.log("API Response:", response);
+
+      // Adjust this line based on actual API response
+      if (response.status === 200) {
+        // ✅ API success, do nothing
+        window.dispatchEvent(new Event("cart-updated"));
+      } else {
+        // ❌ API failed, rollback
+        setCartItems(previousCartItems);
+        toast.error("Failed to update item quantity", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
     } catch (error) {
       console.error("Error updating item quantity:", error);
+
+      // Rollback UI on error
+      setCartItems(previousCartItems);
       toast.error("Error updating item quantity", {
         position: "top-right",
         autoClose: 2000,
@@ -556,43 +572,78 @@ const CartPage = () => {
     }
   };
 
+
+
+
   const removeFromCart = async (itemId, itemName, quantity) => {
-    try {
-      // Remove the item from the local state first
+  // Show confirmation popup
+  const confirmation = await Swal.fire({
+    title: "Are you sure?",
+    text: `Do you want to remove "${itemName}" from your cart?`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#e74c3c", // Red color for delete
+    cancelButtonColor: "#6c757d",  // Grey for cancel
+    confirmButtonText: "Yes, remove it!",
+    cancelButtonText: "Cancel",
+  });
+
+  if (!confirmation.isConfirmed) return; // User clicked Cancel
+
+  try {
+    const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
+      email,
+      itemId,
+      quantity,
+    });
+
+    if (response.data.success) {
+      // Update local state
       const updatedCartItems = cartItems.filter((item) => item.id !== itemId);
       setCartItems(updatedCartItems);
 
-      // Send the removal request to the server
-      const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
-        email,
-        itemId,
-        quantity,
-      });
+      // Fire global event so navbar/sidebar updates cart count
+      window.dispatchEvent(new Event("cart-updated"));
 
-      if (response.data.success) {
-        // Toast notification for successful removal
-        toast.success(`${itemName} has been removed from your cart!`, {
-          position: "top-right",
-          autoClose: 2000,
-          closeOnClick: true,
-        });
-      } else {
-        console.error("Failed to remove item from cart");
-        toast.error("Failed to remove item from cart!", {
-          position: "top-right",
-          autoClose: 2000,
-          closeOnClick: true,
-        });
-      }
-    } catch (error) {
-      console.error("Error removing item from cart:", error);
-      toast.error("Error removing item from cart!", {
-        position: "top-right",
-        autoClose: 2000,
-        closeOnClick: true,
+      // Show success toast
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: `"${itemName}" has been removed from your cart!`,
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+    } else {
+      console.error("Failed to remove item from cart");
+
+      // Show error toast
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "error",
+        title: "Failed to remove item from cart!",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
       });
     }
-  };
+  } catch (error) {
+    console.error("Error removing item from cart:", error);
+
+    // Show error toast
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "error",
+      title: "Error removing item from cart!",
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+    });
+  }
+};
 
   // Assuming addressDetails is already available, you can set the initial address
   useEffect(() => {
@@ -671,18 +722,24 @@ const CartPage = () => {
 
       if (allSuccess) {
         Swal.fire({
+          toast:true,
+          position:'top-right',
           icon: "success",
-          title: "Success!",
-          text: "Selected items added to your cart successfully!",
-          timer: 2000,
+          title: false,
+          text: "Selected items added to your cart.",
+          timer: 3000,
           showConfirmButton: false,
         }).then(() => {
           fetchBuyLaterItems();
         });
 
+        //  Dispatch cart-updated event
+        window.dispatchEvent(new Event("cart-updated"));
+
         setSelectedProducts([]); // Clear selection after adding to cart
         console.log("Cleared Selected Products State.");
-      } else {
+      }
+      else {
         Swal.fire({
           icon: "error",
           title: "Error!",
@@ -871,7 +928,7 @@ const CartPage = () => {
               )}
             </div>
             <div className="cart-product-cardd">
-                <strong style={{ fontSize: "1.0rem" }}>CART ITEMS</strong>
+              <strong style={{ fontSize: "1.0rem" }}>CART ITEMS</strong>
 
               <ul className="cart-list">
                 {cartItems.length === 0 ? (
@@ -895,7 +952,7 @@ const CartPage = () => {
                         key={item.id}
                         className="cart-product "
                       >
-                        
+
                         {/* <Link
                           style={{ textDecoration: "none" }}
                           to={`/product/${item.id}`}
@@ -943,8 +1000,8 @@ const CartPage = () => {
                             >
                               +
                             </button>
-
                           </div>
+
                           <p
                             style={{
                               color: "red",
@@ -1053,6 +1110,10 @@ const CartPage = () => {
                               <p className="cart-product-name">
                                 {product.prod_name}
                               </p>
+                              {product.status === "unavailable" && (
+
+                                <p style={{ color: 'red' }}>Out Of Stock</p>
+                              )}
                               <p className="cart-product-description">
                                 {product.prod_features}
                               </p>
@@ -1085,40 +1146,45 @@ const CartPage = () => {
                                 onClick={() => handleRemoveBuyLater(product.id)}
                               />
                             </div>
-
-                            <div>
-                              <label className="checkbox-container">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedProducts.includes(product.id)}
-                                  onChange={() => handleCheckboxChange(product.id)}
-                                />
-                                <svg viewBox="0 0 64 64" height="2em" width="2em">
-                                  <path
-                                    d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16"
-                                    pathLength="575.0541381835938"
-                                    className="path"
-                                  ></path>
-                                </svg>
-                              </label>
-                            </div>
-
+                            {product.status === "available" && (
+                              <div>
+                                <label className="checkbox-container">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedProducts.includes(product.id)}
+                                    onChange={() => handleCheckboxChange(product.id)}
+                                  />
+                                  <svg viewBox="0 0 64 64" height="2em" width="2em">
+                                    <path
+                                      d="M 0 16 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 16 L 32 48 L 64 16 V 8 A 8 8 90 0 0 56 0 H 8 A 8 8 90 0 0 0 8 V 56 A 8 8 90 0 0 8 64 H 56 A 8 8 90 0 0 64 56 V 16"
+                                      pathLength="575.0541381835938"
+                                      className="path"
+                                    ></path>
+                                  </svg>
+                                </label>
+                              </div>
+                            )}
                           </div>
                         </li>
                       );
                     })}
                   </ul>
 
-                  <button
-                    style={{ float: "right", marginRight: "10px" }}
-                    onClick={handleAddToCart}
-                    className="Addtocart-btn"
-                  >
-                    Move To Cart{" "}
-                    <span style={{ marginLeft: "10px" }}>
-                      <FaShoppingBag />
-                    </span>
-                  </button>
+                  {buyLaterProducts.length >= 1 &&
+                    buyLaterProducts.some((product) => product.status === "available") && (
+                      <button
+                        style={{ float: "right", marginRight: "10px" }}
+                        onClick={handleAddToCart} // Pass product list if needed
+                        className="Addtocart-btn"
+                      >
+                        Move To Cart{" "}
+                        <span style={{ marginLeft: "10px" }}>
+                          <FaShoppingBag />
+                        </span>
+                      </button>
+                    )
+                  }
+
                 </div>
               </div>
             )}
@@ -1240,8 +1306,8 @@ const CartPage = () => {
         </div>
       </div>
       <Footer />
-            <ToastContainer />
-      
+      <ToastContainer />
+
     </>
   );
 };

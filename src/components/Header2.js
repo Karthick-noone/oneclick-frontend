@@ -21,8 +21,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import UserCard from "./UserCard"; // Import UserCard component
 import WishlistSidebar from "./WishlistSidebar"; // Import WishlistSidebar component
 import logo from "./img/logo3.png";
-// import { toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { ApiUrl } from "./ApiUrl";
 import axios from "axios";
 // import Header3 from "./Header3";
@@ -31,8 +31,8 @@ import "nprogress/nprogress.css";
 import NProgress from "nprogress";
 // import isOfferActive from './ProductDetail'
 import { IoMdClose } from "react-icons/io"; // Importing close icon
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
 // import { ToastContainer } from "react-toastify";
 // import Lottie from "lottie-react";
 // import empty_cart from './css/empty_cart.json'
@@ -68,6 +68,50 @@ const Header2 = () => {
   const [cartLoaded, setCartLoaded] = useState(false);
   const [query, setQuery] = useState(""); // ✅ Fix: Declare query state
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  // const [cartItems, setCartItems] = useState([]);
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const email = localStorage.getItem("email");
+    if (!email) return;
+
+    const fetchCartItems = async () => {
+      try {
+        const response = await axios.post(`${ApiUrl}/get-cart-items`, {
+          email,
+          username: localStorage.getItem("username"),
+        });
+
+        const items = response.data.products || [];
+        setCartItems(items);
+
+        //  Update cart count
+        const totalCount = items.reduce(
+          (total, item) => total + (item.quantity || 1),
+          0
+        );
+        setCartCount(totalCount);
+      } catch (error) {
+        console.error("Error fetching cart items:", error);
+      }
+    };
+
+    // Fetch cart items once when navbar mounts
+    fetchCartItems();
+
+    //  Listen for cart-updated events to refresh count
+    const handleCartUpdate = () => {
+      console.log("[Navbar] Cart updated event received. Refreshing cart count...");
+      fetchCartItems();
+    };
+
+    window.addEventListener("cart-updated", handleCartUpdate);
+
+    return () => {
+      // Cleanup on unmount
+      window.removeEventListener("cart-updated", handleCartUpdate);
+    };
+  }, []);
 
   const openMobileSearch = () => setShowMobileSearch(true);
   const closeMobileSearch = () => setShowMobileSearch(false);
@@ -300,6 +344,8 @@ const Header2 = () => {
     }
   };
 
+
+
   const handleSearch = async () => {
     let finalQuery = searchQuery.trim().toLowerCase();
 
@@ -351,6 +397,7 @@ const Header2 = () => {
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearch();
+      setShowSuggestions(false)
     }
   };
 
@@ -512,56 +559,58 @@ const Header2 = () => {
   //     }
   //   }
   // };
-
   const updateCartItemQuantity = async (itemId, newQuantity) => {
-    if (newQuantity <= 0) return; // Prevent reducing quantity below 1
+    if (newQuantity <= 0) return;
 
-    const email = localStorage.getItem("email"); // Ensure email is fetched properly
-    // if (!email) {
-    //   toast.error("User is not logged in!", {
-    //     position: "top-right",
-    //     autoClose: 2000,
-    //   });
-    //   return;
-    // }
+    // Instant UI update
+    setCartItems((prevCartItems) => {
+      const updatedItems = prevCartItems.map((item) =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
+      );
+
+      // Update cart count
+      const totalCount = updatedItems.reduce(
+        (total, item) => total + item.quantity,
+        0
+      );
+      setCartCount(totalCount);
+
+      return updatedItems;
+    });
 
     try {
-      // Send the updated quantity to the server
+      const email = localStorage.getItem("email");
       const response = await axios.post(`${ApiUrl}/update-cart-quantity`, {
         email,
         itemId,
         quantity: newQuantity,
       });
 
-      if (response.status === 200) {
-        // Update the cart item in the local state only after a successful API call
-        setCartItems((prevCartItems) =>
-          prevCartItems.map((item) =>
-            item.id === itemId ? { ...item, quantity: newQuantity } : item
-          )
-        );
-      } else {
-        toast.error("Failed to update item quantity", {
-          position: "top-right",
-          autoClose: 2000,
-        });
+      if (response.status !== 200) {
+        toast.error("Failed to update item quantity");
       }
     } catch (error) {
       console.error("Error updating item quantity:", error);
-      toast.error("Error updating item quantity", {
-        position: "top-right",
-        autoClose: 2000,
-      });
+      toast.error("Error updating item quantity");
     }
   };
 
   const removeFromCart = async (itemId, itemName, quantity) => {
-    try {
-      // Remove the item from the local state first
-      const updatedCartItems = cartItems.filter((item) => item.id !== itemId);
-      setCartItems(updatedCartItems);
+    // Instant UI update
+    setCartItems((prevCartItems) => {
+      const updatedItems = prevCartItems.filter((item) => item.id !== itemId);
 
-      // Send the removal request to the server
+      const totalCount = updatedItems.reduce(
+        (total, item) => total + item.quantity,
+        0
+      );
+      setCartCount(totalCount);
+
+      return updatedItems;
+    });
+
+    try {
+      const email = localStorage.getItem("email");
       const response = await axios.post(`${ApiUrl}/remove-from-cart`, {
         email,
         itemId,
@@ -569,33 +618,27 @@ const Header2 = () => {
       });
 
       if (response.data.success) {
-        const shortName = itemName.length > 30
-          ? itemName.substring(0, 27) + "..."
-          : itemName;
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item removed to your cart!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
+        });    //  Trigger cart-updated event (for navbar badge)
+        window.dispatchEvent(new Event("cart-updated"));
 
-        toast.success(`${shortName} has been removed from your cart!`, {
-          position: "top-right",
-          autoClose: 2000,
-          closeOnClick: true,
-        });
-      }
-      else {
-        console.error("Failed to remove item from cart");
-        toast.error("Failed to remove item from cart!", {
-          position: "top-right",
-          autoClose: 2000,
-          closeOnClick: true,
-        });
+      } else {
+        toast.error("Failed to remove item from cart");
       }
     } catch (error) {
       console.error("Error removing item from cart:", error);
-      toast.error("Error removing item from cart!", {
-        position: "top-right",
-        autoClose: 2000,
-        closeOnClick: true,
-      });
+      toast.error("Error removing item from cart");
     }
   };
+
+
 
   const sidebarRef = useRef(null);
   const wishlistRef = useRef(null);
@@ -671,9 +714,9 @@ const Header2 = () => {
     });
 
     // Delay the navigation until after the toast is shown
-    setTimeout(() => {
-      navigate("/login");
-    }, 2000); // Match the autoClose duration of the toast
+    // setTimeout(() => {
+    //   navigate("/login");
+    // }, 2000); // Match the autoClose duration of the toast
   };
 
   useEffect(() => {
@@ -762,14 +805,14 @@ const Header2 = () => {
 
         // Check for successful response
         if (response.status === 200) {
-          toast.success("Item removed from wishlist!", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
+          Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "success",
+            title: `Item removed from your wishlist!`,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: false,
           });
         } else {
           throw new Error("Unexpected response status");
@@ -807,36 +850,59 @@ const Header2 = () => {
   //   // Add other mappings as needed
   // };
   const [isLoading, setIsLoading] = useState(true);
-
   const email = localStorage.getItem("email");
-
-  useEffect(() => {
-    if (email) {
-      const fetchCartItems = async () => {
-        try {
-          const response = await axios.post(`${ApiUrl}/get-cart-items`, {
-            email,
-            username: localStorage.getItem("username"),
-          });
-
-          const fetchedCart = response.data.products || [];
-          setCartItems(fetchedCart);
-          setCartLoaded(true);
-
-          console.log("Fetched cart items:", fetchedCart);
-        } catch (error) {
-          console.error("Error fetching cart items:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      fetchCartItems();
-      const intervalId = setInterval(fetchCartItems, 5000);
-
-      return () => clearInterval(intervalId);
+  // Fetch cart only if not already loaded or forceRefresh is true
+  const fetchCartItems = async (forceRefresh = false) => {
+    if (cartLoaded && !forceRefresh) {
+      console.log("Cart already loaded, skipping fetch...");
+      return; // ✅ Use cached cart for instant load
     }
-  }, [email]); // Dependency on `email` so it will trigger fetch when email changes
+
+    setIsLoading(true); // Show loading spinner (optional)
+
+    try {
+      const email = localStorage.getItem("email");
+      const username = localStorage.getItem("username");
+
+      const response = await axios.post(`${ApiUrl}/get-cart-items`, {
+        email,
+        username,
+      });
+
+      const fetchedCart = response.data.products || [];
+      setCartItems(fetchedCart);
+      setCartLoaded(true); // ✅ Mark as loaded
+
+      console.log("Fetched cart items:", fetchedCart);
+    } catch (error) {
+      console.error("Error fetching cart items:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch cart immediately when sidebar opens
+  useEffect(() => {
+    if (isSidebarOpen) {
+      console.log("Sidebar opened, fetching cart items...");
+      fetchCartItems();
+    }
+  }, [isSidebarOpen]);
+
+  // Listen for global cart updates (force refresh)
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      console.log("[Event] Cart updated, refetching...");
+      fetchCartItems(true); //  Force refresh on cart changes
+    };
+
+    window.addEventListener("cart-updated", handleCartUpdate);
+
+    return () => {
+      window.removeEventListener("cart-updated", handleCartUpdate);
+    };
+  }, []);
+
 
   const handleViewCart = () => {
     navigate("/Cart", { state: { isOfferActive, product } });
@@ -858,11 +924,11 @@ const Header2 = () => {
   const handleSelect = async (suggestion) => {
     setQuery(suggestion); // Update input field
     setShowSuggestions(false); // Hide dropdown
-    setShowMobileSearch(false)
+    setShowMobileSearch(false);
     handleSearch();
 
-
     try {
+      // 1 Existing API call (keep as is)
       const response = await fetch(
         `${ApiUrl}/api/suggestions?query=${encodeURIComponent(suggestion)}`
       );
@@ -871,21 +937,33 @@ const Header2 = () => {
       if (response.ok && data.category) {
         console.log(`Navigating to: /${data.category}?search=${suggestion}`);
         navigate(
-          `/${encodeURIComponent(data.category)}?search=${encodeURIComponent(
-            suggestion
-          )}`
+          `/${encodeURIComponent(data.category)}?search=${encodeURIComponent(suggestion)}`
         );
       } else {
         console.warn("No category found.");
-        // Swal.fire({
-        //   title: "Product not found",
-        //   text: "We could not find any products matching your search.",
-        //   icon: "warning",
-        //   confirmButtonText: "OK",
-        // });
+      }
+
+      // 2 NEW API call: Fetch full product details
+      const productResponse = await fetch(
+        `${ApiUrl}/fetch-specific-product`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prodName: suggestion }),
+        }
+      );
+
+      const productDetails = await productResponse.json();
+
+      if (productResponse.ok && productDetails) {
+        console.log(" Full Product Details:", productDetails); //  LOG full product details
+      } else {
+        console.log(" No product details found for:", suggestion);
       }
     } catch (error) {
-      console.error("Error fetching category:", error);
+      console.error(" Error in handleSelect:", error);
       Swal.fire({
         title: "Error",
         text: "An error occurred while searching.",
@@ -894,6 +972,7 @@ const Header2 = () => {
       });
     }
   };
+
 
   // Handle Keyboard Events
   const handleKeyDown = (e) => {
@@ -993,6 +1072,7 @@ const Header2 = () => {
             ref={inputRef}
             value={searchQuery}
             onChange={handleSearchInputChange}
+            onKeyDown={handleKeyPress}
             onFocus={() => setShowSuggestions(true)} // 
             placeholder="Search for products, brands and more"
             autoComplete="off"
@@ -1238,8 +1318,8 @@ const Header2 = () => {
             )}
 
 
-            {getTotalItemsCount() > 0 && (
-              <span className="cart-count">{getTotalItemsCount()}</span>
+            {cartCount > 0 && (
+              <span className="cart-count">{cartCount}</span>
             )}
 
 
@@ -1438,6 +1518,14 @@ const Header2 = () => {
               </div>
             </div>
           </div>
+          {/* <ToastContainer
+            position="bottom-center"
+            autoClose={3000}
+            hideProgressBar={true}
+            toastClassName="custom-toast"
+            bodyClassName="custom-toast-body"
+          // icon={false} 
+          /> */}
         </div>
 
         <WishlistSidebar

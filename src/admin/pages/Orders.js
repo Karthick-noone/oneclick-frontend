@@ -9,7 +9,7 @@ import OrderTrackingModal from "./OrderTrackingModal";
 import logo from "./img/logo3.png"; // Ensure the path is correct
 import PrintModal from "./PrintModal";
 import Invoice from "./Invoice"; // Your invoice component
-
+import { InfoIcon, CopyIcon, X } from "lucide-react";
 import {
   FaEye,
   FaTimes,
@@ -20,6 +20,7 @@ import {
 } from "react-icons/fa";
 
 import ReactDOMServer from "react-dom/server"; // Add this import at the top
+import { SearchIcon } from "lucide-react";
 
 const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
   const [orders, setOrders] = useState([]);
@@ -42,6 +43,32 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState({ order: null, productDetails: [] });
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [currentPaymentId, setCurrentPaymentId] = useState(""); // 🔥 Add this
+
+  const handleCopyPaymentId = (paymentId) => {
+    navigator.clipboard.writeText(paymentId);
+    setShowPaymentModal(false)
+
+    Swal.fire({
+      toast: true,
+      position: "top-end", // Top-right corner
+      icon: "success",
+      title: "Payment ID copied to clipboard!",
+      showConfirmButton: false,
+      timer: 2000, // Auto close after 2 seconds
+      timerProgressBar: false,
+      customClass: {
+        popup: "swal-toast",
+      },
+      //  Add zIndex for toast
+      didOpen: (toast) => {
+        toast.style.zIndex = "1002";
+      },
+    });
+  };
+
+
 
   const handlePrintClick = async (order) => {
     console.log("Preparing invoice for order:", order);
@@ -546,6 +573,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
           <h2 className="orders-page-title">Orders</h2>
         </div>
         <div className="search-box2-container">
+
+
           {/* Radio Buttons Filter */}
           <div className="filters-container">
             <div className="custom-radio-buttons">
@@ -573,61 +602,117 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
 
           </div>
 
-          {/* Month and Year Filter */}
-          <div className="month-year-container">
-            <select
-              value={filterMonth}
-              onChange={(e) => setFilterMonth(e.target.value)}
-              className="filter-select"
-            >
-              <option value="">Months</option>
-              <option value="1">January</option>
-              <option value="2">February</option>
-              <option value="3">March</option>
-              <option value="4">April</option>
-              <option value="5">May</option>
-              <option value="6">June</option>
-              <option value="7">July</option>
-              <option value="8">August</option>
-              <option value="9">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
-            </select>
 
-            <select
-              value={filterYear}
-              onChange={(e) => setFilterYear(e.target.value)}
-              className="filter-select"
+          <div
+            className="search-box2-container"
+            style={{
+              display: "flex",
+              justifyContent: "space-between", // 👈 Pushes left/right sections apart
+              alignItems: "center",
+              backgroundColor: "#f8f8f8",
+              padding: "8px 12px",
+              borderRadius: "6px",
+              gap: "10px",
+            }}
+          >
+
+            <div
+              className="current-filters"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                border: "1px solid #ddd",        // 🔥 Outer border
+                borderRadius: "6px",             // 🔥 Rounded corners
+                overflow: "hidden",              // 🔥 Clip borders on spans
+              }}
             >
-              <option value="">Years</option>
-              {Array.from({ length: 11 }, (_, i) => 2023 + i).map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
+              <span
+                style={{
+                  padding: "3px 12px",
+                  borderRight: "1px solid #ddd", // 🔥 Right border
+                }}
+              >
+                <strong>Year:</strong> {filterYear || "All"}
+              </span>
+              <span
+                style={{
+                  padding: "3px 12px",
+                  borderRight: "1px solid #ddd", // 🔥 Right border
+                }}
+              >
+                <strong>Month:</strong>{" "}
+                {filterMonth
+                  ? new Date(0, filterMonth - 1).toLocaleString("en-US", {
+                    month: "long",
+                  })
+                  : "All"}
+              </span>
+              <span
+                style={{
+                  padding: "3px 12px",
+                }}
+              >
+                <strong>Status:</strong> {filterDeliveryStatus || "All"}
+              </span>
+            </div>
+
+
+
+            {/*  Month/Year Filter + Search Box (right side) */}
+            <div
+              className="filter-controls"
+              style={{ display: "flex", alignItems: "center", gap: "10px" }}
+            >
+              <select
+                value={filterMonth}
+                onChange={(e) => setFilterMonth(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">All Months</option>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                  <option key={month} value={month}>
+                    {new Date(0, month - 1).toLocaleString("en-US", { month: "long" })}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={filterYear}
+                onChange={(e) => setFilterYear(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">All Years</option>
+                {Array.from({ length: 11 }, (_, i) => 2023 + i).map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+
+              {/* Search Box */}
+              <span style={{ position: "relative" }}>
+                <SearchIcon className="SearchIcon" width={"18px"} />
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  className="search-box2"
+                />
+                {searchQuery && (
+                  <span
+                    className="clear-button"
+                    onClick={() => setSearchQuery("")}
+                  >
+                    X
+                  </span>
+                )}
+              </span>
+            </div>
           </div>
 
-          {/* Search Box */}
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchQuery}
-            onChange={handleSearch}
-            className="search-box2"
-          />
-          {/* {searchQuery && (
-    <span
-      className="clear-button"
-      onClick={() => setSearchQuery("")}
-    >
-      X
-    </span>
-  )} */}
         </div>
 
-        {/* Search Box */}
 
         <div className="orders-content">
           {loading ? (
@@ -679,7 +764,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                               : "N/A"}
                           </td> */}
                           <td>{formatDate(order.order_date)}</td>
-                          <td style={{ width: "100%", position: "relative" }}>
+                          <td style={{ width: "100px", position: "relative" }}>
                             {editingRow === order.unique_id ? (
                               <>
                                 <select
@@ -689,6 +774,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                                     display: "inline", // Keeps the select inline
                                     marginRight: "17px",
                                   }}
+                                  className="payment-select"
+
                                 >
                                   <option value="Pending">Pending</option>
                                   <option value="Paid">Paid</option>
@@ -706,7 +793,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                                     cursor: "pointer",
                                     color: "green",
                                     position: "absolute", // Position the icon to the right
-                                    right: "10px", // Keeps the icon close to the right edge
+                                    right: "2px", // Keeps the icon close to the right edge
+                                    top: '15px'
                                   }}
                                 />
                               </>
@@ -741,7 +829,102 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                             )}
                           </td>
 
-                          <td>{order.payment_method || "N/A"}</td>
+                          <td style={{ width: "100px", position: "relative" }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "6px",
+                              }}
+                            >
+                              <span>{order.payment_method || "N/A"}</span>
+
+                              {order.payment_method === "Online" && order.payment_id && (
+                                <div className="info-tooltip-container">
+                                  <button
+                                    onClick={() => {
+                                      setCurrentPaymentId(order.payment_id);
+                                      setShowPaymentModal(true);
+                                    }}
+                                    className="icon-btn"
+                                  >
+                                    <InfoIcon style={{ marginTop: "2px" }} size={16} color="black" />
+                                  </button>
+                                  <span className="info-tooltip-text">View Payment ID</span>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+
+
+
+                          {showPaymentModal && (
+                            <div
+                              style={{
+                                position: "fixed",
+                                inset: 0,
+                                backgroundColor: "rgba(0,0,0,0.4)",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                zIndex: 9999,
+                              }}
+                            >
+                              <div
+                                style={{
+                                  background: "white",
+                                  padding: "20px",
+                                  borderRadius: "8px",
+                                  maxWidth: "400px",
+                                  width: "100%",
+                                  textAlign: "center",
+                                  position: "relative",
+                                }}
+                              >
+                                <button
+                                  onClick={() => setShowPaymentModal(false)}
+                                  style={{
+                                    position: "absolute",
+                                    top: "10px",
+                                    right: "10px",
+                                    background: "transparent",
+                                    border: "none",
+                                    fontSize: "1.5rem",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  <X size={20} />
+                                </button>
+                                <h3 style={{ marginBottom: "10px" }}>Payment ID</h3>
+                                <div
+                                  style={{
+                                    display: "flex",               //  Arrange content in a row
+                                    alignItems: "center",          //  Vertically center text and icon
+                                    padding: "10px",
+                                    border: "1px solid #ccc",
+                                    borderRadius: "4px",
+                                    wordBreak: "break-all",
+                                  }}
+                                >
+                                  <span style={{ flex: 1 }}>{currentPaymentId}</span>
+
+                                  <button
+                                    onClick={() => handleCopyPaymentId(currentPaymentId)}
+                                    style={{
+                                      marginLeft: "10px",          // Small space between text & button
+                                      background: "transparent",
+                                      border: "none",
+                                      cursor: "pointer",
+                                    }}
+                                    title="Copy Payment ID"
+                                  >
+                                    <CopyIcon size={18} color="black" />
+                                  </button>
+                                </div>
+
+                              </div>
+                            </div>
+                          )}
                           <td>₹{order.total_amount || "N/A"}</td>
                           <td>
                             <div className="btn-container">
@@ -755,7 +938,6 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                               <button
                                 className="btn btn-delete"
                                 title="Delete this order"
-
                                 onClick={() => deleteOrder(order.unique_id)}
                               >
                                 <FaTrash />
@@ -768,7 +950,6 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                                 onClick={() => openModal2(order)}
                                 className="btn btn-view"
                                 title="View delivery status"
-
                               >
                                 <FaEye />
                               </button>
@@ -827,6 +1008,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                                 : "Cancel"}
                             </button>
                           </td>
+
+
                         </tr>
                       ))
                   ) : (
@@ -850,6 +1033,8 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                   productDetails={modalData.productDetails}
                 />
               </PrintModal>
+
+
             </div>
           )}
 
@@ -891,7 +1076,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                     <>
                       <p className="info-row">
                         <span className="info-label">Product Name</span>
-                        <span className="info-value product-namee">
+                        <span className="info-value">
                           {currentProduct.prod_name}
                         </span>
                       </p>

@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 // import { useCart } from "../components/CartContext";
 // import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const WishlistSidebar = ({
   isOpen,
@@ -64,14 +65,6 @@ const WishlistSidebar = ({
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
 
-    // if (!email || !username) {
-    //   toast.error("User is not logged in!", {
-    //     position: "top-right",
-    //     autoClose: 2000,
-    //   });
-    //   return;
-    // }
-
     try {
       const response = await axios.post(`${ApiUrl}/fetch-wishlist`, {
         email,
@@ -86,28 +79,25 @@ const WishlistSidebar = ({
       console.error("Error fetching wishlist:", error);
     }
   };
+
   useEffect(() => {
-    // Fetch wishlist initially
+    // Fetch wishlist once when component mounts
     fetchWishlist();
 
-    // Set up interval to fetch wishlist every 5 seconds
-    const intervalId = setInterval(() => {
-      fetchWishlist();
-    }, 5000);
-
-    // Also listen for wishlist-updated events to refresh immediately
+    //  Listen for wishlist updates
     const handleWishlistUpdate = () => {
+      console.log("[Event] Wishlist updated, refetching...");
       fetchWishlist();
     };
 
     window.addEventListener("wishlist-updated", handleWishlistUpdate);
 
-    // Cleanup function to clear interval and remove event listener
+    // Cleanup on unmount
     return () => {
-      clearInterval(intervalId);
       window.removeEventListener("wishlist-updated", handleWishlistUpdate);
     };
   }, []);
+
 
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
@@ -116,6 +106,15 @@ const WishlistSidebar = ({
 
     // Check if the user is logged in
     if (!email) {
+      toast.error("User is not logged in!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
       window.location.href = "/login";
       return;
     }
@@ -132,11 +131,23 @@ const WishlistSidebar = ({
 
       // Handle the response
       if (response.status === 200) {
-        toast.success(`${product.prod_name.substring(0,25)+'...'} added to your cart!`, {
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item added to your wishlist!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
+        });
+        window.dispatchEvent(new Event("cart-updated"));
+      } else {
+        toast.error(response.data.message || "Failed to add item to cart", {
           position: "top-right",
           autoClose: 2000,
         });
       }
+
     } catch (error) {
       console.error("Error adding item to cart:", error);
       toast.error("Failed to add item to cart", {
@@ -152,11 +163,6 @@ const WishlistSidebar = ({
   const handleRemoveFromWishlist = async (productId) => {
     const email = localStorage.getItem("email");
 
-    // if (!email) {
-    //   toast.error("User is not logged in!");
-    //   return;
-    // }
-
     try {
       const response = await axios.post(`${ApiUrl}/remove-from-wishlist`, {
         email,
@@ -164,19 +170,30 @@ const WishlistSidebar = ({
       });
 
       if (response.status === 200) {
-        toast.success(`Item removed from wishlist`, {
-          position: "top-right",
-          autoClose: 2000,
-        }); // Update the wishlist in the state
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item removed from your wishlist!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
+        });
+
+        //  Update local wishlist state
         setWishlistItems((prevItems) =>
           prevItems.filter((item) => item.id !== productId)
         );
+
+        //  Dispatch event so other components (like Mobile) update
+        window.dispatchEvent(new Event("wishlist-updated"));
       }
     } catch (error) {
       console.error("Error removing item from wishlist:", error);
       toast.error("Failed to remove item from wishlist");
     }
   };
+
   const handleProductClick = (product) => {
     const slugify = (name) =>
       name

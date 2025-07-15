@@ -286,7 +286,7 @@ useEffect(() => {
             <img src={logo} width={"200px"} loading="lazy" alt="" />
             </Link>
           <Link to="/">
-            <button className="close-btnn" >
+            <button className="close-btnn" title="Back to home">
               <FaSignOutAlt />
             </button>
           </Link>

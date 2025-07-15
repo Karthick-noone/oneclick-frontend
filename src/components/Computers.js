@@ -5,7 +5,7 @@ import Header2 from "./Header2";
 // import Header3 from "./Header3";
 import Footer from "./footer";
 import ComputerFilter from "./ComputerFilter";
-import Modal from "./Modal";
+// import Modal from "./Modal";
 import "./css/Computers.css";
 import { useCart } from "../components/CartContext";
 import { toast, ToastContainer } from "react-toastify";
@@ -15,6 +15,8 @@ import { ApiUrl } from "./ApiUrl";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import FilterIcon from './img/settings.png'
+import Swal from "sweetalert2";
+
 // Define a fallback image URL
 // const fallbackImage = require('./img/laptop.jpg'); // Replace with a valid fallback image
 
@@ -125,7 +127,7 @@ const Computers = () => {
       : true;
 
     // 2. Price
-    const matchesPrice = productPrice >= 20000 && productPrice <= maxPrice;
+    const matchesPrice = productPrice <= maxPrice;
 
     // 3. Brand (extract from prod_name)
     const matchesBrand = selectedBrand.length
@@ -431,11 +433,23 @@ const Computers = () => {
 
       // Handle the response
       if (response.status === 200) {
-        toast.success(`${product.prod_name.substring(0, 25) + '...'} added to your cart!`, {
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item added to your cart!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
+        });
+        window.dispatchEvent(new Event("cart-updated"));
+      } else {
+        toast.error(response.data.message || "Failed to add item to cart", {
           position: "top-right",
           autoClose: 2000,
         });
       }
+
     } catch (error) {
       console.error("Error adding item to cart:", error);
       toast.error("Failed to add item to cart", {
@@ -447,6 +461,7 @@ const Computers = () => {
       setIsAdding(false);
     }
   };
+
   const handleToggleFavorite = async (product, event) => {
     event.stopPropagation();
 
@@ -481,9 +496,14 @@ const Computers = () => {
           `${product.prod_name} (ID: ${product.id}) has been removed from the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.info(`${product.prod_name.substring(0, 25) + '...'} removed from your wishlist!`, {
-          position: "top-right",
-          autoClose: 2000,
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item removed from your wishlist!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
         });
       } else {
         // If not in wishlist, call add API
@@ -502,9 +522,14 @@ const Computers = () => {
           `${product.prod_name} (ID: ${product.id}) has been added to the wishlist.`
         );
         window.dispatchEvent(new Event("wishlist-updated"));
-        toast.success(`${product.prod_name.substring(0, 25) + '...'} added to your wishlist!`, {
-          position: "top-right",
-          autoClose: 2000,
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: `Item added to your wishlist!`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: false,
         });
       }
     } catch (error) {
@@ -515,17 +540,10 @@ const Computers = () => {
       });
     }
   };
-
   useEffect(() => {
     const fetchWishlist = async () => {
       const email = localStorage.getItem("email");
       const username = localStorage.getItem("username");
-
-      // if (!email || !username) {
-      //   console.log("User not logged in");
-      //   return;
-      // }
-
 
       try {
         const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
@@ -537,28 +555,31 @@ const Computers = () => {
           const wishlist = response.data.wishlist;
           const favoritesMap = {};
 
-          // Set the favorites map based on product IDs in the wishlist
           wishlist.forEach((item) => {
-            favoritesMap[`${item}`] = true; // Mark product ID as in wishlist
+            favoritesMap[`${item}`] = true;
           });
 
-          setFavorites(favoritesMap); // Update the favorites state
+          setFavorites(favoritesMap);
         }
       } catch (error) {
         console.error("Error fetching wishlist:", error);
       }
     };
 
-    // Fetch wishlist immediately
+    // Fetch once on mount
     fetchWishlist();
 
-    // Set an interval to fetch the wishlist every second
-    const intervalId = setInterval(() => {
+    //  Listen for wishlist updates
+    const handleWishlistUpdate = () => {
+      console.log("Wishlist updated event received.");
       fetchWishlist();
-    }, 1000); // Update every second (1000ms)
+    };
 
-    // Cleanup the interval when the component unmounts
-    return () => clearInterval(intervalId);
+    window.addEventListener("wishlist-updated", handleWishlistUpdate);
+
+    return () => {
+      window.removeEventListener("wishlist-updated", handleWishlistUpdate);
+    };
   }, []);
 
 
@@ -625,11 +646,7 @@ const Computers = () => {
                   key={product.id}
                   className="product-card"
                   onClick={() => handleCardClick(product)}
-                  onMouseEnter={() => setHoveredProductId(product.id)}
-                  onMouseLeave={() => {
-                    setHoveredProductId(null);
-                    setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
-                  }}
+
                 >
                   {product.offer_label && (
                     <div className="product-label">{product.offer_label}</div>
@@ -640,6 +657,11 @@ const Computers = () => {
                       src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
                       alt={product.prod_name}
                       className="product-image"
+                      onMouseEnter={() => setHoveredProductId(product.id)}
+                      onMouseLeave={() => {
+                        setHoveredProductId(null);
+                        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+                      }}
                     />
                     <span
                       title={
@@ -662,7 +684,7 @@ const Computers = () => {
                   <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
 
                   {/* <h3 className="product-name">{product.offer_price}</h3> */}
-                  <span className="product-subtitle2">{product.subtitle}</span>
+                  <span className="product-subtitle2" title={product.subtitle}>{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}
                           </p> */}
@@ -764,11 +786,7 @@ const Computers = () => {
                   key={product.id}
                   className="product-card"
                   onClick={() => handleCardClick(product)}
-                  onMouseEnter={() => setHoveredProductId(product.id)}
-                  onMouseLeave={() => {
-                    setHoveredProductId(null);
-                    setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
-                  }}
+
                 >
                   {product.offer_label && (
                     <div className="product-label">{product.offer_label}</div>
@@ -779,6 +797,11 @@ const Computers = () => {
                       src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
                       alt={product.prod_name}
                       className="product-image"
+                      onMouseEnter={() => setHoveredProductId(product.id)}
+                      onMouseLeave={() => {
+                        setHoveredProductId(null);
+                        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
+                      }}
                     />
                     <span
                       title={
@@ -799,7 +822,7 @@ const Computers = () => {
                   </div>
 
                   <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
-                  <span className="product-subtitle2">{product.subtitle}</span>
+                  <span className="product-subtitle2" title={product.subtitle}>{product.subtitle}</span>
                   {/* <p className="product-description">
                             {product.prod_features}
                           </p> */}
@@ -890,7 +913,7 @@ const Computers = () => {
       </div>
 
       <Footer />
-      {selectedProduct && (
+      {/* {selectedProduct && (
         <Modal
           isOpen={true}
           onClose={handleCloseModal}
@@ -899,7 +922,7 @@ const Computers = () => {
           onPrev={handlePrevProduct}
           category={category} // Pass the category to the Modal
         />
-      )}
+      )} */}
       <ToastContainer />
     </div>
   );

@@ -3,8 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import './css/ComputerFilter.css';
 import axios from 'axios';
 import { ApiUrl } from './ApiUrl';
+import FilterIcon from './img/settings.png';
 
-const BRANDS = ['Acer', 'Apple', 'Asus', 'Dell', 'HP', 'Lenovo','MI', 'Microsoft',  'MSI', 'Samsung'  ];
+const BRANDS = ['Acer', 'Apple', 'Asus', 'Dell', 'HP', 'Lenovo', 'MI', 'Microsoft', 'MSI', 'Samsung'];
 const RAM_OPTIONS = ['4', '8', '16', '32'];
 const STORAGE_OPTIONS = ['128', '256', '512', '1024'];
 const PROCESSORS = ['i3', 'i5', 'i7', 'Ryzen 5', 'Ryzen 7'];
@@ -170,8 +171,19 @@ const ComputerFilter = ({ showFilters, closeFilters }) => {
                 </button>
             </div>
 
-            <div className="filter-content" style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', marginBottom: '15px' }}>
+            <div
+                className="filter-content"
+                style={{
+                    display: "flex",
+                    alignItems: "center", // vertically center icon & text
+                    gap: "0.1rem", // space between icon and text
+                    marginBottom: "15px",
+                }}
+            >
+                <img src={FilterIcon} alt="Filter Icon" width="20" height="20" />
                 <h2 style={{ margin: 0 }}>Filters</h2>
+
+
                 <button
                     onClick={clearFilters}
                     style={{
@@ -182,6 +194,7 @@ const ComputerFilter = ({ showFilters, closeFilters }) => {
                         fontWeight: 'bold',
                         fontSize: '0.7rem',
                         padding: 0,
+                        marginLeft: '28px'
                     }}
                 >
                     CLEAR ALL

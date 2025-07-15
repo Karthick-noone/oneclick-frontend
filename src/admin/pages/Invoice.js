@@ -13,9 +13,10 @@ const Invoice = ({ order, productDetails }) => {
     (acc, product) => acc + (product.quantity || 0),
     0
   );
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
+
+  const formatDate = (dateObj) => {
+    if (!dateObj) return "N/A";
+    const date = new Date(dateObj); // already a Date object
     const day = date.getDate();
     const month = date.toLocaleString("default", { month: "short" });
     const year = date.getFullYear();
@@ -96,8 +97,8 @@ const Invoice = ({ order, productDetails }) => {
             <p style={{ margin: "0 0 5px 0" }}>
               <strong>Invoice No:</strong> #{order.invoice}
             </p>
-            <p style={{ margin: 0 }}>
-              <strong>Date:</strong> {formatDate(new Date().toLocaleDateString())}
+            <p style={{ margin: "0 11px 5px 0" }}>
+              <strong>Date:</strong> {formatDate(new Date())}
             </p>
           </div>
         </div>
@@ -220,7 +221,7 @@ const Invoice = ({ order, productDetails }) => {
                 justifyContent: "space-between",
               }}
             >
-              <span style={{marginRight:'5px'}}><strong>Total Products:</strong></span>
+              <span style={{ marginRight: '5px' }}><strong>Total Products:</strong></span>
               <span>{totalQuantity}</span>
             </div>
 
@@ -235,7 +236,7 @@ const Invoice = ({ order, productDetails }) => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <span style={{marginRight:'5px'}}><strong>Delivery Charge:</strong></span>
+                  <span style={{ marginRight: '5px' }}><strong>Delivery Charge:</strong></span>
                   <span>
                     ₹
                     {products.reduce(
@@ -397,7 +398,7 @@ const Invoice = ({ order, productDetails }) => {
           </div>
 
           {/* Right Block */}
-           <div
+          <div
             style={{
               textAlign: "left",
               display: "flex",
@@ -423,17 +424,17 @@ const Invoice = ({ order, productDetails }) => {
                 justifyContent: "space-between",
               }}
             >
-              <span style={{marginRight:'5px'}}><strong>Invoice Date:</strong></span>
+              <span style={{ marginRight: '5px' }}><strong>Invoice Date:</strong></span>
               <span>{formatDate(new Date().toLocaleDateString())}</span>
             </div>
 
             {/* Delivery Charge */}
-           
+
 
             {/* Grand Total */}
-           
+
           </div>
-         
+
         </div>
 
         <table
@@ -522,7 +523,7 @@ const Invoice = ({ order, productDetails }) => {
 
           </div>
 
-           <div
+          <div
             style={{
               textAlign: "left",
               display: "flex",
@@ -532,7 +533,7 @@ const Invoice = ({ order, productDetails }) => {
               marginTop: "10px",
             }}
           >
-          
+
 
             {/* Delivery Charge */}
             {products.reduce(

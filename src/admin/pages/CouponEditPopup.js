@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ApiUrl } from '../../components/ApiUrl';
-import './css/ProfileCard.css';
+import './css/CouponEditPopup.css';
 import { FaTimes } from "react-icons/fa"; // Import icons
 import Swal from 'sweetalert2'; // Ensure to import SweetAlert for notifications
-import { ToastContainer, toast } from 'react-toastify';
+// import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdated }) => {

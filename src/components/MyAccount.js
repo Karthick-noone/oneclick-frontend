@@ -209,16 +209,14 @@ const MyAccount = () => {
 
       </div>
 
-      {orders.length > 1 &&
+      {/* {orders.length > 1 &&
         <div style={{ paddingRight: '50px', paddingLeft: '50px' }}>
           <div style={styles.infoSection}>
             <h3 style={{ marginBottom: '10px' }}>Recent Orders</h3>
-            {/* <p>No recent orders yet. Start shopping now!</p> */}
             <div className="order-container">
               {orders.length === 0 ? (
                 <p className="no-orders">No orders found.</p>
               ) : (
-                // Slice the array to show only the first 3 orders
                 orders.slice(0, 3).map((order) => (
                   <div key={order.unique_id} className={`order-card ${order.delivery_status === "Cancelled"
                     ? "cancelled-order-card"
@@ -243,7 +241,6 @@ const MyAccount = () => {
                         >
                           {order.products.map((product) => (
                             <option
-                              // className="product-name"
 
                               key={product.product_id}
                               value={product.product_id}
@@ -270,11 +267,7 @@ const MyAccount = () => {
                       View Details
                     </button>
 
-                    {/* {order.delivery_status === "Cancelled" && (
-                      <div className="cancelled-seal">
-                        <img src={stamp2} loading="lazy" width={"85px"} alt="" />
-                      </div>
-                    )} */}
+
                   </div>
                 ))
                 
@@ -282,7 +275,6 @@ const MyAccount = () => {
 
 
             </div>
-            {/* Modal for Product Details */}
             <Modal
               isOpen={modalIsOpen}
               onRequestClose={closeModal}
@@ -333,12 +325,7 @@ const MyAccount = () => {
                             ₹{currentProduct.prod_price}
                           </span>
                         </p>
-                        {/* <p className="info-row">
-                        <span className="info-label">Description</span>
-                        <span className="info-value product-descriptionn">
-                          {currentProduct.prod_features}
-                        </span>
-                      </p> */}
+
                       </>
                     )}
                   </div>
@@ -358,12 +345,7 @@ const MyAccount = () => {
                         {formatDate(selectedOrder.order_date)}
                       </span>
                     </p>
-                    {/* <p className="info-row">
-              <span className="info-label">Payment Status</span>
-              <span className={`info-value status ${selectedOrder.status ? selectedOrder.status.toLowerCase() : 'unknown'}`}>
-                {selectedOrder.status}
-              </span>
-            </p> */}
+
                     <p className="info-row">
                       <span className="info-label">Total Amount</span>
                       <span className="info-value">
@@ -379,7 +361,6 @@ const MyAccount = () => {
                   </>
                 )}
 
-                {/* Navigation Buttons */}
                 {productDetails && productDetails.length > 1 && (
                   <div className="navigation-buttons">
                     <button
@@ -410,21 +391,11 @@ const MyAccount = () => {
             </Modal>
           </div>
 
-          {/* Account Settings */}
 
 
         </div>
-      }
-      {/* <div style={styles.infoSection}>
-        <h3>Account Settings</h3>
-        <p>
-          Change your password.
-        </p>
-        <Link to="/ForgotPassword">
-          <button className="change-btn"> Change Password</button>
-        </Link>
-      </div> */}
-      {/* Footer */}
+      } */}
+
       <Footer />
     </>
   );

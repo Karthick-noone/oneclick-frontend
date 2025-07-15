@@ -30,13 +30,15 @@ import ComputersAd from './pages/ComputersAd'; // Example page
 import MobileAd from './pages/MobileAd'; // Example page
 import ProductDetailPage from './pages/ProductDetailPage'; // Example page
 import CCTVAd from './pages/CCTVAd'; // Example page
-import Tracking from './pages/Tracking'; // Example page
+// import Tracking from './pages/Tracking'; // Example page
 import CouponManager from './pages/CouponManager'; // Example page
 import StaffManagement from './pages/StaffManagement'; // Example page
 import Secondhandproducts from './pages/AddSecondhandproducts'; // Example page
-import NewProduct from './pages/NewProduct'; // Example page
+// import NewProduct from './pages/NewProduct'; // Example page
 import { ThemeProvider } from './ThemeContext'; // Import ThemeProvider
 import NetworkStatus from '../components/NetworkStatus';
+import { ToastContainer } from "react-toastify";
+import AdminNotFound from './pages/AdminNotFound';
 
 function App() {
   // Inline style for body background
@@ -68,6 +70,7 @@ function App() {
   
   return (
     <ThemeProvider>
+       <ToastContainer />
       <NetworkStatus>
       <AdminMain>
         <Routes>
@@ -85,7 +88,7 @@ function App() {
           <Route path="/CCTVAccessories" element={<CCTVAccessories />} />
           {/* <Route path="/Dashboard" element={<Dashboard />} /> */}
           <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
-          <Route path="/NewProduct" element={<NewProduct />} />
+          {/* <Route path="/NewProduct" element={<NewProduct />} /> */}
 
           <Route path="/Dashboard" element={<ProtectedRoute element={<Dashboard />} restrictedRoles={['Staff']} />} />
           <Route path="/Orders" element={<ProtectedRoute element={<Orders />} restrictedRoles={['Staff']} />} />
@@ -104,10 +107,11 @@ function App() {
           <Route path="/MobileAd" element={<ProtectedRoute element={<MobileAd />} restrictedRoles={['Staff']} />} />
           <Route path="/ProductDetailPage" element={<ProtectedRoute element={<ProductDetailPage />} restrictedRoles={['Staff']} />} />
           <Route path="/CCTVAd" element={<ProtectedRoute element={<CCTVAd />} restrictedRoles={['Staff']} />} />
-          <Route path="/Tracking" element={<ProtectedRoute element={<Tracking />} restrictedRoles={['Staff']} />} />
+          {/* <Route path="/Tracking" element={<ProtectedRoute element={<Tracking />} restrictedRoles={['Staff']} />} /> */}
           <Route path="/CouponManager" element={<ProtectedRoute element={<CouponManager />} restrictedRoles={['Staff']} />} />
           <Route path="/StaffManagement" element={<ProtectedRoute element={<StaffManagement />} restrictedRoles={['Staff']} />} />
-          
+          <Route path="*" element={<AdminNotFound />} />
+
         </Routes>
       </AdminMain>
       </NetworkStatus>

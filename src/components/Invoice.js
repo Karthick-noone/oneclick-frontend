@@ -13,9 +13,9 @@ const Invoice = ({ order, productDetails }) => {
     (acc, product) => acc + (product.quantity || 0),
     0
   );
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
+  const formatDate = (dateObj) => {
+    if (!dateObj) return "N/A";
+    const date = new Date(dateObj); // already a Date object
     const day = date.getDate();
     const month = date.toLocaleString("default", { month: "short" });
     const year = date.getFullYear();
@@ -96,8 +96,8 @@ const Invoice = ({ order, productDetails }) => {
             <p style={{ margin: "0 0 5px 0" }}>
               <strong>Invoice No:</strong> #{order.invoice}
             </p>
-            <p style={{ margin: 0 }}>
-              <strong>Date:</strong> {formatDate(new Date().toLocaleDateString())}
+            <p style={{ margin: "0 11px 5px 0" }}>
+              <strong>Date:</strong> {formatDate(new Date())}
             </p>
           </div>
         </div>
@@ -197,7 +197,7 @@ const Invoice = ({ order, productDetails }) => {
             <p style={{ margin: "0 0 5px 0" }}>
               <strong>Order ID:</strong> #{order.unique_id}
             </p>
-             <p style={{ margin: "0 0 5px 0" }}>
+            <p style={{ margin: "0 0 5px 0" }}>
               <strong>Order Date:</strong> {formatDate(order.order_date)}
             </p>
           </div>
@@ -354,6 +354,10 @@ const Invoice = ({ order, productDetails }) => {
           </div>
 
         </div>
+        <hr />
+        <p style={{ fontSize: "12px", fontFamily: "dancing, cursive", padding: '5px', textAlign: 'left' }}>
+          This is a computer generated invoice, no signature required.
+        </p>
       </div>
 
       {/* <div
@@ -390,11 +394,9 @@ const Invoice = ({ order, productDetails }) => {
       >
       
 
-        <hr />
-        <p style={{ fontSize: "12px", fontFamily: "dancing, cursive" }}>
-          This is a computer generated invoice, no signature required.
-        </p>
+      
       </div> */}
+
     </div >
   );
 };

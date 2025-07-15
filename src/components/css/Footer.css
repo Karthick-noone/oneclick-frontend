@@ -10,11 +10,19 @@
     /* box-shadow: 10px 10px 10px 8px rgba(0, 0, 0, 0.3); */
     margin: 0;
 }
-
+.footer-bg{
+    background-color: #001a35;
+}
 .footer-section {
     flex: 1;
     /* min-width: 200px; */
     margin: 10px;
+}
+
+.play-store-image {
+    width: 170px !important;
+    cursor: pointer;
+    margin-top: 10px;
 }
 
 .footer-section a {
@@ -47,7 +55,9 @@
         gap: 10px; /* Space between grid items; adjust as needed */
         padding: 10px;
     }
-    
+       .play-store-image {
+        width: 80px !important;
+    }
     /* Optionally remove margins in grid layout if they cause extra spacing */
     .footer-section {
         margin-left: 10px;

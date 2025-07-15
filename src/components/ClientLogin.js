@@ -234,7 +234,7 @@ const handleSubmit = async (e) => {
       {backgroundImage && <div style={styles.blurOverlay} />}
       <div style={styles.container}>
         <button style={styles.signOutButton} className="close-btn">
-          <Link to="/" style={styles.signOutLink}>
+          <Link to="/" style={styles.signOutLink} title="Back to home">
             <FaSignOutAlt />
           </Link>
         </button>

@@ -11,10 +11,12 @@ import maestro from './img/cards/jcb.png';
 import rupay from './img/cards/unionpay.png';
 import upi from './img/cards/discover.png';
 
+
 const PaymentMethods = () => {
     return (
         <div className="payment-methods-page">
             <h2>We accept the following payment methods</h2>
+
             <div className="payment-images">
                 <img loading='lazy' src={visa} alt="Visa" />
                 <img loading='lazy' src={mastercard} alt="MasterCard" />
