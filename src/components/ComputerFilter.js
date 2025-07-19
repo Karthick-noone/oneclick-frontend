@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import './css/ComputerFilter.css';
 import axios from 'axios';
 import { ApiUrl } from './ApiUrl';
 import FilterIcon from './img/settings.png';
 
-const BRANDS = ['Acer', 'Apple', 'Asus', 'Dell', 'HP', 'Lenovo', 'MI', 'Microsoft', 'MSI', 'Samsung'];
+const BRANDS = ['Acer', 'Apple', 'Asus', 'Dell', 'HP', 'Lenovo', 'Desktop', 'Microsoft', 'MSI', 'Samsung'];
 const RAM_OPTIONS = ['4', '8', '16', '32'];
 const STORAGE_OPTIONS = ['128', '256', '512', '1024'];
 const PROCESSORS = ['i3', 'i5', 'i7', 'Ryzen 5', 'Ryzen 7'];
@@ -16,7 +16,10 @@ const ComputerFilter = ({ showFilters, closeFilters }) => {
     const [currentPrice, setCurrentPrice] = useState(0); // slider value
     const [userInteractedWithPrice, setUserInteractedWithPrice] = useState(false);
     const [userHasInteracted, setUserHasInteracted] = useState(false);
-
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const search = params.get("search") || ""; // Get `search` query param, fallback to empty string
+    // console.log("Search", search)
     const [filters, setFilters] = useState({
         brand: searchParams.getAll('brand') || [],
         memory: searchParams.getAll('memory') || [],
@@ -66,7 +69,7 @@ const ComputerFilter = ({ showFilters, closeFilters }) => {
         }
 
         setSearchParams(params);
-    }, [filters, userInteractedWithPrice, userHasInteracted]);
+    }, [filters, userInteractedWithPrice, userHasInteracted, setSearchParams]);
 
     // Fetch prices and update price range
     useEffect(() => {
@@ -91,7 +94,7 @@ const ComputerFilter = ({ showFilters, closeFilters }) => {
             }
         };
         fetchPrices();
-    }, []);
+    }, [searchParams]);
 
     //   const toggleFilters = () => setShowFilters(prev => !prev);
 
@@ -209,8 +212,8 @@ const ComputerFilter = ({ showFilters, closeFilters }) => {
                             <FilterBox
                                 key={brand}
                                 label={brand}
-                                selected={filters.brand.includes(brand)}
-                                onClick={() => toggleFilter('brand', brand)}
+                                selected={filters.brand.includes(brand.toLowerCase() || search.toLowerCase() === brand.toLowerCase())}
+                                onClick={() => toggleFilter('brand', brand.toLowerCase())}
                             />
                         ))}
                     </div>

@@ -1,65 +1,73 @@
-/* Main footer styling with card-like effect (for larger screens, using flex) */
+.footer-bg {
+  background-color: #001a35;
+  background-image: linear-gradient(
+      rgba(0, 26, 53, 0.8), /* Slightly dim overlay */
+      rgba(0, 26, 53, 0.8)
+    ),
+    url('./../img/city-profile.jpg'); /*  Use absolute path if image is in /public/img */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #ddd;
+  font-family: 'calibri', sans-serif;
+}
+
 .footer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    padding: 20px;
-    background-color: #001a35;
-    color: #ddd;
-    font-family: 'calibri', sans-serif;
-    /* box-shadow: 10px 10px 10px 8px rgba(0, 0, 0, 0.3); */
-    margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 20px;
 }
-.footer-bg{
-    background-color: #001a35;
-}
+
 .footer-section {
-    flex: 1;
-    /* min-width: 200px; */
-    margin: 10px;
+  flex: 1;
+  margin: 10px;
 }
 
 .play-store-image {
-    width: 170px !important;
-    cursor: pointer;
-    margin-top: 10px;
+  width: 170px;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 .footer-section a {
-    text-decoration: none;
-    color: #ddd;
+  text-decoration: none;
+  color: #ddd;
 }
 
 .footer-section h4 {
-    margin-bottom: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #ddd;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ddd;
 }
 
 .footer-section p {
-    margin: 5px 0;
-    /* margin-left: 20px; */
-    font-size: 14px;
-    color: #ddd;
-    text-align: left;
-    display: block;
+  margin: 5px 0;
+  font-size: 14px;
+  color: #ddd;
+  text-align: left;
+  display: block;
 }
 
+.payment-methods {
+  padding: 10px 0;
+}
 
-/* Responsive adjustments using CSS Grid for smaller screens */
+/* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
-    .footer {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); /* Two equal columns */
-        gap: 10px; /* Space between grid items; adjust as needed */
-        padding: 10px;
-    }
-       .play-store-image {
-        width: 80px !important;
-    }
-    /* Optionally remove margins in grid layout if they cause extra spacing */
-    .footer-section {
-        margin-left: 10px;
-    }
+  .footer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .play-store-image {
+    width: 80px;
+  }
+
+  .footer-section {
+    margin-left: 10px;
+  }
 }

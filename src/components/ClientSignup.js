@@ -549,7 +549,7 @@ const styles = {
     padding: "8px", // Reduce input padding for a smaller card
     margin: "8px 0", // Reduce spacing between inputs
     borderRadius: "5px",
-    border: "1px solid #ccc",
+    // border: "1px solid #ccc",
     fontSize: "14px", // Adjust font size to match the smaller design
     backgroundColor: "transparent",
     border: "1px solid grey",

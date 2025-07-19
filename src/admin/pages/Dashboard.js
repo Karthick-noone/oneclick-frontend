@@ -22,7 +22,7 @@ import {
   FaStore
 } from "react-icons/fa";
 import axios from "axios";
-import { Bar, Line, Pie } from "react-chartjs-2";
+import {  Line, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   Title,
@@ -51,13 +51,13 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-  const [orderData, setOrderData] = useState([]);
-  const [salesData, setSalesData] = useState(null);
+  const [, setOrderData] = useState([]);
+  const [, setSalesData] = useState(null);
   const [pieData, setPieData] = useState(null);
   const [totalOrders, setTotalOrders] = useState(0);
   const [totalSales, setTotalSales] = useState(0);
   const [totalCustomers, setTotalCustomers] = useState(0);
-  const [totalCategories, setTotalCategories] = useState(0);
+  const [, setTotalCategories] = useState(0);
   const [pendingPayments, setPendingPayments] = useState(0);
   const [monthlySales, setMonthlySales] = useState([]);
 
@@ -92,7 +92,7 @@ const Dashboard = () => {
       try {
         const response = await axios.get(`${ApiUrl}/fetchcategories`);
 
-        const totalCategories = response.data.length; // ✅ Get the total number of categories
+        const totalCategories = response.data.length; //  Get the total number of categories
 
         console.log(totalCategories)
 

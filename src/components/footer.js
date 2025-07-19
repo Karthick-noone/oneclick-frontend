@@ -24,10 +24,10 @@ const Footer = () => {
           </h4>
           <p>Market Road, Marthandam,</p>
           <p>Kanyakumari, 629165</p>
-          <p>enquiryoneclick@gmail.com</p>
-          <Link to="tel:+9092206677">
+          <a href="mailto:enquiryoneclick@gmail.com"><p>enquiryoneclick@gmail.com</p></a>
+          <a href="tel:+9092206677">
             <p>+91-9092206677</p>
-          </Link>
+          </a>
           <a href="https://play.google.com/store/apps/details?id=com.oneclick.seasense" target="_blank" rel="noopener noreferrer">
             <img loading='lazy' src={PlayStore} alt="Visa" className='play-store-image' />
           </a>

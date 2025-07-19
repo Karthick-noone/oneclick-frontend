@@ -3,7 +3,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import "./css/Cart.css";
 import { ApiUrl } from "./ApiUrl";
 // import Header1 from './Header1';
-import Header2 from "./Header2";
+// import Header2 from "./Header2";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,7 +13,7 @@ import {
   FaCheck,
   FaShoppingBag,
   FaStore,
-  FaInfo,
+  // FaInfo,
   FaInfoCircle,
   FaTruck,
 } from "react-icons/fa";
@@ -21,8 +21,8 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import {
   FaMoneyBillWave,
   FaCreditCard,
-  FaUniversity,
-  FaPaypal,
+  // FaUniversity,
+  // FaPaypal,
 } from "react-icons/fa";
 import Swal from "sweetalert2";
 import Footer from "./footer";
@@ -34,7 +34,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null); // State for selected address
-  const [, setWishlistItems] = useState([]);
+  // const [, setWishlistItems] = useState([]);
   const [addresses, setAddresses] = useState([]); // State for storing fetched addresses
   const [userId, setUserId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,27 +45,27 @@ const Checkout = () => {
   const [defaultAddress, setDefaultAddress] = useState(null); // Initially selected address
   const [isAddressSelected, setIsAddressSelected] = useState(false);
   const [username, setUsername] = useState("");
-  const [couponCode, setCouponCode] = useState("");
+  // const [couponCode, setCouponCode] = useState("");
   const [message, setMessage] = useState("");
-  const [totalAmount, setTotalAmount] = useState(0);
+  const [, setTotalAmount] = useState(0);
   const [coupon, setCoupon] = useState("");
-  const [selectedProductId, setSelectedProductId] = useState(
-    cartItems.length > 0 ? cartItems[0].id : null
-  ); // Default to first product if available
+  // const [selectedProductId, setSelectedProductId] = useState(
+  //   cartItems.length > 0 ? cartItems[0].id : null
+  // ); // Default to first product if available
   const [newTotalAmount, setNewTotalAmount] = useState(0); // New state for total amount after applying coupon
   const [discountAmount, setDiscountAmount] = useState(0); // New state for storing discount
   const [messageType, setMessageType] = useState(""); // New state to track the message type (success/error)
   const [isCouponApplied, setIsCouponApplied] = useState(false); // New state to track if coupon is applied
-  const [coupons, setCoupons] = useState(0);
+  const [, setCoupons] = useState(0);
   const [couponValue, setCouponValue] = useState(0);
   const [minPurchaseLimit, setMinPurchaseLimit] = useState(0);
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   // const [isOfferActive, setIsOfferActive] = useState(true);
-  const [item, setitem] = useState(null);
+  // const [item, setitem] = useState(null);
   const [isOrdering, setIsOrdering] = useState(false);
 
   const location = useLocation();
-  const { isOfferActive, product } = location.state || {}; // Ensure it doesn't break if undefined
+  const { isOfferActive, } = location.state || {}; // Ensure it doesn't break if undefined
 
   // useEffect(() => {
   //   if (item && item.offer_end_time) {
@@ -116,7 +116,8 @@ const Checkout = () => {
     const inputValue = event.target.value;
 
     // Use a regular expression to allow only alphanumeric characters (A-Z, a-z, 0-9)
-    const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
+// eslint-disable-next-line no-useless-escape
+const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/? ]*$/;
 
     // Check if the input value matches the regex
     if (validCharacters.test(inputValue)) {
@@ -362,7 +363,7 @@ const Checkout = () => {
 
   const [buyLaterItems, setBuyLaterItems] = useState([]);
   // This flag is set only when the user clicks the Buy Later button
-  const [buyLaterApplied, setBuyLaterApplied] = useState(false);
+  const [, setBuyLaterApplied] = useState(false);
 
   const userid = localStorage.getItem("user_id");
 
@@ -476,23 +477,24 @@ const Checkout = () => {
 
   const [buyLaterProducts, setBuyLaterProducts] = useState([]);
 
-  const fetchBuyLaterItems = () => {
-    axios
-      .get(`${ApiUrl}/api/get-buy-later/${userid}`)
-      .then((response) => {
-        console.log("Fetched buy later items:", response.data);
+  const fetchBuyLaterItems = useCallback(() => {
+  axios
+    .get(`${ApiUrl}/api/get-buy-later/${userid}`)
+    .then((response) => {
+      console.log("Fetched buy later items:", response.data);
 
-        setBuyLaterProducts(response.data.buyLater);
-      })
-      .catch((error) => {
-        console.error("Error fetching buy later items:", error);
-      });
-  };
+      setBuyLaterProducts(response.data.buyLater);
+    })
+    .catch((error) => {
+      console.error("Error fetching buy later items:", error);
+    });
+}, [ userid]); //  dependencies
 
   // Call this function when the page loads
-  useEffect(() => {
-    fetchBuyLaterItems();
-  }, [userid]);
+useEffect(() => {
+  fetchBuyLaterItems();
+}, [fetchBuyLaterItems]); //  added fetchBuyLaterItems
+
 
   // Calculate the total price; only filter out buy later items after the user clicks "Buy Later"
   const calculateTotalPrice = () => {
@@ -597,7 +599,7 @@ const Checkout = () => {
         console.error("Error fetching address:", error);
       }
     },
-    [ApiUrl]
+    []
   ); // Include dependencies ApiUrl
 
   useEffect(() => {
@@ -630,15 +632,16 @@ const Checkout = () => {
           // Update the default address to the newly selected address
           setDefaultAddress(selectedAddress);
           await fetchAddress(userId);
-          toast.success("Address updated successfully", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
+           Swal.fire({
+          toast:true,
+          timer: 3000,
+          position:'top-end',
+          // title: "Success",
+          text: "Address updated successfully",
+          icon: "success",
+          confirmButtonText: "OK",
+          showConfirmButton:false,
+        });
           handleCloseModal(); // Close the modal after confirming
         } else {
           throw new Error("Unexpected response status");
@@ -698,7 +701,7 @@ const Checkout = () => {
     }
   };
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
 
   const email = localStorage.getItem("email");
 
@@ -726,7 +729,7 @@ const Checkout = () => {
     // Fetch cart items immediately on mount
     fetchCartItems();
 
-    // 🔥 Listen for cart-updated events
+    //  Listen for cart-updated events
     const handleCartUpdate = () => {
       console.log("[Event] Cart updated, fetching fresh cart data...");
       fetchCartItems();
@@ -763,22 +766,22 @@ const Checkout = () => {
       }, 0)
       .toFixed(2);
   };
-  const discount = () => {
-    return cartItems
-      .reduce((total, item) => {
-        const actual_price = parseFloat(item.actual_price);
-        const price = parseFloat(
-          item.offer_price > 0 && isOfferActive
-            ? item.offer_price
-            : item.prod_price
-        );
-        const discountPerItem = actual_price - price;
-        return (
-          total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
-        );
-      }, 0)
-      .toFixed(2);
-  };
+  // const discount = () => {
+  //   return cartItems
+  //     .reduce((total, item) => {
+  //       const actual_price = parseFloat(item.actual_price);
+  //       const price = parseFloat(
+  //         item.offer_price > 0 && isOfferActive
+  //           ? item.offer_price
+  //           : item.prod_price
+  //       );
+  //       const discountPerItem = actual_price - price;
+  //       return (
+  //         total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
+  //       );
+  //     }, 0)
+  //     .toFixed(2);
+  // };
 
   const getTotalItemsCount = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -915,8 +918,8 @@ const Checkout = () => {
     const selectedAddressDetails = addressDetails.find(
       (address) => String(address.address_id) === String(addressToUse)
     );
-    const finalAmountToSend =
-      newTotalAmount > 0 ? newTotalAmount : calculateTotalPrice();
+    // const finalAmountToSend =
+    //   newTotalAmount > 0 ? newTotalAmount : calculateTotalPrice();
     const phonenumber = `${selectedAddressDetails.phone}`;
     const name = `${selectedAddressDetails.name}`;
     const email = localStorage.getItem("email");
@@ -971,7 +974,7 @@ const Checkout = () => {
     if (addressDetails.length > 0 && !defaultAddress) {
       setDefaultAddress(addressDetails[0].address_id);
     }
-  }, [addressDetails]);
+  }, [addressDetails, defaultAddress]);
 
   const firework = () => {
     confetti({
@@ -1806,7 +1809,7 @@ const Checkout = () => {
                 {selectedPaymentMethod === "card" && (
                   <div className="continue-wrapper">
                     <button
-                      class="pay-btn"
+                      className="pay-btn"
                       onClick={() => handlePayment("Online")}
                     >
                       {isOrdering ? (

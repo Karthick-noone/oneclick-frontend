@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "./css/Cart.css";
 import { ApiUrl } from "./ApiUrl";
 // import Header1 from './Header1';
-import Header2 from "./Header2";
+// import Header2 from "./Header2";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,23 +16,23 @@ const CartPage = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null); // State for selected address
-  const [, setWishlistItems] = useState([]);
+  // const [, setWishlistItems] = useState([]);
   const [addresses, setAddresses] = useState([]); // State for storing fetched addresses
   const [userId, setUserId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [defaultAddress, setDefaultAddress] = useState(null); // Initially selected address
-  const [isAddressSelected, setIsAddressSelected] = useState(false);
+  const [, setIsAddressSelected] = useState(false);
 
   const [addressDetails, setAddressDetails] = useState([]);
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
 
   // const [isOfferActive, setIsOfferActive] = useState(true);
-  const [item, setitem] = useState(null);
+  // const [item, setitem] = useState(null);
 
   const [buyLaterProducts, setBuyLaterProducts] = useState([]);
   const [buyLaterItems, setBuyLaterItems] = useState([]);
   // This flag is set only when the user clicks the Buy Later button
-  const [buyLaterApplied, setBuyLaterApplied] = useState(false);
+  const [, setBuyLaterApplied] = useState(false);
 
   const userid = localStorage.getItem("user_id");
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -155,24 +155,23 @@ const CartPage = () => {
     });
   };
 
-  const fetchBuyLaterItems = () => {
-    axios
-      .get(`${ApiUrl}/api/get-buy-later/${userid}`)
-      .then((response) => {
-        console.log("Fetched buy later items:", response.data);
+  const fetchBuyLaterItems = useCallback(() => {
+  axios
+    .get(`${ApiUrl}/api/get-buy-later/${userid}`)
+    .then((response) => {
+      console.log("Fetched buy later items:", response.data);
 
-        setBuyLaterProducts(response.data.buyLater);
-      })
-      .catch((error) => {
-        console.error("Error fetching buy later items:", error);
-      });
-  };
+      setBuyLaterProducts(response.data.buyLater);
+    })
+    .catch((error) => {
+      console.error("Error fetching buy later items:", error);
+    });
+}, [ userid]); //  dependencies
 
   // Call this function when the page loads
-  useEffect(() => {
-    fetchBuyLaterItems();
-  }, [userid]);
-
+useEffect(() => {
+  fetchBuyLaterItems();
+}, [fetchBuyLaterItems]); //  added fetchBuyLaterItems
   // useEffect(() => {
   //   if (item && item.offer_end_time) {
   //     const now = new Date();
@@ -193,7 +192,7 @@ const CartPage = () => {
         console.error("Error fetching address:", error);
       }
     },
-    [ApiUrl]
+    []
   ); // Include dependencies ApiUrl
 
   useEffect(() => {
@@ -234,15 +233,16 @@ const CartPage = () => {
           // Update the default address to the newly selected address
           setDefaultAddress(selectedAddress);
           await fetchAddress(userId);
-          toast.success("Address updated successfully", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
+           Swal.fire({
+          toast:true,
+          timer: 3000,
+          position:'top-end',
+          // title: "Success",
+          text: "Address updated successfully",
+          icon: "success",
+          confirmButtonText: "OK",
+          showConfirmButton:false,
+        });
           handleCloseModal(); // Close the modal after confirming
         } else {
           throw new Error("Unexpected response status");
@@ -301,7 +301,7 @@ const CartPage = () => {
     }
   };
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
 
   const email = localStorage.getItem("email");
 
@@ -403,20 +403,20 @@ const CartPage = () => {
       }, 0)
       .toFixed(2);
   };
-  const discount = () => {
-    return cartItems
-      .reduce((total, item) => {
-        const actual_price = parseFloat(item.actual_price);
-        const price = parseFloat(
-          item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price
-        );
-        const discountPerItem = actual_price - price;
-        return (
-          total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
-        );
-      }, 0)
-      .toFixed(2);
-  };
+  // const discount = () => {
+  //   return cartItems
+  //     .reduce((total, item) => {
+  //       const actual_price = parseFloat(item.actual_price);
+  //       const price = parseFloat(
+  //         item.offer_price > 0 && isOfferActive ? item.offer_price : item.prod_price
+  //       );
+  //       const discountPerItem = actual_price - price;
+  //       return (
+  //         total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
+  //       );
+  //     }, 0)
+  //     .toFixed(2);
+  // };
 
   const save = () => {
     return cartItems
@@ -650,7 +650,7 @@ const CartPage = () => {
     if (addressDetails.length > 0 && !defaultAddress) {
       setDefaultAddress(addressDetails[0].address_id);
     }
-  }, [addressDetails]);
+  }, [addressDetails, defaultAddress]);
 
   // Function to handle checkbox selection
   const handleCheckboxChange = (id) => {
@@ -763,108 +763,108 @@ const CartPage = () => {
     }
   };
 
-  const handlePlaceOrder = async () => {
-    console.log("handlePlaceOrder function called");
+  // const handlePlaceOrder = async () => {
+  //   console.log("handlePlaceOrder function called");
 
-    // Use the selected address if available, otherwise fall back to the default address
-    const addressToUse = selectedAddress || defaultAddress;
+  //   // Use the selected address if available, otherwise fall back to the default address
+  //   const addressToUse = selectedAddress || defaultAddress;
 
-    if (!addressToUse) {
-      console.log("No address selected or default address found");
-      Swal.fire({
-        icon: "error",
-        title: "Address Required",
-        text: "Please select a shipping address.",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      return;
-    }
+  //   if (!addressToUse) {
+  //     console.log("No address selected or default address found");
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Address Required",
+  //       text: "Please select a shipping address.",
+  //       timer: 2000,
+  //       showConfirmButton: false,
+  //     });
+  //     return;
+  //   }
 
-    console.log("Selected or Default Address ID:", addressToUse);
-    console.log("Address Details:", addressDetails);
+  //   console.log("Selected or Default Address ID:", addressToUse);
+  //   console.log("Address Details:", addressDetails);
 
-    // Log all address IDs to verify the correct comparison
-    console.log(
-      "All address IDs:",
-      addressDetails.map((address) => address.address_id)
-    );
+  //   // Log all address IDs to verify the correct comparison
+  //   console.log(
+  //     "All address IDs:",
+  //     addressDetails.map((address) => address.address_id)
+  //   );
 
-    // Find the address details using the address ID (either default or selected)
-    const selectedAddressDetails = addressDetails.find(
-      (address) => String(address.address_id) === String(addressToUse)
-    );
+  //   // Find the address details using the address ID (either default or selected)
+  //   const selectedAddressDetails = addressDetails.find(
+  //     (address) => String(address.address_id) === String(addressToUse)
+  //   );
 
-    if (!selectedAddressDetails) {
-      console.log("Selected address details not found");
-      Swal.fire({
-        icon: "error",
-        title: "Address Not Found",
-        text: "Selected address not found.",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      return;
-    }
+  //   if (!selectedAddressDetails) {
+  //     console.log("Selected address details not found");
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Address Not Found",
+  //       text: "Selected address not found.",
+  //       timer: 2000,
+  //       showConfirmButton: false,
+  //     });
+  //     return;
+  //   }
 
-    // Construct the full address string
-    const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}`;
+  //   // Construct the full address string
+  //   const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}`;
 
-    // Enrich cart items with additional details
-    const enrichedCartItems = cartItems.map((item) => ({
-      id: item.id,
-      quantity: item.quantity,
-      price: item.price,
-      name: item.name,
-      image: item.image,
-      description: item.description,
-      product_id: item.prod_id,
-      delivery_charge: item.delivery_charge,
-      category: item.category,
-    }));
+  //   // Enrich cart items with additional details
+  //   const enrichedCartItems = cartItems.map((item) => ({
+  //     id: item.id,
+  //     quantity: item.quantity,
+  //     price: item.price,
+  //     name: item.name,
+  //     image: item.image,
+  //     description: item.description,
+  //     product_id: item.prod_id,
+  //     delivery_charge: item.delivery_charge,
+  //     category: item.category,
+  //   }));
 
-    const orderData = {
-      user_id: userId,
-      total_amount: calculateTotalPrice(),
-      shipping_address: fullAddress,
-      address_id: addressToUse,
-      cartItems: enrichedCartItems,
-    };
+  //   const orderData = {
+  //     user_id: userId,
+  //     total_amount: calculateTotalPrice(),
+  //     shipping_address: fullAddress,
+  //     address_id: addressToUse,
+  //     cartItems: enrichedCartItems,
+  //   };
 
-    console.log("Order Data:", orderData);
+  //   console.log("Order Data:", orderData);
 
-    try {
-      const response = await axios.post(`${ApiUrl}/place-order`, orderData);
+  //   try {
+  //     const response = await axios.post(`${ApiUrl}/place-order`, orderData);
 
-      if (response.status === 200) {
-        console.log("Order placed successfully");
-        Swal.fire({
-          icon: "success",
-          title: "Order Placed",
-          text: "Your order has been placed successfully!",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-        // Clear cart or navigate to a confirmation page
-      } else {
-        console.log("Unexpected response status:", response.status);
-        throw new Error("Unexpected response status");
-      }
-    } catch (error) {
-      console.error(
-        "Error placing order:",
-        error.response?.data || error.message
-      );
-      Swal.fire({
-        icon: "error",
-        title: "Order Error",
-        text: `An error occurred: ${error.response?.data?.message || error.message
-          }`,
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    }
-  };
+  //     if (response.status === 200) {
+  //       console.log("Order placed successfully");
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: "Order Placed",
+  //         text: "Your order has been placed successfully!",
+  //         timer: 2000,
+  //         showConfirmButton: false,
+  //       });
+  //       // Clear cart or navigate to a confirmation page
+  //     } else {
+  //       console.log("Unexpected response status:", response.status);
+  //       throw new Error("Unexpected response status");
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "Error placing order:",
+  //       error.response?.data || error.message
+  //     );
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Order Error",
+  //       text: `An error occurred: ${error.response?.data?.message || error.message
+  //         }`,
+  //       timer: 2000,
+  //       showConfirmButton: false,
+  //     });
+  //   }
+  // };
 
   const handleProductClick = (product) => {
     const slugify = (name) =>

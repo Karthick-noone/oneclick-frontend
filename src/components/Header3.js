@@ -10,23 +10,23 @@ import {
   FaHeadphones,
   FaVolumeUp,
   FaTv,
-  FaAppleAlt,
+  // FaAppleAlt,
   FaCog,
   FaRecycle,
   FaInfoCircle,
   FaEnvelope,
   FaQuestionCircle,
-  FaStopwatch,
+  // FaStopwatch,
   // FontAwesomeIcon
 } from "react-icons/fa";
 import "./css/Header3.css"; // Adjust path as needed
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChevronDown, } from "react-icons/fa";
 import listIcon from './img/list.png'
 
 import { Watch } from 'lucide-react';
 
 
-const Header3 = () => {
+const Header3 = ({ topOffset }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showHeadphones, setShowHeadphones] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -68,9 +68,9 @@ const Header3 = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  const toggleMenu = () => {
-    setIsOpen(prev => !prev);
-  };
+  // const toggleMenu = () => {
+  //   setIsOpen(prev => !prev);
+  // };
 
   // Open the menu (☰ icon)
   const openMenu = () => {
@@ -172,7 +172,7 @@ const Header3 = () => {
   const isPrinterAccessoriesActive =
     location.pathname === "/PrinterAccessories";
 
-  const isComputersActive = location.pathname.startsWith("/Computers"); // Match any path starting with "/Computers"
+  // const isComputersActive = location.pathname.startsWith("/Computers"); // Match any path starting with "/Computers"
 
   const handleLinkClick = () => {
     setIsOpen(false);
@@ -202,7 +202,7 @@ const Header3 = () => {
           onClick={openMenu}
         >
           {/* ☰ */}
-          <img src={listIcon} width={'28px'} />
+          <img src={listIcon} width={'28px'} alt="list" />
         </div>
       )}
 
@@ -234,7 +234,7 @@ const Header3 = () => {
       <header
         className="header3"
         ref={headerRef}
-        style={{ position: "sticky", top: "72px" }}
+        style={{ position: "sticky", top: `${topOffset}px`, zIndex: 999 }}
       >
 
         <nav className={`nav ${isOpen ? "open" : ""}`}>
@@ -335,7 +335,7 @@ const Header3 = () => {
                   }`}
               >
                 <FaHeadphones
-                style={{fontSize:'16px'}}
+                  style={{ fontSize: '16px' }}
 
                   className={`fa-icons ${location.pathname === "/Headphones" ? "active" : ""
                     }`}
@@ -349,7 +349,7 @@ const Header3 = () => {
                   }`}
               >
                 <FaVolumeUp
-                style={{fontSize:'16px'}}
+                  style={{ fontSize: '16px' }}
 
                   className={`fa-icons ${location.pathname === "/Speakers" ? "active" : ""
                     }`}
@@ -424,7 +424,7 @@ const Header3 = () => {
                 className={`nav-link ${isComputerAccessoriesActive ? "active" : ""}`}
               >
                 <FaUsb
-                style={{fontSize:'16px'}}
+                  style={{ fontSize: '16px' }}
                   className={`fa-icons ${location.pathname === "/ComputerAccessories" ? "active" : ""
                     }`}
                 /> Computer Accessories
@@ -437,7 +437,7 @@ const Header3 = () => {
                 className={`nav-link ${isMobileAccessoriesActive ? "active" : ""}`}
               >
                 <FaMobileAlt
-                style={{fontSize:'16px'}}
+                  style={{ fontSize: '16px' }}
 
                   className={`fa-icons ${location.pathname === "/MobileAccessories" ? "active" : ""
                     }`} /> Mobile Accessories
@@ -448,7 +448,7 @@ const Header3 = () => {
                 className={`nav-link ${isCCTVAccessoriesActive ? "active" : ""}`}
               >
                 <FaVideo
-                style={{fontSize:'16px'}}
+                  style={{ fontSize: '16px' }}
 
                   className={`fa-icons ${location.pathname === "/CCTVAccessories" ? "active" : ""
                     }`}
@@ -460,7 +460,7 @@ const Header3 = () => {
                 className={`nav-link ${isPrinterAccessoriesActive ? "active" : ""}`}
               >
                 <FaPrint
-                style={{fontSize:'16px'}}
+                  style={{ fontSize: '16px' }}
 
                   className={`fa-icons ${location.pathname === "/PrinterAccessories" ? "active" : ""
                     }`}

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "./css/Cart.css";
 import { ApiUrl } from "./ApiUrl";
 // import Header1 from './Header1';
-import Header2 from "./Header2";
+// import Header2 from "./Header2";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,8 +12,8 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import {
   FaMoneyBillWave,
   FaCreditCard,
-  FaUniversity,
-  FaPaypal,
+  // FaUniversity,
+  // FaPaypal,
   FaStore,
 } from "react-icons/fa";
 import Swal from "sweetalert2";
@@ -26,37 +26,37 @@ import checkout from "./img/checkout.png";
 
 const BuyNow = () => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState([]);
+  // const [cartItems, ] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null); // State for selected address
-  const [, setWishlistItems] = useState([]);
+  // const [, setWishlistItems] = useState([]);
   const [addresses, setAddresses] = useState([]); // State for storing fetched addresses
   const [userId, setUserId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [addressDetails, setAddressDetails] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
-  const [isExpanded, setIsExpanded] = useState(false);
+  // const [isExpanded, setIsExpanded] = useState(false);
   const [defaultAddress, setDefaultAddress] = useState(null); // Initially selected address
   const [isAddressSelected, setIsAddressSelected] = useState(false);
   const [username, setUsername] = useState("");
-  const [couponCode, setCouponCode] = useState("");
+  // const [couponCode, setCouponCode] = useState("");
   const [message, setMessage] = useState("");
   const [totalAmount, setTotalAmount] = useState(0);
   const [coupon, setCoupon] = useState("");
-  const [selectedProductId, setSelectedProductId] = useState(
-    cartItems.length > 0 ? cartItems[0].id : null
-  ); // Default to first product if available
-  const [newTotalAmount, setNewTotalAmount] = useState(0); // New state for total amount after applying coupon
+  // const [selectedProductId, setSelectedProductId] = useState(
+  //   cartItems.length > 0 ? cartItems[0].id : null
+  // ); // Default to first product if available
+  const [newTotalAmount,] = useState(0); // New state for total amount after applying coupon
   const [discountAmount, setDiscountAmount] = useState(0); // New state for storing discount
   const [messageType, setMessageType] = useState(""); // New state to track the message type (success/error)
   const [isCouponApplied, setIsCouponApplied] = useState(false); // New state to track if coupon is applied
-  const [coupons, setCoupons] = useState(0);
+  const [, setCoupons] = useState(0);
   const [couponValue, setCouponValue] = useState(0);
   const [minPurchaseLimit, setMinPurchaseLimit] = useState(0);
   const [isOrdering, setIsOrdering] = useState(false);
 
   const location = useLocation();
-  const { product, email } = location.state || {}; // Get product and email
+  const { product, } = location.state || {}; // Get product and email
   //
   console.log("products", product);
 
@@ -119,8 +119,9 @@ const BuyNow = () => {
   // Allow only valid characters in coupon input
   const handleCouponChange = (event) => {
     const inputValue = event.target.value;
-    const validCharacters =
-      /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/? ]*$/;
+    // eslint-disable-next-line no-useless-escape
+    const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/? ]*$/;
+
     if (validCharacters.test(inputValue)) {
       setCoupon(inputValue);
     }
@@ -290,7 +291,7 @@ const BuyNow = () => {
         console.error("Error fetching address:", error);
       }
     },
-    [ApiUrl]
+    []
   ); // Include dependencies ApiUrl
 
   useEffect(() => {
@@ -323,14 +324,15 @@ const BuyNow = () => {
           // Update the default address to the newly selected address
           setDefaultAddress(selectedAddress);
           await fetchAddress(userId);
-          toast.success("Address updated successfully", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
+          Swal.fire({
+            toast: true,
+            timer: 3000,
+            position: 'top-end',
+            // title: "Success",
+            text: "Address updated successfully",
+            icon: "success",
+            confirmButtonText: "OK",
+            showConfirmButton: false,
           });
           handleCloseModal(); // Close the modal after confirming
         } else {
@@ -460,7 +462,7 @@ const BuyNow = () => {
     if (addressDetails.length > 0 && !defaultAddress) {
       setDefaultAddress(addressDetails[0].address_id);
     }
-  }, [addressDetails]);
+  }, [addressDetails, defaultAddress]);
 
   const firework = () => {
     confetti({
@@ -634,7 +636,7 @@ const BuyNow = () => {
     : JSON.parse(product.prod_img || "[]");
   const firstImage = images.length > 0 ? images[0] : null;
 
-  const discount2 = (product.actual_price - product.prod_price) * quantity;
+  // const discount2 = (product.actual_price - product.prod_price) * quantity;
 
   const delivery_charge = parseInt(product.deliverycharge) || 0;
 
@@ -1101,7 +1103,7 @@ const BuyNow = () => {
                 {selectedPaymentMethod === "card" && (
                   <div className="continue-wrapper">
                     <button
-                      class="pay-btn"
+                      className="pay-btn"
                       onClick={() => handlePayment("Online")}
                     >
                       {isOrdering ? (

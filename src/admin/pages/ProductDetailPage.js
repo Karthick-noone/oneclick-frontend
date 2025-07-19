@@ -23,12 +23,12 @@ const ProductDetailPage = () => {
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [modalIsOpen2, setModalIsOpen2] = useState(false);
-  const [editingImageIndex, setEditingImageIndex] = useState(null); // To track which image is being edited
+  // const [modalIsOpen2, setModalIsOpen2] = useState(false);
+  const [, setEditingImageIndex] = useState(null); // To track which image is being edited
   const [selectedFiles, setSelectedFiles] = useState(null);
-  const [bannerImageName, setBannerImageName] = useState(null);
-  const [bannerKeyword, setBannerKeyword] = useState(''); // Define state for bannerKeyword
-  const [isBannerEdit, setIsBannerEdit] = useState(false); // Track if the edit is for the banner
+  const [, setBannerImageName] = useState(null);
+  const [, setBannerKeyword] = useState(''); // Define state for bannerKeyword
+  const [, setIsBannerEdit] = useState(false); // Track if the edit is for the banner
   
   const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -314,59 +314,59 @@ const handleAddProduct = async () => {
 
 
 
-  const handleUpdateImage = async () => {
-    if (!selectedFiles) {
-      Swal.fire({
-        icon: 'error',
-        title: 'No File Selected',
-        text: 'Please select an image to update.',
-      });
-      return;
-    }
+  // const handleUpdateImage = async () => {
+  //   if (!selectedFiles) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'No File Selected',
+  //       text: 'Please select an image to update.',
+  //     });
+  //     return;
+  //   }
 
-    const formData = new FormData();
-    const imageNamePrefix = isBannerEdit ? `${bannerKeyword}${selectedFiles.name}` : selectedFiles.name; // Use the banner keyword if applicable
-    formData.append('image', new File([selectedFiles], imageNamePrefix)); // Create a new File object with the prefixed name
+  //   const formData = new FormData();
+  //   const imageNamePrefix = isBannerEdit ? `${bannerKeyword}${selectedFiles.name}` : selectedFiles.name; // Use the banner keyword if applicable
+  //   formData.append('image', new File([selectedFiles], imageNamePrefix)); // Create a new File object with the prefixed name
 
-    try {
-      const response = await axios.put(
-        `${ApiUrl}/update-banner-product-image/${editingProduct.id}`, // Update the endpoint to only include the product ID
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+  //   try {
+  //     const response = await axios.put(
+  //       `${ApiUrl}/update-banner-product-image/${editingProduct.id}`, // Update the endpoint to only include the product ID
+  //       formData,
+  //       {
+  //         headers: {
+  //           'Content-Type': 'multipart/form-data',
+  //         },
+  //       }
+  //     );
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Image Updated',
-        text: 'The image has been updated successfully!',
-      });
+  //     Swal.fire({
+  //       icon: 'success',
+  //       title: 'Image Updated',
+  //       text: 'The image has been updated successfully!',
+  //     });
 
-      // Update the product images after a successful update
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === editingProduct.id
-            ? { ...product, image: response.data.updatedImages } // Adjust how you set the image data
-            : product
-        )
-      );
+  //     // Update the product images after a successful update
+  //     setProducts((prevProducts) =>
+  //       prevProducts.map((product) =>
+  //         product.id === editingProduct.id
+  //           ? { ...product, image: response.data.updatedImages } // Adjust how you set the image data
+  //           : product
+  //       )
+  //     );
 
-      // Optionally, reset the state
-      setSelectedFiles(null);
-      setEditingProduct(null);
-      // Close the modal if you have one
-    } catch (error) {
-      console.error('Error updating image:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Update Failed',
-        text: 'There was an error updating the image. Please try again.',
-      });
-    }
-  };
+  //     // Optionally, reset the state
+  //     setSelectedFiles(null);
+  //     setEditingProduct(null);
+  //     // Close the modal if you have one
+  //   } catch (error) {
+  //     console.error('Error updating image:', error);
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Update Failed',
+  //       text: 'There was an error updating the image. Please try again.',
+  //     });
+  //   }
+  // };
 
 
   const handleFileChange = (e) => {

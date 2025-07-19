@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef  } from "react";
+import React, { useState, useEffect, useRef, useCallback  } from "react";
 import "./css/Slidebar.css"; // Ensure you create this CSS file
 import {
   FaHome,
   FaBriefcase,
   FaBox,
-  FaTags,
+  // FaTags,
   FaUsers,
   FaBars,
   FaChartLine,
-  FaCog,
+  // FaCog,
   FaEnvelope,
   FaChevronDown,
   FaChevronRight,
@@ -121,81 +121,83 @@ useEffect(() => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isActive = (path) => (location.pathname === path ? "active" : "");
+ //  Memoize isActive so it doesn't re-create on every render
+const isActive = useCallback(
+  (path) => (location.pathname === path ? "active" : ""),
+  [location.pathname] //  dependency
+);
 
-  // Check if any product-related route is active
-  const isProductActive = () => {
-    return (
-      isActive("/Admin/Computers") ||
-      isActive("/Admin/Mobiles") ||
-      isActive("/Admin/CCTV") ||
-      isActive("/Admin/Headphones") ||
-      isActive("/Admin/Speakers") ||
-      isActive("/Admin/TVHomeCinema") ||
-      isActive("/Admin/WearableTech") ||
-      isActive("/Admin/Printers") ||
-      isActive("/Admin/ComputerAccessories") ||
-      isActive("/Admin/MobileAccessories") ||
-      isActive("/Admin/PrinterAccessories") ||
-      isActive("/Admin/CCTVAccessories") ||
-      isActive("/Admin/secondhandproducts")
-    );
-  };
+//  Now these are clean
+const isProductActive = useCallback(() => {
+  return (
+    isActive("/Admin/Computers") ||
+    isActive("/Admin/Mobiles") ||
+    isActive("/Admin/CCTV") ||
+    isActive("/Admin/Headphones") ||
+    isActive("/Admin/Speakers") ||
+    isActive("/Admin/TVHomeCinema") ||
+    isActive("/Admin/WearableTech") ||
+    isActive("/Admin/Printers") ||
+    isActive("/Admin/ComputerAccessories") ||
+    isActive("/Admin/MobileAccessories") ||
+    isActive("/Admin/PrinterAccessories") ||
+    isActive("/Admin/CCTVAccessories") ||
+    isActive("/Admin/secondhandproducts")
+  );
+}, [isActive]);
 
-  // Check if any edit-related route is active
-  const isEditPageActive = () => {
-    return (
-      isActive("/Admin/EditHomePage") ||
-      isActive("/Admin/EditDoubleImageAd") ||
-      isActive("/Admin/EditLoginBackgroundImage") ||
-      isActive("/Admin/EditSingleImageAd") ||
-      isActive("/Admin/CouponManager")
-    );
-  };
+const isEditPageActive = useCallback(() => {
+  return (
+    isActive("/Admin/EditHomePage") ||
+    isActive("/Admin/EditDoubleImageAd") ||
+    isActive("/Admin/EditLoginBackgroundImage") ||
+    isActive("/Admin/EditSingleImageAd") ||
+    isActive("/Admin/CouponManager")
+  );
+}, [isActive]);
 
-  // Check if any offer-related route is active
-  const isOfferPageActive = () => {
-    return (
-      isActive("/Admin/ComputersAd") ||
-      isActive("/Admin/MobileAd") ||
-      isActive("/Admin/CCTVAd") ||
-      isActive("/Admin/ProductDetailPage")
-    );
-  };
+const isOfferPageActive = useCallback(() => {
+  return (
+    isActive("/Admin/ComputersAd") ||
+    isActive("/Admin/MobileAd") ||
+    isActive("/Admin/CCTVAd") ||
+    isActive("/Admin/ProductDetailPage")
+  );
+}, [isActive]);
 
-  const isReportActive = () => {
-    return (
-      isActive("/Admin/reports") ||
-      isActive("/Admin/SalesReport") ||
-      isActive("/Admin/CustomerReports")
-      // isActive('/Admin/ProductDetailPage')
-    );
-  };
+const isReportActive = useCallback(() => {
+  return (
+    isActive("/Admin/reports") ||
+    isActive("/Admin/SalesReport") ||
+    isActive("/Admin/CustomerReports")
+  );
+}, [isActive]);
 
-  // Set the products submenu to open if any product route is active
-  useEffect(() => {
-    if (isProductActive()) {
-      setIsProductsOpen(true);
-      setIsEditPageOpen(false); // Close Edit Pages submenu
-      setIsOfferPageOpen(false); // Close Offer Pages submenu
-      setIsReportOpen(false); // Close Reports submenu
-    } else if (isEditPageActive()) {
-      setIsEditPageOpen(true);
-      setIsProductsOpen(false); // Close Products submenu
-      setIsOfferPageOpen(false); // Close Offer Pages submenu
-      setIsReportOpen(false); // Close Reports submenu
-    } else if (isOfferPageActive()) {
-      setIsOfferPageOpen(true);
-      setIsProductsOpen(false); // Close Products submenu
-      setIsEditPageOpen(false); // Close Edit Pages submenu
-      setIsReportOpen(false); // Close Reports submenu
-    } else if (isReportActive()) {
-      setIsOfferPageOpen(false);
-      setIsProductsOpen(false); // Close Products submenu
-      setIsEditPageOpen(false); // Close Edit Pages submenu
-      setIsReportOpen(true); // Close Reports submenu
-    }
-  }, []); // Run on component mount
+
+useEffect(() => {
+  if (isProductActive()) {
+    setIsProductsOpen(true);
+    setIsEditPageOpen(false);
+    setIsOfferPageOpen(false);
+    setIsReportOpen(false);
+  } else if (isEditPageActive()) {
+    setIsEditPageOpen(true);
+    setIsProductsOpen(false);
+    setIsOfferPageOpen(false);
+    setIsReportOpen(false);
+  } else if (isOfferPageActive()) {
+    setIsOfferPageOpen(true);
+    setIsProductsOpen(false);
+    setIsEditPageOpen(false);
+    setIsReportOpen(false);
+  } else if (isReportActive()) {
+    setIsReportOpen(true);
+    setIsProductsOpen(false);
+    setIsEditPageOpen(false);
+    setIsOfferPageOpen(false);
+  }
+}, [isProductActive, isEditPageActive, isOfferPageActive, isReportActive]); //  Added dependencies
+
 
   const userRole = localStorage.getItem("userRole"); // Assuming "Staff" or "admin"
 

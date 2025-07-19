@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import html2pdf from "html2pdf.js";
 import { DownloadCloudIcon } from "lucide-react";
-import { DownloadIcon } from "lucide-react";
+// import { DownloadIcon } from "lucide-react";
 
 const PrintModal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;

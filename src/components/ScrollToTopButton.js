@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 // import { FaArrowUp } from "react-icons/fa";
 import "./css/ScrollToTopButton.css"; // Create this CSS file or put styles in global CSS
-import upArrow from './img/up-arrow.png'
+// import upArrow from './img/up-arrow.png'
 const ScrollToTopButton = () => {
     const [isVisible, setIsVisible] = useState(false);
 
@@ -21,11 +21,11 @@ const ScrollToTopButton = () => {
 
     return isVisible ? (
         <div className="scroll-to-top-button" onClick={scrollToTop} >
-            <div class="tooltip-container">
+            <div className="tooltip-container">
 
-                <span class="tooltip">Back to top</span>
+                <span className="tooltip">Back to top</span>
 
-                <img src={upArrow} alt="Scroll to top" className="up-arrow-icon" />
+                <img src="/img/up-arrow.png" alt="Scroll to top" className="up-arrow-icon" />
             </div>
         </div>
 

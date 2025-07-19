@@ -5,7 +5,7 @@ import ApproveImage from './img/approve.png';
 import ApprovalWaitingImage from './img/approval_waiting.png';
 
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes, FaImages, FaPlusCircle,FaChevronDown } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes, FaImages, FaPlusCircle, FaChevronDown } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -13,13 +13,13 @@ import Slider from "react-slick"; // Import Slider from react-slick
 import { FaInfoCircle, FaClone } from "react-icons/fa"; // Ensure to import any icons you need
 import CouponEditPopup from "./CouponEditPopup";
 import EditCouponModal from "./EditCouponModal"; // Import the modal component
-import CouponImage from './img/coupons.png'
-import { toast, ToastContainer } from "react-toastify";
+// import CouponImage from './img/coupons.png'
+import { toast, } from "react-toastify";
 
 import ActiveCouponImage from './img/Active-coupon.png'
 import ExpiredCouponImage from './img/Expired-coupon.png'
-import leftarrow from './img/left.png';
-import rightarrow from './img/right.png';
+// import leftarrow from './img/left.png';
+// import rightarrow from './img/right.png';
 import { SearchIcon } from "lucide-react";
 import FilterIcon from "./img/filter.png";
 
@@ -56,7 +56,7 @@ const ComputerAccessories = () => {
   const [selectedFile, setSelectedFile] = useState(null); // State for selected file
   const [imageIndex, setImageIndex] = useState(null);
   const [newImages, setNewImages] = useState({});
-  const [isPopupVisible, setPopupVisible] = useState(false);
+  // const [isPopupVisible, setPopupVisible] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [isViewingCoupons, setIsViewingCoupons] = useState(false);
@@ -79,13 +79,13 @@ const ComputerAccessories = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showOutOfStockOnly, setShowOutOfStockOnly] = useState(false);
   const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
-  const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
+  // const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
 
-  
- const [loadingProductId, setLoadingProductId] = useState(null);
-    const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
-     const handleStatusChange = async (newStatus, productId) => {
+  const [, setLoadingProductId] = useState(null);
+  const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+
+  const handleStatusChange = async (newStatus, productId) => {
     try {
       const res = await axios.post(
         `${ApiUrl}/api/products/status`,
@@ -126,73 +126,73 @@ const ComputerAccessories = () => {
     }
   };
 
-const handleStatusUpdate = async (prodId) => {
-  try {
-    console.log(`Updating productStatus for prod_id=${prodId}`);
-    setLoadingProductId(prodId); // Mark this product as loading
+  const handleStatusUpdate = async (prodId) => {
+    try {
+      console.log(`Updating productStatus for prod_id=${prodId}`);
+      setLoadingProductId(prodId); // Mark this product as loading
 
-    const newStatus = "approved"; // Always set to approved
+      const newStatus = "approved"; // Always set to approved
 
-    // Update product status with a timeout of 5 seconds
-    const response = await axios.post(
-      `${ApiUrl}/product-status/update`,
-      {
-        prod_id: prodId,
-        productStatus: newStatus,
-      },
-      { timeout: 5000 } // 5-second timeout
-    );
+      // Update product status with a timeout of 5 seconds
+      const response = await axios.post(
+        `${ApiUrl}/product-status/update`,
+        {
+          prod_id: prodId,
+          productStatus: newStatus,
+        },
+        { timeout: 5000 } // 5-second timeout
+      );
 
-    if (response.status === 200) {
-      console.log(`Product ${prodId} approved`);
-      toast.success("Product approved successfully", {
-        position: "top-right",
-        autoClose: 3000, // Close after 3 seconds
-        hideProgressBar: true, //  No progress bar
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      if (response.status === 200) {
+        console.log(`Product ${prodId} approved`);
+        toast.success("Product approved successfully", {
+          position: "top-right",
+          autoClose: 3000, // Close after 3 seconds
+          hideProgressBar: true, //  No progress bar
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
 
-      // Refresh product list
-      const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcomputeraccessories`, {
-        timeout: 5000,
-      });
-      console.log("Refreshed product list:", refreshedProducts.data);
+        // Refresh product list
+        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcomputeraccessories`, {
+          timeout: 5000,
+        });
+        console.log("Refreshed product list:", refreshedProducts.data);
 
-      // Update the product list in state
-      setProducts(refreshedProducts.data);
-    } else {
-      console.warn(`Failed to update product ${prodId}`);
-      toast.error(" Failed to update product status", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+        // Update the product list in state
+        setProducts(refreshedProducts.data);
+      } else {
+        console.warn(`Failed to update product ${prodId}`);
+        toast.error(" Failed to update product status", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+    } catch (error) {
+      console.error(`Error updating product ${prodId}:`, error.message);
+      if (error.code === "ECONNABORTED") {
+        toast.error(" Request timed out. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+        });
+      } else {
+        toast.error(" An error occurred while updating product status", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+        });
+      }
+    } finally {
+      setLoadingProductId(null); // Clear loading state
+      console.log(`Status update finished for prod_id: ${prodId}`);
     }
-  } catch (error) {
-    console.error(`Error updating product ${prodId}:`, error.message);
-    if (error.code === "ECONNABORTED") {
-      toast.error(" Request timed out. Please try again.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-      });
-    } else {
-      toast.error(" An error occurred while updating product status", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-      });
-    }
-  } finally {
-    setLoadingProductId(null); // Clear loading state
-    console.log(`Status update finished for prod_id: ${prodId}`);
-  }
-};
+  };
 
   const fetchCouponStatus = async (productId) => {
     console.log(`[INFO] Checking coupon for product ID: ${productId}`);
@@ -401,9 +401,9 @@ const handleStatusUpdate = async (prodId) => {
     setSelectedProductId(null);
   };
 
-  const handlePopupToggle = () => {
-    setPopupVisible(!isPopupVisible);
-  };
+  // const handlePopupToggle = () => {
+  //   setPopupVisible(!isPopupVisible);
+  // };
 
   const fetchCoupons = async (productId, productName, productPrice) => {
     console.log(`Fetching coupons for product ID: ${productId}`); // Log when fetching starts
@@ -848,8 +848,10 @@ const handleStatusUpdate = async (prodId) => {
     }
 
     // Validate coupon code and extract numeric part
-    const couponCode = newProduct.coupon; // Fetching the coupon code
-    const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
+    // const couponCode = newProduct.coupon; // Fetching the coupon code
+
+    // const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
+
 
     // Check if either coupon code or coupon expiry date is provided
     // if (
@@ -974,18 +976,18 @@ const handleStatusUpdate = async (prodId) => {
   };
 
   const handleEditProduct = (product) => {
-    let formattedDate = "";
-    if (product.coupon_expiry_date) {
-      const expiryDate = new Date(product.coupon_expiry_date);
+    // let formattedDate = "";
+    // if (product.coupon_expiry_date) {
+    //   const expiryDate = new Date(product.coupon_expiry_date);
 
-      if (!isNaN(expiryDate)) {
-        // Format the date manually to YYYY-MM-DD without timezone conversion
-        const year = expiryDate.getFullYear();
-        const month = String(expiryDate.getMonth() + 1).padStart(2, "0"); // Add 1 because months are 0-indexed
-        const day = String(expiryDate.getDate()).padStart(2, "0");
-        formattedDate = `${year}-${month}-${day}`;
-      }
-    }
+    //   if (!isNaN(expiryDate)) {
+    //     // Format the date manually to YYYY-MM-DD without timezone conversion
+    //     const year = expiryDate.getFullYear();
+    //     const month = String(expiryDate.getMonth() + 1).padStart(2, "0"); // Add 1 because months are 0-indexed
+    //     const day = String(expiryDate.getDate()).padStart(2, "0");
+    //     formattedDate = `${year}-${month}-${day}`;
+    //   }
+    // }
 
     setEditingProduct({
       id: product.id,
@@ -1385,47 +1387,46 @@ const handleStatusUpdate = async (prodId) => {
     backgroundColor: "#218838", // Darker shade on hover
   };
 
-  const handleAddPipe = () => {
-    const textarea = document.querySelector(".laptops-card-input1"); // Get the textarea element by class
-    const cursorPosition = textarea.selectionStart; // Get the cursor position
+  // const handleAddPipe = () => {
+  //   const textarea = document.querySelector(".laptops-card-input1"); // Get the textarea element by class
+  //   const cursorPosition = textarea.selectionStart; // Get the cursor position
 
-    // Insert the pipe at the cursor position
-    const updatedFeatures = [
-      newProduct.features.slice(0, cursorPosition),
-      "|",
-      newProduct.features.slice(cursorPosition),
-    ].join("");
+  //   // Insert the pipe at the cursor position
+  //   const updatedFeatures = [
+  //     newProduct.features.slice(0, cursorPosition),
+  //     "|",
+  //     newProduct.features.slice(cursorPosition),
+  //   ].join("");
 
-    // Update the features with the inserted pipe
-    setNewProduct({
-      ...newProduct,
-      features: updatedFeatures,
-    });
+  //   // Update the features with the inserted pipe
+  //   setNewProduct({
+  //     ...newProduct,
+  //     features: updatedFeatures,
+  //   });
 
-    // Return focus back to the textarea after insertion
-    textarea.focus();
-  };
+  //   // Return focus back to the textarea after insertion
+  //   textarea.focus();
+  // };
+  // const handleUpdatePipe = () => {
+  //   const textarea = document.querySelector(".adminmodal-input1"); // Get the textarea element by class
+  //   const cursorPosition = textarea.selectionStart; // Get the cursor position
 
-  const handleUpdatePipe = () => {
-    const textarea = document.querySelector(".adminmodal-input1"); // Get the textarea element by class
-    const cursorPosition = textarea.selectionStart; // Get the cursor position
+  //   // Insert the pipe at the cursor position
+  //   const updatedFeatures = [
+  //     editingProduct.features.slice(0, cursorPosition),
+  //     "|",
+  //     editingProduct.features.slice(cursorPosition),
+  //   ].join("");
 
-    // Insert the pipe at the cursor position
-    const updatedFeatures = [
-      editingProduct.features.slice(0, cursorPosition),
-      "|",
-      editingProduct.features.slice(cursorPosition),
-    ].join("");
+  //   // Update the features with the inserted pipe
+  //   setEditingProduct({
+  //     ...editingProduct,
+  //     features: updatedFeatures,
+  //   });
 
-    // Update the features with the inserted pipe
-    setEditingProduct({
-      ...editingProduct,
-      features: updatedFeatures,
-    });
-
-    // Return focus back to the textarea after insertion
-    textarea.focus();
-  };
+  //   // Return focus back to the textarea after insertion
+  //   textarea.focus();
+  // };
 
   // Get today's date and format it as YYYY-MM-DD
   const getFormattedDate = (date) => {
@@ -1650,7 +1651,7 @@ const handleStatusUpdate = async (prodId) => {
             <div className="filters-card2">
               <div className="filters-panel">
                 <div className="filter-label-title">
-                  <img src={FilterIcon} width={"20px"} />
+                  <img src={FilterIcon} width={"20px"} alt="Filter" />
 
                   <span> Filter By </span>
                   {/* <FilterIcon width={"20px"}/> */}
@@ -1775,15 +1776,16 @@ const handleStatusUpdate = async (prodId) => {
                       </div>
 
                       {/* Display product name */}
-                       <div className="laptops-product-details">
-                                              <h3 className="laptops-product-name" title={product.prod_name}>
-                                                {product.prod_name}
-                                              </h3>
-                      
-                                             {product.productStatus === "unapproved" && (
+                      <div className="laptops-product-details">
+                        <h3 className="laptops-product-name" title={product.prod_name}>
+                          {product.prod_name}
+                        </h3>
+
+                        {product.productStatus === "unapproved" && (
                           <>
                             <img
                               src={userRole === "Admin" ? ApproveImage : ApprovalWaitingImage}
+                              title={userRole === "Admin" ? "Click to approve this product" : "Product yet to approve"}
                               width={userRole === "Admin" ? "50px" : "60px"}
                               style={{
                                 cursor: userRole === "Admin" ? "pointer" : "not-allowed",
@@ -1793,11 +1795,12 @@ const handleStatusUpdate = async (prodId) => {
                                   ? () => handleStatusUpdate(product.prod_id) //  Only for Admin
                                   : undefined //  Disabled for non-admin
                               }
+                              alt="role"
                             />
                           </>
                         )}
-                      
-                                            </div>
+
+                      </div>
                       <div>
                         M.R.P <span style={{ textDecoration: "line-through", color: 'red', fontSize: '14px' }}>₹{product.actual_price}</span>  <span style={{ color: 'green', marginLeft: '5px' }}>₹{product.prod_price}</span>
                       </div>
@@ -1923,15 +1926,17 @@ const handleStatusUpdate = async (prodId) => {
                                   </div>
 
                                   <div className="laptops-modal-right-section">
-                                    <div
-                                      onClick={() => handleOpenOfferModal(product.id)}
-                                      className="offer-edit-btn"
-                                    >
-                                      <span className="offer-edit-text">
-                                        Edit Limited Time Offer
-                                      </span>
-                                      <FaEdit className="offer-edit-icon" />
-                                    </div>
+                                    {product.status === "available" &&
+                                      <div
+                                        onClick={() => handleOpenOfferModal(product.id)}
+                                        className="offer-edit-btn"
+                                      >
+                                        <span className="offer-edit-text">
+                                          Edit Limited Time Offer
+                                        </span>
+                                        <FaEdit className="offer-edit-icon" />
+                                      </div>
+                                    }
 
                                     {/* Modal Rendering */}
                                     {isOfferModalOpen && (
@@ -2004,13 +2009,14 @@ const handleStatusUpdate = async (prodId) => {
                                               type="submit"
                                               className="offer-submit-btn"
                                             >
-                                              {isEditMode
+                                              {isEditMode && offerStartTime && offerEndTime && offerPrice
                                                 ? "Update Offer"
-                                                : "Add Offer"}
+                                                : "Add Offer"
+                                              }
                                             </button>
                                           </form>
 
-                                          {isEditMode && (
+                                          {isEditMode && offerStartTime && offerEndTime && offerPrice && (
                                             <button
                                               onClick={handleDelete}
                                               className="offer-delete-btn"
@@ -2070,10 +2076,12 @@ const handleStatusUpdate = async (prodId) => {
                                         }
                                         style={{ cursor: "pointer" }}
                                       >
-                                        <FaEye
-                                          className="faedit"
-                                          title="View Coupon"
-                                        />
+                                        {couponProducts[product.id]?.hasCoupon && (
+                                          <FaEye
+                                            className="faedit"
+                                            title="View Coupon"
+                                          />
+                                        )}
                                       </span>
                                     </p>
 
@@ -2529,11 +2537,11 @@ const handleStatusUpdate = async (prodId) => {
 };
 // Custom next arrow component
 const SampleNextArrow = (props) => {
-  const { className, style, onClick } = props;
+  const { className, onClick } = props;
   return (
     <div
       className={`${className} `}
-   
+
       onClick={onClick}
     >
       {/* <img src={rightarrow} alt="Next" width="15px" height="15px" /> */}
@@ -2542,11 +2550,11 @@ const SampleNextArrow = (props) => {
 };
 
 const SamplePrevArrow = (props) => {
-  const { className, style, onClick } = props;
+  const { className, onClick } = props;
   return (
     <div
       className={`${className}`}
-   
+
       onClick={onClick}
     >
       {/* <img src={leftarrow} alt="Previous" width="15px" height="15px" /> */}

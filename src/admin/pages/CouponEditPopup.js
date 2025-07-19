@@ -7,7 +7,7 @@ import Swal from 'sweetalert2'; // Ensure to import SweetAlert for notifications
 // import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdated }) => {
+const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice }) => {
   const [couponCode, setCouponCode] = useState('');
   const [couponValue, setCouponValue] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
@@ -37,6 +37,16 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
       });
       return;
     }
+    if (Number(couponValue) === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Invalid Input",
+        text: "Coupon value should not be 0",
+      });
+      return;
+    }
+
+
 
     if (!couponCode && !expiryDate) {
       Swal.fire({
@@ -47,7 +57,7 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
       return;
     }
 
-  
+
     // if (upperCouponCode.trim() === "" || !upperCouponCode.match(/[a-zA-Z]/) || !upperCouponCode.match(/\d/)) {
     //   Swal.fire({
     //     icon: "warning",
@@ -98,12 +108,12 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
 
   const handleCouponCodeChange = (e) => {
     const value = e.target.value;
-    const regex = /^[a-zA-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/; // Allow letters and special symbols
+    const regex = /^[a-zA-Z!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]*$/;
     if (regex.test(value) || value === "") {
       setCouponCode(value);
     }
   };
-  
+
   const handleCouponValueChange = (e) => {
     const value = e.target.value;
     const regex = /^[0-9]*$/; // Only allow numeric characters
@@ -111,7 +121,7 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
       setCouponValue(value);
     }
   };
-  
+
 
   return (
     <div className="pop-overlay">
@@ -122,12 +132,15 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
           placeholder="Coupon Code"
           value={couponCode}
           onChange={handleCouponCodeChange}
+          className='coupon-input'
         />
         <input
           type="text"
-          placeholder="Coupon Value (e.g., Discount)"
+          placeholder="Coupon Price (e.g., Discount Amount)"
           value={couponValue}
           onChange={handleCouponValueChange} // New handler for Coupon Value
+          className='coupon-input'
+
         />
         <input
           type="date"
@@ -136,6 +149,8 @@ const CouponEditPopup = ({ isOpen, onClose, productId, prodPrice, onCouponUpdate
           onChange={(e) => setExpiryDate(e.target.value)}
           min={minDate}
           max={maxDateStr}
+          className='coupon-input'
+
         />
         <button className='coupon-btn' onClick={handleAddCoupon}>Add Coupon</button>
         <button className='close-button7' onClick={onClose}>

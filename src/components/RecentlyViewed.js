@@ -115,15 +115,15 @@ const RecentlyViewed = () => {
         <h3 className="recent-product-name" title={product.prod_name}>{product.prod_name.substring(0, 20) + "..."}</h3>
         {/* <span className="recent-product-subtitle">{product.subtitle}</span> */}
         <p>
-          <span style={{ marginRight: "5px", fontSize: "15px", color:'#888' }}>M.R.P</span>
+          <span style={{ marginRight: "5px", fontSize: "15px", color: '#888' }}>M.R.P</span>
           <span className="product-actual-price" style={{ textDecoration: "line-through", color: "red" }}>
             ₹{product.actual_price}
-            
+
           </span>
           <span style={{ color: "green", marginLeft: "10px", marginBottom: "10px" }}>
             ({getDiscountPercentage(product.actual_price, product.offer_price, product.prod_price)}% OFF)
           </span>
-          <p className="product-price">₹{product.offer_price > 0 ? product.offer_price : product.prod_price}</p>
+          <span className="product-price">₹{product.offer_price > 0 ? product.offer_price : product.prod_price}</span>
 
         </p>
       </div>

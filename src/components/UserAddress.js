@@ -833,7 +833,7 @@ const AddressPage = () => {
           ) : (
             <div className="no-address-wrapper">
               {/* <FaBoxOpen className="no-orders-icon" /> */}
-              <img src={AddressIcon} width={"130px"} />
+              <img src={AddressIcon} width={"130px"} alt="Address"/>
               <p className="no-address-text">No address added yet</p>
             </div>
           )}

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, {  useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Slider from "react-slick";
 import axios from "axios";
@@ -29,17 +29,17 @@ const Homepage = () => {
     refetchOnReconnect: false     //  Don't refetch on network reconnect
   });
 
-  const CustomPrevArrow = useCallback(({ onClick }) => (
-    <button className="slider-prev-arrow" onClick={onClick}>
-      ◄
-    </button>
-  ), []);
+const CustomPrevArrow = ({ onClick }) => (
+  <button className="slider-prev-arrow" onClick={onClick}>
+    ◄
+  </button>
+);
 
-  const CustomNextArrow = useCallback(({ onClick }) => (
-    <button className="slider-next-arrow" onClick={onClick}>
-      ►
-    </button>
-  ), []);
+const CustomNextArrow = ({ onClick }) => (
+  <button className="slider-next-arrow" onClick={onClick}>
+    ►
+  </button>
+);
 
   const sliderSettings = useMemo(() => ({
     dots: data.length > 1,
@@ -53,7 +53,7 @@ const Homepage = () => {
     arrows: data.length > 1,
     prevArrow: data.length > 1 ? <CustomPrevArrow /> : null,
     nextArrow: data.length > 1 ? <CustomNextArrow /> : null
-  }), [data.length, CustomPrevArrow, CustomNextArrow]);
+  }), [data.length]);
 
 
   return (

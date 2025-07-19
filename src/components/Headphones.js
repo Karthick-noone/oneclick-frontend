@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 // import Header1 from "./Header1";
-import Header2 from "./Header2";
+// import Header2 from "./Header2";
 // import Header3 from "./Header3";
 import Footer from "./footer";
 import Sidebar from "./Sidebar";
 // import Modal from "./Modal";
 import "./css/Computers.css";
-import { useCart } from "../components/CartContext";
+// import { useCart } from "../components/CartContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
@@ -20,7 +20,7 @@ import Swal from "sweetalert2";
 
 const Headphones = () => {
   const [products, setProducts] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  // const [selectedProduct, setSelectedProduct] = useState(null);
   const [favorites, setFavorites] = useState({});
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
   const [loading, setLoading] = useState(true);
@@ -68,7 +68,8 @@ const Headphones = () => {
   const searchQuery = queryParams.get("search");
 
   // Log the raw search query
-  console.log("Search Query:", searchQuery);
+    // console.log("Search Query:", searchQuery);
+
 
   // Normalize a string by trimming, lowercasing, and removing all spaces
   const normalizeString = (str) =>
@@ -97,74 +98,42 @@ const Headphones = () => {
     })
     : products; // If no search query, return all products // If no search query, return all products
 
-  const [coupons, setCoupons] = useState({}); // State to store coupons
+const cacheRef = useRef({
+  headphones: null,
+});
 
-  const cacheRef = {
-    headphones: null,
-    headphoneCoupons: {},
+useEffect(() => {
+  const fetchProducts = async () => {
+    // 1. Show cached data immediately (if available)
+    if (cacheRef.current.headphones) {
+      setProducts(cacheRef.current.headphones);
+    } else {
+      setLoading(true); // Only show loader if no cached data
+    }
+
+    try {
+      // 2. Always fetch fresh data in background
+      const response = await axios.get(`${ApiUrl}/fetchheadphones`);
+      const fetchedProducts = response.data;
+
+      setProducts(fetchedProducts); // Update UI with fresh data
+      cacheRef.current.headphones = fetchedProducts; // Update cache
+    } catch (error) {
+      console.error("Error fetching headphones:", error);
+      if (!cacheRef.current.headphones) {
+        // Only show error if no cached data
+        toast.error("Failed to fetch headphones.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-
-      try {
-        //  Return from cache if available
-        if (cacheRef.headphones) {
-          setProducts(cacheRef.headphones);
-          setCoupons(cacheRef.headphoneCoupons);
-          setLoading(false);
-          return;
-        }
-
-        //  Fetch product list
-        const response = await axios.get(`${ApiUrl}/fetchheadphones`);
-        const fetchedProducts = response.data;
-        setProducts(fetchedProducts);
-        cacheRef.headphones = fetchedProducts;
-
-        // Fetch all coupons in parallel
-        const couponPromises = fetchedProducts.map((product) =>
-          axios
-            .get(`${ApiUrl}/coupons/${product.prod_id}`)
-            .then((res) => ({
-              prod_id: product.prod_id,
-              coupon_code: res.data?.coupons?.[0]?.coupon_code || null,
-            }))
-            .catch((err) => {
-              console.error(`Error fetching coupon for ${product.prod_id}`, err);
-              return { prod_id: product.prod_id, coupon_code: null };
-            })
-        );
-
-        const couponResults = await Promise.all(couponPromises);
-        const couponMap = {};
-
-        couponResults.forEach(({ prod_id, coupon_code }) => {
-          if (coupon_code) {
-            couponMap[prod_id] = coupon_code;
-          }
-        });
-
-        setCoupons(couponMap); // Set once
-        cacheRef.headphoneCoupons = couponMap;
-      } catch (error) {
-        console.error("Error fetching headphones:", error);
-        toast.error("Failed to fetch headphones.", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
+  fetchProducts();
+}, []);
 
   const [isOfferActive, setIsOfferActive] = useState(true);
-  const [product, setProduct] = useState(null);
+  const [, setProduct] = useState(null);
 
   useEffect(() => {
     const now = new Date();
@@ -291,29 +260,29 @@ const Headphones = () => {
 
 
 
-  const handleCloseModal = () => {
-    setSelectedProduct(null);
-  };
+  // const handleCloseModal = () => {
+  //   setSelectedProduct(null);
+  // };
 
-  const handleNextProduct = () => {
-    if (selectedProduct) {
-      const currentIndex = products.findIndex(
-        (p) => p.id === selectedProduct.id
-      );
-      const nextIndex = (currentIndex + 1) % products.length;
-      setSelectedProduct(products[nextIndex]);
-    }
-  };
+  // const handleNextProduct = () => {
+  //   if (selectedProduct) {
+  //     const currentIndex = products.findIndex(
+  //       (p) => p.id === selectedProduct.id
+  //     );
+  //     const nextIndex = (currentIndex + 1) % products.length;
+  //     setSelectedProduct(products[nextIndex]);
+  //   }
+  // };
 
-  const handlePrevProduct = () => {
-    if (selectedProduct) {
-      const currentIndex = products.findIndex(
-        (p) => p.id === selectedProduct.id
-      );
-      const prevIndex = (currentIndex - 1 + products.length) % products.length;
-      setSelectedProduct(products[prevIndex]);
-    }
-  };
+  // const handlePrevProduct = () => {
+  //   if (selectedProduct) {
+  //     const currentIndex = products.findIndex(
+  //       (p) => p.id === selectedProduct.id
+  //     );
+  //     const prevIndex = (currentIndex - 1 + products.length) % products.length;
+  //     setSelectedProduct(products[prevIndex]);
+  //   }
+  // };
 
   const handleAddToCart = async (product, event) => {
     event.stopPropagation(); // Prevent the event from bubbling up
@@ -460,6 +429,11 @@ const Headphones = () => {
       const email = localStorage.getItem("email");
       const username = localStorage.getItem("username");
 
+      if (!email || !username) {
+        console.log("No email/username found, skipping wishlist fetch.");
+        return;
+      }
+
       try {
         const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
           email,
@@ -502,7 +476,7 @@ const Headphones = () => {
 
 
   // Define the category variable
-  const category = "headphones";
+  // const category = "headphones";
 
   // offerPercentage = ((actual_price - prod_price) / actual_price) * 100
 
@@ -520,308 +494,166 @@ const Headphones = () => {
       <div className="main-content">
         <Sidebar />
         <div className="product-list">
-          {loading ? (
-            // 1. Loading state
-            [...Array(8)].map((_, index) => (
-              <div key={index} className="skeleton-product-card">
-                <div className="skeleton-image"></div>
-                <div className="skeleton-text"></div>
-                <div className="skeleton-text short"></div>
-                <div className="skeleton-price"></div>
-                <div className="skeleton-buttons"></div>
-              </div>
-            ))
-          ) : products.length === 0 ? (
-            <div className="no-products-message">
-              <h2>No products here yet...</h2>
-              <p>
-                In the meantime, you can choose a different category to continue
-                shopping.
-              </p>
-            </div>
-          ) : filteredProducts.length === 0 ? (
-            // If filteredProducts is empty, fallback to using all products
-            products.map((product) => {
-              const images = Array.isArray(product.prod_img)
-                ? product.prod_img
-                : JSON.parse(product.prod_img || "[]");
-
-              const activeIndex =
-                hoveredProductId === product.id
-                  ? hoverImageIndexes[product.id] || 0
-                  : 0;
-
-              const currentImage = images[activeIndex];
-
-              return (
-                <div
-                  key={product.id}
-                  className="product-card"
-                  onClick={() => handleCardClick(product)}
-
-                >
-                  {product.offer_label && (
-                    <div className="product-label">{product.offer_label}</div>
-                  )}
-
-                  <div className="product-actions">
-                    <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
-                      alt={product.prod_name}
-                      className="product-image"
-                      onMouseEnter={() => setHoveredProductId(product.id)}
-                      onMouseLeave={() => {
-                        setHoveredProductId(null);
-                        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
-                      }}
-                    />
-                    <span
-                      title={
-                        favorites[`${product.id}`]
-                          ? "Remove from Wishlist"
-                          : "Add to Wishlist"
-                      }
-                      className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
-                        }`}
-                      onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
-                    >
-                      {favorites[`${product.id}`] ? (
-                        <FaHeart style={{ color: "red" }} /> // Filled heart
-                      ) : (
-                        <FaRegHeart /> // Empty heart
-                      )}
-                    </span>
-                  </div>
-
-                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
-
-                  {/* <h3 className="product-name">{product.offer_price}</h3> */}
-                  <span className="product-subtitle2" title={product.subtitle}>{product.subtitle}</span>
-                  {/* <p className="product-description">
-                            {product.prod_features}
-                          </p> */}
-                  <p>
-                    <span>
-                      <span className="product-price">
-                        ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
-                      </span>
-                      <span style={{ marginRight: "5px", fontSize: "15px" }}>
-                        M.R.P
-                      </span>
-                      <span
-                        className="product-actual-price"
-                        style={{ textDecoration: "line-through", color: 'red' }}
-                      >
-                        ₹{product.actual_price}
-                      </span>
-                    </span>
-                    <p
-                      style={{
-                        color: "green",
-                        marginLeft: "10px",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      (
-                      {Math.round(
-                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
-                          product.actual_price) *
-                        100
-                      )}
-                      % OFF)
-                    </p>
-                  </p>
-                  {product.status === "unavailable" ? (
-                    <p
-                      style={{
-                        color: "red",
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                        textAlign: "center",
-                        marginTop: "10px",
-                        padding: "10px",
-                        // border: "2px solid red",
-                        // borderRadius: "5px",
-                        // backgroundColor: "#fdd",
-                      }}
-                      className="out-of-stock"
-                    >
-                      Out of Stock
-                    </p>
+                  {loading ? (
+                    // Show skeletons while loading
+                    [...Array(8)].map((_, index) => (
+                      <div key={index} className="skeleton-product-card">
+                        <div className="skeleton-image"></div>
+                        <div className="skeleton-text"></div>
+                        <div className="skeleton-text short"></div>
+                        <div className="skeleton-price"></div>
+                        <div className="skeleton-buttons"></div>
+                      </div>
+                    ))
                   ) : (
-                    <div className="btn-container">
-                      <button
-                        onClick={(event) => handleAddToCart(product, event)}
-                        className="addToCart"
-                        title="Add To Cart"
-                      >
-                        ADD TO CART
-                      </button>
-                      <button
-                        title="Buy Now"
-                        onClick={(event) => handleBuyNow(product, event)}
-                        className="buy-now"
-                      >
-                        BUY NOW
-                      </button>
-                    </div>
-                  )}
-                  <>
-                    {/* <br /> */}
-                    {/* {coupons[product.prod_id] && ( // Access using prod_id
-                <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
-                  <span>
-                    Coupon Available
-                  </span>
-                </div>
-              )} */}
-                  </>
-                </div>
-              );
-            })
-          ) : (
-            // If filteredProducts has results, display them
-            filteredProducts.map((product) => {
-              const images = Array.isArray(product.prod_img)
-                ? product.prod_img
-                : JSON.parse(product.prod_img || "[]");
-
-              const activeIndex =
-                hoveredProductId === product.id
-                  ? hoverImageIndexes[product.id] || 0
-                  : 0;
-
-              const currentImage = images[activeIndex];
-
-              return (
-                <div
-                  key={product.id}
-                  className="product-card"
-                  onClick={() => handleCardClick(product)}
-
-                >
-                  {product.offer_label && (
-                    <div className="product-label">{product.offer_label}</div>
-                  )}
-
-                  <div className="product-actions">
-                    <img
-                      src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
-                      alt={product.prod_name}
-                      className="product-image"
-                      onMouseEnter={() => setHoveredProductId(product.id)}
-                      onMouseLeave={() => {
-                        setHoveredProductId(null);
-                        setHoverImageIndexes((prev) => ({ ...prev, [product.id]: 0 }));
-                      }}
-                    />
-                    <span
-                      title={
-                        favorites[`${product.id}`]
-                          ? "Remove from Wishlist"
-                          : "Add to Wishlist"
-                      }
-                      className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
-                        }`}
-                      onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
-                    >
-                      {favorites[`${product.id}`] ? (
-                        <FaHeart style={{ color: "red" }} /> // Filled heart
+                    <>
+                      {(filteredProducts.length > 0 ? filteredProducts : products).length === 0 ? (
+                        <div className="no-products-message">
+                          <h2>No products here yet...</h2>
+                          <p>In the meantime, you can choose a different category to continue shopping.</p>
+                        </div>
                       ) : (
-                        <FaRegHeart /> // Empty heart
+                        (filteredProducts.length > 0 ? filteredProducts : products).map((product) => {
+                          const images = Array.isArray(product.prod_img)
+                            ? product.prod_img
+                            : JSON.parse(product.prod_img || "[]");
+                          const activeIndex =
+                            hoveredProductId === product.id
+                              ? hoverImageIndexes[product.id] || 0
+                              : 0;
+                          const currentImage = images[activeIndex];
+        
+                          return (
+                            <div
+                              key={product.id}
+                              className="product-card"
+                              onClick={() => handleCardClick(product)}
+                            >
+                              {product.offer_label && (
+                                <div className="product-label">{product.offer_label}</div>
+                              )}
+        
+                              <div className="product-actions">
+                                <img
+                                  src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
+                                  alt={product.prod_name}
+                                  className="product-image"
+                                  onMouseEnter={() => setHoveredProductId(product.id)}
+                                  onMouseLeave={() => {
+                                    setHoveredProductId(null);
+                                    setHoverImageIndexes((prev) => ({
+                                      ...prev,
+                                      [product.id]: 0,
+                                    }));
+                                  }}
+                                />
+                                <span
+                                  title={
+                                    favorites[`${product.id}`]
+                                      ? "Remove from Wishlist"
+                                      : "Add to Wishlist"
+                                  }
+                                  className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
+                                    }`}
+                                  onClick={(event) => handleToggleFavorite(product, event)}
+                                >
+                                  {favorites[`${product.id}`] ? (
+                                    <FaHeart style={{ color: "red" }} />
+                                  ) : (
+                                    <FaRegHeart />
+                                  )}
+                                </span>
+                              </div>
+        
+                              <h3 className="product-name" title={product.prod_name}>
+                                {product.prod_name.charAt(0).toUpperCase() +
+                                  product.prod_name.slice(1)}
+                              </h3>
+                              <span
+                                className="product-subtitle2"
+                                title={product.subtitle}
+                              >
+                                {product.subtitle}
+                              </span>
+        
+                              <div>
+                                <span>
+                                  <span className="product-price">
+                                    ₹
+                                    {product.offer_price > 0 && isOfferActive
+                                      ? product.offer_price
+                                      : product.prod_price}
+                                  </span>
+                                  <span style={{ margin: "5px", fontSize: "15px" }}>
+                                    M.R.P
+                                  </span>
+                                  <span
+                                    className="product-actual-price"
+                                    style={{
+                                      textDecoration: "line-through",
+                                      color: "red",
+                                    }}
+                                  >
+                                    ₹{product.actual_price}
+                                  </span>
+                                </span>
+                                <p
+                                  style={{
+                                    color: "green",
+                                    marginLeft: "10px",
+                                    marginBottom: "10px",
+                                  }}
+                                >
+                                  (
+                                  {Math.round(
+                                    ((product.actual_price -
+                                      (product.offer_price > 0 && isOfferActive
+                                        ? product.offer_price
+                                        : product.prod_price)) /
+                                      product.actual_price) *
+                                    100
+                                  )}
+                                  % OFF)
+                                </p>
+                              </div>
+        
+                              {product.status === "unavailable" ? (
+                                <p
+                                  style={{
+                                    color: "red",
+                                    fontWeight: "bold",
+                                    fontSize: "16px",
+                                    textAlign: "center",
+                                  }}
+                                  className="out-of-stock"
+                                >
+                                  Out of Stock
+                                </p>
+                              ) : (
+                                <div className="btn-container">
+                                  <button
+                                    onClick={(event) => handleAddToCart(product, event)}
+                                    className="addToCart"
+                                    title="Add To Cart"
+                                  >
+                                    ADD TO CART
+                                  </button>
+                                  <button
+                                    title="Buy Now"
+                                    onClick={(event) => handleBuyNow(product, event)}
+                                    className="buy-now"
+                                  >
+                                    BUY NOW
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })
                       )}
-                    </span>
-                  </div>
-
-                  <h3 className="product-name" title={product.prod_name}>{product.prod_name.charAt(0).toUpperCase() + product.prod_name.slice(1)}</h3>
-                  <span className="product-subtitle2" title={product.subtitle}>{product.subtitle}</span>
-                  {/* <p className="product-description">
-                            {product.prod_features}
-                          </p> */}
-
-                  <p>
-                    <span>
-                      <span className="product-price">
-                        ₹{product.offer_price > 0 && isOfferActive ? product.offer_price : product.prod_price}
-                      </span>
-                      <span style={{ marginRight: "5px", fontSize: "15px" }}>
-                        M.R.P
-                      </span>
-                      <span
-                        className="product-actual-price"
-                        style={{ textDecoration: "line-through", color: 'red' }}
-                      >
-                        ₹{product.actual_price}
-                      </span>
-                    </span>
-                    <p
-                      style={{
-                        color: "green",
-                        marginLeft: "10px",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      (
-                      {Math.round(
-                        ((product.actual_price - (product.offer_price > 0 ? product.offer_price : product.prod_price)) /
-                          product.actual_price) *
-                        100
-                      )}
-                      % OFF)
-                    </p>
-                  </p>
-
-                  {product.status === "unavailable" ? (
-                    <p
-                      style={{
-                        color: "red",
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                        textAlign: "center",
-                        marginTop: "10px",
-                        padding: "10px",
-                        // border: "2px solid red",
-                        // borderRadius: "5px",
-                        // backgroundColor: "#fdd",
-                      }}
-                      className="out-of-stock"
-                    >
-                      Out of Stock
-                    </p>
-                  ) : (
-                    <div className="btn-container">
-                      <button
-                        onClick={(event) => handleAddToCart(product, event)}
-                        className="addToCart"
-                        title="Add To Cart"
-                      >
-                        ADD TO CART
-                      </button>
-                      <button
-                        title="Buy Now"
-                        onClick={(event) => handleBuyNow(product, event)}
-                        className="buy-now"
-                      >
-                        BUY NOW
-                      </button>
-                    </div>
+                    </>
                   )}
-
-                  <>
-                    {/* <br /> */}
-                    {/* {coupons[product.prod_id] && ( // Access using prod_id
-                <div className="laptops-product-coupon" style={{ marginBottom:'5px', textAlign: "center" }}>
-                  <span>
-                    Coupon Available
-                  </span>
                 </div>
-              )} */}
-                  </>
-                </div>
-              );
-            })
-          )}
-        </div>
       </div>
 
       <Footer />

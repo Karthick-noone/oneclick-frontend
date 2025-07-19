@@ -65,6 +65,11 @@ const WishlistSidebar = ({
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
 
+    if (!email || !username) {
+      console.log("No email/username found, skipping wishlist fetch.");
+      return;
+    }
+    
     try {
       const response = await axios.post(`${ApiUrl}/fetch-wishlist`, {
         email,
@@ -135,7 +140,7 @@ const WishlistSidebar = ({
           toast: true,
           position: "top-end",
           icon: "success",
-          title: `Item added to your wishlist!`,
+          title: `Item added to your cart!`,
           showConfirmButton: false,
           timer: 3000,
           timerProgressBar: false,
@@ -224,7 +229,7 @@ const WishlistSidebar = ({
           <p className="empty-wishlist">Your wishlist is empty.</p>
         ) : (
           <ul>
-            {wishlistItems.map((product) => {
+            {[...wishlistItems].reverse().map((product) => {
               // Parse the image JSON array
               const images = Array.isArray(product.prod_img)
                 ? product.prod_img

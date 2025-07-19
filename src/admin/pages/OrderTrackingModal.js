@@ -10,7 +10,7 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [deliveryStatus, setDeliveryStatus] = useState("");
   const [deliveryDate, setDeliveryDate] = useState(""); // Add state for delivery date
-  const [loading, setLoading] = useState(false); // Loading state for spinner
+  const [, setLoading] = useState(false); // Loading state for spinner
 
   const regularStatuses = [
     "Order Placed",
@@ -59,7 +59,7 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
     } finally {
       setLoading(false); // Stop loading spinner after fetch completes
     }
-  }, [order_id, ApiUrl]);
+  }, [order_id]);
 
   useEffect(() => {
     // Fetch data only when the modal opens
@@ -68,14 +68,14 @@ const OrderTrackingModal = ({ isOpen, onRequestClose, order_id }) => {
     }
   }, [isOpen, fetchDeliveryStatus]);
 
-  const maxDate = () => {
-    if (orderDate) {
-      const maxDateObj = new Date(orderDate);
-      maxDateObj.setDate(maxDateObj.getDate() + 30);
-      return maxDateObj.toISOString().split("T")[0]; // Format as YYYY-MM-DD
-    }
-    return "";
-  };
+  // const maxDate = () => {
+  //   if (orderDate) {
+  //     const maxDateObj = new Date(orderDate);
+  //     maxDateObj.setDate(maxDateObj.getDate() + 30);
+  //     return maxDateObj.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+  //   }
+  //   return "";
+  // };
 
   const handleStatusChange = (event) => {
     const status = event.target.value;

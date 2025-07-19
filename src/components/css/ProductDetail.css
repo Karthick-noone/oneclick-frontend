@@ -30,7 +30,8 @@
   border-radius: 8px;
   transition: transform 0.3s ease-in-out; 
   display: block;
-  margin: 0 auto;
+  margin: 18px auto;
+  
 }
 .zoom-lens {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -53,6 +54,12 @@
   margin: 5px auto;
   padding: 5px;
   position: relative;
+}
+
+.thumbnail-skeletons{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* .slick-prev,
@@ -114,7 +121,7 @@
 @media (max-width: 768px) {
   .thumbnails-container {
   width: 300px; /* Define container width */
-  margin: 5px auto;
+  margin: 10px auto;
   padding: 5px;
   position: relative;
 }
@@ -404,7 +411,8 @@
   padding: 4px 12px;
   border-radius: 5px;
   color: #fff; /* White text for contrast */
-  margin-top: 20px;
+  margin-top: 2px;
+  margin-right: 2px;
   font-size: 16px;
   font-weight: bold;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -858,6 +866,13 @@
   font-size: 1.2em;
   font-weight: bold;
   color: #333;
+  margin-bottom: 5px;
+  text-align: justify;
+}
+.product-detail-subtitle {
+  font-size: 1em;
+  /* font-weight: bold; */
+  color: #333;
   margin-bottom: 10px;
   text-align: justify;
 }
@@ -1014,11 +1029,35 @@
 
 /* Heart Icon */
 .heart-icon {
+  position: absolute;
+  top: 0;
+  right: 10px;
   font-size: 20px;
   color: #ccc;
   cursor: pointer;
   transition: transform 0.3s ease;
   margin-top: 8px;
+  z-index: 2;
+}
+.skeleton-heart-wrapper {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+}
+.skeleton-label-wrapper {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+}
+
+.skeleton-heart-icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
 .heart-icon.filled {
@@ -1082,7 +1121,7 @@
 
 .related-product-name {
   display: -webkit-box; /* Required for WebKit-based browsers */
-  display: box; /* Fallback for other browsers */
+  /* display: box;  */
   -webkit-box-orient: vertical; /* Required for WebKit-based browsers */
   box-orient: vertical; /* Fallback for other browsers */
   overflow: hidden; /* Hide overflow content */

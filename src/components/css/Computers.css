@@ -274,8 +274,8 @@
 .product-card {
   position: relative;
   width: calc(25% - 20px); /* Ensures 4 cards in a row */
-  height: 380px; /* Fixed height for uniformity */
-  max-height: 420px;
+  height: auto; /* Fixed height for uniformity */
+  max-height: 350px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   background-color: #fff;
   text-align: center;
@@ -309,7 +309,7 @@
 .product-subtitle2 {
   font-size: 13px;
   color: grey;
-  /* margin: 2px; */
+  /* margin-bottom: 2px; */
 }
 
 .product-price {
@@ -406,7 +406,12 @@
       margin: 3px 0;
     }
     .product-price {
-      font-size: 16px;
+      font-size: 18px;
+      margin: 3px 0;
+    }
+    
+    .product-MRP-price {
+      font-size: 14px;
       margin: 3px 0;
     }
     
@@ -414,7 +419,7 @@
 
 .product-description {
     display: -webkit-box;              /* Required for WebKit-based browsers */
-    display: box;                       /* Fallback for other browsers */
+    /* display: box;                        */
     -webkit-box-orient: vertical;      /* Required for WebKit-based browsers */
     box-orient: vertical;              /* Fallback for other browsers */
     overflow: hidden;                   /* Hide overflow content */
@@ -444,4 +449,5 @@
     line-clamp: 1;                     /* Future proofing for standard implementation */
     text-overflow: ellipsis;           /* Show ellipsis when text overflows */
   }
+  
   

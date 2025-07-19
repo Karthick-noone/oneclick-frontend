@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import Swal from "sweetalert2";
+// import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaSignOutAlt } from "react-icons/fa";
@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState(1); // 1: mobile, 2: otp, 3: reset
   const [mobile, setMobile] = useState("");
-  const [otp, setOtp] = useState("");
+  // const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -147,7 +147,7 @@ const ForgotPasswordPage = () => {
         setShowResend(false); // Hide resend button
       }
     } catch (error) {
-    if (error.response && error.response.status === 400) {
+    if (error.response && error.response.status === 404) {
       toast.error("Mobile number is not registered!");
     } else {
       toast.error("Failed to send OTP. Try again.");

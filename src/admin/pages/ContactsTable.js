@@ -232,9 +232,9 @@ const handleMessageClick = async (contact) => {
                     View
                   </button>
                   {contact.isRead ? (
-                    <img src={BlueTick} title="Seen" style={{marginLeft:'5px'}} width={'20px'}/> // Blue tick
+                    <img alt="Seen" src={BlueTick} title="Seen" style={{marginLeft:'5px'}} width={'20px'}/> // Blue tick
                   ) : (
-                    <img src={BlackTick} title="Unseen"  style={{marginLeft:'5px'}} width={'18px'}/> // Grey tick
+                    <img alt="Unseen" src={BlackTick} title="Unseen"  style={{marginLeft:'5px'}} width={'18px'}/> // Grey tick
                   )}
                 </td>
 

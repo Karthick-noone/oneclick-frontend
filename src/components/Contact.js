@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 // import Header2 from "./Header2";
 import Footer from "./footer";
 import { ApiUrl } from "./ApiUrl";
@@ -34,43 +34,46 @@ const Contact = () => {
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(false);
 
-    const userNumber = localStorage.getItem("contact_number");
+  const userNumber = localStorage.getItem("contact_number");
   const userName = localStorage.getItem("username");
-const fetchEnquiries = async () => {
-  try {
-    console.log("[fetchEnquiries] Fetching enquiries for:", userNumber);
-    setLoading(true);
 
-    const response = await axios.get(`${ApiUrl}/api/enquiries/${userNumber}`);
-    const fetchedEnquiries = response.data.enquiries || [];
 
-    console.log("[fetchEnquiries] Fetched enquiries:", fetchedEnquiries);
-    setEnquiries(fetchedEnquiries); // Just set data
-  } catch (err) {
-    console.error("[fetchEnquiries] Error fetching enquiries:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchEnquiries = useCallback(async () => {
+    try {
+      console.log("[fetchEnquiries] Fetching enquiries for:", userNumber);
+      setLoading(true);
 
-const handleEnquiryIconClick = () => {
-  console.log("[handleEnquiryIconClick] Opening modal...");
-  setShowModal(true);
-};
+      const response = await axios.get(`${ApiUrl}/api/enquiries/${userNumber}`);
+      const fetchedEnquiries = response.data.enquiries || [];
 
-useEffect(() => {
-  const cached = localStorage.getItem("userEnquiries");
-  if (cached) {
-    setEnquiries(JSON.parse(cached));
-    console.log("[Cache Load] Enquiries loaded from cache");
-  }
+      console.log("[fetchEnquiries] Fetched enquiries:", fetchedEnquiries);
+      setEnquiries(fetchedEnquiries); // Just set data
+    } catch (err) {
+      console.error("[fetchEnquiries] Error fetching enquiries:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [userNumber]); //  Add dependencies
 
-  // Fetch fresh data anyway
-  if (userNumber) {
-    console.log("[Page Load] Fetching fresh enquiries for:", userNumber);
-    fetchEnquiries();
-  }
-}, [userNumber]);
+
+  const handleEnquiryIconClick = () => {
+    console.log("[handleEnquiryIconClick] Opening modal...");
+    setShowModal(true);
+  };
+
+  useEffect(() => {
+    const cached = localStorage.getItem("userEnquiries");
+    if (cached) {
+      setEnquiries(JSON.parse(cached));
+      console.log("[Cache Load] Enquiries loaded from cache");
+    }
+
+    // Fetch fresh data anyway
+    if (userNumber) {
+      console.log("[Page Load] Fetching fresh enquiries for:", userNumber);
+      fetchEnquiries();
+    }
+  }, [userNumber, fetchEnquiries]); //  Added fetchEnquiries
 
 
 
@@ -217,7 +220,7 @@ useEffect(() => {
     setIsSubmitting(true);
 
     // Combine firstName and lastName into a single name field
-    const { firstName, lastName, email, subject, message, number } = formData;
+    const { firstName, lastName, email, subject, message } = formData;
     const formDataToSend = {
       name: `${firstName} ${lastName}`, // Combine names
       email: email,
@@ -316,6 +319,8 @@ useEffect(() => {
               allowFullScreen=""
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
+              title="Google Maps location of One Click Technologies"
+
             ></iframe>
           </div>
         </div>
@@ -331,7 +336,7 @@ useEffect(() => {
                 onClick={handleEnquiryIconClick}
                 title="View Previous Enquiries"
               >
-                <img src={EnquiryIcon} width={'30px'} style={{ marginLeft: '8px' }} />
+                <img src={EnquiryIcon} width={'30px'} style={{ marginLeft: '8px' }} alt="Enquiry"/>
               </span>
             </p>
           )}
@@ -368,6 +373,7 @@ useEffect(() => {
                                 className="read-icon"
                                 title="Seen"
                                 width="18px"
+                                alt="Seen"
                               />
                             ) : (
                               <img
@@ -375,6 +381,7 @@ useEffect(() => {
                                 className="read-icon"
                                 title="Unseen"
                                 width="18px"
+                                alt="Unseen"
                               />
                             )}
                           </div>
@@ -518,38 +525,38 @@ useEffect(() => {
     </div>
   );
 };
-const modalStyle = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  backgroundColor: "rgba(0,0,0,0.5)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 1000,
-};
+// const modalStyle = {
+//   position: "fixed",
+//   top: 0,
+//   left: 0,
+//   width: "100%",
+//   height: "100%",
+//   backgroundColor: "rgba(0,0,0,0.5)",
+//   display: "flex",
+//   justifyContent: "center",
+//   alignItems: "center",
+//   zIndex: 1000,
+// };
 
-const modalContentStyle = {
-  backgroundColor: "#fff",
-  padding: "20px",
-  borderRadius: "8px",
-  width: "400px",
-  maxHeight: "80vh",
-  overflowY: "auto",
-  position: "relative",
-};
+// const modalContentStyle = {
+//   backgroundColor: "#fff",
+//   padding: "20px",
+//   borderRadius: "8px",
+//   width: "400px",
+//   maxHeight: "80vh",
+//   overflowY: "auto",
+//   position: "relative",
+// };
 
-const closeButtonStyle = {
-  position: "absolute",
-  top: "10px",
-  right: "10px",
-  border: "none",
-  background: "transparent",
-  fontSize: "18px",
-  cursor: "pointer",
-};
+// const closeButtonStyle = {
+//   position: "absolute",
+//   top: "10px",
+//   right: "10px",
+//   border: "none",
+//   background: "transparent",
+//   fontSize: "18px",
+//   cursor: "pointer",
+// };
 
 const styles = {
 

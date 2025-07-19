@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./css/Customers.css"; // Import external CSS
@@ -20,25 +20,25 @@ const Customers = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch Users Data
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get(`${ApiUrl}/api/users`);
-      setUsers(response.data);
-      setTotalPages(Math.ceil(response.data.length / itemsPerPage));
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
+const fetchUsers = useCallback(async () => {
+  try {
+    const response = await axios.get(`${ApiUrl}/api/users`);
+    setUsers(response.data);
+    setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+}, [ itemsPerPage]); //  Add dependencies if needed
 
-  useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-    if (!loggedIn) {
-      navigate("/AdminLogin");
-    } else {
-      fetchUsers();
-    }
-  }, [navigate]);
+ useEffect(() => {
+  const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+  if (!loggedIn) {
+    navigate("/AdminLogin");
+  } else {
+    fetchUsers();
+  }
+}, [navigate, fetchUsers]); //  Clean dependency array
+
   const indexOfLastUser = currentPage * itemsPerPage;
   const indexOfFirstUser = indexOfLastUser - itemsPerPage;
 

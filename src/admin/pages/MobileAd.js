@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Modal from "react-modal";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { ApiUrl } from "../../components/ApiUrl";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -28,17 +28,17 @@ const MobileAd = () => {
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [modalIsOpen2, setModalIsOpen2] = useState(false);
-  const [editingImageIndex, setEditingImageIndex] = useState(null); // To track which image is being edited
+  // const [modalIsOpen2, setModalIsOpen2] = useState(false);
+  // const [editingImageIndex, setEditingImageIndex] = useState(null); // To track which image is being edited
   const [selectedFiles, setSelectedFiles] = useState(null);
-  const [bannerImage, setBannerImage] = useState(null);
-  const [bannerImageName, setBannerImageName] = useState(null);
-  const [bannerKeyword, setBannerKeyword] = useState(""); // Define state for bannerKeyword
+  // const [bannerImage, setBannerImage] = useState(null);
+  const [, setBannerImageName] = useState(null);
+  // const [bannerKeyword, setBannerKeyword] = useState(""); // Define state for bannerKeyword
   const [isBannerEdit, setIsBannerEdit] = useState(false); // Track if the edit is for the banner
 
-  const [portraitImage, setportraitImage] = useState(null);
-  const [portraitImageName, setportraitImageName] = useState(null);
-  const [portraitKeyword, setportraitKeyword] = useState(""); // Define state for portraitKeyword
+  // const [portraitImage, setportraitImage] = useState(null);
+  const [, setportraitImageName] = useState(null);
+  // const [portraitKeyword, setportraitKeyword] = useState(""); // Define state for portraitKeyword
   const [isportraitEdit, setIsportraitEdit] = useState(false); // Track if the edit is for the banner
   const [isOpen, setIsOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
@@ -49,7 +49,7 @@ const MobileAd = () => {
     banner: { isUploading: false, progress: 0 },
     portrait: { isUploading: false, progress: 0 },
   }); 
-  const [uploadProgress, setUploadProgress] = useState(0);
+  // const [uploadProgress, setUploadProgress] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateProgress, setUpdateProgress] = useState(0); // optional if needed
 
@@ -59,7 +59,7 @@ const MobileAd = () => {
     setIsOpen(true);
   };
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // Fetch products and the banner image
   useEffect(() => {

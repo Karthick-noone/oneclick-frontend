@@ -5,7 +5,7 @@ import "./css/MyOrders.css"; // Add CSS for styles
 import Footer from "./footer";
 import { ApiUrl } from "./ApiUrl";
 import Modal from "react-modal"; // Install if needed using `npm install react-modal`
-import { FaTimes, FaPrint, FaBoxOpen } from "react-icons/fa";
+import { FaTimes, FaPrint,  } from "react-icons/fa";
 import OrderTrackingModal from "./TrackingModal";
 import Swal from "sweetalert2";
 
@@ -15,7 +15,7 @@ import Invoice from "./Invoice";
 import stamp2 from "./img/cancelled-stamp.png";
 import BoxIcon from "./img/box.png";
 
-import ReactDOMServer from "react-dom/server"; // Add this import at the top
+// import ReactDOMServer from "react-dom/server"; // Add this import at the top
 // import RecentlyViewed from "./RecentlyViewed";
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -238,8 +238,8 @@ const MyOrders = () => {
   const [selectedProduct, setSelectedProduct] = useState(
     orders[0]?.products?.[0]?.product_id
   );
-  const [, setCurrentOrder] = useState(null);
-  const [, setCurrentProduct] = useState(null);
+  // const [, setCurrentOrder] = useState(null);
+  // const [, setCurrentProduct] = useState(null);
 
   const handleProductChange = (event) => {
     const productId = event.target.value;
@@ -287,41 +287,41 @@ const MyOrders = () => {
     }
   }, [selectedOrder]); // Run effect when selectedOrder changes
 
-  const printInvoice = async (order) => {
-    console.log("Preparing to print invoice for order:", order);
+  // const printInvoice = async (order) => {
+  //   console.log("Preparing to print invoice for order:", order);
 
-    // Fetch product details before printing
-    const details = await fetchProductDetails(order.unique_id); // Get product details
+  //   // Fetch product details before printing
+  //   const details = await fetchProductDetails(order.unique_id); // Get product details
 
-    // Log the product details to be printed
-    console.log("Product details to print:", details);
+  //   // Log the product details to be printed
+  //   console.log("Product details to print:", details);
 
-    if (!details || details.length === 0) {
-      console.error("No product details available to print. Aborting print.");
-      return; // Exit if no product details
-    }
+  //   if (!details || details.length === 0) {
+  //     console.error("No product details available to print. Aborting print.");
+  //     return; // Exit if no product details
+  //   }
 
-    const printWindow = window.open("", "_blank");
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Invoice</title>
-          <style>
-            body { font-family: Arial, sans-serif; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid black; padding: 8px; text-align: left; }
-          </style>
-        </head>
-        <body>
-          ${ReactDOMServer.renderToStaticMarkup(
-      <Invoice order={order} productDetails={details} />
-    )}
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-  };
+  //   const printWindow = window.open("", "_blank");
+  //   printWindow.document.write(`
+  //     <html>
+  //       <head>
+  //         <title>Invoice</title>
+  //         <style>
+  //           body { font-family: Arial, sans-serif; }
+  //           table { width: 100%; border-collapse: collapse; }
+  //           th, td { border: 1px solid black; padding: 8px; text-align: left; }
+  //         </style>
+  //       </head>
+  //       <body>
+  //         ${ReactDOMServer.renderToStaticMarkup(
+  //     <Invoice order={order} productDetails={details} />
+  //   )}
+  //       </body>
+  //     </html>
+  //   `);
+  //   printWindow.document.close();
+  //   printWindow.print();
+  // };
 
   return (
     <>
@@ -380,7 +380,7 @@ const MyOrders = () => {
           {filteredOrders.length === 0 ? (
             <div className="no-orders-wrapper">
               {/* <FaBoxOpen className="no-orders-icon" /> */}
-              <img src={BoxIcon} width={"150px"}/>
+              <img src={BoxIcon} width={"150px"} alt="Box icon"/>
               <p className="no-orders-text">No orders found</p>
             </div>
 

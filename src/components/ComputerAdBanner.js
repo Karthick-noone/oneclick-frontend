@@ -64,7 +64,7 @@ const noTitleProducts = products.filter(
       <div className="skeleton-banner" />
     </div>
     <div className="skeleton-offers-container">
-      {[...Array(4)].map((_, i) => (
+      {[...Array(3)].map((_, i) => (
         <div className="skeleton-offer" key={i} />
       ))}
     </div>

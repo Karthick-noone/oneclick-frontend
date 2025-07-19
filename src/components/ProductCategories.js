@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate from React
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the CSS for Toastify
 // import { useCart } from "../components/CartContext";
+import Swal from "sweetalert2";
 
 const ProductList = () => {
   // const {
@@ -37,138 +38,152 @@ const ProductList = () => {
   };
 
   useEffect(() => {
-  axios
-    .get(`${ApiUrl}/api/products`)
-    .then((response) => {
-      // Group products by category
-      const categories = response.data.reduce((acc, product) => {
-        const categoryName = product.category;
-        if (categoryName) {
-          if (!acc[categoryName]) {
-            acc[categoryName] = []; // Initialize array for category
+    axios
+      .get(`${ApiUrl}/api/products`)
+      .then((response) => {
+        // Group products by category
+        const categories = response.data.reduce((acc, product) => {
+          const categoryName = product.category;
+          if (categoryName) {
+            if (!acc[categoryName]) {
+              acc[categoryName] = []; // Initialize array for category
+            }
+            acc[categoryName].push(product); // Add product to the category array
           }
-          acc[categoryName].push(product); // Add product to the category array
-        }
-        return acc;
-      }, {}); // Initial accumulator is an empty object
+          return acc;
+        }, {}); // Initial accumulator is an empty object
 
-      setProductsByCategory(categories);
-      console.log("Grouped Product Categories", categories);
-      setLoading(false);
-    })
-    .catch((error) => {
-      console.error("Error fetching products:", error);
-      setError("Failed to fetch products. Please try again later.");
-      setLoading(false);
-    });
-}, []);
+        setProductsByCategory(categories);
+        // console.log("Grouped Product Categories", categories);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+        setError("Failed to fetch products. Please try again later.");
+        setLoading(false);
+      });
+  }, []);
 
   const handleToggleFavorite = async (product, event) => {
-  event.stopPropagation();
+    event.stopPropagation();
 
-  const email = localStorage.getItem("email");
-  const username = localStorage.getItem("username");
-
-  if (!email || !username) {
-    toast.error("User is not logged in!", {
-      position: "top-right",
-      autoClose: 2000,
-    });
-    window.location.href = "/login";
-    return;
-  }
-
-  try {
-    const isFavorite = favorites[`${product.id}`];
-
-    if (isFavorite) {
-      // Optimistically update UI
-      setFavorites((prev) => {
-        const updated = { ...prev };
-        delete updated[`${product.id}`];
-        return updated;
-      });
-
-      await axios.post(`${ApiUrl}/remove-from-wishlist`, {
-        email,
-        productId: product.id,
-      });
-
-      window.dispatchEvent(new Event("wishlist-updated"));
-      toast.info(`${product.prod_name.substring(0, 25)}... removed from your wishlist!`, {
-        position: "top-right",
-        autoClose: 2000,
-      });
-    } else {
-      // Optimistically update UI
-      setFavorites((prev) => ({
-        ...prev,
-        [`${product.id}`]: true,
-      }));
-
-      await axios.post(`${ApiUrl}/update-user-wishlist`, {
-        email,
-        username,
-        action: "add",
-        prod_id: product.id,
-      });
-
-      window.dispatchEvent(new Event("wishlist-updated"));
-      toast.success(`${product.prod_name.substring(0, 25)}... added to your wishlist!`, {
-        position: "top-right",
-        autoClose: 2000,
-      });
-    }
-  } catch (error) {
-    console.error("Error updating wishlist:", error);
-    toast.error("An error occurred while updating wishlist.", {
-      position: "top-right",
-      autoClose: 2000,
-    });
-  }
-};
-useEffect(() => {
-  const fetchWishlist = async () => {
     const email = localStorage.getItem("email");
     const username = localStorage.getItem("username");
 
-    try {
-      const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
-        email,
-        username,
+    if (!email || !username) {
+      toast.error("User is not logged in!", {
+        position: "top-right",
+        autoClose: 2000,
       });
+      window.location.href = "/login";
+      return;
+    }
 
-      if (response.data.wishlist) {
-        const wishlist = response.data.wishlist;
-        const favoritesMap = {};
+    try {
+      const isFavorite = favorites[`${product.id}`];
 
-        wishlist.forEach((item) => {
-          favoritesMap[`${item}`] = true;
+      if (isFavorite) {
+        // Optimistically update UI
+        setFavorites((prev) => {
+          const updated = { ...prev };
+          delete updated[`${product.id}`];
+          return updated;
         });
 
-        setFavorites(favoritesMap);
+        await axios.post(`${ApiUrl}/remove-from-wishlist`, {
+          email,
+          productId: product.id,
+        });
+
+        window.dispatchEvent(new Event("wishlist-updated"));
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          text: "Item removed from your wishlist",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 3000
+        });
+      } else {
+        // Optimistically update UI
+        setFavorites((prev) => ({
+          ...prev,
+          [`${product.id}`]: true,
+        }));
+
+        await axios.post(`${ApiUrl}/update-user-wishlist`, {
+          email,
+          username,
+          action: "add",
+          prod_id: product.id,
+        });
+
+        window.dispatchEvent(new Event("wishlist-updated"));
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          text: "Item added to your wishlist",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 3000
+        });
       }
     } catch (error) {
-      console.error("Error fetching wishlist:", error);
+      console.error("Error updating wishlist:", error);
+      toast.error("An error occurred while updating wishlist.", {
+        position: "top-right",
+        autoClose: 2000,
+      });
     }
   };
 
-  // Fetch wishlist immediately on mount
-  fetchWishlist();
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      const email = localStorage.getItem("email");
+      const username = localStorage.getItem("username");
 
-  // Listen for wishlist updates
-  const handleWishlistUpdate = () => {
-    console.log("[Event] Wishlist updated, fetching...");
+      if (!email || !username) {
+        console.log("No email/username found, skipping wishlist fetch.");
+        return;
+      }
+
+      try {
+        const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
+          email,
+          username,
+        });
+
+        if (response.data.wishlist) {
+          const wishlist = response.data.wishlist;
+          const favoritesMap = {};
+
+          wishlist.forEach((item) => {
+            favoritesMap[`${item}`] = true;
+          });
+
+          setFavorites(favoritesMap);
+        }
+      } catch (error) {
+        console.error("Error fetching wishlist:", error);
+      }
+    };
+
+    // Fetch wishlist immediately on mount
     fetchWishlist();
-  };
 
-  window.addEventListener("wishlist-updated", handleWishlistUpdate);
+    // Listen for wishlist updates
+    const handleWishlistUpdate = () => {
+      console.log("[Event] Wishlist updated, fetching...");
+      fetchWishlist();
+    };
 
-  // Cleanup on unmount
-  return () => {
-    window.removeEventListener("wishlist-updated", handleWishlistUpdate);
-  };
-}, []);
+    window.addEventListener("wishlist-updated", handleWishlistUpdate);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("wishlist-updated", handleWishlistUpdate);
+    };
+  }, []);
 
   // useEffect(() => {
   //   const updateFavorites = () => {
@@ -198,13 +213,46 @@ useEffect(() => {
   // }, []);
 
   const handleProductClick = (product) => {
+
+    // const slugify = (name) =>
+    //   name
+    //     .toLowerCase()
+    //     .replace(/\s+/g, "-")
+    //     .replace(/[^\w-]+/g, "");
+
+    // navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
+    
+    if (product && product.id) {
+    const now = Date.now();
+
+    let storedData = localStorage.getItem("Recently-viewed");
+    let parsedData = [];
+
+    try {
+      parsedData = storedData ? JSON.parse(storedData) : [];
+    } catch (err) {
+      console.error("Failed to parse Recently-viewed:", err);
+    }
+
+    // Remove if already exists
+    parsedData = parsedData.filter((item) => item.id !== product.id);
+
+    // Add current item with timestamp
+    parsedData.unshift({
+      id: product.id,
+      timestamp: now,
+    });
+
+    // Keep only last 10
+    parsedData = parsedData.slice(0, 10);
+
+    localStorage.setItem("Recently-viewed", JSON.stringify(parsedData));
+
     const slugify = (name) =>
-      name
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^\w-]+/g, "");
+      name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
 
     navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
+  }
   };
   const renderCategoryRow = (categoryName = false) => {
     // Combine products for the accessory row (Headphones + Speakers or all Accessories)
@@ -294,7 +342,7 @@ useEffect(() => {
               // For extra small screens (320px and down)
               320: { slidesPerView: 2 },
             }}
-            onInit={(swiper) => console.log("Swiper initialized:", swiper)}
+          // onInit={(swiper) => console.log("Swiper initialized:", swiper)}
           >
             {loading || combinedProducts.length === 0
               ? [...Array(5)].map((_, index) => (
@@ -330,7 +378,10 @@ useEffect(() => {
                         }`}
                     >
                       {product.offer_label && (
-                        <div className="product-label">
+                        <div className="product-label"
+                          style={{ marginTop: '5px' }}
+
+                        >
                           {product.offer_label.charAt(0).toUpperCase() +
                             product.offer_label.slice(1)}
                         </div>
@@ -362,7 +413,8 @@ useEffect(() => {
                         )}
                       </span>
 
-                      <h3 className="custom-slider-name">
+
+                      <h3 className="custom-slider-name" title={product.prod_name}>
                         {product.prod_name}
                       </h3>
                       {product.subtitle && (
@@ -376,7 +428,7 @@ useEffect(() => {
                           style={{
                             color: "#27ae60",
                             fontWeight: "bold",
-                            fontSize: "20px",
+                            // fontSize: "20px",
                           }}
                         >
                           ₹{product.prod_price}
@@ -392,6 +444,7 @@ useEffect(() => {
                             M.R.P
                           </span>
                           <span
+                            className="product-MRP-price"
                             style={{
                               textDecoration: "line-through",
                               color: "red",
@@ -414,15 +467,15 @@ useEffect(() => {
                           % OFF)
                         </span>
                       </p>
-                    
+
                     </div>
 
                     {combinedProducts.length > 5 &&
                       idx === combinedProducts.length - 1 && (
                         <div className="see-more-wrapper">
-                        
+
                           <button
-                            class="animated-button"
+                            className="animated-button"
                             onClick={() => {
                               const lastProductCategory =
                                 combinedProducts[combinedProducts.length - 1]
@@ -432,16 +485,16 @@ useEffect(() => {
                           >
                             <svg
                               viewBox="0 0 24 24"
-                              class="arr-2"
+                              className="arr-2"
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
                             </svg>
-                            <span class="text">View More</span>
-                            <span class="circle"></span>
+                            <span className="text">View More</span>
+                            <span className="circle"></span>
                             <svg
                               viewBox="0 0 24 24"
-                              class="arr-1"
+                              className="arr-1"
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>

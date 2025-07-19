@@ -17,7 +17,7 @@ const EditSingleImageAd = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [category, setCategory] = useState(''); // Add a new state to track the selected category
+  const [, setCategory] = useState(''); // Add a new state to track the selected category
 
 
   const [isUploading, setIsUploading] = useState(false);
@@ -26,9 +26,9 @@ const EditSingleImageAd = () => {
   const [updateProgress, setUpdateProgress] = useState(0); // optional if needed
 
 
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value); // Update category value when a new category is selected
-  };
+  // const handleCategoryChange = (e) => {
+  //   setCategory(e.target.value); // Update category value when a new category is selected
+  // };
   const navigate = useNavigate();
 
   useEffect(() => {

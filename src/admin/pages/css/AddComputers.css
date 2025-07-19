@@ -1806,8 +1806,8 @@
 .product-label {
 
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 5px;
+  left: 5px;
   background-color: #f14949; 
   color: white; 
   padding: 5px 10px;
@@ -2878,7 +2878,7 @@
 .laptops-product-name {
   display: -webkit-box;
   /* Required for multiline clamp */
-  -webkit-line-clamp: 1;
+  /* -webkit-line-clamp: 1; */
   /* Limits to exactly 2 lines */
   -webkit-box-orient: vertical;
   overflow: hidden;

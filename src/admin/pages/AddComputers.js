@@ -65,7 +65,7 @@ const Computers = () => {
   const [selectedFile, setSelectedFile] = useState(null); // State for selected file
   const [imageIndex, setImageIndex] = useState(null);
   const [newImages, setNewImages] = useState({});
-  const [isPopupVisible, setPopupVisible] = useState(false);
+  // const [isPopupVisible, setPopupVisible] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [isViewingCoupons, setIsViewingCoupons] = useState(false);
@@ -98,7 +98,7 @@ const Computers = () => {
   const [showOutOfStockOnly, setShowOutOfStockOnly] = useState(false);
   const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
   const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
-  const [loadingProductId, setLoadingProductId] = useState(null);
+  const [, setLoadingProductId] = useState(null);
   const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
   const handleStatusChange = async (newStatus, productId) => {
@@ -485,9 +485,9 @@ const Computers = () => {
     setSelectedProductId(null);
   };
 
-  const handlePopupToggle = () => {
-    setPopupVisible(!isPopupVisible);
-  };
+   // const handlePopupToggle = () => {
+  //   setPopupVisible(!isPopupVisible);
+  // };
 
   const fetchCoupons = async (productId, productName, productPrice) => {
 
@@ -921,8 +921,10 @@ const Computers = () => {
     }
 
     // Validate coupon code and extract numeric part
-    const couponCode = newProduct.coupon; // Fetching the coupon code
-    const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
+        // const couponCode = newProduct.coupon; // Fetching the coupon code
+
+        // const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
+
 
     // Check if either coupon code or coupon expiry date is provided
     // if (
@@ -1935,7 +1937,7 @@ const Computers = () => {
             <div className="filters-card">
               <div className="filters-panel">
                 <div className="filter-label-title">
-                  <img src={FilterIcon} width={"20px"} />
+                  <img src={FilterIcon} width={"20px"} alt="Filter"/>
 
                   <span> Filter By </span>
                   {/* <FilterIcon width={"20px"}/> */}
@@ -2085,6 +2087,7 @@ const Computers = () => {
                           <>
                             <img
                               src={userRole === "Admin" ? ApproveImage : ApprovalWaitingImage}
+                              title={userRole === "Admin" ? "Click to approve this product" : "Product yet to approve"}
                               width={userRole === "Admin" ? "50px" : "60px"}
                               style={{
                                 cursor: userRole === "Admin" ? "pointer" : "not-allowed",
@@ -2094,6 +2097,7 @@ const Computers = () => {
                                   ? () => handleStatusUpdate(product.prod_id) //  Only for Admin
                                   : undefined //  Disabled for non-admin
                               }
+                              alt="role"
                             />
                           </>
                         )}
@@ -2189,7 +2193,7 @@ const Computers = () => {
                           <div className="accessory-count-wrapper">
                             <span className="accessory-count">
                               {/* {accessoryCounts[product.id]} FA */}
-                              <img src={AccessoriesImage} width={"60px"}
+                              <img src={AccessoriesImage} width={"60px"} alt="accessories"
                               //  onClick={() =>
                               //             handleOpenFrequentlyBuyModal(
                               //               product.id,
@@ -2301,15 +2305,17 @@ const Computers = () => {
                                   </div>
 
                                   <div className="laptops-modal-right-section">
-                                    <div
-                                      onClick={() => handleOpenOfferModal(product.id)}
-                                      className="offer-edit-btn"
-                                    >
-                                      <span className="offer-edit-text">
-                                        Edit Limited Time Offer
-                                      </span>
-                                      <FaEdit className="offer-edit-icon" />
-                                    </div>
+                                    {product.status === "available" &&
+                                      <div
+                                        onClick={() => handleOpenOfferModal(product.id)}
+                                        className="offer-edit-btn"
+                                      >
+                                        <span className="offer-edit-text">
+                                          Edit Limited Time Offer
+                                        </span>
+                                        <FaEdit className="offer-edit-icon" />
+                                      </div>
+                                      }
 
                                     {/* Modal Rendering */}
                                     {isOfferModalOpen && (
@@ -2387,13 +2393,14 @@ const Computers = () => {
                                               type="submit"
                                               className="offer-submit-btn"
                                             >
-                                              {isEditMode
+                                              {isEditMode && offerStartTime && offerEndTime && offerPrice
                                                 ? "Update Offer"
-                                                : "Add Offer"}
+                                                : "Add Offer"
+                                                }
                                             </button>
                                           </form>
 
-                                          {isEditMode && (
+                                          {isEditMode && offerStartTime && offerEndTime && offerPrice && (
                                             <button
                                               onClick={handleDelete}
                                               className="offer-delete-btn"
@@ -2453,10 +2460,12 @@ const Computers = () => {
                                         }
                                         style={{ cursor: "pointer" }}
                                       >
+                                        {couponProducts[product.id]?.hasCoupon && (
                                         <FaEye
                                           className="faedit"
                                           title="View Coupon"
                                         />
+                                        )}
                                       </span>
                                     </p>
 
@@ -2510,7 +2519,7 @@ const Computers = () => {
                                                   </span>{" "}
                                                   
                                                   <span className="expiry-date">
-                                                    {/* {/* Expires on:{" "} */}{" "} */}
+                                                    {/* Expires on:{" "} */}{" "}
                                                     {new Date(
                                                       coupon.expiry_date
                                                     ).toLocaleDateString("en-GB", {
@@ -3248,7 +3257,7 @@ const Computers = () => {
 
 // Custom next arrow component
 const SampleNextArrow = (props) => {
-  const { className, style, onClick } = props;
+  const { className,  onClick } = props;
   return (
     <div
       className={`${className} `}
@@ -3261,7 +3270,7 @@ const SampleNextArrow = (props) => {
 };
 
 const SamplePrevArrow = (props) => {
-  const { className, style, onClick } = props;
+  const { className,  onClick } = props;
   return (
     <div
       className={`${className} `}

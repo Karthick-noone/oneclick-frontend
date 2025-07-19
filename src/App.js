@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -55,6 +55,8 @@ import BuyNow from "./components/BuyNow";
 import NetworkStatus from "./components/NetworkStatus"; // Import the component
 import ScrollToTopButton from "./components/ScrollToTopButton"; // Adjust path as needed
 
+
+
 const ScrollToTop = () => {
   const location = useLocation();
 
@@ -66,19 +68,46 @@ const ScrollToTop = () => {
 };
 
 const AppWrapper = ({ children }) => {
+  const header2Ref = useRef(null);
+  const [header2Height, setHeader2Height] = useState(0);
+
+  useEffect(() => {
+    if (header2Ref.current) {
+      const height = header2Ref.current.offsetHeight;
+      // console.log(`[AppWrapper] Initial Header2 height: ${height}px`);
+      setHeader2Height(height);
+    }
+
+    const handleResize = () => {
+      if (header2Ref.current) {
+        const height = header2Ref.current.offsetHeight;
+        // console.log(`[AppWrapper] Header2 height on resize: ${height}px`);
+        setHeader2Height(height);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   const location = useLocation();
   const path = location.pathname.toLowerCase(); // Convert to lowercase
 
   const isExcluded =
-    path.startsWith("/admin") || path === "/login" || path === "/signup" || path === "/forgotpassword";
+    path.startsWith("/admin") ||
+    path === "/login" ||
+    path === "/signup" ||
+    path === "/forgotpassword";
 
   return (
-    <>
-      {!isExcluded && <Header2 />}
-      {!isExcluded && <Header3 />}
-
-      {children}
-    </>
+  <>
+  {!isExcluded && <Header2 header2Ref={header2Ref} />}
+  {!isExcluded && <Header3 topOffset={header2Height} />}
+  {children}
+</>
   );
 };
 

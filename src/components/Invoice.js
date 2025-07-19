@@ -1,6 +1,6 @@
 import React from "react";
 import logo from "./img/logo3.png"; // Ensure the path is correct
-import { HiScissors } from "react-icons/hi";
+// import { HiScissors } from "react-icons/hi";
 // import './css/Invoice.css'
 const Invoice = ({ order, productDetails }) => {
   const products = productDetails || []; // Use productDetails passed as prop
@@ -119,7 +119,8 @@ const Invoice = ({ order, productDetails }) => {
           <div style={{ textAlign: "left", lineHeight: "1.6" }}>
             <p style={{ margin: "0 0 5px 0", fontWeight: "bold" }}>Billing Address:</p>
             <p style={{ margin: "0" }}>Market Road, Marthandam,</p>
-            <p style={{ margin: "0" }}>Kanyakumari, 629165</p>
+            <p style={{ margin: "0" }}>Kanyakumari, Tamilnadu</p>
+            <p style={{ margin: "0" }}>India, 629165</p>
             <p style={{ margin: "0" }}><strong>Email:</strong> enquiryoneclick@gmail.com</p>
             <p style={{ margin: "0" }}><strong>Phone:</strong> +91-9092206677</p>
           </div>
@@ -129,20 +130,40 @@ const Invoice = ({ order, productDetails }) => {
             <p style={{ margin: "0 0 5px 0", fontWeight: "bold" }}>Delivery Address:</p>
             {order.shipping_address ? (() => {
               const parts = order.shipping_address.split(",").map((part) => part.trim());
-              const firstLine = parts.slice(0, 2).join(", ");
-              const middleLine = parts.length > 5 ? parts.slice(2, parts.length - 1).join(", ") : null;
+
+              const rows = [];
+
+              // First part as first line
+              if (parts.length > 0) {
+                rows.push(
+                  <p key="first" style={{ margin: "0" }}>{parts[0]}</p>
+                );
+              }
+
+              // Middle parts: combine 2 parts per line (excluding first and last)
+              for (let i = 1; i < parts.length - 1; i += 2) {
+                const line = [parts[i], parts[i + 1]].filter(Boolean).join(", ");
+                rows.push(
+                  <p key={i} style={{ margin: "0" }}>{line}</p>
+                );
+              }
+
+              // Last part as phone
               const phoneLine = parts[parts.length - 1];
 
               return (
                 <>
-                  <p style={{ margin: "0" }}>{firstLine}</p>
-                  {middleLine && <p style={{ margin: "0" }}>{middleLine}</p>}
-                  <p style={{ margin: "0" }}><strong>Phone:</strong> {phoneLine}</p>
+                  {rows}
+                  <p style={{ margin: "0" }}>
+                    <strong>Phone:</strong> {phoneLine}
+                  </p>
                 </>
               );
             })() : (
               <p style={{ margin: "0" }}>N/A</p>
             )}
+
+
           </div>
 
         </div>

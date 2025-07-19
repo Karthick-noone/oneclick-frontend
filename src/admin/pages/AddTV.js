@@ -55,7 +55,7 @@ const TV = () => {
   const [selectedFile, setSelectedFile] = useState(null); // State for selected file
   const [imageIndex, setImageIndex] = useState(null);
   const [newImages, setNewImages] = useState({});
-  const [isPopupVisible, setPopupVisible] = useState(false);
+  // const [isPopupVisible, setPopupVisible] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [isViewingCoupons, setIsViewingCoupons] = useState(false);
@@ -82,7 +82,7 @@ const TV = () => {
   const [showOutOfStockOnly, setShowOutOfStockOnly] = useState(false);
   const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
   // const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
-  const [loadingProductId, setLoadingProductId] = useState(null);
+  const [, setLoadingProductId] = useState(null);
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
      const handleStatusChange = async (newStatus, productId) => {
@@ -396,9 +396,9 @@ const TV = () => {
     setSelectedProductId(null);
   };
 
-  const handlePopupToggle = () => {
-    setPopupVisible(!isPopupVisible);
-  };
+  // const handlePopupToggle = () => {
+  //   setPopupVisible(!isPopupVisible);
+  // };
 
   const fetchCoupons = async (productId, productName, productPrice) => {
     console.log(`Fetching coupons for product ID: ${productId}`); // Log when fetching starts
@@ -834,8 +834,10 @@ const TV = () => {
     }
 
     // Validate coupon code and extract numeric part
-    const couponCode = newProduct.coupon; // Fetching the coupon code
-    const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
+    //     // const couponCode = newProduct.coupon; // Fetching the coupon code
+
+    //     // const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
+
 
     // Check if either coupon code or coupon expiry date is provided
     // if (
@@ -960,18 +962,18 @@ const TV = () => {
   };
 
   const handleEditProduct = (product) => {
-    let formattedDate = "";
-    if (product.coupon_expiry_date) {
-      const expiryDate = new Date(product.coupon_expiry_date);
+    // let formattedDate = "";
+    // if (product.coupon_expiry_date) {
+    //   const expiryDate = new Date(product.coupon_expiry_date);
 
-      if (!isNaN(expiryDate)) {
-        // Format the date manually to YYYY-MM-DD without timezone conversion
-        const year = expiryDate.getFullYear();
-        const month = String(expiryDate.getMonth() + 1).padStart(2, "0"); // Add 1 because months are 0-indexed
-        const day = String(expiryDate.getDate()).padStart(2, "0");
-        formattedDate = `${year}-${month}-${day}`;
-      }
-    }
+    //   if (!isNaN(expiryDate)) {
+    //     // Format the date manually to YYYY-MM-DD without timezone conversion
+    //     const year = expiryDate.getFullYear();
+    //     const month = String(expiryDate.getMonth() + 1).padStart(2, "0"); // Add 1 because months are 0-indexed
+    //     const day = String(expiryDate.getDate()).padStart(2, "0");
+    //     formattedDate = `${year}-${month}-${day}`;
+    //   }
+    // }
 
     setEditingProduct({
       id: product.id,
@@ -1362,47 +1364,47 @@ const TV = () => {
     backgroundColor: "#218838", // Darker shade on hover
   };
 
-  const handleAddPipe = () => {
-    const textarea = document.querySelector(".laptops-card-input1"); // Get the textarea element by class
-    const cursorPosition = textarea.selectionStart; // Get the cursor position
+  // const handleAddPipe = () => {
+  //   const textarea = document.querySelector(".laptops-card-input1"); // Get the textarea element by class
+  //   const cursorPosition = textarea.selectionStart; // Get the cursor position
 
-    // Insert the pipe at the cursor position
-    const updatedFeatures = [
-      newProduct.features.slice(0, cursorPosition),
-      "|",
-      newProduct.features.slice(cursorPosition),
-    ].join("");
+  //   // Insert the pipe at the cursor position
+  //   const updatedFeatures = [
+  //     newProduct.features.slice(0, cursorPosition),
+  //     "|",
+  //     newProduct.features.slice(cursorPosition),
+  //   ].join("");
 
-    // Update the features with the inserted pipe
-    setNewProduct({
-      ...newProduct,
-      features: updatedFeatures,
-    });
+  //   // Update the features with the inserted pipe
+  //   setNewProduct({
+  //     ...newProduct,
+  //     features: updatedFeatures,
+  //   });
 
-    // Return focus back to the textarea after insertion
-    textarea.focus();
-  };
+  //   // Return focus back to the textarea after insertion
+  //   textarea.focus();
+  // };
 
-  const handleUpdatePipe = () => {
-    const textarea = document.querySelector(".adminmodal-input1"); // Get the textarea element by class
-    const cursorPosition = textarea.selectionStart; // Get the cursor position
+  // const handleUpdatePipe = () => {
+  //   const textarea = document.querySelector(".adminmodal-input1"); // Get the textarea element by class
+  //   const cursorPosition = textarea.selectionStart; // Get the cursor position
 
-    // Insert the pipe at the cursor position
-    const updatedFeatures = [
-      editingProduct.features.slice(0, cursorPosition),
-      "|",
-      editingProduct.features.slice(cursorPosition),
-    ].join("");
+  //   // Insert the pipe at the cursor position
+  //   const updatedFeatures = [
+  //     editingProduct.features.slice(0, cursorPosition),
+  //     "|",
+  //     editingProduct.features.slice(cursorPosition),
+  //   ].join("");
 
-    // Update the features with the inserted pipe
-    setEditingProduct({
-      ...editingProduct,
-      features: updatedFeatures,
-    });
+  //   // Update the features with the inserted pipe
+  //   setEditingProduct({
+  //     ...editingProduct,
+  //     features: updatedFeatures,
+  //   });
 
-    // Return focus back to the textarea after insertion
-    textarea.focus();
-  };
+  //   // Return focus back to the textarea after insertion
+  //   textarea.focus();
+  // };
 
   const getFormattedDate = (date) => {
     const year = date.getFullYear();
@@ -1616,7 +1618,7 @@ const TV = () => {
             <div className="filters-card2">
               <div className="filters-panel">
                 <div className="filter-label-title">
-                  <img src={FilterIcon} width={"20px"} />
+                  <img src={FilterIcon} width={"20px"} alt="Filter"/>
 
                   <span> Filter By </span>
                   {/* <FilterIcon width={"20px"}/> */}
@@ -1749,6 +1751,7 @@ const TV = () => {
                           <>
                             <img
                               src={userRole === "Admin" ? ApproveImage : ApprovalWaitingImage}
+                              title={userRole === "Admin" ? "Click to approve this product" : "Product yet to approve"}
                               width={userRole === "Admin" ? "50px" : "60px"}
                               style={{
                                 cursor: userRole === "Admin" ? "pointer" : "not-allowed",
@@ -1758,6 +1761,7 @@ const TV = () => {
                                   ? () => handleStatusUpdate(product.prod_id) //  Only for Admin
                                   : undefined //  Disabled for non-admin
                               }
+                              alt="role"
                             />
                           </>
                         )}
@@ -1883,15 +1887,17 @@ const TV = () => {
                                   </div>
 
                                   <div className="laptops-modal-right-section">
-                                    <div
-                                      onClick={() => handleOpenOfferModal(product.id)}
-                                      className="offer-edit-btn"
-                                    >
-                                      <span className="offer-edit-text">
-                                        Edit Limited Time Offer
-                                      </span>
-                                      <FaEdit className="offer-edit-icon" />
-                                    </div>
+                                    {product.status === "available" &&
+                                      <div
+                                        onClick={() => handleOpenOfferModal(product.id)}
+                                        className="offer-edit-btn"
+                                      >
+                                        <span className="offer-edit-text">
+                                          Edit Limited Time Offer
+                                        </span>
+                                        <FaEdit className="offer-edit-icon" />
+                                      </div>
+                                      }
 
                                     {/* Modal Rendering */}
                                     {isOfferModalOpen && (
@@ -1964,13 +1970,14 @@ const TV = () => {
                                               type="submit"
                                               className="offer-submit-btn"
                                             >
-                                              {isEditMode
+                                              {isEditMode && offerStartTime && offerEndTime && offerPrice
                                                 ? "Update Offer"
-                                                : "Add Offer"}
+                                                : "Add Offer"
+                                                }
                                             </button>
                                           </form>
 
-                                          {isEditMode && (
+                                          {isEditMode && offerStartTime && offerEndTime && offerPrice && (
                                             <button
                                               onClick={handleDelete}
                                               className="offer-delete-btn"
@@ -2030,10 +2037,12 @@ const TV = () => {
                                         }
                                         style={{ cursor: "pointer" }}
                                       >
+                                        {couponProducts[product.id]?.hasCoupon && (
                                         <FaEye
                                           className="faedit"
                                           title="View Coupon"
                                         />
+                                        )}
                                       </span>
                                     </p>
 
@@ -2470,7 +2479,7 @@ const TV = () => {
 };
 // Custom next arrow component
 const SampleNextArrow = (props) => {
-  const { className, style, onClick } = props;
+  const { className,  onClick } = props;
   return (
     <div
       className={`${className} `}
@@ -2483,7 +2492,7 @@ const SampleNextArrow = (props) => {
 };
 
 const SamplePrevArrow = (props) => {
-  const { className, style, onClick } = props;
+  const { className,  onClick } = props;
   return (
     <div
       className={`${className}`}

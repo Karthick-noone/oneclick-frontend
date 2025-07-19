@@ -49,49 +49,49 @@ const [updateProgress, setUpdateProgress] = useState(0); // optional if needed
     fetchProducts();
   }, []);
 
-  const compressImage = (file, maxSizeKB = 450) => {
-    // Set maxSizeKB to 450
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+  // const compressImage = (file, maxSizeKB = 450) => {
+  //   // Set maxSizeKB to 450
+  //   return new Promise((resolve) => {
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(file);
 
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
+  //     reader.onload = (event) => {
+  //       const img = new Image();
+  //       img.src = event.target.result;
 
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 500; // Set maximum width for the image
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
+  //       img.onload = () => {
+  //         const canvas = document.createElement("canvas");
+  //         const MAX_WIDTH = 500; // Set maximum width for the image
+  //         const scaleSize = MAX_WIDTH / img.width;
+  //         canvas.width = MAX_WIDTH;
+  //         canvas.height = img.height * scaleSize;
 
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  //         const ctx = canvas.getContext("2d");
+  //         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          // Compression function with adjustable quality
-          const compress = (quality) => {
-            return new Promise((resolveInner) => {
-              canvas.toBlob(
-                (blob) => {
-                  if (blob.size / 1024 <= maxSizeKB || quality < 0.3) {
-                    resolveInner(blob); // Return if under size limit or at minimum quality
-                  } else {
-                    resolveInner(compress(quality - 0.1)); // Retry with lower quality
-                  }
-                },
-                "image/jpeg",
-                quality
-              );
-            });
-          };
+  //         // Compression function with adjustable quality
+  //         const compress = (quality) => {
+  //           return new Promise((resolveInner) => {
+  //             canvas.toBlob(
+  //               (blob) => {
+  //                 if (blob.size / 1024 <= maxSizeKB || quality < 0.3) {
+  //                   resolveInner(blob); // Return if under size limit or at minimum quality
+  //                 } else {
+  //                   resolveInner(compress(quality - 0.1)); // Retry with lower quality
+  //                 }
+  //               },
+  //               "image/jpeg",
+  //               quality
+  //             );
+  //           });
+  //         };
 
-          // Start compressing with initial quality of 0.8
-          compress(0.8).then(resolve);
-        };
-      };
-    });
-  };
+  //         // Start compressing with initial quality of 0.8
+  //         compress(0.8).then(resolve);
+  //       };
+  //     };
+  //   });
+  // };
 
  const handleImageChange = (e) => {
   const file = e.target.files[0];

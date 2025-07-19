@@ -54,7 +54,7 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null); // State to track the currently selected image
   const [, setIsAdding] = useState(false); // Track the adding state to prevent multiple clicks
-  const [currentStartIndex, setCurrentStartIndex] = useState(0);
+  // const [currentStartIndex, setCurrentStartIndex] = useState(0);
   // const [currentIndex, setCurrentIndex] = useState(0);
   // const [showCarousel, setShowCarousel] = useState(false);
   const [relatedAccessories, setRelatedAccessories] = useState([]);
@@ -73,7 +73,7 @@ const ProductDetail = () => {
   // State for storing related items
   const [relatedItems, setRelatedItems] = useState([]);
   // State for tracking the current index for carousel
-  const [currentStartIndex2, setStartIndex] = useState(0);
+  // const [currentStartIndex2, setStartIndex] = useState(0);
 
   const [remainingTime, setRemainingTime] = useState(null);
   const [isOfferActive, setIsOfferActive] = useState(true);
@@ -113,7 +113,7 @@ const ProductDetail = () => {
     }
   }, [product]);
 
-  const maxDisplayItems = 5;
+  // const maxDisplayItems = 5;
 
   // Filter products to remove the current product from related items
   const productsExcludingCurrent = relatedItems.filter(
@@ -121,21 +121,21 @@ const ProductDetail = () => {
   );
 
   // Handle next slide in carousel
-  const handleNextSlide = () => {
-    if (
-      currentStartIndex2 + 1 <
-      productsExcludingCurrent.length - maxDisplayItems + 1
-    ) {
-      setStartIndex((prev) => prev + 1);
-    }
-  };
+  // const handleNextSlide = () => {
+  //   if (
+  //     currentStartIndex2 + 1 <
+  //     productsExcludingCurrent.length - maxDisplayItems + 1
+  //   ) {
+  //     setStartIndex((prev) => prev + 1);
+  //   }
+  // };
 
   // Handle previous slide in carousel
-  const handlePreviousSlide = () => {
-    if (currentStartIndex2 > 0) {
-      setStartIndex((prev) => prev - 1);
-    }
-  };
+  // const handlePreviousSlide = () => {
+  //   if (currentStartIndex2 > 0) {
+  //     setStartIndex((prev) => prev - 1);
+  //   }
+  // };
 
   // Sort related products based on keyword matches from the current product name
   const prioritizedRelatedItems = productsExcludingCurrent
@@ -180,23 +180,23 @@ const ProductDetail = () => {
   //   );
   // };
 
-  const itemsToShow = 5;
+  // const itemsToShow = 5;
 
   const filteredProducts = relatedProducts.filter(
     (relatedProduct) => relatedProduct.id !== product.id
   );
 
-  const handleNext = () => {
-    if (currentStartIndex + 1 < filteredProducts.length - itemsToShow + 1) {
-      setCurrentStartIndex((prevIndex) => prevIndex + 1);
-    }
-  };
+  // const handleNext = () => {
+  //   if (currentStartIndex + 1 < filteredProducts.length - itemsToShow + 1) {
+  //     setCurrentStartIndex((prevIndex) => prevIndex + 1);
+  //   }
+  // };
 
-  const handlePrev = () => {
-    if (currentStartIndex > 0) {
-      setCurrentStartIndex((prevIndex) => prevIndex - 1);
-    }
-  };
+  // const handlePrev = () => {
+  //   if (currentStartIndex > 0) {
+  //     setCurrentStartIndex((prevIndex) => prevIndex - 1);
+  //   }
+  // };
 
   // Sort related products to prioritize matching product name (exact and partial)
   const s = filteredProducts.slice().sort((a, b) => {
@@ -446,7 +446,7 @@ const ProductDetail = () => {
 
       // Handle the response
       if (response.status === 200) {
-       Swal.fire({
+        Swal.fire({
           toast: true,
           position: "top-end",
           icon: "success",
@@ -564,7 +564,7 @@ const ProductDetail = () => {
         });
 
         window.dispatchEvent(new Event("wishlist-updated"));
-         Swal.fire({
+        Swal.fire({
           toast: true,
           position: "top-end",
           icon: "success",
@@ -586,6 +586,11 @@ const ProductDetail = () => {
     const fetchWishlist = async () => {
       const email = localStorage.getItem("email");
       const username = localStorage.getItem("username");
+
+      if (!email || !username) {
+        console.log("No email/username found, skipping wishlist fetch.");
+        return;
+      }
 
       try {
         const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
@@ -777,45 +782,45 @@ const ProductDetail = () => {
   //   return <div>Loadingvbcvbcv...</div>;
   // }
 
-  useEffect(() => {
-    const fetchWishlist = async () => {
-      const email = localStorage.getItem("email");
-      const username = localStorage.getItem("username");
+  // useEffect(() => {
+  //   const fetchWishlist = async () => {
+  //     const email = localStorage.getItem("email");
+  //     const username = localStorage.getItem("username");
 
-      // if (!email || !username) {
-      //   console.log("User not logged in");
-      //   return;
-      // }
+  //     // if (!email || !username) {
+  //     //   console.log("User not logged in");
+  //     //   return;
+  //     // }
 
 
-      try {
-        const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
-          email,
-          username,
-        });
+  //     try {
+  //       const response = await axios.post(`${ApiUrl}/fetchwishlist`, {
+  //         email,
+  //         username,
+  //       });
 
-        if (response.data.wishlist) {
-          const wishlist = response.data.wishlist;
-          const favoritesMap = {};
+  //       if (response.data.wishlist) {
+  //         const wishlist = response.data.wishlist;
+  //         const favoritesMap = {};
 
-          wishlist.forEach((item) => {
-            favoritesMap[item] = true;
-          });
+  //         wishlist.forEach((item) => {
+  //           favoritesMap[item] = true;
+  //         });
 
-          setFavorites(favoritesMap);
-        }
-      } catch (error) {
-        console.error("Error fetching wishlist:", error);
-      }
-    };
+  //         setFavorites(favoritesMap);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching wishlist:", error);
+  //     }
+  //   };
 
-    // Fetch wishlist on component mount
-    fetchWishlist();
+  //   // Fetch wishlist on component mount
+  //   fetchWishlist();
 
-    // Optionally, use a longer polling interval if you need periodic updates
-    // const intervalId = setInterval(fetchWishlist, 30000); // every 30 seconds
-    // return () => clearInterval(intervalId);
-  }, []);
+  //   // Optionally, use a longer polling interval if you need periodic updates
+  //   // const intervalId = setInterval(fetchWishlist, 30000); // every 30 seconds
+  //   // return () => clearInterval(intervalId);
+  // }, []);
 
 
 
@@ -940,7 +945,7 @@ const ProductDetail = () => {
 
 
   const NextArrow = (props) => {
-    const { className, style, onClick } = props;
+    const { className, onClick } = props;
     return (
       <div
         className={className}
@@ -953,7 +958,7 @@ const ProductDetail = () => {
   };
 
   const PrevArrow = (props) => {
-    const { className, style, onClick } = props;
+    const { className, onClick } = props;
     return (
       <div
         className={className}
@@ -1091,18 +1096,57 @@ const ProductDetail = () => {
                 </Link>
               </div>
               <div className="product-detail-image-container">
+
                 {loading && product.offer_label ? (
-                  <Skeleton
-                    width={100}
-                    height={30}
-                    className="product-label-skeleton"
-                  />
+                  <div className="skeleton-label-wrapper">
+
+                    <Skeleton
+                      width={100}
+                      height={30}
+                      className="product-label-skeleton"
+                    />
+                  </div>
+
                 ) : (
                   product.offer_label && (
                     <div className="product-label2">
                       {product.offer_label}
                     </div>
                   )
+                )}
+
+                {/* Wishlist Heart Icon */}
+                {loading ? (
+                  <div className="skeleton-heart-wrapper">
+                    <Skeleton
+                      circle
+                      width={30}
+                      height={30}
+                      className="skeleton-heart-icon"
+                    />
+                  </div>
+                ) : (
+                  <span
+                    title={
+                      favorites[`${product.id}`]
+                        ? "Remove from Wishlist"
+                        : "Add to Wishlist"
+                    }
+                    className={`heart-icon ${favorites[`${product.id}`] ? "filled" : ""
+                      }`}
+                    onClick={(event) =>
+                      handleToggleFavorite(product, event)
+                    }
+                  >
+                    {favorites[`${product.id}`] ? (
+                      <FaHeart
+                        title="Remove from wishlist"
+                        style={{ color: "red" }}
+                      />
+                    ) : (
+                      <FaRegHeart title="Add to wishlist" />
+                    )}
+                  </span>
                 )}
                 <div className="carousel-container">
 
@@ -1116,7 +1160,7 @@ const ProductDetail = () => {
                         height={400}
                         width={400}
                         className="product-image-skeleton"
-                        style={{ marginTop: "10px" }}
+                        style={{ marginTop: "25px" }}
                       />
                     ) : (
                       <div
@@ -1147,7 +1191,7 @@ const ProductDetail = () => {
                         className="thumbnail-skeletons"
                         style={{ display: "flex" }}
                       >
-                        {[...Array(5)].map((_, index) => (
+                        {[...Array(images.length)].map((_, index) => (
                           <Skeleton
                             key={index}
                             width={80}
@@ -1168,6 +1212,7 @@ const ProductDetail = () => {
                                 }`}
                               onClick={() => setSelectedImage(index)}
                               onMouseEnter={() => setSelectedImage(index)} // Update on hover
+                              alt="Thumbnail"
                             />
                           </div>
                         ))}
@@ -1217,6 +1262,14 @@ const ProductDetail = () => {
                       )}
                     </h2>
 
+                    <span className="product-detail-subtitle">
+                      {product.subtitle && loading ? (
+                        <Skeleton width={380} height={40} />
+                      ) : (
+                        product.subtitle
+                      )}
+                    </span>
+
                     {/* <span>{product.productType}</span> */}
 
                     {/* Coupon Section */}
@@ -1244,7 +1297,7 @@ const ProductDetail = () => {
                     {/* <img id="imgpmalogo" src="./themes/pmahomme/img/logo_left.png" alt="phpMyAdmin"> */}
 
                     {/* Price Section */}
-                    <p>
+                    <p style={{ marginTop: '5px' }}>
                       <div>
                         {loading ? (
                           <div style={{ display: "flex" }}>
@@ -1291,6 +1344,36 @@ const ProductDetail = () => {
                                   ? product.offer_price
                                   : product.prod_price)}
                             </span>
+
+                            {product.offer_price > 0 &&
+                              isOfferActive &&
+                              product.offer_price &&
+                              product.status === "available" &&
+                              remainingTime && (
+                                <div className="offer-timer">
+                                  {remainingTime.days ? (
+                                    <p style={{ color: "red" }}>
+                                      Offer ends in {remainingTime.days > 1 ? `${remainingTime.days} days` : `${remainingTime.days} day`}, Hurry up!
+                                    </p>
+                                  ) : (
+                                    <p>
+                                      Don't miss it! Deals end in{" "}
+                                      <span className="timer-tag">
+                                        {remainingTime.hours >= 1 &&
+                                          `${remainingTime.hours}h : `
+                                        }
+                                        {remainingTime.minutes >= 1 &&
+                                          `${remainingTime.minutes}m : `
+                                        }
+                                        {/* {remainingTime.minutes}m :{" "} */}
+                                        {remainingTime.seconds}s
+                                      </span>
+
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+
                             <div className="secure-delivery" style={{ color: "#28a745", marginTop: "5px" }}>
                               🚚 Secure delivery in 10 days, &nbsp;
 
@@ -1302,28 +1385,6 @@ const ProductDetail = () => {
                               {new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toLocaleDateString()}
                               ) */}
                             </div>
-                            {product.offer_price > 0 &&
-                              isOfferActive &&
-                              product.offer_price &&
-                              remainingTime && (
-                                <div className="offer-timer">
-                                  {remainingTime.days ? (
-                                    <p style={{ color: "red" }}>
-                                      {remainingTime.days} day(s) left for this
-                                      offer
-                                    </p>
-                                  ) : (
-                                    <p>
-                                      Deals end in{" "}
-                                      <span className="timer-tag">
-                                        {remainingTime.hours}h :{" "}
-                                        {remainingTime.minutes}m :{" "}
-                                        {remainingTime.seconds}s
-                                      </span>
-                                    </p>
-                                  )}
-                                </div>
-                              )}
                           </span>
                         )}
 
@@ -1457,37 +1518,7 @@ const ProductDetail = () => {
                           <span style={{ marginLeft: "10px" }}><FaBolt /></span>
                         </button>
 
-                        {/* Wishlist Heart Icon */}
-                        {loading ? (
-                          <Skeleton
-                            circle
-                            width={30}
-                            height={30}
-                            style={{ marginLeft: "10px" }}
-                          />
-                        ) : (
-                          <span
-                            title={
-                              favorites[`${product.id}`]
-                                ? "Remove from Wishlist"
-                                : "Add to Wishlist"
-                            }
-                            className={`heart-icon ${favorites[`${product.id}`] ? "filled" : ""
-                              }`}
-                            onClick={(event) =>
-                              handleToggleFavorite(product, event)
-                            }
-                          >
-                            {favorites[`${product.id}`] ? (
-                              <FaHeart
-                                title="Remove from wishlist"
-                                style={{ color: "red" }}
-                              />
-                            ) : (
-                              <FaRegHeart title="Add to wishlist" />
-                            )}
-                          </span>
-                        )}
+
                       </div>
                     ) : (
                       <p className="product-detail-out-of-stock">

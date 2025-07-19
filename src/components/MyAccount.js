@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
-import Header2 from "./Header2";
+// import Header2 from "./Header2";
 import Footer from "./footer";
 import fullad from "./img/banar3.png";
 import Logo from "./img/user.jpg";
 import { ApiUrl } from "./ApiUrl";
 import axios from "axios";
-import Modal from "react-modal"; // Install if needed using `npm install react-modal`
-import { FaTimes } from "react-icons/fa";
+// import Modal from "react-modal"; // Install if needed using `npm install react-modal`
+// import { FaTimes } from "react-icons/fa";
 import "./css/MyAccount.css"
 import { Link } from "react-router-dom";
-import stamp2 from "./img/cancelled-stamp.png";
+// import stamp2 from "./img/cancelled-stamp.png";
 
 const MyAccount = () => {
   const [user, setUser] = useState({ username: "", email: "" });
-  const [orders, setOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null); // For modal
-  const [productDetails, setProductDetails] = useState(null); // To store fetched product details
-  const [modalIsOpen, setModalIsOpen] = useState(false); // To open and close modal
+  const [, setOrders] = useState([]);
+  // const [, setSelectedOrder] = useState(null); // For modal
+  // const [productDetails, ] = useState(null); // To store fetched product details
+  // const [, setModalIsOpen] = useState(false); // To open and close modal
   const [address, setAddress] = useState(null);
 
   const userId = localStorage.getItem("user_id");
@@ -44,14 +44,14 @@ const MyAccount = () => {
       });
   }, [userId]);
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("default", { month: "short" });
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
-  };
+  // const formatDate = (dateString) => {
+  //   if (!dateString) return "N/A";
+  //   const date = new Date(dateString);
+  //   const day = date.getDate();
+  //   const month = date.toLocaleString("default", { month: "short" });
+  //   const year = date.getFullYear();
+  //   return `${day} ${month} ${year}`;
+  // };
 
   // Fetch user data from localStorage when the component mounts
   useEffect(() => {
@@ -79,76 +79,76 @@ const MyAccount = () => {
     } else {
       console.error("User ID not found in localStorage");
     }
-  }, []);
+  }, [userId]);
 
   // Function to capitalize the first letter of a string
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
 
-  const openModal = async (order) => {
-    setSelectedOrder(order);
-    setModalIsOpen(true);
+  // const openModal = async (order) => {
+  //   setSelectedOrder(order);
+  //   setModalIsOpen(true);
 
-    try {
-      const orderId = order.unique_id;
-      console.log("Fetching product details for Order ID:", orderId);
+  //   try {
+  //     const orderId = order.unique_id;
+  //     console.log("Fetching product details for Order ID:", orderId);
 
-      // Fetch product IDs using order_id
-      const productResponse = await axios.get(
-        `${ApiUrl}/getProductByOrderId/${orderId}`
-      );
-      console.log("Product Response Data:", productResponse.data);
+  //     // Fetch product IDs using order_id
+  //     const productResponse = await axios.get(
+  //       `${ApiUrl}/getProductByOrderId/${orderId}`
+  //     );
+  //     console.log("Product Response Data:", productResponse.data);
 
-      // Check if any product details are present
-      if (!productResponse.data || productResponse.data.length === 0) {
-        console.error("No products found for Order ID:", orderId);
-        return;
-      }
+  //     // Check if any product details are present
+  //     if (!productResponse.data || productResponse.data.length === 0) {
+  //       console.error("No products found for Order ID:", orderId);
+  //       return;
+  //     }
 
-      // Set product details directly from the response
-      setProductDetails(productResponse.data);
-    } catch (error) {
-      console.error("Error fetching product details:", error);
-    }
-  };
+  //     // Set product details directly from the response
+  //     setProductDetails(productResponse.data);
+  //   } catch (error) {
+  //     console.error("Error fetching product details:", error);
+  //   }
+  // };
 
-  const [currentProductIndex, setCurrentProductIndex] = useState(0); // State to track the current product index
+  // const [currentProductIndex, setCurrentProductIndex] = useState(0); // State to track the current product index
 
   // Check if productDetails is an array and has elements
-  const hasProducts =
-    Array.isArray(productDetails) && productDetails.length > 0;
+  // const hasProducts =
+  //   Array.isArray(productDetails) && productDetails.length > 0;
 
-  const handleNextProduct = () => {
-    if (hasProducts && currentProductIndex < productDetails.length - 1) {
-      setCurrentProductIndex(currentProductIndex + 1); // Move to the next product
-    }
-  };
+  // const handleNextProduct = () => {
+  //   if (hasProducts && currentProductIndex < productDetails.length - 1) {
+  //     setCurrentProductIndex(currentProductIndex + 1); // Move to the next product
+  //   }
+  // };
 
-  const handlePreviousProduct = () => {
-    if (hasProducts && currentProductIndex > 0) {
-      setCurrentProductIndex(currentProductIndex - 1); // Move to the previous product
-    }
-  };
+  // const handlePreviousProduct = () => {
+  //   if (hasProducts && currentProductIndex > 0) {
+  //     setCurrentProductIndex(currentProductIndex - 1); // Move to the previous product
+  //   }
+  // };
 
   // Only get the current product if hasProducts is true
-  const currentProduct = hasProducts
-    ? productDetails[currentProductIndex]
-    : null;
+  // const currentProduct = hasProducts
+  //   ? productDetails[currentProductIndex]
+  //   : null;
 
-  const closeModal = () => {
-    setModalIsOpen(false);
-    setProductDetails(null);
-  };
+  // const closeModal = () => {
+  //   setModalIsOpen(false);
+  //   setProductDetails(null);
+  // };
 
-  const handleProductChange = (event) => {
-    const productId = event.target.value;
-    setSelectedProduct(productId);
-  };
+  // const handleProductChange = (event) => {
+  //   const productId = event.target.value;
+  //   setSelectedProduct(productId);
+  // };
 
-  const [selectedProduct, setSelectedProduct] = useState(
-    orders[0]?.products?.[0]?.product_id
-  );
+  // const [selectedProduct, setSelectedProduct] = useState(
+  //   orders[0]?.products?.[0]?.product_id
+  // );
 
   return (
     <>
@@ -405,107 +405,107 @@ const MyAccount = () => {
 
 export default MyAccount;
 
-// Styles for the enhanced page
-const styles = {
-  bannerContainer: {
-    position: "relative",
-    width: "100%",
-    height: "250px",
-    overflow: "hidden",
-    marginTop: "0px",
-  },
-  bannerImage: {
-    width: "100%",
-    height: "100%",
-    // objectFit: "cover",
-  },
-  bannerTextContainer: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    color: "black",
-    textAlign: "center",
-  },
-  bannerText: {
-    fontSize: "2.5rem",
-    // fontWeight: "bold",
-  },
-  accountContainer: {
-    padding: "20px",
-    textAlign: "center",
-    maxWidth: "1000px",
-    margin: "0 auto",
-  },
-  profileCard: {
-    backgroundColor: "#fff",
-    borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-    padding: "20px",
-    marginBottom: "30px",
-    textAlign: "left",
-  },
-  profileHeader: {
-    display: "flex",
-    alignItems: "flex-start", // Align items to the top of the card
-    justifyContent: "space-between", // Distribute space between left and right sections
-    flexWrap: "wrap", // Allows wrapping for responsiveness
-  },
-  profileLeft: {
-    display: "flex",
-    alignItems: "center",
-    flex: 1, // Left side takes available space
-    marginRight: "20px", // Adds space between the left and right side
-    flexWrap: "wrap", // Allows wrapping for smaller screens
-    gap: "10px", // Adds spacing between elements
-  },
-  avatar: {
-    width: "150px",
-    height: "150px",
-    borderRadius: "50%",
-    marginRight: "20px",
-  },
-  profileName: {
-    fontSize: "1.8rem",
-    margin: 0,
-  },
-  profileEmail: {
-    fontSize: "1rem",
-    color: "#666",
-  },
-  profileAbout: {
-    marginTop: "10px",
-    fontSize: "1rem",
-    color: "#444",
-  },
-  addressCard: {
-    flex: 1, // Right side takes available space
-    textAlign: "left",
-    padding: "15px",
-    borderLeft: "2px solid #ddd", // Adds a separator between the two sections
-    marginTop: "10px",
-  },
-  infoSection: {
-    textAlign: "left",
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-    marginBottom: "20px",
+// // Styles for the enhanced page
+// const styles = {
+//   bannerContainer: {
+//     position: "relative",
+//     width: "100%",
+//     height: "250px",
+//     overflow: "hidden",
+//     marginTop: "0px",
+//   },
+//   bannerImage: {
+//     width: "100%",
+//     height: "100%",
+//     // objectFit: "cover",
+//   },
+//   bannerTextContainer: {
+//     position: "absolute",
+//     top: "50%",
+//     left: "50%",
+//     transform: "translate(-50%, -50%)",
+//     color: "black",
+//     textAlign: "center",
+//   },
+//   bannerText: {
+//     fontSize: "2.5rem",
+//     // fontWeight: "bold",
+//   },
+//   accountContainer: {
+//     padding: "20px",
+//     textAlign: "center",
+//     maxWidth: "1000px",
+//     margin: "0 auto",
+//   },
+//   profileCard: {
+//     backgroundColor: "#fff",
+//     borderRadius: "10px",
+//     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+//     padding: "20px",
+//     marginBottom: "30px",
+//     textAlign: "left",
+//   },
+//   profileHeader: {
+//     display: "flex",
+//     alignItems: "flex-start", // Align items to the top of the card
+//     justifyContent: "space-between", // Distribute space between left and right sections
+//     flexWrap: "wrap", // Allows wrapping for responsiveness
+//   },
+//   profileLeft: {
+//     display: "flex",
+//     alignItems: "center",
+//     flex: 1, // Left side takes available space
+//     marginRight: "20px", // Adds space between the left and right side
+//     flexWrap: "wrap", // Allows wrapping for smaller screens
+//     gap: "10px", // Adds spacing between elements
+//   },
+//   avatar: {
+//     width: "150px",
+//     height: "150px",
+//     borderRadius: "50%",
+//     marginRight: "20px",
+//   },
+//   profileName: {
+//     fontSize: "1.8rem",
+//     margin: 0,
+//   },
+//   profileEmail: {
+//     fontSize: "1rem",
+//     color: "#666",
+//   },
+//   profileAbout: {
+//     marginTop: "10px",
+//     fontSize: "1rem",
+//     color: "#444",
+//   },
+//   addressCard: {
+//     flex: 1, // Right side takes available space
+//     textAlign: "left",
+//     padding: "15px",
+//     borderLeft: "2px solid #ddd", // Adds a separator between the two sections
+//     marginTop: "10px",
+//   },
+//   infoSection: {
+//     textAlign: "left",
+//     backgroundColor: "#fff",
+//     padding: "20px",
+//     borderRadius: "10px",
+//     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+//     marginBottom: "20px",
 
-  },
-  "@media (max-width: 768px)": {
-    profileHeader: {
-      flexDirection: "column", // Stack image and details vertically
-      alignItems: "center", // Center align for a clean look
-      textAlign: "center",
-    },
-    avatar: {
-      marginRight: 0, // Remove right margin when stacked vertically
-      marginBottom: "15px", // Add some spacing below the image
-    },
-    profileName: {
-      fontSize: "1.5rem",
-    },
-  },
-};
+//   },
+//   "@media (max-width: 768px)": {
+//     profileHeader: {
+//       flexDirection: "column", // Stack image and details vertically
+//       alignItems: "center", // Center align for a clean look
+//       textAlign: "center",
+//     },
+//     avatar: {
+//       marginRight: 0, // Remove right margin when stacked vertically
+//       marginBottom: "15px", // Add some spacing below the image
+//     },
+//     profileName: {
+//       fontSize: "1.5rem",
+//     },
+//   },
+// };

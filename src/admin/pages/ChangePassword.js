@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 // import Slidebar from './Slidebar';
 // import Topbar from './Topbar';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
+// import Swal from 'sweetalert2';
 import axios from 'axios'; // Import axios for making API requests
 import './css/ChangePassword.css'; // Import the CSS file for styling
 import { ApiUrl } from '../../components/ApiUrl';

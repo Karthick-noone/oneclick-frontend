@@ -7,13 +7,13 @@ import { SearchIcon } from "lucide-react";
 
 const Reports = () => {
   const navigate = useNavigate();
-  const [salesReport, setSalesReport] = useState([]);
-  const [ordersReport, setOrdersReport] = useState([]);
+  const [, setSalesReport] = useState([]);
+  const [, setOrdersReport] = useState([]);
   const [customersReport, setCustomersReport] = useState([]);
 
   // Pagination States
-  const [currentPageOrders, setCurrentPageOrders] = useState(1);
-  const [currentPageSales, setCurrentPageSales] = useState(1);
+  // const [currentPageOrders, setCurrentPageOrders] = useState(1);
+  // const [currentPageSales, setCurrentPageSales] = useState(1);
   const [currentPageCustomers, setCurrentPageCustomers] = useState(1);
 
   const [itemsPerPage] = useState(10); // Number of items per page

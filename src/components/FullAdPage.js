@@ -23,19 +23,23 @@ const FullAdPage = () => {
     fetchAdImages();
   }, []);
 
-  const categoryMap = {
+// Memoize categoryMap so it's stable
+const categoryMap = useMemo(
+  () => ({
     TV: "TV",
     Speakers: "Speaker",
     // Add other mappings as needed
-  };
+  }),
+  []
+);
 
-  // Preprocess ads for efficiency
-  const processedAds = useMemo(() => {
-    return adImages.map((ad) => ({
-      ...ad,
-      mappedCategory: categoryMap[ad.category] || ad.category,
-    }));
-  }, [adImages]);
+const processedAds = useMemo(() => {
+  return adImages.map((ad) => ({
+    ...ad,
+    mappedCategory: categoryMap[ad.category] || ad.category,
+  }));
+}, [adImages, categoryMap]); //  Added categoryMap
+
 
   return (
     <div className="full-page-container">

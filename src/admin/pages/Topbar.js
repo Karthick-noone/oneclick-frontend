@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./css/Topbar.css";
-import { FaBell, FaUserCircle, FaPowerOff, FaUser } from "react-icons/fa";
+import {  FaUserCircle, FaPowerOff, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import user from "./img/user.jpg";
 import axios from "axios";
@@ -133,16 +133,16 @@ const Topbar = () => {
     });
   };
 
-  const toggleNotification = () => {
-    setIsNotificationOpen((prevState) => {
-      if (prevState) {
-        return false; // If notification is open, close it
-      } else {
-        setIsMenuOpen(false); // Close menu if notification is opened
-        return true;
-      }
-    });
-  };
+  // const toggleNotification = () => {
+  //   setIsNotificationOpen((prevState) => {
+  //     if (prevState) {
+  //       return false; // If notification is open, close it
+  //     } else {
+  //       setIsMenuOpen(false); // Close menu if notification is opened
+  //       return true;
+  //     }
+  //   });
+  // };
 
   const handleClickOutside = (event) => {
     if (

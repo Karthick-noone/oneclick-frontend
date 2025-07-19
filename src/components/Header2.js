@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   FaSearch,
-  FaUser,
-  FaHeart,
-  FaShoppingCart,
+  // FaUser,
+  // FaHeart,
+  // FaShoppingCart,
   FaTimes,
   FaEllipsisV,
-  FaInfoCircle,
-  FaEnvelope,
-  FaQuestionCircle,
-  FaShoppingBag,
-  FaAddressBook,
-  FaPowerOff,
-  FaBox,
+  // FaInfoCircle,
+  // FaEnvelope,
+  // FaQuestionCircle,
+  // FaShoppingBag,
+  // FaAddressBook,
+  // FaPowerOff,
+  // FaBox,
   FaChevronDown
 } from "react-icons/fa";
 import "./../styles.css"; // Adjust path as needed
@@ -20,8 +20,8 @@ import "./css/Header2.css"; // Adjust path as needed
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import UserCard from "./UserCard"; // Import UserCard component
 import WishlistSidebar from "./WishlistSidebar"; // Import WishlistSidebar component
-import logo from "./img/logo3.png";
-import { toast, ToastContainer } from "react-toastify";
+// import logo from "./img/logo3.png";
+import { toast, } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ApiUrl } from "./ApiUrl";
 import axios from "axios";
@@ -42,9 +42,9 @@ import usericon from "./img/user.png";
 import defaultUser from "./img/default-picture.png";
 import wishlisticon from "./img/wish-list.png";
 import carticon from "./img/shopping-cart3.png";
-import { Search, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 
-const Header2 = () => {
+const Header2 = ({ header2Ref }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isUserCardOpen, setIsUserCardOpen] = useState(false);
@@ -52,24 +52,56 @@ const Header2 = () => {
   const [cartItems, setCartItems] = useState([]);
   const [wishlistItems, setWishlistItems] = useState([]);
   const userCardRef = useRef(null);
-  const [isMobileView, setIsMobileView] = useState(false);
+  const [, setIsMobileView] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [suggestions, setSuggestions] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDropdownOpen4, setIsDropdownOpen4] = useState(false);
-  const [isDropdownOpen3, setIsDropdownOpen3] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); // State to hold error message
+  // const [isDropdownOpen3, setIsDropdownOpen3] = useState(false);
+  // const [errorMessage, setErrorMessage] = useState(""); // State to hold error message
   const dropdownRef = useRef(null);
   const [username, setUsername] = useState("");
-  const [isOfferActive, setIsOfferActive] = useState(true);
-  const [product, setProduct] = useState(null);
+  const [isOfferActive,] = useState(true);
+  const [product,] = useState(null);
   const [cartLoaded, setCartLoaded] = useState(false);
-  const [query, setQuery] = useState(""); // ✅ Fix: Declare query state
+  const [, setQuery] = useState(""); //  Fix: Declare query state
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   // const [cartItems, setCartItems] = useState([]);
   const [cartCount, setCartCount] = useState(0);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const tooltipTimerRef = useRef(null);
+
+  // Auto show tooltip every 5 mins
+  useEffect(() => {
+    if (!username) {
+      // Show tooltip immediately on mount
+      setShowTooltip(true);
+
+      // Hide it after 10 seconds
+      const hideTimeout = setTimeout(() => {
+        setShowTooltip(false);
+      }, 10000); // 10,000 ms = 10 sec
+
+      // Start interval to show every 5 minutes
+      tooltipTimerRef.current = setInterval(() => {
+        setShowTooltip(true);
+
+        // Hide tooltip automatically after 10 seconds
+        setTimeout(() => {
+          setShowTooltip(false);
+        }, 10000); // Hide after 10 seconds
+      }, 300000); // 300,000 ms = 5 mins
+
+      // Cleanup timers
+      return () => {
+        clearTimeout(hideTimeout);
+        clearInterval(tooltipTimerRef.current);
+      };
+    }
+  }, [username]);
 
   useEffect(() => {
     const email = localStorage.getItem("email");
@@ -119,7 +151,7 @@ const Header2 = () => {
 
   const inputRef = useRef(null);
   const imgRef = useRef(null);
-  const containerRef = useRef(null);
+  // const containerRef = useRef(null);
 
   const location = useLocation();
 
@@ -314,7 +346,7 @@ const Header2 = () => {
 
   // Debounce API calls
   useEffect(() => {
-    console.log(`Search query changed: ${searchQuery}`);
+    // console.log(`Search query changed: ${searchQuery}`);
     const timer = setTimeout(() => {
       if (searchQuery.trim()) {
         fetchSuggestions(searchQuery.trim().toLowerCase());
@@ -324,12 +356,12 @@ const Header2 = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const handleSuggestionClick = (suggestion) => {
-    console.log(`Suggestion clicked: ${suggestion}`);
-    setSearchQuery(suggestion);
-    setShowSuggestions(false);
-    handleSearch(); // Perform search
-  };
+  // const handleSuggestionClick = (suggestion) => {
+  //   console.log(`Suggestion clicked: ${suggestion}`);
+  //   setSearchQuery(suggestion);
+  //   setShowSuggestions(false);
+  //   handleSearch(); // Perform search
+  // };
 
   const handleSearchInputChange = (e) => {
     const value = e.target.value;
@@ -346,7 +378,7 @@ const Header2 = () => {
 
 
 
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     let finalQuery = searchQuery.trim().toLowerCase();
 
     // If a suggestion is highlighted, prefer that
@@ -391,7 +423,8 @@ const Header2 = () => {
         confirmButtonText: "OK",
       });
     }
-  };
+  }, [searchQuery, highlightedIndex, suggestions, navigate]); //  Added dependencies
+
 
 
   const handleKeyPress = (e) => {
@@ -469,22 +502,22 @@ const Header2 = () => {
       .toFixed(0);
   };
 
-  const discount = () => {
-    return cartItems
-      .reduce((total, item) => {
-        const actual_price = parseFloat(item.actual_price);
-        const price = parseFloat(item.price);
-        const discountPerItem = actual_price - price;
-        return (
-          total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
-        );
-      }, 0)
-      .toFixed(2);
-  };
+  // const discount = () => {
+  //   return cartItems
+  //     .reduce((total, item) => {
+  //       const actual_price = parseFloat(item.actual_price);
+  //       const price = parseFloat(item.price);
+  //       const discountPerItem = actual_price - price;
+  //       return (
+  //         total + (isNaN(discountPerItem) ? 0 : discountPerItem * item.quantity)
+  //       );
+  //     }, 0)
+  //     .toFixed(2);
+  // };
 
-  const getTotalItemsCount = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0); // Ensure quantity is a valid number
-  };
+  // const getTotalItemsCount = () => {
+  //   return cartItems.reduce((total, item) => total + item.quantity, 0); // Ensure quantity is a valid number
+  // };
 
   // const updateCartItemQuantity = (itemId, itemCategory, newQuantity) => {
   //   const updatedCartItems = cartItems.map((item) =>
@@ -627,7 +660,7 @@ const Header2 = () => {
           timer: 3000,
           timerProgressBar: false,
         });    //  Trigger cart-updated event (for navbar badge)
-        window.dispatchEvent(new Event("cart-updated"));
+        // window.dispatchEvent(new Event("cart-updated"));
 
       } else {
         toast.error("Failed to remove item from cart");
@@ -850,15 +883,18 @@ const Header2 = () => {
   //   // Add other mappings as needed
   // };
   const [isLoading, setIsLoading] = useState(true);
-  const email = localStorage.getItem("email");
+  // const [delayFetch, setDelayFetch] = useState(false); // Added flag
+
+  // const email = localStorage.getItem("email");
   // Fetch cart only if not already loaded or forceRefresh is true
-  const fetchCartItems = async (forceRefresh = false) => {
+  const fetchCartItems = useCallback(async (forceRefresh = false) => {
     if (cartLoaded && !forceRefresh) {
       console.log("Cart already loaded, skipping fetch...");
-      return; // ✅ Use cached cart for instant load
+      return;
     }
 
-    setIsLoading(true); // Show loading spinner (optional)
+    setIsLoading(true);
+
 
     try {
       const email = localStorage.getItem("email");
@@ -871,7 +907,7 @@ const Header2 = () => {
 
       const fetchedCart = response.data.products || [];
       setCartItems(fetchedCart);
-      setCartLoaded(true); // ✅ Mark as loaded
+      setCartLoaded(true);
 
       console.log("Fetched cart items:", fetchedCart);
     } catch (error) {
@@ -879,21 +915,19 @@ const Header2 = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [cartLoaded]); //  Add stable dependencies
 
-  // Fetch cart immediately when sidebar opens
   useEffect(() => {
     if (isSidebarOpen) {
       console.log("Sidebar opened, fetching cart items...");
       fetchCartItems();
     }
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, fetchCartItems]); //  Add fetchCartItems
 
-  // Listen for global cart updates (force refresh)
   useEffect(() => {
     const handleCartUpdate = () => {
       console.log("[Event] Cart updated, refetching...");
-      fetchCartItems(true); //  Force refresh on cart changes
+      fetchCartItems(true);
     };
 
     window.addEventListener("cart-updated", handleCartUpdate);
@@ -901,7 +935,7 @@ const Header2 = () => {
     return () => {
       window.removeEventListener("cart-updated", handleCartUpdate);
     };
-  }, []);
+  }, [fetchCartItems]); //  Add fetchCartItems
 
 
   const handleViewCart = () => {
@@ -921,7 +955,7 @@ const Header2 = () => {
   }, [highlightedIndex]);
 
 
-  const handleSelect = async (suggestion) => {
+  const handleSelect = useCallback(async (suggestion) => {
     setQuery(suggestion); // Update input field
     setShowSuggestions(false); // Hide dropdown
     setShowMobileSearch(false);
@@ -971,31 +1005,41 @@ const Header2 = () => {
         confirmButtonText: "OK",
       });
     }
-  };
+  }, [navigate, handleSearch]); //  Add dependencies
+
 
 
   // Handle Keyboard Events
-  const handleKeyDown = (e) => {
-    if (!showSuggestions || suggestions.length === 0) return;
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (!showSuggestions || suggestions.length === 0) return;
 
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightedIndex((prev) =>
-        prev === 0 ? suggestions.length - 1 : prev - 1
-      );
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (highlightedIndex >= 0) {
-        const selected = suggestions[highlightedIndex];
-        const query = selected?.prod_name || selected;
-        handleSelect(query); // Send prod_name like in old dropdown
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev === 0 ? suggestions.length - 1 : prev - 1
+        );
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (highlightedIndex >= 0) {
+          const selected = suggestions[highlightedIndex];
+          const query = selected?.prod_name || selected;
+          handleSelect(query); // Send prod_name like in old dropdown
+        }
       }
-    }
-  };
+    },
+    [
+      showSuggestions,
+      suggestions,
+      highlightedIndex,
+      handleSelect, //  Added dependencies
+    ]
+  );
 
+  // Scroll selected suggestion into view
   useEffect(() => {
     if (
       highlightedIndex !== null &&
@@ -1008,17 +1052,21 @@ const Header2 = () => {
     }
   }, [highlightedIndex]);
 
-
+  // Attach keyboard listener to inputRef
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.addEventListener("keydown", handleKeyDown);
+    const inputElement = inputRef.current; // ✅ Cache ref to avoid stale cleanup
+
+    if (inputElement) {
+      inputElement.addEventListener("keydown", handleKeyDown);
     }
+
     return () => {
-      if (inputRef.current) {
-        inputRef.current.removeEventListener("keydown", handleKeyDown);
+      if (inputElement) {
+        inputElement.removeEventListener("keydown", handleKeyDown);
       }
     };
-  }, [suggestions, highlightedIndex, showSuggestions]);
+  }, [handleKeyDown]); //  Only depends on handleKeyDown
+
 
   const handleProductClick = (product) => {
     const slugify = (name) =>
@@ -1029,21 +1077,21 @@ const Header2 = () => {
 
     navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
+  
   return (
     <>
       <header
         // style={{ position: "sticky", top: 0, zIndex: 1001 }}
         className="header2"
+         ref={header2Ref}
       >
         {/* <div className="company-name"> */}
-        <Link to="/">
+        <Link to="/" className="logo-link">
           <img
-            src={logo}
-            width={"230px"}
+            src="/img/logo3.png"
+            width="230px"
             style={{ marginLeft: "50px" }}
             alt="Company Logo"
-            // loading="lazy"
-            loading="eager"
           />
         </Link>
 
@@ -1135,16 +1183,39 @@ const Header2 = () => {
 
         <div className="iconss">
 
-          <div ref={imgRef} className="userLogo" onClick={toggleUserCard}>
+          <div
+            ref={imgRef}
+            className="userLogo"
+            onClick={() => {
+              if (!username) {
+                // Redirect to login page
+                navigate("/login");
+              } else {
+                toggleUserCard();
+              }
+            }}
+          >
             <img
               title={username ? `Logged in as ${username}` : "Login"}
-
               className="icons"
               src={username ? usericon : defaultUser}
-              style={{ width: "28px", height: "28px", borderRadius: "50%", objectFit: "cover" }}
+              style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "50%",
+                objectFit: "cover"
+              }}
               alt=""
             />
-            <span style={{ fontSize: "14px", color: "#fff", display: "flex", alignItems: "center", gap: "4px" }}>
+            <span
+              style={{
+                fontSize: "14px",
+                color: "#fff",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px"
+              }}
+            >
               {username ? (
                 <>
                   <FaChevronDown
@@ -1156,6 +1227,13 @@ const Header2 = () => {
                 <>Login</>
               )}
             </span>
+
+            {/* Tooltip */}
+            {!username && showTooltip && (
+              <div className="login-tooltip">
+                LOGIN
+              </div>
+            )}
           </div>
 
 
@@ -1224,7 +1302,7 @@ const Header2 = () => {
                   }}
                 >
                   {/* <FaPowerOff style={{ color: "#333" }} /> */}
-                  <svg width="24" height="24" class="" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#2A55E5" stroke-width="0.3" stroke="#2A55E5" d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"></path></svg>
+                  <svg width="24" height="24"  viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#2A55E5" stroke-width="0.3" stroke="#2A55E5" d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"></path></svg>
                   <span style={{ fontSize: '16px' }}> Logout </span>
                 </Link>
               </div>
@@ -1326,7 +1404,7 @@ const Header2 = () => {
           </div>
           <div className="mobile-search-icon" onClick={openMobileSearch}>
             {/* <FaSearch /> */}
-            <img src={searchIcon} className="search-product-icon" width={"28px"} />
+            <img src={searchIcon} className="search-product-icon" width={"28px"} alt="search product" />
 
           </div>
 
@@ -1353,25 +1431,35 @@ const Header2 = () => {
           <div className="sidebarcart-body">
             {isLoading ? (
 
+              <ul>
+                {[...Array(cartItems.length)].map((_, index) => (
+                  <li key={index} className="cart-item skeleton-cart-item">
+                    <div className="skeleton-product-image"></div>
+                    <div className="item-details">
+                      <div className="skeleton-text skeleton-title"></div>
+                      <div className="skeleton-text skeleton-price"></div>
+                    </div>
+                    <div className="item-price">
+                      <div className="skeleton-quantity"></div>
+                      <div className="skeleton-remove-btn"></div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+            ) : cartItems.length === 0 ? (
+
               <>
                 <p style={{ textAlign: "center" }}>Your cart is empty.</p>
                 <div style={{ display: "flex", justifyContent: "center", marginTop: "5px" }}>
                   {/* <Lottie animationData={empty_cart} style={{ width: 250, height: 250 }} /> */}
                   <img src={Empty_cart} className="empty-cart-image" alt="Cart is Empty" />
+
                 </div>
-              </>) : cartItems.length === 0 ? (
 
-                <>
-                  <p style={{ textAlign: "center" }}>Your cart is empty.</p>
-                  <div style={{ display: "flex", justifyContent: "center", marginTop: "5px" }}>
-                    {/* <Lottie animationData={empty_cart} style={{ width: 250, height: 250 }} /> */}
-                    <img src={Empty_cart} className="empty-cart-image" alt="Cart is Empty" />
-
-                  </div>
-
-                </>) : (
+              </>) : (
               <ul>
-                {cartItems.map((item) => {
+                {[...cartItems].reverse().map((item) => {
                   // Check if image is a stringified array and parse it
                   const images = Array.isArray(item.prod_img)
                     ? item.prod_img
@@ -1416,23 +1504,25 @@ const Header2 = () => {
                       </div>
 
                       <div className="item-price">
-                        <p
-                          style={{
-                            color: "red",
-                            textDecoration: "line-through",
-                            fontSize: "12px",
-                          }}
-                        >
-                          ₹{item.actual_price * item.quantity}
-                        </p>
-                        <p style={{ color: "#27ae60" }}>
-                          {" "}
-                          {/* ₹{item.prod_price * item.quantity} */}₹
-                          {item.offer_price > 0 && isOfferValid(item)
-                            ? item.offer_price
-                            : item.prod_price}
+                        <div style={{ display: 'flex' }}>
+                          <p
+                            style={{
+                              color: "red",
+                              textDecoration: "line-through",
+                              fontSize: "12px",
+                            }}
+                          >
+                            ₹{item.actual_price * item.quantity}
+                          </p>
+                          <p style={{ color: "#27ae60", marginLeft: '10px' }}>
+                            {" "}
+                            {/* ₹{item.prod_price * item.quantity} */}₹
+                            {item.offer_price > 0 && isOfferValid(item)
+                              ? item.offer_price
+                              : item.prod_price}
 
-                        </p>
+                          </p>
+                        </div>
 
                         <div className="quantity-controls">
                           <button
@@ -1464,6 +1554,8 @@ const Header2 = () => {
                           Remove
                         </button>
                       </div>
+
+
                     </li>
                   );
                 })}
@@ -1494,11 +1586,11 @@ const Header2 = () => {
   <div class="text">View Cart</div>
 </button> */}
 
-                  <button class="cssbuttons-io-button">
+                  <button className="cssbuttons-io-button">
                     View Cart
-                    <div class="icon3" onClick={handleViewCart}>
+                    <div className="icon3" onClick={handleViewCart}>
                       <svg
-                        class="svg-icon"
+                        className="svg-icon"
                         viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg"
                       >

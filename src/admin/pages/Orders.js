@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./css/Orders.css";
@@ -6,7 +6,7 @@ import { ApiUrl } from "../../components/ApiUrl";
 import Modal from "react-modal"; // Install if needed using `npm install react-modal`
 import Swal from "sweetalert2"; // For better confirmation, install with `npm install sweetalert2`
 import OrderTrackingModal from "./OrderTrackingModal";
-import logo from "./img/logo3.png"; // Ensure the path is correct
+// import logo from "./img/logo3.png"; // Ensure the path is correct
 import PrintModal from "./PrintModal";
 import Invoice from "./Invoice"; // Your invoice component
 import { InfoIcon, CopyIcon, X } from "lucide-react";
@@ -19,10 +19,10 @@ import {
   FaCheck,
 } from "react-icons/fa";
 
-import ReactDOMServer from "react-dom/server"; // Add this import at the top
+// import ReactDOMServer from "react-dom/server"; // Add this import at the top
 import { SearchIcon } from "lucide-react";
 
-const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
+const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -44,7 +44,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState({ order: null, productDetails: [] });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [currentPaymentId, setCurrentPaymentId] = useState(""); // 🔥 Add this
+  const [currentPaymentId, setCurrentPaymentId] = useState(""); //  Add this
 
   const handleCopyPaymentId = (paymentId) => {
     navigator.clipboard.writeText(paymentId);
@@ -85,9 +85,9 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
     setModalOpen(true);
   };
 
-  const handlePrintModal = () => {
-    window.print();
-  };
+  // const handlePrintModal = () => {
+  //   window.print();
+  // };
 
 
   const handleStatusChange = (e) => {
@@ -146,18 +146,18 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
     }
   };
 
-  const yearRef = useRef(null);
-  const monthRef = useRef(null);
+  // const yearRef = useRef(null);
+  // const monthRef = useRef(null);
 
-  const handleYearChange = (event) => {
-    setYear(event.target.value);
-    yearRef.current.focus(); // Set focus back to the year field
-  };
+  // const handleYearChange = (event) => {
+  //   setYear(event.target.value);
+  //   yearRef.current.focus(); // Set focus back to the year field
+  // };
 
-  const handleMonthChange = (event) => {
-    setMonth(event.target.value);
-    monthRef.current.focus(); // Set focus back to the month field
-  };
+  // const handleMonthChange = (event) => {
+  //   setMonth(event.target.value);
+  //   monthRef.current.focus(); // Set focus back to the month field
+  // };
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
@@ -197,7 +197,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
     }
   }, [navigate]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${ApiUrl}/fetchorders`);
@@ -221,15 +221,16 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); //  Include ApiUrl as dependency if needed
 
   useEffect(() => {
     fetchOrders(); // Call fetchOrders when the component mounts
-  }, []);
+  }, [fetchOrders]); //  Safe dependency array
 
-  const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-  };
+
+  // const capitalizeFirstLetter = (string) => {
+  //   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  // };
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -481,41 +482,41 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
     }
   }, [selectedOrder]); // Run effect when selectedOrder changes
 
-  const printInvoice = async (order) => {
-    console.log("Preparing to print invoice for order:", order);
+  // const printInvoice = async (order) => {
+  //   console.log("Preparing to print invoice for order:", order);
 
-    // Fetch product details before printing
-    const details = await fetchProductDetails(order.unique_id); // Get product details
+  //   // Fetch product details before printing
+  //   const details = await fetchProductDetails(order.unique_id); // Get product details
 
-    // Log the product details to be printed
-    console.log("Product details to print:", details);
+  //   // Log the product details to be printed
+  //   console.log("Product details to print:", details);
 
-    if (!details || details.length === 0) {
-      console.error("No product details available to print. Aborting print.");
-      return; // Exit if no product details
-    }
+  //   if (!details || details.length === 0) {
+  //     console.error("No product details available to print. Aborting print.");
+  //     return; // Exit if no product details
+  //   }
 
-    const printWindow = window.open("", "_blank");
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Invoice</title>
-          <style>
-            body { font-family: Arial, sans-serif; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid black; padding: 8px; text-align: left; }
-          </style>
-        </head>
-        <body>
-          ${ReactDOMServer.renderToStaticMarkup(
-      <Invoice order={order} productDetails={details} />
-    )}
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-  };
+  //   const printWindow = window.open("", "_blank");
+  //   printWindow.document.write(`
+  //     <html>
+  //       <head>
+  //         <title>Invoice</title>
+  //         <style>
+  //           body { font-family: Arial, sans-serif; }
+  //           table { width: 100%; border-collapse: collapse; }
+  //           th, td { border: 1px solid black; padding: 8px; text-align: left; }
+  //         </style>
+  //       </head>
+  //       <body>
+  //         ${ReactDOMServer.renderToStaticMarkup(
+  //     <Invoice order={order} productDetails={details} />
+  //   )}
+  //       </body>
+  //     </html>
+  //   `);
+  //   printWindow.document.close();
+  //   printWindow.print();
+  // };
 
   const cancelOrder = async (orderId) => {
     try {
@@ -621,15 +622,15 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
               style={{
                 display: "flex",
                 alignItems: "center",
-                border: "1px solid #ddd",        // 🔥 Outer border
-                borderRadius: "6px",             // 🔥 Rounded corners
-                overflow: "hidden",              // 🔥 Clip borders on spans
+                border: "1px solid #ddd",        //  Outer border
+                borderRadius: "6px",             //  Rounded corners
+                overflow: "hidden",              //  Clip borders on spans
               }}
             >
               <span
                 style={{
                   padding: "3px 12px",
-                  borderRight: "1px solid #ddd", // 🔥 Right border
+                  borderRight: "1px solid #ddd", //  Right border
                 }}
               >
                 <strong>Year:</strong> {filterYear || "All"}
@@ -637,7 +638,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
               <span
                 style={{
                   padding: "3px 12px",
-                  borderRight: "1px solid #ddd", // 🔥 Right border
+                  borderRight: "1px solid #ddd", //  Right border
                 }}
               >
                 <strong>Month:</strong>{" "}
@@ -734,7 +735,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                     <th>View/Delete</th>
                     <th>Delivery Status</th>
                     <th>Current Status</th> {/* New Column */}
-                    <th>Print Invoice</th>
+                    <th>Print</th>
                     <th>Cancel Order</th>
                   </tr>
                 </thead>
@@ -858,73 +859,7 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
 
 
 
-                          {showPaymentModal && (
-                            <div
-                              style={{
-                                position: "fixed",
-                                inset: 0,
-                                backgroundColor: "rgba(0,0,0,0.4)",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                zIndex: 9999,
-                              }}
-                            >
-                              <div
-                                style={{
-                                  background: "white",
-                                  padding: "20px",
-                                  borderRadius: "8px",
-                                  maxWidth: "400px",
-                                  width: "100%",
-                                  textAlign: "center",
-                                  position: "relative",
-                                }}
-                              >
-                                <button
-                                  onClick={() => setShowPaymentModal(false)}
-                                  style={{
-                                    position: "absolute",
-                                    top: "10px",
-                                    right: "10px",
-                                    background: "transparent",
-                                    border: "none",
-                                    fontSize: "1.5rem",
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  <X size={20} />
-                                </button>
-                                <h3 style={{ marginBottom: "10px" }}>Payment ID</h3>
-                                <div
-                                  style={{
-                                    display: "flex",               //  Arrange content in a row
-                                    alignItems: "center",          //  Vertically center text and icon
-                                    padding: "10px",
-                                    border: "1px solid #ccc",
-                                    borderRadius: "4px",
-                                    wordBreak: "break-all",
-                                  }}
-                                >
-                                  <span style={{ flex: 1 }}>{currentPaymentId}</span>
 
-                                  <button
-                                    onClick={() => handleCopyPaymentId(currentPaymentId)}
-                                    style={{
-                                      marginLeft: "10px",          // Small space between text & button
-                                      background: "transparent",
-                                      border: "none",
-                                      cursor: "pointer",
-                                    }}
-                                    title="Copy Payment ID"
-                                  >
-                                    <CopyIcon size={18} color="black" />
-                                  </button>
-                                </div>
-
-                              </div>
-                            </div>
-                          )}
                           <td>₹{order.total_amount || "N/A"}</td>
                           <td>
                             <div className="btn-container">
@@ -1024,6 +959,76 @@ const Orders = ({ year, setYear, month, setMonth, updateOrderStatus }) => {
                   )}
                 </tbody>
               </table>
+
+              {showPaymentModal && (
+                <div
+                  style={{
+                    position: "fixed",
+                    inset: 0,
+                    backgroundColor: "rgba(0, 0, 0, 0.4)", // semi-transparent overlay
+                    backdropFilter: "blur(6px)", // adds the blur effect
+                    WebkitBackdropFilter: "blur(8px)", // for Safari support
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    zIndex: 9999,
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "white",
+                      padding: "20px",
+                      borderRadius: "8px",
+                      maxWidth: "400px",
+                      width: "100%",
+                      textAlign: "center",
+                      position: "relative",
+                    }}
+                  >
+                    <button
+                      onClick={() => setShowPaymentModal(false)}
+                      style={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "10px",
+                        background: "transparent",
+                        border: "none",
+                        fontSize: "1.5rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <X size={20} />
+                    </button>
+                    <h3 style={{ marginBottom: "10px" }}>Payment ID</h3>
+                    <div
+                      style={{
+                        display: "flex",               //  Arrange content in a row
+                        alignItems: "center",          //  Vertically center text and icon
+                        padding: "10px",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        wordBreak: "break-all",
+                      }}
+                    >
+                      <span style={{ flex: 1 }}>{currentPaymentId}</span>
+
+                      <button
+                        onClick={() => handleCopyPaymentId(currentPaymentId)}
+                        style={{
+                          marginLeft: "10px",          // Small space between text & button
+                          background: "transparent",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                        title="Copy Payment ID"
+                      >
+                        <CopyIcon size={18} color="black" />
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              )}
               <PrintModal
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}

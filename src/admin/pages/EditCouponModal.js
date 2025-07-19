@@ -8,29 +8,29 @@ const EditCouponModal = ({
   isOpen,
   onClose,
   coupon,
-  onCouponUpdated,
+  // onCouponUpdated,
   productPrice,
-  productId,
+  // productId,
 }) => {
   const [expiryDate, setExpiryDate] = useState("");
   const [couponCode, setCouponCode] = useState("");
   const [couponValue, setCouponValue] = useState("");
 
-  console.log("productPricehjghjghkhgk", productPrice);
-  console.log("productId", productId);
-useEffect(() => {
-  if (coupon) {
-    const dateObj = new Date(coupon.expiry_date);
-    const yyyy = dateObj.getFullYear();
-    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const dd = String(dateObj.getDate()).padStart(2, '0');
-    const formattedDate = `${yyyy}-${mm}-${dd}`; // Local time without timezone shift
+  // console.log("productPricehjghjghkhgk", productPrice);
+  // console.log("productId", productId);
+  useEffect(() => {
+    if (coupon) {
+      const dateObj = new Date(coupon.expiry_date);
+      const yyyy = dateObj.getFullYear();
+      const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const dd = String(dateObj.getDate()).padStart(2, '0');
+      const formattedDate = `${yyyy}-${mm}-${dd}`; // Local time without timezone shift
 
-    setExpiryDate(formattedDate);
-    setCouponCode(coupon.coupon_code);
-    setCouponValue(coupon.discount_value);
-  }
-}, [coupon]);
+      setExpiryDate(formattedDate);
+      setCouponCode(coupon.coupon_code);
+      setCouponValue(coupon.discount_value);
+    }
+  }, [coupon]);
 
   const handleUpdateCoupon = async () => {
     try {
@@ -51,6 +51,14 @@ useEffect(() => {
         return;
       }
 
+      if (Number(couponValue) === 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Input",
+          text: "Coupon value should not be 0",
+        });
+        return;
+      }
 
 
       // Check if coupon code is provided and not just spaces

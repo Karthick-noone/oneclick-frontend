@@ -1,134 +1,209 @@
 .profile-card-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .profile-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    margin-bottom: 10px;
-  }
-  
-  .profile-username {
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
-  }
-  
-  .pop-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(158, 158, 158, 0.7); /* Semi-transparent gray overlay */
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    z-index: 1000; /* Ensure this is above other elements */
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.profile-username {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+}
+
+.pop-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(158, 158, 158, 0.7);
+  /* Semi-transparent gray overlay */
+  display: flex;
+  justify-content: center;
+  /* Center horizontally */
+  align-items: center;
+  /* Center vertically */
+  z-index: 1000;
+  /* Ensure this is above other elements */
+}
+
+.pop-content {
+  background: white;
+  /* White background for the popup */
+  border-radius: 10px;
+  /* Slightly rounded corners */
+  width: 400px;
+  /* Fixed width */
+  height: 350px;
+  /* Fixed height */
+  position: relative;
+  /* Relative positioning for close button */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  /* Enhanced shadow for depth */
+  overflow: hidden;
+  /* Hide overflow to remove scrollbar */
+  padding: 20px;
+  /* Add padding for better spacing */
+  overflow-y: auto;
+  /* Enable vertical scrolling if content overflows */
+
+}
+
+.pop-content h2 {
+  margin-bottom: 15px;
+  /* Space below title */
+  font-size: 1.5em;
+  /* Increase title font size */
+  color: #333;
+  /* Darker color for title */
+  text-align: center;
+  /* Center align the title */
+}
+
+.pop-content input {
+  width: calc(100% - 20px);
+  /* Full width minus padding */
+  margin: 10px 0;
+  padding: 10px;
+  /* Increased padding for better touch targets */
+  border: 1px solid #ccc;
+  /* Light border */
+  border-radius: 4px;
+  /* Rounded corners */
+  font-size: 1em;
+  /* Consistent font size */
+}
+
+.coupon-btn {
+  margin-right: 10px;
+  padding: 10px 15px;
+  /* Increased padding for buttons */
+  border: none;
+  /* Remove default border */
+  border-radius: 4px;
+  /* Rounded corners */
+  background-color: #007BFF;
+  /* Primary color */
+  color: white;
+  /* White text */
+  font-size: 1em;
+  /* Consistent font size */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  transition: background-color 0.3s;
+  /* Smooth transition for background color */
+}
+
+@media (max-width: 768px) {
   .pop-content {
-    background: white; /* White background for the popup */
-    border-radius: 10px; /* Slightly rounded corners */
-    width: 400px; /* Fixed width */
-    height: 350px; /* Fixed height */
-    position: relative; /* Relative positioning for close button */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
-    overflow: hidden; /* Hide overflow to remove scrollbar */
-    padding: 20px; /* Add padding for better spacing */
-    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+    background: white;
+    /* White background for the popup */
+    border-radius: 10px;
+    /* Slightly rounded corners */
+    width: 310px;
+    /* Fixed width */
+    height: 350px;
+    /* Fixed height */
+    position: relative;
+    /* Relative positioning for close button */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    /* Enhanced shadow for depth */
+    overflow: hidden;
+    /* Hide overflow to remove scrollbar */
+    padding: 20px;
+    /* Add padding for better spacing */
+    overflow-y: auto;
+    /* Enable vertical scrolling if content overflows */
 
   }
-  
-  .pop-content h2 {
-    margin-bottom: 15px; /* Space below title */
-    font-size: 1.5em; /* Increase title font size */
-    color: #333; /* Darker color for title */
-    text-align: center; /* Center align the title */
-  }
-  
-  .pop-content input {
-    width: calc(100% - 20px); /* Full width minus padding */
-    margin: 10px 0;
-    padding: 10px; /* Increased padding for better touch targets */
-    border: 1px solid #ccc; /* Light border */
-    border-radius: 4px; /* Rounded corners */
-    font-size: 1em; /* Consistent font size */
-  }
-  
-  .coupon-btn {
-    margin-right: 10px;
-    padding: 10px 15px; /* Increased padding for buttons */
-    border: none; /* Remove default border */
-    border-radius: 4px; /* Rounded corners */
-    background-color: #007BFF; /* Primary color */
-    color: white; /* White text */
-    font-size: 1em; /* Consistent font size */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth transition for background color */
-  }
-  @media (max-width: 768px) {
-  .pop-content {
-    background: white; /* White background for the popup */
-    border-radius: 10px; /* Slightly rounded corners */
-    width: 310px; /* Fixed width */
-    height: 350px; /* Fixed height */
-    position: relative; /* Relative positioning for close button */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow for depth */
-    overflow: hidden; /* Hide overflow to remove scrollbar */
-    padding: 20px; /* Add padding for better spacing */
-    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+}
 
-  }
-  }
-  
-  .coupon-btn:hover {
-    background-color: #0056b3; /* Darker shade on hover */
-  }
-  
-  .close-button7 {
-    position: absolute; /* Position relative to the parent */
-    top: 10px; /* 10px from the top */
-    right: 10px; /* 10px from the right */
-    background: transparent; /* Transparent background */
-    border: none; /* No border */
-    cursor: pointer; /* Pointer cursor on hover */
-    color: #999; /* Default color for close button */
-    transition: color 0.3s; /* Smooth color transition */
-  }
-  
-  .close-button7:hover {
-    color: black; /* Change color on hover */
-  }
-  
-  .coupons-list {
-    list-style-type: none; /* Remove default list styling */
-    padding: 0; /* Remove padding */
-    margin: 0; /* Remove margin */
-  }
-  
- 
-  .coupon-item {
-    padding: 10px 0; /* Add vertical padding to items */
-    border-bottom: none; /* Remove border between items */
-    display: flex; /* Use flexbox for layout */
-    align-items: center; /* Center align items vertically */
-  }
-  
-  .serial-number {
-    margin-right: 10px; /* Space between serial number and coupon code */
-  }
-  
-  .edit-icon {
-    margin-left: 10px; /* Space between expiry date and edit icon */
-    cursor: pointer; /* Pointer cursor on hover */
-    color: #007BFF; /* Color for the edit icon */
-    transition: color 0.3s; /* Smooth transition for color */
-  }
-  
-  .edit-icon:hover {
-    color: #0056b3; /* Darker color on hover */
-  }
+.coupon-btn:hover {
+  background-color: #0056b3;
+  /* Darker shade on hover */
+}
+
+.close-button7 {
+  position: absolute;
+  /* Position relative to the parent */
+  top: 10px;
+  /* 10px from the top */
+  right: 10px;
+  /* 10px from the right */
+  background: transparent;
+  /* Transparent background */
+  border: none;
+  /* No border */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  color: #999;
+  /* Default color for close button */
+  transition: color 0.3s;
+  /* Smooth color transition */
+}
+
+.close-button7:hover {
+  color: black;
+  /* Change color on hover */
+}
+
+.coupons-list {
+  list-style-type: none;
+  /* Remove default list styling */
+  padding: 0;
+  /* Remove padding */
+  margin: 0;
+  /* Remove margin */
+}
+
+
+.coupon-item {
+  padding: 10px 0;
+  /* Add vertical padding to items */
+  border-bottom: none;
+  /* Remove border between items */
+  display: flex;
+  /* Use flexbox for layout */
+  align-items: center;
+  /* Center align items vertically */
+}
+
+.serial-number {
+  margin-right: 10px;
+  /* Space between serial number and coupon code */
+}
+
+.edit-icon {
+  margin-left: 10px;
+  /* Space between expiry date and edit icon */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  color: #007BFF;
+  /* Color for the edit icon */
+  transition: color 0.3s;
+  /* Smooth transition for color */
+}
+
+.edit-icon:hover {
+  color: #0056b3;
+  /* Darker color on hover */
+}
+
+.coupon-input:focus {
+
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.coupon-input:hover {
+
+  border-color: #0056b3;
+  box-shadow: 0 0 6px rgba(0, 86, 179, 0.6);
+}
