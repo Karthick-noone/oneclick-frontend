@@ -22,6 +22,7 @@ const ShopByCategory = () => {
   return (
     <section className="shop-by-category">
       <h2>Shop by Category</h2>
+     <center> <span className="category-sub-heading">Explore our wide range of electronics across all categories</span></center>
       <div className="categories">
         {categories.map((category, index) => (
           <div className="category" key={index}>

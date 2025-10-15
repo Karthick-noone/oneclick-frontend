@@ -466,7 +466,7 @@ const MobileAd = () => {
         <div className="laptops-card">
           <div className="laptops-card-header">
             {/* <div className="laptops-card-item">Title</div> */}
-            <div className="laptops-card-item">Image(6912 x 3456)</div>
+            <div className="laptops-card-item">Image(1200 x 800)</div>
             {/* <div className="laptops-card-item">Description</div> */}
             {/* <div className="laptops-card-item">Offer</div> */}
           </div>

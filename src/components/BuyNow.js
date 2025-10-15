@@ -743,7 +743,7 @@ const BuyNow = () => {
                   ))}
                 </ul>
               ) : (
-                <div>
+                <div style={{display:'flex', justifyContent:'space-between'}}>
                   <strong style={{ fontSize: "1.0rem" }}>
                     DELIVERY ADDRESS <FaTimes style={{ color: "red" }} />
                   </strong>
@@ -1103,7 +1103,7 @@ const BuyNow = () => {
                 {selectedPaymentMethod === "card" && (
                   <div className="continue-wrapper">
                     <button
-                      className="pay-btn"
+                      className="summary-place-order-btn"
                       onClick={() => handlePayment("Online")}
                     >
                       {isOrdering ? (

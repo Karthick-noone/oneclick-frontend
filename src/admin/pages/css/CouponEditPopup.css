@@ -23,15 +23,45 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(158, 158, 158, 0.7);
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
   /* Semi-transparent gray overlay */
   display: flex;
   justify-content: center;
   /* Center horizontally */
   align-items: center;
   /* Center vertically */
-  z-index: 1000;
+  z-index: 1001;
   /* Ensure this is above other elements */
+}
+
+.pop-content2 {
+  background: white;
+  /* White background for the popup */
+  border-radius: 10px;
+  /* Slightly rounded corners */
+  width: 400px;
+  /* Fixed width */
+  height: 350px;
+  /* Fixed height */
+  position: relative;
+  /* Relative positioning for close button */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  /* Enhanced shadow for depth */
+  overflow: hidden;
+  /* Hide overflow to remove scrollbar */
+  padding: 20px;
+  /* Add padding for better spacing */
+  overflow-y: hidden;
+  /* Enable vertical scrolling if content overflows */
+  display: flex;
+  flex-direction: column;
+  /* Stack items vertically */
+  align-items: center;
+  /* Center items horizontally */
+  justify-content: center;
+  text-align: center;
+
 }
 
 .pop-content {
@@ -56,6 +86,40 @@
 
 }
 
+.coupon-code {
+  display: inline-block;
+  word-break: break-word; /* Force long words to break */
+  overflow-wrap: anywhere; /* Allow breaking anywhere if needed */
+  max-width: 100px !important; /* Reduce width so it wraps sooner */
+  line-height: 1.4; /* Add space between lines */
+}
+
+.pop-content2 h2 {
+  margin-bottom: 15px;
+  /* Space below title */
+  font-size: 1.5em;
+  /* Increase title font size */
+  color: #333;
+  /* Darker color for title */
+  text-align: center;
+  /* Center align the title */
+}
+
+.pop-content2 input {
+  width: 315px;
+  /* Full width minus padding */
+  margin: 10px 0;
+  padding: 10px;
+  /* Increased padding for better touch targets */
+  border: 1px solid #ccc;
+  /* Light border */
+  border-radius: 4px;
+  /* Rounded corners */
+  font-size: 1em;
+  /* Consistent font size */
+}
+
+
 .pop-content h2 {
   margin-bottom: 15px;
   /* Space below title */
@@ -68,7 +132,7 @@
 }
 
 .pop-content input {
-  width: calc(100% - 20px);
+  width: 100%;
   /* Full width minus padding */
   margin: 10px 0;
   padding: 10px;
@@ -161,6 +225,63 @@
   /* Remove padding */
   margin: 0;
   /* Remove margin */
+}
+.coupons-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Active coupons box */
+.active-coupons-box {
+  border: 2px solid #4CAF50; /* Green border */
+  border-radius: 8px;
+  background-color: #f0fff0; /* Light green */
+  padding: 10px;
+}
+
+.active-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Expired coupons box */
+.expired-coupons-box {
+  position: relative;
+  border: 2px solid #ff4d4d; /* Red border */
+  border-radius: 8px;
+  background-color: #ffdddd;
+  padding: 10px;
+}
+
+.expired-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Watermark for expired box */
+/* .expired-coupons-box::before {
+  content: "EXPIRED";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 80px;
+  color: rgba(255, 0, 0, 0.1);
+  font-weight: 900;
+  pointer-events: none;
+  z-index: 1;
+} */
+
+.coupon-item {
+  position: relative;
+  z-index: 2; /* Ensure text stays above watermark */
+  padding: 5px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 

@@ -50,13 +50,35 @@ const RecentlyViewed = () => {
     const fetchProducts = async () => {
       try {
         const productResponses = await Promise.all(
-          validData.map((item) => axios.get(`${ApiUrl}/recently-viewed-products/${item.id}`))
+          validData.map((item) =>
+            axios
+              .get(`${ApiUrl}/recently-viewed-products/${item.id}`)
+              .then((res) => res.data[0]) // get first product
+              .catch((err) => {
+                if (err.response && err.response.status === 404) {
+                  console.info(
+                    `No recently viewed product found for ID: ${item.id}. Skipping.`
+                  );
+                  return null; // skip this product
+                } else {
+                  console.error(
+                    `Error fetching recently viewed product for ID: ${item.id}`,
+                    err.response ? err.response.data : err.message
+                  );
+                  return null; // skip other errors too, if needed
+                }
+              })
+          )
         );
-        setRecentProducts(productResponses.map((res) => res.data[0]).filter(Boolean));
+
+        // Filter out nulls (failed requests)
+        setRecentProducts(productResponses.filter(Boolean));
       } catch (error) {
         console.error("Error fetching recently viewed products:", error);
       }
     };
+
+
 
     fetchProducts();
   }, []);

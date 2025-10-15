@@ -20,7 +20,7 @@ import SamsungLogo from "./img/brands/samsung.png";
 
 // Define brands array with names, logos, and categories
 const brands = [
-  { name: "cctv", logo: CCTVLogo, category: "cctv" },
+  { name: "dahua", logo: CCTVLogo, category: "cctv" },
   { name: "oneplus", logo: Oneplus, category: "mobiles" },
   { name: "zebronics", logo: Zebronics, category: "headphones" },
   { name: "apple", logo: Apple, category: "mobiles" },
@@ -62,6 +62,7 @@ const BrandsPage = () => {
               src={brand.logo}
               alt={brand.name}
               className="brand-logo"
+              title={brand.name}
             />
             {/* <p className="brand-name">{brand.name}</p>
             <p className="brand-category">{brand.category}</p> */}

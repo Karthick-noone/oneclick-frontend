@@ -29,7 +29,7 @@ const CouponManager = () => {
     e.preventDefault();
     try {
 
-        const upperCaseName = couponName; // Convert name to uppercase
+      const upperCaseName = couponName; // Convert name to uppercase
 
       if (editingId) {
         await axios.put(`${ApiUrl}/api/editcoupons/${editingId}`, {
@@ -73,7 +73,7 @@ const CouponManager = () => {
         confirmButtonText: "Yes, delete it!",
         cancelButtonText: "Cancel",
       });
-  
+
       if (result.isConfirmed) {
         await axios.delete(`${ApiUrl}/api/deletecoupons/${id}`);
         console.log(`Deleted coupon with ID: ${id}`);
@@ -82,25 +82,33 @@ const CouponManager = () => {
             window.location.reload();
           }, 1500); // Delay of 1.5 seconds before reloading
         });
-                fetchCoupons();
+        fetchCoupons();
       }
     } catch (error) {
       console.error("Error deleting coupon:", error);
       Swal.fire("Error", "Failed to delete the coupon. Please try again.", "error");
     }
   };
-  
+
   const handleEdit = (coupon) => {
-    console.log("Editing coupon:", coupon);
-    setCouponName(coupon.name);
-    setCouponValue(coupon.value);
-    setMinPurchaseLimit(coupon.min_purchase_limit);
-    setEditingId(coupon.id);
-    
+    if (editingId === coupon.id) {
+      // If already editing this coupon, cancel editing
+      setCouponName("");
+      setCouponValue("");
+      setMinPurchaseLimit("");
+      setEditingId(null);
+    } else {
+      // Start editing this coupon
+      setCouponName(coupon.name);
+      setCouponValue(coupon.value);
+      setMinPurchaseLimit(coupon.min_purchase_limit);
+      setEditingId(coupon.id);
+    }
   };
+
   const handleValueChange = (e) => {
     const value = e.target.value;
-    
+
     // Allow only numeric values and prevent starting with '0'
     if (/^[1-9][0-9]*$|^$/.test(value)) {
       setCouponValue(value);
@@ -109,93 +117,101 @@ const CouponManager = () => {
 
   return (
     <div style={styles.container}>
-    <div style={styles.innerBox}>
-      <h2 style={styles.title}>🎟️ Coupon Manager</h2>
-      <form style={styles.form} onSubmit={handleAddOrUpdate}>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Coupon Code:</label>
-          <input
-            type="text"
-            value={couponName}
-            onChange={(e) => setCouponName(e.target.value)}
-            required
-            style={styles.input}
-            className="custom-input"
+      <div style={styles.innerBox}>
+        <h2 style={styles.title}>🎟️ Coupon Manager</h2>
+        <form style={styles.form} onSubmit={handleAddOrUpdate}>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Coupon Code:</label>
+            <input
+              type="text"
+              value={couponName}
+              onChange={(e) => setCouponName(e.target.value)}
+              required
+              style={styles.input}
+              className="custom-input"
 
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Coupon Value (₹):</label>
-          <input
-            type="number"
-            value={couponValue}
-            onChange={handleValueChange}
-            required
-            style={styles.input}
-            className="custom-input"
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Minimum Purchase (₹):</label>
-          <input
-            type="number"
-            value={minPurchaseLimit}
-            id="minPurchaseLimit"
-            onChange={(e) => setMinPurchaseLimit(e.target.value)}
-            required
-            style={styles.input}
-            className="custom-input"
+            />
+          </div>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Coupon Value (₹):</label>
+            <input
+              type="number"
+              value={couponValue}
+              onChange={handleValueChange}
+              required
+              style={styles.input}
+              className="custom-input"
+            />
+          </div>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Minimum Purchase (₹):</label>
+            <input
+              type="number"
+              value={minPurchaseLimit}
+              id="minPurchaseLimit"
+              onChange={(e) => setMinPurchaseLimit(e.target.value)}
+              required
+              style={styles.input}
+              className="custom-input"
 
-          />
-        </div>
+            />
+          </div>
 
-       
-        <button type="submit" style={styles.button}>
-          {editingId ? "Update Coupon" : "Add Coupon"}
-        </button>
-      </form>
-      <ul style={styles.couponList}>
-        {coupons.map((coupon) => (
-          <li key={coupon.id} style={styles.couponItem}>
-            <span style={styles.couponText}>
-              {coupon.name}: ₹{coupon.value} 
-            </span>
-            <span> Purchase above - ₹{coupon.min_purchase_limit}</span>
-            <div>
-              <button onClick={() => handleEdit(coupon)} style={styles.editButton}>
-                ✏️ Edit
-              </button>
-              <button onClick={() => handleDelete(coupon.id)} style={styles.deleteButton}>
-                🗑️ Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+
+          <button type="submit" style={styles.button}>
+            {editingId ? "Update Coupon" : "Add Coupon"}
+          </button>
+        </form>
+        <ul style={styles.couponList}>
+          {coupons.map((coupon) => (
+            <li key={coupon.id} style={styles.couponItem}>
+              <span style={styles.couponText}>
+                {coupon.name}: ₹{coupon.value}
+              </span>
+              <span> Purchase above - ₹{coupon.min_purchase_limit}</span>
+              <div>
+                <button
+                  onClick={() => handleEdit(coupon)}
+                  style={{
+                    ...styles.editButton,
+                    backgroundColor: editingId === coupon.id ? "#3b82f6" : "#ffc107", // Red for cancel, Blue for edit
+                    color: "#fff",
+                  }}
+                >
+                  {editingId === coupon.id ? "❌ Cancel" : "✏️ Edit"}
+                </button>
+
+                <button onClick={() => handleDelete(coupon.id)} style={styles.deleteButton}>
+                  🗑️ Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
-  </div>
-  
+
   );
 };
 
 const styles = {
-    container: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh", // Full viewport height
-        fontFamily: "'Arial', sans-serif",
-        backgroundColor: "#f9f9f9",
-      },
-      innerBox: {
-        padding: "20px",
-        maxWidth: "600px",
-        width: "90%", // Ensures responsiveness
-        backgroundColor: "#fff",
-        borderRadius: "10px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        marginTop:'50px',
-      },
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh", // Full viewport height
+    fontFamily: "'Arial', sans-serif",
+    backgroundColor: "#f9f9f9",
+  },
+  innerBox: {
+    padding: "20px",
+    maxWidth: "600px",
+    width: "90%", // Ensures responsiveness
+    backgroundColor: "#fff",
+    borderRadius: "10px",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    marginTop: '50px',
+  },
   title: {
     textAlign: "center",
     color: "#333",

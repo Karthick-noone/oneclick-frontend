@@ -250,7 +250,7 @@ const Invoice = ({ order, productDetails }) => {
               <th style={{ border: "1px solid #000", padding: "5px", fontSize: '13px' }}>Product</th>
               <th style={{ border: "1px solid #000", padding: "5px", fontSize: '13px' }}>Qty</th>
               <th style={{ border: "1px solid #000", padding: "5px", fontSize: '13px' }}>Price</th>
-              <th style={{ border: "1px solid #000", padding: "5px", fontSize: '13px' }}>Tax</th>
+              {/* <th style={{ border: "1px solid #000", padding: "5px", fontSize: '13px' }}>Tax</th> */}
               <th style={{ border: "1px solid #000", padding: "5px", fontSize: '13px' }}>Total Price</th>
             </tr>
           </thead>
@@ -291,9 +291,9 @@ const Invoice = ({ order, productDetails }) => {
                   <td style={{ border: "1px solid #000", padding: "5px", fontSize: '13px' }}>
                     {basePrice === 0 ? "Free" : `₹${basePrice}`}
                   </td>
-                  <td style={{ border: "1px solid #000", padding: "5px", fontSize: '13px' }}>
+                  {/* <td style={{ border: "1px solid #000", padding: "5px", fontSize: '13px' }}>
                     {product.tax || "-"}
-                  </td>
+                  </td> */}
                   <td style={{ border: "1px solid #000", padding: "5px", fontSize: '13px' }}>
                     ₹{basePrice * quantity}
                   </td>
@@ -317,64 +317,84 @@ const Invoice = ({ order, productDetails }) => {
           }}
         >
           {/* Left Side - Total Products */}
-          <p style={{ fontSize: '15px' }}>
+          <p style={{ fontSize: "15px" }}>
             <strong>Total Products: </strong> {totalQuantity}
           </p>
 
-          {/* Right Side - Delivery Charge & Grand Total */}
+          {/* Right Side - GST, Delivery Charge & Grand Total */}
           <div style={{ textAlign: "right" }}>
-            {products.reduce(
-              (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
-              0
-            ) > 0 && (
-                <p style={{ fontSize: '15px' }}>
-                  <strong>Delivery Charge: </strong> ₹
-                  {products.reduce(
-                    (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
-                    0
-                  )}
-                </p>
-              )}
+            {(() => {
+              const accessoriesCategories = [
+                "ComputerAccessories",
+                "MobileAccessories",
+                "PrinterAccessories",
+                "CCTVAccessories",
+              ];
 
-            <p style={{ fontSize: '15px' }}>
-              <strong>Grand Total: </strong> ₹
-              {(() => {
-                const accessoriesCategories = [
-                  "ComputerAccessories",
-                  "MobileAccessories",
-                  "PrinterAccessories",
-                  "CCTVAccessories"
-                ];
+              // Calculate subtotal (products only, no delivery)
+              const subtotal = products.reduce((acc, product) => {
+                const quantity = product.quantity || 1;
+                const isAccessory = accessoriesCategories.includes(product.category);
 
-                const total = products.reduce((acc, product) => {
-                  const quantity = product.quantity || 1;
-                  const isAccessory = accessoriesCategories.includes(product.category);
-
-                  let price;
-
-                  if (isAccessory) {
-                    if (product.effectiveprice === 0) {
-                      price = 0;
-                    } else if (product.effectiveprice > 0) {
-                      price = product.effectiveprice;
-                    } else {
-                      price = product.prod_price;
-                    }
+                let price;
+                if (isAccessory) {
+                  if (product.effectiveprice === 0) {
+                    price = 0;
+                  } else if (product.effectiveprice > 0) {
+                    price = product.effectiveprice;
                   } else {
                     price = product.prod_price;
                   }
+                } else {
+                  price = product.prod_price;
+                }
 
-                  const delivery = parseInt(product.deliverycharge, 10) || 0;
+                return acc + price * quantity;
+              }, 0);
 
-                  return acc + price * quantity + delivery;
-                }, 0);
+              // Delivery charge
+              const deliveryTotal = products.reduce(
+                (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
+                0
+              );
 
-                return total;
-              })()}
-            </p>
+              // Grand total = subtotal + delivery (already final price)
+              const grandTotal = subtotal + deliveryTotal;
+
+              const gstRate = 0.18; // 18%
+              const gstAmount = (subtotal * gstRate) / (1 + gstRate); 
+              const cgst = gstAmount / 2;
+              const sgst = gstAmount / 2;
+
+              return (
+                <>
+                  <p style={{ fontSize: "15px" }}>
+                    <strong>CGST (9%): </strong> ₹{Math.round(cgst).toLocaleString("en-IN")}
+                  </p>
+                  <p style={{ fontSize: "15px", marginTop: '5px' }}>
+                    <strong>SGST (9%): </strong> ₹{Math.round(sgst).toLocaleString("en-IN")}
+                  </p>
+
+                  {deliveryTotal > 0 && (
+                    <p style={{ fontSize: "15px", marginTop: '5px' }}>
+                      <strong>Delivery Charge: </strong> ₹{deliveryTotal.toLocaleString("en-IN")}
+                    </p>
+                  )}
+
+                  <p style={{
+                    fontSize: "15px", marginTop: '5px',
+                    borderTop: "1px solid #333",
+                    paddingTop: "5px",
+                    marginTop: "5px",
+                  }}>
+                    <strong>Grand Total: </strong> ₹{Math.round(grandTotal).toLocaleString("en-IN")}
+                  </p>
+                </>
+              );
+            })()}
           </div>
-
         </div>
+
         <hr />
         <p style={{ fontSize: "12px", fontFamily: "dancing, cursive", padding: '5px', textAlign: 'left' }}>
           This is a computer generated invoice, no signature required.

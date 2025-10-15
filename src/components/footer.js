@@ -3,6 +3,7 @@ import "./css/Footer.css"; // Adjust path as needed
 import PaymentMethods from "./PaymentMethods"; // Import the PaymentMethods page
 import { Link } from "react-router-dom";
 import PlayStore from './img/Play-Store.png';
+import appQR from './img/qr-code.png';
 
 // Import icons from react-icons
 import { FaMapMarkerAlt, FaHeadset, FaShareAlt, FaGavel } from "react-icons/fa";
@@ -28,9 +29,14 @@ const Footer = () => {
           <a href="tel:+9092206677">
             <p>+91-9092206677</p>
           </a>
-          <a href="https://play.google.com/store/apps/details?id=com.oneclick.seasense" target="_blank" rel="noopener noreferrer">
-            <img loading='lazy' src={PlayStore} alt="Visa" className='play-store-image' />
-          </a>
+          <div className="app-download">
+            <img src={appQR} alt="App download QR code" className="QR-code" title="Scan to download the app" />
+
+            <a href="https://play.google.com/store/apps/details?id=com.oneclick.seasense" target="_blank" rel="noopener noreferrer">
+              <img loading='lazy' src={PlayStore} alt="Visa" className='play-store-image' />
+            </a>
+          </div>          Scan to download the app
+
         </div>
 
         <div className="footer-section">

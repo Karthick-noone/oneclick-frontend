@@ -322,6 +322,13 @@ const Contact = () => {
               title="Google Maps location of One Click Technologies"
 
             ></iframe>
+            <iframe 
+             style={styles.mapIframe}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Google Maps location of One Click Technologies"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d823.7860709161048!2d77.22245466948718!3d8.302361126533542!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b04554d46344113%3A0xbda68de23a7d7261!2sOne%20Click%20Technologies!5e1!3m2!1sen!2sin!4v1753952009476!5m2!1sen!2sin" width="400" height="300" allowfullscreen="" referrerpolicy="no-referrer-when-downgrade"></iframe>
           </div>
         </div>
 

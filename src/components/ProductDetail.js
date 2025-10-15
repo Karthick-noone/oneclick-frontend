@@ -68,7 +68,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     // Simulate loading delay (remove this in real API calls)
-    setTimeout(() => setLoading(false), 1000);
+    setTimeout(() => setLoading(false), 100);
   }, []);
   // State for storing related items
   const [relatedItems, setRelatedItems] = useState([]);
@@ -273,6 +273,7 @@ const ProductDetail = () => {
             `Coupons found for product ${productData.prod_id}:`,
             couponResponse.data.coupons
           );
+
 
           // Set the first coupon code for the product
           setCoupons((prev) => ({
@@ -726,10 +727,18 @@ const ProductDetail = () => {
             setRelatedAccessories([]);
           }
         } catch (error) {
-          console.error(
-            "Error fetching related accessories:",
-            error.response ? error.response.data : error.message
-          );
+          // Ignore 404 errors silently
+          if (error.response && error.response.status === 404) {
+            console.info(
+              `No accessories found for product ID: ${product.id}. Skipping.`
+            );
+            setRelatedAccessories([]); // Clear related accessories
+          } else {
+            console.error(
+              "Error fetching related accessories:",
+              error.response ? error.response.data : error.message
+            );
+          }
         }
       } else {
         console.warn("Product or product ID is undefined");
@@ -738,6 +747,7 @@ const ProductDetail = () => {
 
     fetchRelatedAccessories();
   }, [product]);
+
 
   useEffect(() => {
     const calculateRemainingTime = () => {
@@ -871,7 +881,7 @@ const ProductDetail = () => {
 
     setZoomStyle({
       backgroundImage: `url(${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[selectedImage]})`,
-      backgroundSize: "300%", // Higher zoom ratio for sharpness
+      backgroundSize: "250%", // Higher zoom ratio for more detail
       backgroundPosition: `${percentX}% ${percentY}%`,
       position: "absolute",
       top: 0,
@@ -882,9 +892,17 @@ const ProductDetail = () => {
       zIndex: 10,
       backgroundRepeat: "no-repeat",
       border: "1px solid rgba(0, 0, 0, 0.1)",
-      imageRendering: "auto", /* Or 'crisp-edges' */
-      transform: "scale(1)",
-      transition: "background-position 0.1s ease",
+
+      /* Image sharpness enhancements */
+      imageRendering: "pixelated",          // Sharp edges for pixel-style images
+      filter: `
+    contrast(110%) 
+    saturate(120%) 
+    brightness(105%) 
+    sharpen(1px)
+  `,                                    // Add contrast, saturation, and sharpening
+      willChange: "transform, filter",      // Hint to browser for better performance
+      transition: "background-position 0.05s ease", // Smoother movement
     });
 
 
@@ -910,6 +928,9 @@ const ProductDetail = () => {
   // const firstImage = images.length > 0 ? images[0] : null; // Get the first image or null if not available
 
   const couponCode = coupons[product?.prod_id]; // Use coupons object instead of product
+
+  // const couponExpiryDate = coupons[0].coupon_expiry_date; // Use coupons object instead of product
+
 
   // console.log("couponCode", couponCode);
   // Ensure couponCode is a valid string and contains digits
@@ -1256,7 +1277,7 @@ const ProductDetail = () => {
                     {/* Product Title */}
                     <h2 className="product-detail-title">
                       {loading ? (
-                        <Skeleton width={380} height={40} />
+                        <Skeleton width={360} height={40} />
                       ) : (
                         product.prod_name
                       )}
@@ -1264,7 +1285,7 @@ const ProductDetail = () => {
 
                     <span className="product-detail-subtitle">
                       {product.subtitle && loading ? (
-                        <Skeleton width={380} height={40} />
+                        <Skeleton width={360} height={40} />
                       ) : (
                         product.subtitle
                       )}
@@ -1313,7 +1334,7 @@ const ProductDetail = () => {
                               style={{ marginLeft: "12px" }}
                             />
                             <Skeleton
-                              width={100}
+                              width={90}
                               height={30}
                               style={{ marginLeft: "10px" }}
                             />
@@ -1374,7 +1395,7 @@ const ProductDetail = () => {
                                 </div>
                               )}
 
-                            <div className="secure-delivery" style={{ color: "#28a745", marginTop: "5px" }}>
+                            <div className="secure-delivery" style={{ color: "#28a745", marginTop: "10px" }}>
                               🚚 Secure delivery in 10 days, &nbsp;
 
                               {new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US", {
@@ -1405,7 +1426,7 @@ const ProductDetail = () => {
                     {/* Price Table */}
                     {loading ? (
                       <Skeleton
-                        width={380}
+                        width={360}
                         height={90}
                         style={{ marginTop: "15px" }}
                       />
@@ -1478,12 +1499,12 @@ const ProductDetail = () => {
                           style={{ marginRight: "10px" }}
                         />
                         <Skeleton width={150} height={50} />
-                        <Skeleton
+                        {/* <Skeleton
                           circle
                           width={25}
                           height={25}
                           style={{ marginTop: "15px" }}
-                        />
+                        /> */}
                       </div>
                     ) : product.status !== "unavailable" ? (
                       <div className="add-to-cart-container">
@@ -1553,8 +1574,8 @@ const ProductDetail = () => {
                                 style={{ marginRight: "10px" }}
                               />
                               <Skeleton
-                                width={45}
-                                height={45}
+                                width={55}
+                                height={50}
                               // style={{ marginLeft: "10px" }}
                               />
                               <div style={{ flex: 1 }}>
@@ -1586,7 +1607,7 @@ const ProductDetail = () => {
                         <Skeleton
                           width={60}
                           height={30}
-                          style={{ marginTop: "15px" }}
+                          style={{ marginTop: "5px" }}
                         />
                       </div>
                     </div>
@@ -1601,10 +1622,12 @@ const ProductDetail = () => {
                                 ? accessory.prod_img
                                 : JSON.parse(accessory.prod_img || "[]");
 
-                              const firstImage =
-                                images.length > 0
-                                  ? images[0]
-                                  : "fallback_image.jpg"; // Fallback image
+                              const firstImage = images[0]
+
+                              // const firstImage =
+                              //   images.length > 0
+                              //     ? images[0]
+                              //     : "fallback_image.jpg"; // Fallback image
 
                               return (
                                 <div
@@ -1675,6 +1698,7 @@ const ProductDetail = () => {
                                       width: "60px",
                                       height: "60px",
                                       marginLeft: "10px",
+                                      objectFit: 'contain',
                                     }}
                                   />
                                   <div style={{ flex: 1 }}>
@@ -2053,7 +2077,7 @@ const ProductDetail = () => {
                               alt={relatedProduct.prod_name}
                               className="similar-product-image"
                             />
-                            <p className="product-name">
+                            <p className="product-name" title={relatedProduct.prod_name}>
                               {relatedProduct.prod_name.charAt(0).toUpperCase() +
                                 relatedProduct.prod_name.slice(1)}
                             </p>

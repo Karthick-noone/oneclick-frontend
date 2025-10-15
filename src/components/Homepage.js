@@ -69,11 +69,12 @@ const CustomNextArrow = ({ onClick }) => (
           <Slider {...sliderSettings}>
             {data.map((item, index) => (
               <div key={index} className="slider-image-container" tabIndex={-1}>
-                <Link to={`/${item.category}`} className="shop-button-link">
+                <Link to={`/${item.category === "Home" ? "" : item.category}`} className="shop-button-link">
                   <img
                     src={`${ApiUrl}/uploads/edithomepage/${item.image}`}
                     alt={`Ad ${index + 1}`}
                     className="slider-image"
+                    style={{outline:'none'}}
                   />
                 </Link>
               </div>

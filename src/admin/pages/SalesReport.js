@@ -123,7 +123,7 @@ const SalesReport = () => {
           <table className="styled-table">
             <thead>
               <tr>
-                <th>S.No</th>
+                <th>Sl.No</th>
                 <th >Product Name</th>
                 <th>Category</th>
                 <th>Qnty</th>

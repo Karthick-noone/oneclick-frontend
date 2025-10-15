@@ -57,6 +57,8 @@ const fetchUsers = useCallback(async () => {
     }
   }, [filteredUsers, itemsPerPage, currentPage]);
 
+  console.log("Current Users", currentUsers)
+
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
@@ -216,7 +218,7 @@ const fetchUsers = useCallback(async () => {
             <table className="careers-table">
               <thead>
                 <tr>
-                  <th>S.No</th>
+                  <th>Sl.No</th>
                   <th>Username</th>
                   <th>Email</th>
                   <th>Number</th>

@@ -11,18 +11,18 @@ import {
   FaDesktop,
   FaMobileAlt,
   FaVideo,
-  FaHeadphones,
-  FaVolumeUp,
-  FaTv,
-  FaPrint,
-  FaClock,
-  FaTools,
-  FaCogs,
+  // FaHeadphones,
+  // FaVolumeUp,
+  // FaTv,
+  // FaPrint,
+  // FaClock,
+  // FaTools,
+  // FaCogs,
   FaTags,
   FaStore
 } from "react-icons/fa";
 import axios from "axios";
-import {  Line, Pie } from "react-chartjs-2";
+import { Line, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   Title,
@@ -37,6 +37,27 @@ import {
 } from "chart.js";
 import { ApiUrl } from "../../components/ApiUrl";
 import { Link } from "react-router-dom";
+import PrinterAccessoriesImage from './img/printer-accessories.png'
+import ComputerAccessoriesImage from './img/computer-accessories.png'
+import ComputerImage from './img/computer.png'
+import CCTVAccessoriesImage from './img/cctvcamera.png'
+import MobileAccessoriesImage from './img/charger.png'
+import WatchImage from './img/smartwatch.png'
+import TVImage from './img/tv.png'
+import speakerImage from './img/speaker1.png'
+import printerImage from './img/printer1.png'
+import headphoneImage from './img/headphones.png'
+import MobileImage from './img/mobile.png'
+import CCTVImage from './img/cctv.png'
+import Electronics from './img/electronics.png'
+import Order from './img/order.png'
+import Staff from './img/staff.png'
+import Customers from './img/customers.png'
+import Payment from './img/payment.png'
+import Profit from './img/profit.png'
+import Refurbish from './img/recycling.png'
+import ElectronicDevices from './img/electronic-devices.png'
+
 
 ChartJS.register(
   Title,
@@ -271,23 +292,23 @@ const Dashboard = () => {
   }, []);
 
   const categoryIcons = {
-    Computers: <FaDesktop />,
-    Mobiles: <FaMobileAlt />,
-    CCTV: <FaVideo />,
-    Headphones: <FaHeadphones />,
-    Speakers: <FaVolumeUp />,
-    TV: <FaTv />,
-    Printers: <FaPrint />,
-    Watch: <FaClock />,
-    ComputerAccessories: <FaTools />,
-    MobileAccessories: <FaCogs />,
-    CCTVAccessories: <FaCogs />,
-    PrinterAccessories: <FaTools />,
-    secondhandproducts: <FaStore />
+    Computers: <img src={ComputerImage} alt="Computer" style={{ width: "35px", height: "35px" }} />,
+    Mobiles: <img src={MobileImage} alt="Mobile" style={{ width: "35px", height: "35px" }} />,
+    CCTV: <img src={CCTVImage} alt="CCTV" style={{ width: "35px", height: "35px" }} />,
+    Headphones: <img src={headphoneImage} alt="Headphone" style={{ width: "35px", height: "35px" }} />,
+    Speakers: <img src={speakerImage} alt="Speaker" style={{ width: "35px", height: "35px" }} />,
+    TV: <img src={TVImage} alt="TV" style={{ width: "35px", height: "35px" }} />,
+    Printers: <img src={printerImage} alt="Printer" style={{ width: "35px", height: "35px" }} />,
+    Watch: <img src={WatchImage} alt="Watch" style={{ width: "35px", height: "35px" }} />,
+    ComputerAccessories: <img src={ComputerAccessoriesImage} alt="Computer Accessories" style={{ width: "35px", height: "35px" }} />,
+    MobileAccessories: <img src={MobileAccessoriesImage} alt="Mobile Accessories" style={{ width: "35px", height: "35px" }} />,
+    CCTVAccessories: <img src={CCTVAccessoriesImage} alt="CCTV Accessories" style={{ width: "35px", height: "35px" }} />,
+    PrinterAccessories: <img src={PrinterAccessoriesImage} alt="Printer Accessories" style={{ width: "35px", height: "35px" }} />,
+    secondhandproducts: <img src={Refurbish} alt="Refurbish" style={{ width: "35px", height: "35px" }} />
   };
 
   const categoryLabels = {
-    secondhandproducts: "Secondhand Products",
+    secondhandproducts: "Refurbished Products",
     CCTVAccessories: "CCTV Accessories",
     ComputerAccessories: "Computer Accessories",
     MobileAccessories: "Mobile Accessories",
@@ -311,6 +332,22 @@ const Dashboard = () => {
   ];
 
 
+  const allCategories = [
+    "Computers",
+    "Mobiles",
+    "CCTV",
+    "Headphones",
+    "Speakers",
+    "TV",
+    "Printers",
+    "Watch",
+    "ComputerAccessories",
+    "MobileAccessories",
+    "CCTVAccessories",
+    "PrinterAccessories",
+    "secondhandproducts",
+  ];
+
   return (
     <div className="dashboard">
       <div className="dashboard-header">
@@ -319,25 +356,46 @@ const Dashboard = () => {
       <div className="dashboard-content">
         <h3>Product Summary</h3>
 
-        {/* ---------- SECTION 1: Products & Categories ---------- */}
         <div className="dashboard-summary">
-          <div className="product-summary-card">
-            <FaBox className="summary-icon" />
+          <div className="product-summary-card1">
+            <img className="summary-icon" src={Electronics} alt="Electronics" style={{ width: "45px", height: "45px" }} />
+            {/* <FaBox /> */}
             <div className="summary-info">
               <h3>Total Products</h3>
               <p>{totalProducts}</p>
             </div>
+
+
+          </div>
+          <div className="product-summary-card1">
+            <img src={ElectronicDevices} alt="Product Categories" style={{ width: "35px", height: "35px" }} />            <div className="summary-info">
+              <h3>Product Categories</h3>
+              <p>13</p>
+            </div>
           </div>
 
-          {categoryCounts
-            .filter(item => (item.total_products || item.total_category || item.total_amount) > 0)
-            .sort((a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category))
-            .map((item, index) => {
-              const label = categoryLabels[item.category] || item.category;
-              const icon = categoryIcons[item.category] || <FaTags />;
+          {allCategories
+            .map((cat) => {
+              const item = categoryCounts.find(c => c.category === cat);
+              const count =
+                item?.total_products || item?.total_category || item?.total_amount || 0;
+
+              return { cat, count, item };
+            })
+            .sort((a, b) => b.count - a.count) //  highest to lowest
+            // .sort((a, b) => a.count - b.count) //  lowest to highest (if you prefer)
+            .map(({ cat, count }, index) => {
+              const label = categoryLabels[cat] || cat;
+              const icon = categoryIcons[cat] || <FaTags />;
+
               return (
                 <Link
-                  to={`/Admin/${item.category === "TV" ? "TVHomeCinema" : item.category}`}
+                  to={`/Admin/${cat === "TV"
+                    ? "TVHomeCinema"
+                    : cat === "Watch"
+                      ? "WearableTech"
+                      : cat
+                    }`}
                   key={index}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
@@ -345,32 +403,29 @@ const Dashboard = () => {
                     <div className="summary-icon">{icon}</div>
                     <div className="summary-info">
                       <h3>{label}</h3>
-                      <p>{item.total_products || item.total_category || item.total_amount}</p>
+                      <p style={{ color: count === 0 ? "red" : "inherit" }}>
+                        {count === 0 ? "No Items" : count}
+                      </p>
                     </div>
                   </div>
                 </Link>
               );
             })}
 
-          <div className="product-summary-card">
-            <FaTag className="summary-icon" />
-            <div className="summary-info">
-              <h3>Product Categories</h3>
-              <p>13</p>
-            </div>
-          </div>
+
+
+
         </div>
 
         <h3>Other Reports</h3>
 
-        {/* ---------- SECTION 2: Orders, Customers, Staffs, etc. ---------- */}
         <div className="dashboard-summary">
           <Link to={"/Admin/orders"}
             style={{ textDecoration: "none", color: "inherit" }}
 
           >
             <div className="summary-card">
-              <FaBox className="summary-icon" />
+              <img className="summary-icon" src={Order} alt="Order" style={{ width: "45px", height: "45px" }} />
               <div className="summary-info">
                 <h3>Total Orders</h3>
                 <p>{totalOrders}</p>
@@ -379,7 +434,7 @@ const Dashboard = () => {
           </Link>
 
           <div className="summary-card">
-            <FaChartLine className="summary-icon" />
+            <img className="summary-icon" src={Profit} alt="Profit" style={{ width: "45px", height: "45px" }} />
             <div className="summary-info">
               <h3>Sales Revenue</h3>
               <p>₹{totalSales}</p>
@@ -388,7 +443,7 @@ const Dashboard = () => {
 
 
           <div className="summary-card">
-            <FaMoneyBillWave className="summary-icon" />
+            <img className="summary-icon" src={Payment} alt="Payment" style={{ width: "45px", height: "45px" }} />
             <div className="summary-info">
               <h3>Pending Payments</h3>
               <p>₹{pendingPayments}</p>
@@ -399,7 +454,7 @@ const Dashboard = () => {
 
           >
             <div className="summary-card">
-              <FaUsers className="summary-icon" />
+              <img className="summary-icon" src={Customers} alt="Customers" style={{ width: "45px", height: "45px" }} />
               <div className="summary-info">
                 <h3>Total Customers</h3>
                 <p>{totalCustomers}</p>
@@ -411,7 +466,7 @@ const Dashboard = () => {
             style={{ textDecoration: "none", color: "inherit" }}
           >
             <div className="summary-card">
-              <FaUsers className="summary-icon" />
+              <img className="summary-icon" src={Staff} alt="Staff" style={{ width: "45px", height: "45px" }} />
               <div className="summary-info">
                 <h3>Total Staffs</h3>
                 <p>{staffCount}</p>

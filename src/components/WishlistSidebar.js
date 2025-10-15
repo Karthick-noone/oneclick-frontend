@@ -266,7 +266,7 @@ const WishlistSidebar = ({
                         handleProductClick(product);
                       }}
                     >
-                      <h3 className="item-name">{product.prod_name}</h3>
+                      <h3 className="item-name" title={product.prod_name}>{product.prod_name}</h3>
                       {/* <p className="item-features">{product.prod_features}</p> */}
                     </div>
                   </div>

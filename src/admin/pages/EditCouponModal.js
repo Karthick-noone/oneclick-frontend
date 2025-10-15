@@ -163,7 +163,7 @@ const EditCouponModal = ({
 
   return (
     <div className="pop-overlay">
-      <div className="pop-content">
+      <div className="pop-content2">
         <h4>
           Edit Coupon for {coupon.coupon_code.split(" ").slice(0, 3).join(" ")}
         </h4>
@@ -191,7 +191,16 @@ const EditCouponModal = ({
           <input
             type="date"
             value={expiryDate}
-            onChange={(e) => setExpiryDate(e.target.value)}
+            onChange={(e) => {
+              const selectedDate = e.target.value;
+              if (selectedDate >= minDate) {
+                setExpiryDate(selectedDate);
+              } else {
+                // Reset or show error if past date is entered
+                // alert("You cannot select a past date.");
+                setExpiryDate(minDate); // Reset to today's date
+              }
+            }}
             min={minDate}
             max={maxDateStr}
           />

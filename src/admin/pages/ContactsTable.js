@@ -177,6 +177,8 @@ const handleMessageClick = async (contact) => {
       }
     }
   };
+
+  
   return (
     <div className="contacts-table-container">
       <main className="staff-main-content">
@@ -186,7 +188,7 @@ const handleMessageClick = async (contact) => {
         <table className="careers-table">
           <thead>
             <tr>
-              <th>S.No</th>
+              <th>Sl.No</th>
               <th>Name</th>
               <th>Email</th>
               <th>Phone</th>
@@ -224,7 +226,7 @@ const handleMessageClick = async (contact) => {
                     : contact.subject}
                 </td>
 
-                <td style={{display:'flex', alignItems:'center'}}>
+                <td >
                   <button
                     className="message-btn"
                     onClick={() => handleMessageClick(contact)}
@@ -232,9 +234,9 @@ const handleMessageClick = async (contact) => {
                     View
                   </button>
                   {contact.isRead ? (
-                    <img alt="Seen" src={BlueTick} title="Seen" style={{marginLeft:'5px'}} width={'20px'}/> // Blue tick
+                    <img alt="Seen" src={BlueTick} title="Seen" style={{marginLeft:'5px'}} width={'17px'}/> // Blue tick
                   ) : (
-                    <img alt="Unseen" src={BlackTick} title="Unseen"  style={{marginLeft:'5px'}} width={'18px'}/> // Grey tick
+                    <img alt="Unseen" src={BlackTick} title="Unseen"  style={{marginLeft:'5px'}} width={'17px'}/> // Grey tick
                   )}
                 </td>
 

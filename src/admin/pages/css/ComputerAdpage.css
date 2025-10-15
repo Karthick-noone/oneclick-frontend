@@ -131,6 +131,10 @@
   right: 10px;
 }
 
+
+.close-button:focus{
+  outline: none;
+}
 .close-button:hover {
   color: red;
 }
@@ -711,10 +715,6 @@
   margin: 0; /* Remove margin */
 }
 
-.coupon-item {
-  padding: 10px 0; /* Add vertical padding to items */
-  border-bottom: 1px solid #e0e0e0; /* Light border between items */
-}
 
 .coupon-code {
   font-weight: bold; /* Make coupon code bold */

@@ -223,8 +223,8 @@
   }
 .product-namee {
   font-weight: bold;
-  text-align: left !important; /* 👈 Force text to align left */
-  display: block; /* 👈 Make it block-level to align left properly */
+  text-align: left !important; /*  Force text to align left */
+  display: block; /*  Make it block-level to align left properly */
   max-width: 300px; /* Adjust as needed */
   white-space: nowrap; /* Keep text in one line */
   overflow: hidden; /* Hide overflow text */

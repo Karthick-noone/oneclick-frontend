@@ -116,8 +116,8 @@ const Checkout = () => {
     const inputValue = event.target.value;
 
     // Use a regular expression to allow only alphanumeric characters (A-Z, a-z, 0-9)
-// eslint-disable-next-line no-useless-escape
-const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/? ]*$/;
+    // eslint-disable-next-line no-useless-escape
+    const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/? ]*$/;
 
     // Check if the input value matches the regex
     if (validCharacters.test(inputValue)) {
@@ -290,7 +290,7 @@ const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/? ]*$/;
         title: "No Items Selected",
         text: "Please select at least one item before adding to cart.",
         confirmButtonText: "OK",
-        timer: 3000,
+        timer: 5000,
       });
       return;
     }
@@ -478,22 +478,22 @@ const validCharacters = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/? ]*$/;
   const [buyLaterProducts, setBuyLaterProducts] = useState([]);
 
   const fetchBuyLaterItems = useCallback(() => {
-  axios
-    .get(`${ApiUrl}/api/get-buy-later/${userid}`)
-    .then((response) => {
-      console.log("Fetched buy later items:", response.data);
+    axios
+      .get(`${ApiUrl}/api/get-buy-later/${userid}`)
+      .then((response) => {
+        console.log("Fetched buy later items:", response.data);
 
-      setBuyLaterProducts(response.data.buyLater);
-    })
-    .catch((error) => {
-      console.error("Error fetching buy later items:", error);
-    });
-}, [ userid]); //  dependencies
+        setBuyLaterProducts(response.data.buyLater);
+      })
+      .catch((error) => {
+        console.error("Error fetching buy later items:", error);
+      });
+  }, [userid]); //  dependencies
 
   // Call this function when the page loads
-useEffect(() => {
-  fetchBuyLaterItems();
-}, [fetchBuyLaterItems]); //  added fetchBuyLaterItems
+  useEffect(() => {
+    fetchBuyLaterItems();
+  }, [fetchBuyLaterItems]); //  added fetchBuyLaterItems
 
 
   // Calculate the total price; only filter out buy later items after the user clicks "Buy Later"
@@ -632,16 +632,16 @@ useEffect(() => {
           // Update the default address to the newly selected address
           setDefaultAddress(selectedAddress);
           await fetchAddress(userId);
-           Swal.fire({
-          toast:true,
-          timer: 3000,
-          position:'top-end',
-          // title: "Success",
-          text: "Address updated successfully",
-          icon: "success",
-          confirmButtonText: "OK",
-          showConfirmButton:false,
-        });
+          Swal.fire({
+            toast: true,
+            timer: 3000,
+            position: 'top-end',
+            // title: "Success",
+            text: "Address updated successfully",
+            icon: "success",
+            confirmButtonText: "OK",
+            showConfirmButton: false,
+          });
           handleCloseModal(); // Close the modal after confirming
         } else {
           throw new Error("Unexpected response status");
@@ -918,11 +918,11 @@ useEffect(() => {
     const selectedAddressDetails = addressDetails.find(
       (address) => String(address.address_id) === String(addressToUse)
     );
-    // const finalAmountToSend =
-    //   newTotalAmount > 0 ? newTotalAmount : calculateTotalPrice();
+    const finalAmountToSend =
+      newTotalAmount > 0 ? newTotalAmount : calculateTotalPrice();
     const phonenumber = `${selectedAddressDetails.phone}`;
     const name = `${selectedAddressDetails.name}`;
-    const email = localStorage.getItem("email");
+    // const email = localStorage.getItem("email");
 
     // console.log("Razorpay Prefill Data:", {
     //   name: name,           // Logs the user's name (or admin's name if hardcoded)
@@ -935,6 +935,7 @@ useEffect(() => {
       key_secret: "IUFWdAs57nzoQqnrPZM1pzzt", // Replace with your Razorpay Test Key ID
       // key: "rzp_test_mtjdapiflomQkN", // Sample Razorpay Test Key ID (karthick)
       // key_secret: "g13PipAk6MMAEj2Rr3lajUmJ", // Replace with your Razorpay Test Key ID(karthick)
+      amount: finalAmountToSend * 100,
       currency: "INR",
       name: "One Click",
       description: "Order Payment",
@@ -1175,35 +1176,45 @@ useEffect(() => {
         </div>
         <div className="cart-content row">
           <div className="cart-products">
-            <div className="cart-address">
-              <strong> LOGIN </strong>
+            <div
+              className="cart-address"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+              }}
+            >
+              {/* Left side: LOGIN + icon + username */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                  <strong>LOGIN</strong>
+                  {username ? (
+                    <FaCheck style={{ color: "green" }} />
+                  ) : (
+                    <FaTimes style={{ color: "red" }} />
+                  )}
+                </div>
 
-              {username ? (
-                <>
-                  <FaCheck style={{ color: "green" }} />
-                  <br />
-                  <span style={{ fontSize: "14px" }}>
+                {username && (
+                  <span style={{ fontSize: "14px", marginTop: "4px", display: "block" }}>
                     {capitalizeFirstLetter(username)}
                   </span>
-                </>
-              ) : (
-                <>
-                  <FaTimes style={{ color: "red" }} />
-                  <br />
-                  {/* <span style={{ fontSize: "14px" }}>Guest</span> */}
-                  {/* <br /> */}
-                  <Link to="/Login">
-                    <button
-                      className="change-btn"
-                      style={{ cursor: "pointer", float: "right" }}
-                    // onClick={() => console.log("Redirect to login page")} // Replace with actual login logic
-                    >
-                      Login
-                    </button>
-                  </Link>
-                </>
+                )}
+              </div>
+
+              {/* Right side: Login button (only if not logged in) */}
+              {!username && (
+                <Link to="/Login">
+                  <button
+                    className="change-btn"
+                    style={{ cursor: "pointer" }}
+                  >
+                    Login
+                  </button>
+                </Link>
               )}
             </div>
+
             <div className="cart-address">
               {/* <h3>Select Delivery Address</h3> */}
               {addressDetails.length > 0 ? (
@@ -1214,40 +1225,45 @@ useEffect(() => {
                         }`}
                       key={address.address_id}
                     >
-                      <button
-                        style={{ float: "right" }}
-                        className="change-btn"
-                        title="Change Delivery Address"
-                        onClick={() =>
-                          handleSelectAddressClick(address.address_id)
-                        } // Ensure this is calling the correct function
-                      >
-                        {isAddressSelected &&
-                          selectedAddress === address.address_id
-                          ? "Change"
-                          : "Change"}
-                      </button>
+
                       <strong style={{ fontSize: "1.0rem" }}>
                         DELIVERY ADDRESS <FaCheck style={{ color: "green" }} />
                       </strong>
-                      <label>
-                        <span style={{ fontSize: "14px", marginTop: "5px" }}>
-                          {address.name}, {address.street}, {address.city},{" "}
-                          {address.state}, {address.country},{" "}
-                          {address.postal_code}, {address.phone}
-                        </span>
-                      </label>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <label>
+                          <span style={{ fontSize: "14px", marginTop: "5px" }}>
+                            {address.name}, {address.street}, {address.city},{" "}
+                            {address.state}, {address.country},{" "}
+                            {address.postal_code}, {address.phone}
+                          </span>
+                        </label>
+                        <button
+                          // style={{ float: "right" }}
+                          className="change-btn"
+                          title="Change Delivery Address"
+                          onClick={() =>
+                            handleSelectAddressClick(address.address_id)
+                          } // Ensure this is calling the correct function
+                        >
+                          {isAddressSelected &&
+                            selectedAddress === address.address_id
+                            ? "Change"
+                            : "Change"}
+                        </button>
+                      </div>
+
+
                     </li>
                   ))}
                 </ul>
               ) : (
-                <div>
+                <div style={{ display: "flex", justifyContent: 'space-between' }}>
                   <strong style={{ fontSize: "1.0rem" }}>
                     DELIVERY ADDRESS <FaTimes style={{ color: "red" }} />
                   </strong>
-                  <br />
+                  {/* <br /> */}
                   <Link to="/Useraddress">
-                    <button style={{ float: "right" }} className="change-btn">
+                    <button className="change-btn">
                       Add Address
                     </button>
                   </Link>
@@ -1280,7 +1296,7 @@ useEffect(() => {
                       </Link>
                     </div>
                   ) : (
-                    <div>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
                       <p>
                         {totalItems === 1
                           ? `${totalItems} item`
@@ -1288,7 +1304,7 @@ useEffect(() => {
                         in cart
                       </p>
                       <button
-                        style={{ float: "right" }}
+                        // style={{ float: "right" }}
                         className="change-btn"
                         onClick={handleToggleExpand}
                       >
@@ -1572,9 +1588,6 @@ useEffect(() => {
                     )
                   }
 
-
-
-
                 </div>
               </div>
             )}
@@ -1750,79 +1763,80 @@ useEffect(() => {
               <h4 style={{ marginTop: "10px" }}>Select Payment Method</h4>
             </center>
             <div className="payment-methods">
-              <div
-                className={`summary-item2 ${selectedPaymentMethod === "cod" ? "selected" : ""
-                  }`}
-              >
-                <FaMoneyBillWave
-                  style={{ color: "green" }}
-                  className="payment-icon"
-                />
-                <span className="methods">Cash on Delivery</span>
-                <span>
-                  <input
-                    type="radio"
-                    name="payment-method"
-                    value="cod"
-                    checked={selectedPaymentMethod === "cod"}
-                    onChange={handlePaymentMethodChange}
+              <div className="radio-container">
+                <div
+                  className={`summary-item2 ${selectedPaymentMethod === "cod" ? "selected" : ""
+                    }`}
+                >
+                  <FaMoneyBillWave
+                    style={{ color: "green" }}
+                    className="payment-icon"
                   />
-                </span>
-                {selectedPaymentMethod === "cod" && (
-                  <div className="continue-wrapper">
-                    <button
-                      onClick={() => handlePlaceOrder("cod")} // Pass "cod" to handlePayment function
-                      className="summary-place-order-btn"
-                    >
-                      {isOrdering ? (
-                        <img
-                          src={orderTruck}
-                          alt="Ordering..."
-                          style={{ height: "100px", padding: "1px" }}
-                        />
-                      ) : (
-                        "Order Now"
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
+                  <span className="methods">Cash on Delivery</span>
+                  <span>
+                    <input
+                      type="radio"
+                      name="payment-method"
+                      value="cod"
+                      checked={selectedPaymentMethod === "cod"}
+                      onChange={handlePaymentMethodChange}
+                    />
+                  </span>
+                  {selectedPaymentMethod === "cod" && (
+                    <div className="continue-wrapper">
+                      <button
+                        onClick={() => handlePlaceOrder("cod")} // Pass "cod" to handlePayment function
+                        className="summary-place-order-btn"
+                      >
+                        {isOrdering ? (
+                          <img
+                            src={orderTruck}
+                            alt="Ordering..."
+                            style={{ height: "100px", padding: "1px" }}
+                          />
+                        ) : (
+                          "Order Now"
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
 
-              <div
-                className={`summary-item2 ${selectedPaymentMethod === "card" ? "selected" : ""
-                  }`}
-              >
-                <FaCreditCard
-                  style={{ color: "skyblue" }}
-                  className="payment-icon"
-                />
-                <span className="methods">Pay Online</span>
-                <span>
-                  <input
-                    type="radio"
-                    name="payment-method"
-                    value="card"
-                    checked={selectedPaymentMethod === "card"}
-                    onChange={handlePaymentMethodChange}
+                <div
+                  className={`summary-item2 ${selectedPaymentMethod === "card" ? "selected" : ""
+                    }`}
+                >
+                  <FaCreditCard
+                    style={{ color: "skyblue" }}
+                    className="payment-icon"
                   />
-                </span>
-                {selectedPaymentMethod === "card" && (
-                  <div className="continue-wrapper">
-                    <button
-                      className="pay-btn"
-                      onClick={() => handlePayment("Online")}
-                    >
-                      {isOrdering ? (
-                        <img
-                          src={orderTruck}
-                          alt="Ordering..."
-                          style={{ height: "100px", padding: "1px" }}
-                        />
-                      ) : (
-                        "Pay Now"
-                      )}
-                      {/* <span class="btn-text">Pay Now</span> */}
-                      {/* <div class="icon-container">
+                  <span className="methods">Pay Online</span>
+                  <span>
+                    <input
+                      type="radio"
+                      name="payment-method"
+                      value="card"
+                      checked={selectedPaymentMethod === "card"}
+                      onChange={handlePaymentMethodChange}
+                    />
+                  </span>
+                  {selectedPaymentMethod === "card" && (
+                    <div className="continue-wrapper">
+                      <button
+                        className="summary-place-order-btn"
+                        onClick={() => handlePayment("Online")}
+                      >
+                        {isOrdering ? (
+                          <img
+                            src={orderTruck}
+                            alt="Ordering..."
+                            style={{ height: "100px", padding: "1px" }}
+                          />
+                        ) : (
+                          "Pay Now"
+                        )}
+                        {/* <span class="btn-text">Pay Now</span> */}
+                        {/* <div class="icon-container">
                         <svg viewBox="0 0 24 24" class="icon5 card-icon">
                           <path
                             d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18C2,19.11 2.89,20 4,20H20C21.11,20 22,19.11 22,18V6C22,4.89 21.11,4 20,4Z"
@@ -1859,47 +1873,47 @@ useEffect(() => {
                           ></path>
                         </svg>
                       </div> */}
-                    </button>
-                  </div>
-                )}
-              </div>
+                      </button>
+                    </div>
+                  )}
+                </div>
 
-              <div
-                className={`summary-item2 ${selectedPaymentMethod === "pickup" ? "selected" : ""
-                  }`}
-              >
-                <FaStore style={{ color: "orange" }} className="payment-icon" />
-                <span className="methods">Pick Up From Store</span>
-                <span>
-                  <input
-                    type="radio"
-                    name="payment-method"
-                    value="pickup"
-                    checked={selectedPaymentMethod === "pickup"}
-                    onChange={handlePaymentMethodChange}
-                  />
-                </span>
-                {selectedPaymentMethod === "pickup" && (
-                  <div className="continue-wrapper">
-                    <button
-                      onClick={() => handlePlaceOrder("pickup")} // Pass "cod" to handlePayment function
-                      className="summary-place-order-btn"
-                    >
-                      {isOrdering ? (
-                        <img
-                          src={orderTruck}
-                          alt="Ordering..."
-                          style={{ height: "100px", padding: "1px" }}
-                        />
-                      ) : (
-                        "Order Now"
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
+                <div
+                  className={`summary-item2 ${selectedPaymentMethod === "pickup" ? "selected" : ""
+                    }`}
+                >
+                  <FaStore style={{ color: "orange" }} className="payment-icon" />
+                  <span className="methods">Pick Up From Store</span>
+                  <span>
+                    <input
+                      type="radio"
+                      name="payment-method"
+                      value="pickup"
+                      checked={selectedPaymentMethod === "pickup"}
+                      onChange={handlePaymentMethodChange}
+                    />
+                  </span>
+                  {selectedPaymentMethod === "pickup" && (
+                    <div className="continue-wrapper">
+                      <button
+                        onClick={() => handlePlaceOrder("pickup")} // Pass "cod" to handlePayment function
+                        className="summary-place-order-btn"
+                      >
+                        {isOrdering ? (
+                          <img
+                            src={orderTruck}
+                            alt="Ordering..."
+                            style={{ height: "100px", padding: "1px" }}
+                          />
+                        ) : (
+                          "Order Now"
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
 
-              {/* <div className={`summary-item2 ${selectedPaymentMethod === 'net-banking' ? 'selected' : ''}`}>
+                {/* <div className={`summary-item2 ${selectedPaymentMethod === 'net-banking' ? 'selected' : ''}`}>
           <FaUniversity className="payment-icon" />
           <span className="methods">Net Banking</span>
           <span>
@@ -1936,66 +1950,67 @@ useEffect(() => {
             </div>
           )}
         </div> */}
-            </div>
-            {isModalOpen && (
-              <div className="modal4-overlay">
-                <div className="modal4-content">
-                  <h3>Select Delivery Address</h3>
-                  <button
-                    onClick={handleCloseModal}
-                    className="modal4-close-btn"
-                  >
-                    &times;
-                  </button>
-                  {addresses.length > 0 ? (
-                    <ul className="address-list">
-                      {addresses.map((address) => (
-                        <li key={address.address_id} className="address-item">
-                          <label>
-                            <input
-                              type="radio"
-                              name="selectedAddress"
-                              value={address.address_id}
-                              checked={selectedAddress === address.address_id}
-                              onChange={() =>
-                                setSelectedAddress(address.address_id)
-                              }
-                            />
-                            {address.name}, {address.street}, {address.city},{" "}
-                            {address.state}, {address.postal_code},{" "}
-                            {address.country}, {address.phone}
-                          </label>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>No addresses found. Please add one during checkout.</p>
-                  )}
-                  <center>
-                    <div className="modal4c">
-                      <button
-                        title="Set this address as delivery address"
-                        onClick={handleConfirm}
-                        className="modal4-confirm-btn"
-                      >
-                        Set Address
-                      </button>
-                      <Link
-                        style={{ textDecoration: "none" }}
-                        to="/Useraddress"
-                      >
+              </div>
+              {isModalOpen && (
+                <div className="modal4-overlay">
+                  <div className="modal4-content">
+                    <h3>Select Delivery Address</h3>
+                    <button
+                      onClick={handleCloseModal}
+                      className="modal4-close-btn"
+                    >
+                      &times;
+                    </button>
+                    {addresses.length > 0 ? (
+                      <ul className="address-list">
+                        {addresses.map((address) => (
+                          <li key={address.address_id} className="address-item">
+                            <label>
+                              <input
+                                type="radio"
+                                name="selectedAddress"
+                                value={address.address_id}
+                                checked={selectedAddress === address.address_id}
+                                onChange={() =>
+                                  setSelectedAddress(address.address_id)
+                                }
+                              />
+                              {address.name}, {address.street}, {address.city},{" "}
+                              {address.state}, {address.postal_code},{" "}
+                              {address.country}, {address.phone}
+                            </label>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No addresses found. Please add one during checkout.</p>
+                    )}
+                    <center>
+                      <div className="modal4c">
                         <button
-                          title="Add new address"
+                          title="Set this address as delivery address"
+                          onClick={handleConfirm}
                           className="modal4-confirm-btn"
                         >
-                          Add New Address
+                          Set Address
                         </button>
-                      </Link>
-                    </div>
-                  </center>
+                        <Link
+                          style={{ textDecoration: "none" }}
+                          to="/Useraddress"
+                        >
+                          <button
+                            title="Add new address"
+                            className="modal4-confirm-btn"
+                          >
+                            Add New Address
+                          </button>
+                        </Link>
+                      </div>
+                    </center>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Address Section */}

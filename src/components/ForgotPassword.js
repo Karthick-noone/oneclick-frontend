@@ -315,7 +315,7 @@ const ForgotPasswordPage = () => {
                     {/* <Link to="/ForgotPassword" style={styles.link}>
                       Forgot Password?
                     </Link> */}
-                    <Link to="/signup" style={styles.link}>
+                    <Link to="/login" style={styles.link}>
                       Don't have an account? Sign Up
                     </Link>
                   </div>

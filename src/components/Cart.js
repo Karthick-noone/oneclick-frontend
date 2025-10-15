@@ -919,10 +919,10 @@ useEffect(() => {
                   ))}
                 </ul>
               ) : (
-                <div>
+                <div style={{display:'flex', justifyContent:'space-between'}}>
                   <p> Please add one address during checkout. </p>
                   <Link to="/Useraddress">
-                    <button style={{ float: "right" }} className="change-btn">Add Address</button>
+                    <button className="change-btn">Add Address</button>
                   </Link>
                 </div>
               )}

@@ -106,8 +106,16 @@ const StaffManagementPage = () => {
 
       try {
         await axios.put(`${ApiUrl}/api/updatestaff/${formData.id}`, formData);
-        Swal.fire("Updated!", "Staff details updated successfully.", "success");
-        await fetchStaff(); // Refresh staff list
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: "success",
+          // title: "Success",
+          text: "Staff details updated successfully.!",
+          confirmButtonColor: "#4caf50",
+          showConfirmButton: false,
+          timer: 4000
+        }); await fetchStaff(); // Refresh staff list
       } catch (error) {
         console.error("Error updating staff:", error);
         Swal.fire("Error!", "Failed to update staff.", "error");
@@ -116,8 +124,16 @@ const StaffManagementPage = () => {
       try {
         const response = await axios.post(`${ApiUrl}/api/addstaff`, formData);
         setStaffList([...staffList, response.data]);
-        Swal.fire("Success!", "New staff added successfully.", "success");
-        await fetchStaff(); // Refresh staff list
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: "success",
+          // title: "Success",
+          text: "New staff added successfully!",
+          confirmButtonColor: "#4caf50",
+          showConfirmButton: false,
+          timer: 4000
+        }); await fetchStaff(); // Refresh staff list
       } catch (error) {
         console.error("Error adding staff:", error);
         Swal.fire("Error!", "Failed to add staff.", "error");
@@ -129,6 +145,7 @@ const StaffManagementPage = () => {
 
   const handleDelete = (index) => {
     Swal.fire({
+      // toast:true,
       title: "Are you sure?",
       text: "You won't be able to revert this!",
       icon: "warning",
@@ -142,8 +159,17 @@ const StaffManagementPage = () => {
         try {
           await axios.delete(`${ApiUrl}/api/deletestaff/${idToDelete}`);
           const updatedList = staffList.filter((_, i) => i !== index);
-          setStaffList(updatedList);
-          Swal.fire("Deleted!", "Staff has been deleted.", "success");
+          setStaffList(updatedList)
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: "success",
+            // title: "Success",
+            text: "Staff has been deleted!",
+            confirmButtonColor: "#4caf50",
+            showConfirmButton: false,
+            timer: 4000
+          });
         } catch (error) {
           console.error("Error deleting staff:", error);
           Swal.fire("Error!", "Failed to delete staff.", "error");
@@ -154,7 +180,11 @@ const StaffManagementPage = () => {
 
   const handleEdit = (index) => {
     setEditingIndex(index);
-    setFormData(staffList[index]);
+    setFormData(staffList[index]); // Prefill the form with selected staff
+  };
+  const handleCancelEdit = () => {
+    setEditingIndex(null); // Exit edit mode
+    setFormData({ staffname: "", username: "", password: "", status: "active" }); // Reset form
   };
 
 
@@ -232,49 +262,78 @@ const StaffManagementPage = () => {
               <option value="inactive">Inactive</option>
             </select>
           </div>
-          <button type="submit" className="staff-btn-submit">
-            {editingIndex !== null ? "Update" : "Add"}
-          </button>
+
+          <div style={{ display: 'flex' }}>
+            <button type="submit" className="staff-btn-submit">
+              {editingIndex !== null ? "Update" : "Add"}
+            </button>
+
+            {editingIndex !== null && (
+              <button
+                type="button"
+                className="staff-cancel-btn"
+                onClick={handleCancelEdit}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
+
         <div className="staff-table-wrapper">
-  <table className="staff-table">
-    <thead>
-      <tr>
-        <th>S.No</th>
-        <th>Staff Name</th>
-        <th>Username</th>
-        <th>Password</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {currentStaff.map((staff, index) => (
-        <tr key={index}>
-          <td>{indexOfFirstStaff + index + 1}</td>
-          <td>{staff.staffname}</td>
-          <td>{staff.username}</td>
-          <td>{staff.password}</td>
-          <td>{staff.status}</td>
-          <td>
-            <button
-              onClick={() => handleEdit(index)}
-              className="staff-btn-edit"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDelete(index)}
-              className="staff-btn-delete"
-            >
-              Delete
-            </button>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+          <table className="staff-table">
+            <thead>
+              <tr>
+                <th>Sl.No</th>
+                <th>Staff Name</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentStaff.map((staff, index) => (
+                <tr key={index} style={{backgroundColor:staff.status === "inactive" ? "#ffdddd" : "",}}>
+                  <td>{indexOfFirstStaff + index + 1}</td>
+                  <td>{staff.staffname.charAt(0).toUpperCase()+staff.staffname.slice(1).toLowerCase()}</td>
+                  <td>{staff.username}</td>
+                  <td>{staff.password}</td>
+                  <td style={{ color: staff.status === "active" ? "green" : "red"}}>{staff.status.charAt(0).toUpperCase()+staff.status.slice(1).toLowerCase()}</td>
+                  <td>
+                    {/* <button
+                      onClick={() => handleEdit(index)}
+                      className="staff-btn-edit"
+                      style={{
+                        backgroundColor: editingIndex === index ? "#3b82f6" : "#ffc107", // Red for Cancel, Blue for Edit
+                        color: "#fff",
+                        border: "none",
+                        padding: "6px 12px",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {editingIndex === index ? "Cancel" : "Edit"}
+                    </button> */}
+
+                    <button
+                      onClick={() => handleEdit(index)}
+                      className="staff-btn-edit"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(index)}
+                      className="staff-btn-delete"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         <div className="pagination">
           {pageNumbers.map((number) => (

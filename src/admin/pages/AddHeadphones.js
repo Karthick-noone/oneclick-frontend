@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes, FaImages, FaPlusCircle,FaChevronDown } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes, FaImages, FaPlusCircle, FaChevronDown } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +22,7 @@ import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { SearchIcon } from "lucide-react";
 import FilterIcon from "./img/filter.png";
-import { toast,  } from "react-toastify";
+import { toast, } from "react-toastify";
 // Set up the modal root element
 Modal.setAppElement("#root");
 
@@ -84,10 +84,10 @@ const Headphones = () => {
   const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
   // const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
 
-const [, setLoadingProductId] = useState(null);
-    const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+  const [, setLoadingProductId] = useState(null);
+  const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
-     const handleStatusChange = async (newStatus, productId) => {
+  const handleStatusChange = async (newStatus, productId) => {
     try {
       const res = await axios.post(
         `${ApiUrl}/api/products/status`,
@@ -128,73 +128,73 @@ const [, setLoadingProductId] = useState(null);
     }
   };
 
-const handleStatusUpdate = async (prodId) => {
-  try {
-    console.log(`Updating productStatus for prod_id=${prodId}`);
-    setLoadingProductId(prodId); // Mark this product as loading
+  const handleStatusUpdate = async (prodId) => {
+    try {
+      console.log(`Updating productStatus for prod_id=${prodId}`);
+      setLoadingProductId(prodId); // Mark this product as loading
 
-    const newStatus = "approved"; // Always set to approved
+      const newStatus = "approved"; // Always set to approved
 
-    // Update product status with a timeout of 5 seconds
-    const response = await axios.post(
-      `${ApiUrl}/product-status/update`,
-      {
-        prod_id: prodId,
-        productStatus: newStatus,
-      },
-      { timeout: 5000 } // 5-second timeout
-    );
+      // Update product status with a timeout of 5 seconds
+      const response = await axios.post(
+        `${ApiUrl}/product-status/update`,
+        {
+          prod_id: prodId,
+          productStatus: newStatus,
+        },
+        { timeout: 5000 } // 5-second timeout
+      );
 
-    if (response.status === 200) {
-      console.log(`Product ${prodId} approved`);
-      toast.success("Product approved successfully", {
-        position: "top-right",
-        autoClose: 3000, // Close after 3 seconds
-        hideProgressBar: true, //  No progress bar
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      if (response.status === 200) {
+        console.log(`Product ${prodId} approved`);
+        toast.success("Product approved successfully", {
+          position: "top-right",
+          autoClose: 3000, // Close after 3 seconds
+          hideProgressBar: true, //  No progress bar
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
 
-      // Refresh product list
-      const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
-        timeout: 5000,
-      });
-      console.log("Refreshed product list:", refreshedProducts.data);
+        // Refresh product list
+        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
+          timeout: 5000,
+        });
+        console.log("Refreshed product list:", refreshedProducts.data);
 
-      // Update the product list in state
-      setProducts(refreshedProducts.data);
-    } else {
-      console.warn(`Failed to update product ${prodId}`);
-      toast.error(" Failed to update product status", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+        // Update the product list in state
+        setProducts(refreshedProducts.data);
+      } else {
+        console.warn(`Failed to update product ${prodId}`);
+        toast.error(" Failed to update product status", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+    } catch (error) {
+      console.error(`Error updating product ${prodId}:`, error.message);
+      if (error.code === "ECONNABORTED") {
+        toast.error(" Request timed out. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+        });
+      } else {
+        toast.error(" An error occurred while updating product status", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+        });
+      }
+    } finally {
+      setLoadingProductId(null); // Clear loading state
+      console.log(`Status update finished for prod_id: ${prodId}`);
     }
-  } catch (error) {
-    console.error(`Error updating product ${prodId}:`, error.message);
-    if (error.code === "ECONNABORTED") {
-      toast.error(" Request timed out. Please try again.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-      });
-    } else {
-      toast.error(" An error occurred while updating product status", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-      });
-    }
-  } finally {
-    setLoadingProductId(null); // Clear loading state
-    console.log(`Status update finished for prod_id: ${prodId}`);
-  }
-};
+  };
 
 
   const fetchCouponStatus = async (productId) => {
@@ -400,7 +400,7 @@ const handleStatusUpdate = async (prodId) => {
     setSelectedProductId(null);
   };
 
-   // const handlePopupToggle = () => {
+  // const handlePopupToggle = () => {
   //   setPopupVisible(!isPopupVisible);
   // };
 
@@ -838,9 +838,9 @@ const handleStatusUpdate = async (prodId) => {
     }
 
     // Validate coupon code and extract numeric part
-        // const couponCode = newProduct.coupon; // Fetching the coupon code
+    // const couponCode = newProduct.coupon; // Fetching the coupon code
 
-        // const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
+    // const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
 
 
     // Check if either coupon code or coupon expiry date is provided
@@ -1368,7 +1368,7 @@ const handleStatusUpdate = async (prodId) => {
     backgroundColor: "#218838", // Darker shade on hover
   };
 
-    // const handleAddPipe = () => {
+  // const handleAddPipe = () => {
   //   const textarea = document.querySelector(".laptops-card-input1"); // Get the textarea element by class
   //   const cursorPosition = textarea.selectionStart; // Get the cursor position
 
@@ -1424,22 +1424,49 @@ const handleStatusUpdate = async (prodId) => {
   const maxDate = getFormattedDate(new Date(today.setDate(today.getDate() + 10)));
 
   const handleDeleteCoupon = async (couponId) => {
-    const confirmation = window.confirm(
-      "Are you sure you want to delete this coupon?"
-    );
-    if (!confirmation) return;
+    // Show confirmation popup
+    const result = await Swal.fire({
+      toast: 'true',
+      title: "Are you sure?",
+      text: "This coupon will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33", // Red button
+      cancelButtonColor: "#3085d6", // Blue cancel button
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    // If user cancels, do nothing
+    if (!result.isConfirmed) return;
 
     try {
-      const response = await axios.delete(
-        `${ApiUrl}/deletecoupons/${couponId}`
-      );
+      const response = await axios.delete(`${ApiUrl}/deletecoupons/${couponId}`);
       if (response.status === 200) {
-        alert("Coupon deleted successfully");
+        // Show success popup
+        await Swal.fire({
+          toast: true,
+          position: "top-right",
+          title: false,
+          text: "The coupon has been deleted successfully.",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+          showConfirmButton: false,
+          timer: 3000,
+        });
+
+        // Remove deleted coupon from state
         setCoupons(coupons.filter((coupon) => coupon.coupon_id !== couponId));
       }
     } catch (error) {
       console.error("Error deleting coupon:", error);
-      alert("Failed to delete the coupon");
+      // Show error popup
+      Swal.fire({
+        title: "Error",
+        text: "Failed to delete the coupon. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
@@ -1619,7 +1646,7 @@ const handleStatusUpdate = async (prodId) => {
             <div className="filters-card2">
               <div className="filters-panel">
                 <div className="filter-label-title">
-                  <img src={FilterIcon} width={"20px"} alt="Filter"/>
+                  <img src={FilterIcon} width={"20px"} alt="Filter" />
 
                   <span> Filter By </span>
                   {/* <FilterIcon width={"20px"}/> */}
@@ -1741,7 +1768,7 @@ const handleStatusUpdate = async (prodId) => {
                             ))}
                           </Slider>
                         </div>
-          {/* <ToastContainer /> */}
+                        {/* <ToastContainer /> */}
 
                       </div>
 
@@ -1751,7 +1778,7 @@ const handleStatusUpdate = async (prodId) => {
                           {product.prod_name}
                         </h3>
 
-                       {product.productStatus === "unapproved" && (
+                        {product.productStatus === "unapproved" && (
                           <>
                             <img
                               src={userRole === "Admin" ? ApproveImage : ApprovalWaitingImage}
@@ -1782,6 +1809,13 @@ const handleStatusUpdate = async (prodId) => {
                             <div className="coupon-image-wrapper">
                               {couponProducts[product.id].isExpired === true ?
                                 <img
+                                  onClick={() =>
+                                    fetchCoupons(
+                                      product.prod_id,
+                                      product.prod_name,
+                                      product.prod_price
+                                    )
+                                  }
                                   src={ExpiredCouponImage}
                                   width="35px"
                                   alt="Coupon"
@@ -1789,6 +1823,13 @@ const handleStatusUpdate = async (prodId) => {
                                 />
                                 :
                                 <img
+                                  onClick={() =>
+                                    fetchCoupons(
+                                      product.prod_id,
+                                      product.prod_name,
+                                      product.prod_price
+                                    )
+                                  }
                                   src={ActiveCouponImage}
                                   width="35px"
                                   alt="Coupon"
@@ -1903,7 +1944,7 @@ const handleStatusUpdate = async (prodId) => {
                                         </span>
                                         <FaEdit className="offer-edit-icon" />
                                       </div>
-                                      }
+                                    }
 
                                     {/* Modal Rendering */}
                                     {isOfferModalOpen && (
@@ -1979,7 +2020,7 @@ const handleStatusUpdate = async (prodId) => {
                                               {isEditMode && offerStartTime && offerEndTime && offerPrice
                                                 ? "Update Offer"
                                                 : "Add Offer"
-                                                }
+                                              }
                                             </button>
                                           </form>
 
@@ -2034,20 +2075,22 @@ const handleStatusUpdate = async (prodId) => {
                                         />
                                       </span>
                                       <span
-                                        onClick={() =>
+                                        onClick={() => {
+                                          setIsModalOpen2(false);
                                           fetchCoupons(
                                             product.prod_id,
                                             product.prod_name,
                                             product.prod_price
-                                          )
+                                          );
+                                        }
                                         }
                                         style={{ cursor: "pointer" }}
                                       >
                                         {couponProducts[product.id]?.hasCoupon && (
-                                        <FaEye
-                                          className="faedit"
-                                          title="View Coupon"
-                                        />
+                                          <FaEye
+                                            className="faedit"
+                                            title="View Coupon"
+                                          />
                                         )}
                                       </span>
                                     </p>
@@ -2060,98 +2103,6 @@ const handleStatusUpdate = async (prodId) => {
                                       onCouponUpdated={handleCouponUpdated}
                                     />
 
-                                    {isViewingCoupons && (
-                                      <div className="pop-overlay">
-                                        <div className="pop-content">
-                                          <button
-                                            onClick={() => setIsViewingCoupons(false)}
-                                            className="fatimes"
-                                          >
-                                            <FaTimes color="black" size={20} />
-                                          </button>
-                                          <h4>Coupon list for this product</h4>
-                                          <span className="coupon-title-with-image">
-                                            {product.prod_img?.[0] && (
-                                              <img
-                                                src={`${ApiUrl}/uploads/headphones/${product.prod_img[0]}`}
-                                                alt={product.prod_name}
-                                                className="coupon-product-image"
-                                              />
-                                            )}
-                                            <span className="coupon-product-name">
-                                              {productName}
-                                            </span>
-                                          </span>
-                                          {coupons.length > 0 ? (
-                                            <ul className="coupons-list">
-                                              {coupons.map((coupon, index) => (
-                                                <li
-                                                  key={coupon.coupon_id}
-                                                  className="coupon-item"
-                                                >
-                                                  <span className="serial-number">
-                                                    {index + 1}.{" "}
-                                                  </span>
-                                                  <span className="coupon-code">
-                                                    {coupon.coupon_code}
-                                                  </span>{" "}
-                                                  -
-                                                  <span className="coupon-code">
-                                                    {coupon.discount_value}
-                                                  </span>{" "}
-                                                  -
-                                                  <span className="expiry-date">
-                                                    {/* Expires on:{" "} */}{" "}
-                                                    {new Date(
-                                                      coupon.expiry_date
-                                                    ).toLocaleDateString("en-GB", {
-                                                      day: "2-digit",
-                                                      month: "short",
-                                                      year: "numeric",
-                                                    })}
-                                                  </span>
-                                                  <FaEdit
-                                                    className="edit-icon"
-                                                    title="Edit Expiry Date"
-                                                    onClick={() =>
-                                                      handleEditExpiry(
-                                                        coupon.coupon_id
-                                                      )
-                                                    }
-                                                  />
-                                                  <FaTrash
-                                                    className="delete-icon"
-                                                    title="Delete Coupon"
-                                                    onClick={() =>
-                                                      handleDeleteCoupon(
-                                                        coupon.coupon_id
-                                                      )
-                                                    }
-                                                    style={{
-                                                      marginLeft: "10px",
-                                                      cursor: "pointer",
-                                                    }}
-                                                  />
-                                                </li>
-                                              ))}
-                                            </ul>
-                                          ) : (
-                                            <p>
-                                              No coupons available for this product.
-                                            </p>
-                                          )}
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    <EditCouponModal
-                                      isOpen={isEditingCoupon}
-                                      onClose={() => setIsEditingCoupon(false)}
-                                      coupon={selectedCoupon}
-                                      productId={selectedProductId}
-                                      productPrice={selectedProductPrice}
-                                      onCouponUpdated={() => { }}
-                                    />
 
                                     <div
                                       className="frequently-buy"
@@ -2197,11 +2148,164 @@ const handleStatusUpdate = async (prodId) => {
                           </div>
                         </div>
                       )}
+
+                      {isViewingCoupons && (
+                        <div className="pop-overlay">
+                          <div className="pop-content">
+                            <button
+                              onClick={() => setIsViewingCoupons(false)}
+                              className="fatimes"
+                            >
+                              <FaTimes color="black" size={20} />
+                            </button>
+                            <h4>Coupon list for this product</h4>
+                            <span className="coupon-title-with-image">
+                              {product.prod_img?.[0] && (
+                                <img
+                                  src={`${ApiUrl}/uploads/headphones/${product.prod_img[0]}`}
+                                  alt={product.prod_name}
+                                  className="coupon-product-image"
+                                />
+                              )}
+                              <span className="coupon-product-name">
+                                {productName}
+                              </span>
+                            </span>
+                            {coupons.length > 0 ? (
+                              <div className="coupons-wrapper">
+                                {/* Active Coupons */}
+                                {coupons.filter(coupon => {
+                                  const couponDate = new Date(coupon.expiry_date);
+                                  const today = new Date();
+                                  // Normalize both dates to midnight (ignore time zone)
+                                  couponDate.setHours(0, 0, 0, 0);
+                                  today.setHours(0, 0, 0, 0);
+                                  return couponDate >= today;
+                                }).length > 0 && (
+                                    <div className="active-coupons-box">
+                                      <h5>Active Coupons</h5>
+                                      <ul className="coupons-list active-list">
+                                        {coupons
+                                          .filter(coupon => {
+                                            const couponDate = new Date(coupon.expiry_date);
+                                            const today = new Date();
+                                            couponDate.setHours(0, 0, 0, 0);
+                                            today.setHours(0, 0, 0, 0);
+                                            return couponDate >= today;
+                                          })
+                                          .map((coupon, index) => (
+                                            <li key={coupon.coupon_id} className="coupon-item">
+                                              <span className="serial-number">{index + 1}. </span>
+                                              <span className="coupon-code">{coupon.coupon_code}</span> -
+                                              <span className="coupon-code">{coupon.discount_value}</span> -
+                                              <span className="expiry-date">
+                                                {new Date(coupon.expiry_date).toLocaleDateString("en-GB", {
+                                                  day: "2-digit",
+                                                  month: "short",
+                                                  year: "numeric",
+                                                })}
+                                              </span>
+                                              <FaEdit
+                                                className="edit-icon"
+                                                title="Edit Expiry Date"
+                                                onClick={() => {
+                                                  handleEditExpiry(coupon.coupon_id);
+                                                  setIsViewingCoupons(false);
+                                                }}
+                                              />
+                                              <FaTrash
+                                                className="delete-icon"
+                                                title="Delete Coupon"
+                                                onClick={() => handleDeleteCoupon(coupon.coupon_id)}
+                                                style={{
+                                                  marginLeft: "10px",
+                                                  cursor: "pointer",
+                                                }}
+                                              />
+                                            </li>
+                                          ))}
+                                      </ul>
+                                    </div>
+                                  )}
+
+                                {/* Expired Coupons */}
+                                {coupons.filter(coupon => {
+                                  const couponDate = new Date(coupon.expiry_date);
+                                  const today = new Date();
+                                  // Normalize both dates
+                                  couponDate.setHours(0, 0, 0, 0);
+                                  today.setHours(0, 0, 0, 0);
+                                  return couponDate < today;
+                                }).length > 0 && (
+                                    <div className="expired-coupons-box">
+                                      <h5>Expired Coupons</h5>
+                                      <ul className="coupons-list expired-list">
+                                        {coupons
+                                          .filter(coupon => {
+                                            const couponDate = new Date(coupon.expiry_date);
+                                            const today = new Date();
+                                            couponDate.setHours(0, 0, 0, 0);
+                                            today.setHours(0, 0, 0, 0);
+                                            return couponDate < today;
+                                          })
+                                          .map((coupon, index) => (
+                                            <li key={coupon.coupon_id} className="coupon-item">
+                                              <span className="serial-number">{index + 1}. </span>
+                                              <span className="coupon-code">{coupon.coupon_code}</span> -
+                                              <span className="coupon-code">{coupon.discount_value}</span> -
+                                              <span className="expiry-date">
+                                                {new Date(coupon.expiry_date).toLocaleDateString("en-GB", {
+                                                  day: "2-digit",
+                                                  month: "short",
+                                                  year: "numeric",
+                                                })}
+                                              </span>
+                                              <FaEdit
+                                                className="edit-icon"
+                                                title="Edit Expiry Date"
+                                                onClick={() => {
+                                                  handleEditExpiry(coupon.coupon_id);
+                                                  setIsViewingCoupons(false);
+                                                }}
+                                              />
+                                              <FaTrash
+                                                className="delete-icon"
+                                                title="Delete Coupon"
+                                                onClick={() => handleDeleteCoupon(coupon.coupon_id)}
+                                                style={{
+                                                  marginLeft: "10px",
+                                                  cursor: "pointer",
+                                                }}
+                                              />
+                                            </li>
+                                          ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                              </div>
+                            ) : (
+                              <p>No coupons available for this product.</p>
+                            )}
+
+                          </div>
+                        </div>
+                      )}
+
+                      <EditCouponModal
+                        isOpen={isEditingCoupon}
+                        onClose={() => setIsEditingCoupon(false)}
+                        coupon={selectedCoupon}
+                        productId={selectedProductId}
+                        productPrice={selectedProductPrice}
+                        onCouponUpdated={() => { }}
+                      />
+
                     </div>
                   ))
               );
             })()
-          )}        </div>
+          )}
+        </div>
       </div>
       {/* Modal for Image Upload */}
       <Modal
@@ -2485,7 +2589,7 @@ const handleStatusUpdate = async (prodId) => {
 };
 // Custom next arrow component
 const SampleNextArrow = (props) => {
-  const { className,  onClick } = props;
+  const { className, onClick } = props;
   return (
     <div
       className={`${className} `}
@@ -2498,7 +2602,7 @@ const SampleNextArrow = (props) => {
 };
 
 const SamplePrevArrow = (props) => {
-  const { className,  onClick } = props;
+  const { className, onClick } = props;
   return (
     <div
       className={`${className}`}

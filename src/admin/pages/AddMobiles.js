@@ -101,7 +101,7 @@ const Mobiles = () => {
 
   const [, setLoadingProductId] = useState(null);
 
-   const handleStatusChange = async (newStatus, productId) => {
+  const handleStatusChange = async (newStatus, productId) => {
     try {
       const res = await axios.post(
         `${ApiUrl}/api/products/status`,
@@ -470,7 +470,7 @@ const Mobiles = () => {
     setSelectedProductId(null);
   };
 
-   // const handlePopupToggle = () => {
+  // const handlePopupToggle = () => {
   //   setPopupVisible(!isPopupVisible);
   // };
 
@@ -914,9 +914,9 @@ const Mobiles = () => {
     }
 
     // Validate coupon code and extract numeric part
-        // const couponCode = newProduct.coupon; // Fetching the coupon code
+    // const couponCode = newProduct.coupon; // Fetching the coupon code
 
-        // const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
+    // const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
 
 
     // Check if either coupon code or coupon expiry date is provided
@@ -1444,7 +1444,7 @@ const Mobiles = () => {
     backgroundColor: "#218838", // Darker shade on hover
   };
 
-    // const handleAddPipe = () => {
+  // const handleAddPipe = () => {
   //   const textarea = document.querySelector(".laptops-card-input1"); // Get the textarea element by class
   //   const cursorPosition = textarea.selectionStart; // Get the cursor position
 
@@ -1499,23 +1499,50 @@ const Mobiles = () => {
   const minDate = getFormattedDate(today);
   const maxDate = getFormattedDate(new Date(today.setDate(today.getDate() + 10)));
 
-  const handleDeleteCoupon = async (couponId) => {
-    const confirmation = window.confirm(
-      "Are you sure you want to delete this coupon?"
-    );
-    if (!confirmation) return;
+const handleDeleteCoupon = async (couponId) => {
+    // Show confirmation popup
+    const result = await Swal.fire({
+      toast: 'true',
+      title: "Are you sure?",
+      text: "This coupon will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33", // Red button
+      cancelButtonColor: "#3085d6", // Blue cancel button
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    // If user cancels, do nothing
+    if (!result.isConfirmed) return;
 
     try {
-      const response = await axios.delete(
-        `${ApiUrl}/deletecoupons/${couponId}`
-      );
+      const response = await axios.delete(`${ApiUrl}/deletecoupons/${couponId}`);
       if (response.status === 200) {
-        alert("Coupon deleted successfully");
+        // Show success popup
+        await Swal.fire({
+          toast: true,
+          position: "top-right",
+          title: false,
+          text: "The coupon has been deleted successfully.",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+          showConfirmButton: false,
+          timer: 3000,
+        });
+
+        // Remove deleted coupon from state
         setCoupons(coupons.filter((coupon) => coupon.coupon_id !== couponId));
       }
     } catch (error) {
       console.error("Error deleting coupon:", error);
-      alert("Failed to delete the coupon");
+      // Show error popup
+      Swal.fire({
+        title: "Error",
+        text: "Failed to delete the coupon. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
@@ -1638,10 +1665,14 @@ const Mobiles = () => {
         console.log("[INFO] Accessories updated successfully:", data);
 
         Swal.fire({
+          toast:true,
+          position:'top-end',
           icon: "success",
-          title: "Success",
+          // title: "Success",
           text: "Accessories have been updated successfully!",
           confirmButtonColor: "#4caf50",
+          showConfirmButton:false,
+          timer:4000
         });
       } else {
         const errorData = await response.text();
@@ -1932,7 +1963,7 @@ const Mobiles = () => {
             <div className="filters-card">
               <div className="filters-panel">
                 <div className="filter-label-title">
-                  <img src={FilterIcon} width={"20px"} alt="Filter"/>
+                  <img src={FilterIcon} width={"20px"} alt="Filter" />
 
                   <span> Filter By </span>
                   {/* <FilterIcon width={"20px"}/> */}
@@ -2103,6 +2134,13 @@ const Mobiles = () => {
                             <div className="coupon-image-wrapper">
                               {couponProducts[product.id].isExpired === true ?
                                 <img
+                                  onClick={() =>
+                                    fetchCoupons(
+                                      product.prod_id,
+                                      product.prod_name,
+                                      product.prod_price
+                                    )
+                                  }
                                   src={ExpiredCouponImage}
                                   width="35px"
                                   alt="Coupon"
@@ -2110,6 +2148,13 @@ const Mobiles = () => {
                                 />
                                 :
                                 <img
+                                  onClick={() =>
+                                    fetchCoupons(
+                                      product.prod_id,
+                                      product.prod_name,
+                                      product.prod_price
+                                    )
+                                  }
                                   src={ActiveCouponImage}
                                   width="35px"
                                   alt="Coupon"
@@ -2136,7 +2181,14 @@ const Mobiles = () => {
                           <div className="accessory-count-wrapper">
                             <span className="accessory-count">
                               {/* {accessoryCounts[product.id]} FA */}
-                              <img src={AccessoriesImage} width={"60px"} alt="accessories"/>
+                              <img
+                                onClick={() =>
+                                  handleOpenFrequentlyBuyModal(
+                                    product.id,
+                                    product.category
+                                  )
+                                }
+                                src={AccessoriesImage} width={"60px"} alt="accessories" />
                               <span className="tooltip-text">Frequently buy accessories</span>
                             </span>
                           </div>
@@ -2263,7 +2315,7 @@ const Mobiles = () => {
                                         </span>
                                         <FaEdit className="offer-edit-icon" />
                                       </div>
-                                      }
+                                    }
 
                                     {/* Modal Rendering */}
                                     {isOfferModalOpen && (
@@ -2339,7 +2391,7 @@ const Mobiles = () => {
                                               {isEditMode && offerStartTime && offerEndTime && offerPrice
                                                 ? "Update Offer"
                                                 : "Add Offer"
-                                                }
+                                              }
                                             </button>
                                           </form>
 
@@ -2393,20 +2445,22 @@ const Mobiles = () => {
                                         />
                                       </span>
                                       <span
-                                        onClick={() =>
+                                        onClick={() => {
+                                          setIsModalOpen2(false);
                                           fetchCoupons(
                                             product.prod_id,
                                             product.prod_name,
                                             product.prod_price
-                                          )
+                                          );
+                                        }
                                         }
                                         style={{ cursor: "pointer" }}
                                       >
                                         {couponProducts[product.id]?.hasCoupon && (
-                                        <FaEye
-                                          className="faedit"
-                                          title="View Coupon"
-                                        />
+                                          <FaEye
+                                            className="faedit"
+                                            title="View Coupon"
+                                          />
                                         )}
                                       </span>
                                     </p>
@@ -2419,98 +2473,7 @@ const Mobiles = () => {
                                       onCouponUpdated={handleCouponUpdated}
                                     />
 
-                                    {isViewingCoupons && (
-                                      <div className="pop-overlay">
-                                        <div className="pop-content">
-                                          <button
-                                            onClick={() => setIsViewingCoupons(false)}
-                                            className="fatimes"
-                                          >
-                                            <FaTimes color="black" size={20} />
-                                          </button>
-                                          <h4>Coupon list for this product</h4>
-                                          <span className="coupon-title-with-image">
-                                            {product.prod_img?.[0] && (
-                                              <img
-                                                src={`${ApiUrl}/uploads/mobiles/${product.prod_img[0]}`}
-                                                alt={product.prod_name}
-                                                className="coupon-product-image"
-                                              />
-                                            )}
-                                            <span className="coupon-product-name">
-                                              {productName}
-                                            </span>
-                                          </span>
-                                          {coupons.length > 0 ? (
-                                            <ul className="coupons-list">
-                                              {coupons.map((coupon, index) => (
-                                                <li
-                                                  key={coupon.coupon_id}
-                                                  className="coupon-item"
-                                                >
-                                                  <span className="serial-number">
-                                                    {index + 1}.{" "}
-                                                  </span>
-                                                  <span className="coupon-code">
-                                                    {coupon.coupon_code}
-                                                  </span>{" "}
-                                                  -
-                                                  <span className="coupon-code">
-                                                    {coupon.discount_value}
-                                                  </span>{" "}
-                                                  -
-                                                  <span className="expiry-date">
-                                                    {/* Expires on:{" "} */}{" "}
-                                                    {new Date(
-                                                      coupon.expiry_date
-                                                    ).toLocaleDateString("en-GB", {
-                                                      day: "2-digit",
-                                                      month: "short",
-                                                      year: "numeric",
-                                                    })}
-                                                  </span>
-                                                  <FaEdit
-                                                    className="edit-icon"
-                                                    title="Edit Expiry Date"
-                                                    onClick={() =>
-                                                      handleEditExpiry(
-                                                        coupon.coupon_id
-                                                      )
-                                                    }
-                                                  />
-                                                  <FaTrash
-                                                    className="delete-icon"
-                                                    title="Delete Coupon"
-                                                    onClick={() =>
-                                                      handleDeleteCoupon(
-                                                        coupon.coupon_id
-                                                      )
-                                                    }
-                                                    style={{
-                                                      marginLeft: "10px",
-                                                      cursor: "pointer",
-                                                    }}
-                                                  />
-                                                </li>
-                                              ))}
-                                            </ul>
-                                          ) : (
-                                            <p>
-                                              No coupons available for this product.
-                                            </p>
-                                          )}
-                                        </div>
-                                      </div>
-                                    )}
 
-                                    <EditCouponModal
-                                      isOpen={isEditingCoupon}
-                                      onClose={() => setIsEditingCoupon(false)}
-                                      coupon={selectedCoupon}
-                                      productId={selectedProductId}
-                                      productPrice={selectedProductPrice}
-                                      onCouponUpdated={() => { }}
-                                    />
 
 
                                     {/* Frequently Buy Section */}
@@ -2533,11 +2496,13 @@ const Mobiles = () => {
                                       </span>
                                       <FaPlusCircle
                                         className="frequently-buy-icon"
-                                        onClick={() =>
+                                        onClick={() => {
                                           handleOpenFrequentlyBuyModal(
                                             product.id,
                                             product.category
-                                          )
+                                          );
+                                          setIsModalOpen2(false)
+                                        }
                                         }
                                       />
                                     </div>
@@ -2564,7 +2529,7 @@ const Mobiles = () => {
                                       </div>
                                     </div>
 
-                                    {isFrequentlyBuyModalOpen && (
+                                    {/* {isFrequentlyBuyModalOpen && (
                                       <div className="freq-modal-overlay">
                                         <div className="freq-modal-content">
                                           <button
@@ -2657,11 +2622,259 @@ const Mobiles = () => {
                                             )}
                                         </div>
                                       </div>
-                                    )}
+                                    )} */}
                                   </div>
                                 </div>
                               </div>
                             </div>
+                          </div>
+                        </div>
+                      )}
+
+
+                      <EditCouponModal
+                        isOpen={isEditingCoupon}
+                        onClose={() => setIsEditingCoupon(false)}
+                        coupon={selectedCoupon}
+                        productId={selectedProductId}
+                        productPrice={selectedProductPrice}
+                        onCouponUpdated={() => { }}
+                      />
+
+
+                      {isViewingCoupons && (
+                        <div className="pop-overlay">
+                          <div className="pop-content">
+                            <button
+                              onClick={() => setIsViewingCoupons(false)}
+                              className="fatimes"
+                            >
+                              <FaTimes color="black" size={20} />
+                            </button>
+                            <h4>Coupon list for this product</h4>
+                            <span className="coupon-title-with-image">
+                              {product.prod_img?.[0] && (
+                                <img
+                                  src={`${ApiUrl}/uploads/mobiles/${product.prod_img[0]}`}
+                                  alt={product.prod_name}
+                                  className="coupon-product-image"
+                                />
+                              )}
+                              <span className="coupon-product-name">
+                                {productName}
+                              </span>
+                            </span>
+                           {coupons.length > 0 ? (
+                                                         <div className="coupons-wrapper">
+                                                           {/* Active Coupons */}
+                                                           {coupons.filter(coupon => {
+                                                             const couponDate = new Date(coupon.expiry_date);
+                                                             const today = new Date();
+                                                             // Normalize both dates to midnight (ignore time zone)
+                                                             couponDate.setHours(0, 0, 0, 0);
+                                                             today.setHours(0, 0, 0, 0);
+                                                             return couponDate >= today;
+                                                           }).length > 0 && (
+                                                               <div className="active-coupons-box">
+                                                                 <h5>Active Coupons</h5>
+                                                                 <ul className="coupons-list active-list">
+                                                                   {coupons
+                                                                     .filter(coupon => {
+                                                                       const couponDate = new Date(coupon.expiry_date);
+                                                                       const today = new Date();
+                                                                       couponDate.setHours(0, 0, 0, 0);
+                                                                       today.setHours(0, 0, 0, 0);
+                                                                       return couponDate >= today;
+                                                                     })
+                                                                     .map((coupon, index) => (
+                                                                       <li key={coupon.coupon_id} className="coupon-item">
+                                                                         <span className="serial-number">{index + 1}. </span>
+                                                                         <span className="coupon-code">{coupon.coupon_code}</span> -
+                                                                         <span className="coupon-code">{coupon.discount_value}</span> -
+                                                                         <span className="expiry-date">
+                                                                           {new Date(coupon.expiry_date).toLocaleDateString("en-GB", {
+                                                                             day: "2-digit",
+                                                                             month: "short",
+                                                                             year: "numeric",
+                                                                           })}
+                                                                         </span>
+                                                                         <FaEdit
+                                                                           className="edit-icon"
+                                                                           title="Edit Expiry Date"
+                                                                           onClick={() => {
+                                                                             handleEditExpiry(coupon.coupon_id);
+                                                                             setIsViewingCoupons(false);
+                                                                           }}
+                                                                         />
+                                                                         <FaTrash
+                                                                           className="delete-icon"
+                                                                           title="Delete Coupon"
+                                                                           onClick={() => handleDeleteCoupon(coupon.coupon_id)}
+                                                                           style={{
+                                                                             marginLeft: "10px",
+                                                                             cursor: "pointer",
+                                                                           }}
+                                                                         />
+                                                                       </li>
+                                                                     ))}
+                                                                 </ul>
+                                                               </div>
+                                                             )}
+                           
+                                                           {/* Expired Coupons */}
+                                                           {coupons.filter(coupon => {
+                                                             const couponDate = new Date(coupon.expiry_date);
+                                                             const today = new Date();
+                                                             // Normalize both dates
+                                                             couponDate.setHours(0, 0, 0, 0);
+                                                             today.setHours(0, 0, 0, 0);
+                                                             return couponDate < today;
+                                                           }).length > 0 && (
+                                                               <div className="expired-coupons-box">
+                                                                 <h5>Expired Coupons</h5>
+                                                                 <ul className="coupons-list expired-list">
+                                                                   {coupons
+                                                                     .filter(coupon => {
+                                                                       const couponDate = new Date(coupon.expiry_date);
+                                                                       const today = new Date();
+                                                                       couponDate.setHours(0, 0, 0, 0);
+                                                                       today.setHours(0, 0, 0, 0);
+                                                                       return couponDate < today;
+                                                                     })
+                                                                     .map((coupon, index) => (
+                                                                       <li key={coupon.coupon_id} className="coupon-item">
+                                                                         <span className="serial-number">{index + 1}. </span>
+                                                                         <span className="coupon-code">{coupon.coupon_code}</span> -
+                                                                         <span className="coupon-code">{coupon.discount_value}</span> -
+                                                                         <span className="expiry-date">
+                                                                           {new Date(coupon.expiry_date).toLocaleDateString("en-GB", {
+                                                                             day: "2-digit",
+                                                                             month: "short",
+                                                                             year: "numeric",
+                                                                           })}
+                                                                         </span>
+                                                                         <FaEdit
+                                                                           className="edit-icon"
+                                                                           title="Edit Expiry Date"
+                                                                           onClick={() => {
+                                                                             handleEditExpiry(coupon.coupon_id);
+                                                                             setIsViewingCoupons(false);
+                                                                           }}
+                                                                         />
+                                                                         <FaTrash
+                                                                           className="delete-icon"
+                                                                           title="Delete Coupon"
+                                                                           onClick={() => handleDeleteCoupon(coupon.coupon_id)}
+                                                                           style={{
+                                                                             marginLeft: "10px",
+                                                                             cursor: "pointer",
+                                                                           }}
+                                                                         />
+                                                                       </li>
+                                                                     ))}
+                                                                 </ul>
+                                                               </div>
+                                                             )}
+                                                         </div>
+                                                       ) : (
+                                                         <p>No coupons available for this product.</p>
+                                                       )}
+                           
+                          </div>
+                        </div>
+                      )}
+
+                      {isFrequentlyBuyModalOpen && (
+                        <div className="freq-modal-overlay">
+                          <div className="freq-modal-content">
+                            <button
+                              onClick={handleCloseFrequentlyBuyModal}
+                              className="freq-modal-close-btn"
+                            >
+                              <FaTimes />
+                            </button>
+                            <h3 className="freq-modal-title">
+                              Select Accessories
+                            </h3>
+                            {Array.isArray(computerAccessories) &&
+                              computerAccessories.length === 0 ? (
+                              <div className="no-accessories-message">
+                                <p>
+                                  No accessories added to this category
+                                </p>
+                                <button
+                                  onClick={handleAddAccessories}
+                                  className="add-accessories-btn"
+                                >
+                                  Add Accessories
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="freq-modal-list">
+                                {Array.isArray(computerAccessories) &&
+                                  computerAccessories.map(
+                                    (accessory) => {
+                                      const images = Array.isArray(
+                                        accessory.prod_img
+                                      )
+                                        ? accessory.prod_img
+                                        : JSON.parse(
+                                          accessory.prod_img || "[]"
+                                        );
+                                      const firstImage = images[0];
+
+                                      return (
+                                        <div
+                                          key={accessory.id}
+                                          className="freq-modal-item"
+                                        >
+                                          <div className="freq-image-wrapper">
+                                            {firstImage && (
+                                              <img
+                                                src={`${ApiUrl}/uploads/mobileaccessories/${firstImage}`}
+                                                alt={
+                                                  accessory.prod_name
+                                                }
+                                                className="freq-item-image"
+                                              />
+                                            )}
+                                          </div>
+                                          <div className="freq-item-details">
+                                            <span className="freq-item-name">
+                                              {accessory.prod_name
+                                                .split(" ")
+                                                .slice(0, 4)
+                                                .join(" ")}                                                    </span>
+                                            <span className="freq-item-price">
+                                              ₹{accessory.prod_price}
+                                            </span>
+                                          </div>
+                                          <input
+                                            type="checkbox"
+                                            className="freq-item-checkbox"
+                                            value={accessory.id}
+                                            checked={selectedAccessories.includes(
+                                              accessory.id.toString()
+                                            )}
+                                            onChange={
+                                              handleAccessorySelection
+                                            }
+                                          />
+                                        </div>
+                                      );
+                                    }
+                                  )}
+                              </div>
+                            )}
+                            {Array.isArray(computerAccessories) &&
+                              computerAccessories.length > 0 && (
+                                <button
+                                  onClick={handleSaveAccessories}
+                                  className="freq-save-btn"
+                                >
+                                  Add
+                                </button>
+                              )}
                           </div>
                         </div>
                       )}
@@ -3097,7 +3310,7 @@ const Mobiles = () => {
 
 // Custom next arrow component
 const SampleNextArrow = (props) => {
-  const { className,  onClick } = props;
+  const { className, onClick } = props;
   return (
     <div
       className={`${className} `}
@@ -3110,7 +3323,7 @@ const SampleNextArrow = (props) => {
 };
 
 const SamplePrevArrow = (props) => {
-  const { className,  onClick } = props;
+  const { className, onClick } = props;
   return (
     <div
       className={`${className}`}

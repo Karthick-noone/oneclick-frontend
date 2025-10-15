@@ -771,20 +771,14 @@ const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
                                 <select
                                   value={selectedStatus}
                                   onChange={handleStatusChange}
-                                  style={{
-                                    display: "inline", // Keeps the select inline
-                                    marginRight: "17px",
-                                  }}
                                   className="payment-select"
-
                                 >
                                   <option value="Pending">Pending</option>
                                   <option value="Paid">Paid</option>
-                                  <option value="Refund Pending">
-                                    Refund Pending
-                                  </option>
+                                  <option value="Refund Pending">Refund Pending</option>
                                   <option value="Refunded">Refunded</option>
                                 </select>
+
                                 <FaCheck
                                   className="tick-icon"
                                   onClick={() =>
@@ -794,7 +788,7 @@ const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
                                     cursor: "pointer",
                                     color: "green",
                                     position: "absolute", // Position the icon to the right
-                                    right: "2px", // Keeps the icon close to the right edge
+                                    right: "-1px", // Keeps the icon close to the right edge
                                     top: '15px'
                                   }}
                                 />

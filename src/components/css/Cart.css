@@ -608,7 +608,7 @@ border: 1px solid #ddd;
 background-color: #ffffff;
 width: 100%; /* Takes up full width of its container */
 max-width: 780px; /* Set a maximum width */
-height: 95px;
+height: auto;
 margin-left: auto;
 margin-right: auto; /* Centers the address section */
 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -616,7 +616,7 @@ border-radius: 8px;
 }
 
 .cart-address span {
-margin-bottom: 15px;
+/* margin-bottom: 15px; */
 font-size: 1.1em;
 }
 
@@ -626,9 +626,9 @@ padding: 0;
 margin: 0;
 }
 
-.cart-address li {
+/* .cart-address li {
 margin-bottom: 10px;
-}
+} */
 
 .cart-address label {
 font-size: 1.3em;
@@ -774,10 +774,10 @@ align-items: flex-start; /* Align the content to the left */
 border: 1px solid #ddd;
 border-radius: 8px;
 margin-bottom: 15px;
-padding: 15px;
+padding: 20px;
 background-color: #fff;
 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-max-height: 400px;
+max-height: 410px;
 overflow-y: auto;
 }
 .cart-product-description {
@@ -828,10 +828,43 @@ flex: 1; /* Allow text to take available space */
 text-align: left; /* Align text to the left */
 }
 
-/* Payment method radio button styling */
+/* Payment radio button style like Uiverse */
 .summary-item2 input[type="radio"] {
-margin-left: 10px; /* Space between text and radio button */
+  --s: 20px; /* size */
+  --c: #009688; /* active color */
+
+  width: var(--s);
+  height: var(--s);
+  appearance: none;
+  border: 2px solid #888;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  display: inline-block;
 }
+
+.summary-item2 input[type="radio"]::before {
+  content: "";
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 25%;
+  left: 25%;
+  background-color: var(--c);
+  border-radius: 50%;
+  transform: scale(0);
+  transition: transform 0.3s ease;
+}
+
+.summary-item2 input[type="radio"]:checked {
+  border-color: var(--c);
+}
+
+.summary-item2 input[type="radio"]:checked::before {
+  transform: scale(1);
+} 
 
 /* Wrapper for continue button */
 .continue-wrapper {

@@ -744,7 +744,8 @@ const Header2 = ({ header2Ref }) => {
       closeOnClick: true,
       pauseOnHover: false,
       draggable: true,
-    });
+    })
+    window.location.reload()
 
     // Delay the navigation until after the toast is shown
     // setTimeout(() => {
@@ -1077,13 +1078,13 @@ const Header2 = ({ header2Ref }) => {
 
     navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
-  
+
   return (
     <>
       <header
         // style={{ position: "sticky", top: 0, zIndex: 1001 }}
         className="header2"
-         ref={header2Ref}
+        ref={header2Ref}
       >
         {/* <div className="company-name"> */}
         <Link to="/" className="logo-link">
@@ -1181,11 +1182,23 @@ const Header2 = ({ header2Ref }) => {
 
 
 
-        <div className="iconss">
+        <div className="iconss"
+
+        >
 
           <div
             ref={imgRef}
             className="userLogo"
+            // onMouseEnter={() => {
+            //   if (window.innerWidth > 768) { // Only for desktop
+            //     setIsDropdownOpen4(true);
+            //   }
+            // }}
+            // onMouseLeave={() => {
+            //   if (window.innerWidth > 768) { // Only for desktop
+            //     setIsDropdownOpen4(false);
+            //   }
+            // }}
             onClick={() => {
               if (!username) {
                 // Redirect to login page
@@ -1196,7 +1209,7 @@ const Header2 = ({ header2Ref }) => {
             }}
           >
             <img
-              title={username ? `Logged in as ${username}` : "Login"}
+              title={username ? `${username}` : "Login"}
               className="icons"
               src={username ? usericon : defaultUser}
               style={{
@@ -1302,7 +1315,7 @@ const Header2 = ({ header2Ref }) => {
                   }}
                 >
                   {/* <FaPowerOff style={{ color: "#333" }} /> */}
-                  <svg width="24" height="24"  viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#2A55E5" stroke-width="0.3" stroke="#2A55E5" d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"></path></svg>
+                  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#2A55E5" stroke-width="0.3" stroke="#2A55E5" d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"></path></svg>
                   <span style={{ fontSize: '16px' }}> Logout </span>
                 </Link>
               </div>
@@ -1335,8 +1348,10 @@ const Header2 = ({ header2Ref }) => {
             /> */}
             <img
               title="Cart"
-              onClick={toggleSidebar}
-              src={carticon}
+              onClick={() => {
+                toggleSidebar();     // existing function
+                setIsDropdownOpen4(false);    //  setIsMore false when clicked
+              }} src={carticon}
               style={{ width: "25px", cursor: "pointer", marginLeft: '5px' }}
               alt=""
               className="icons"
@@ -1347,7 +1362,16 @@ const Header2 = ({ header2Ref }) => {
               style={{ color: "white" }}
               // className="dots"
               className={`dots ${isDropdownOpen ? "dot-rotate" : ""}`}
-
+              // onMouseEnter={() => {
+              //   if (window.innerWidth > 768) { // Only for desktop
+              //     setIsDropdownOpen(true);
+              //   }
+              // }}
+              // onMouseLeave={() => {
+              //   if (window.innerWidth > 768) { // Only for desktop
+              //     setIsDropdownOpen(false);
+              //   }
+              // }}
               onClick={handleToggleDropdown}
             />
 
@@ -1498,7 +1522,7 @@ const Header2 = ({ header2Ref }) => {
                             handleProductClick(item);
                           }}
                         >
-                          <h3 className="item-name">{item.prod_name}</h3>
+                          <h3 className="item-name" title={item.prod_name}>{item.prod_name}</h3>
                           {/* <span className="item-features">{item.prod_features}</span> */}
                         </span>
                       </div>
@@ -1588,9 +1612,11 @@ const Header2 = ({ header2Ref }) => {
 
                   <button className="cssbuttons-io-button">
                     View Cart
-                    <div className="icon3" onClick={handleViewCart}>
+                    <div className="icon3" onClick={handleViewCart} >
+
                       <svg
                         className="svg-icon"
+                        
                         viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg"
                       >
@@ -1598,7 +1624,11 @@ const Header2 = ({ header2Ref }) => {
                         <circle cx="20" cy="21" r="1"></circle>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                       </svg>
+                      {/* {cartCount > 0 && (
+                        <span className="cart-item-count" >{cartCount}</span>
+                      )} */}
                     </div>
+
                   </button>
                 </Link>
 

@@ -346,7 +346,6 @@ const CareersForm = () => {
               onChange={handleChange}
               style={formStyles.select}
               className="staff-input"
-
             >
               <option value="">Select Position</option>
               <option value="inStoreSales">In-store Sales</option>

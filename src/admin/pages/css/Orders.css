@@ -400,7 +400,7 @@
   width: 100%;
 }
 
-/* ✅ Month & Year dropdowns stay in same row */
+/*  Month & Year dropdowns stay in same row */
 .month-year-container {
   display: flex;
   gap: 10px; /* Space between dropdowns */
@@ -412,7 +412,7 @@
   min-width: 120px;
 }
 
-/* ✅ Search Box moves to next row */
+/*  Search Box moves to next row */
 .search-container {
   display: flex;
   width: 100%; /* Full width */
@@ -571,8 +571,9 @@
 }
 
 .orders-table th {
-  background-color: #e0e0e0;
-  color: #333;
+ background-color: rgb(7, 24, 61);
+  font-weight: bold;
+  color: white;
 }
 
 /* .orders-table tbody tr:nth-child(even) {

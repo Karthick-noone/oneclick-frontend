@@ -221,38 +221,38 @@ const ProductList = () => {
     //     .replace(/[^\w-]+/g, "");
 
     // navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
-    
+
     if (product && product.id) {
-    const now = Date.now();
+      const now = Date.now();
 
-    let storedData = localStorage.getItem("Recently-viewed");
-    let parsedData = [];
+      let storedData = localStorage.getItem("Recently-viewed");
+      let parsedData = [];
 
-    try {
-      parsedData = storedData ? JSON.parse(storedData) : [];
-    } catch (err) {
-      console.error("Failed to parse Recently-viewed:", err);
+      try {
+        parsedData = storedData ? JSON.parse(storedData) : [];
+      } catch (err) {
+        console.error("Failed to parse Recently-viewed:", err);
+      }
+
+      // Remove if already exists
+      parsedData = parsedData.filter((item) => item.id !== product.id);
+
+      // Add current item with timestamp
+      parsedData.unshift({
+        id: product.id,
+        timestamp: now,
+      });
+
+      // Keep only last 10
+      parsedData = parsedData.slice(0, 10);
+
+      localStorage.setItem("Recently-viewed", JSON.stringify(parsedData));
+
+      const slugify = (name) =>
+        name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
+
+      navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
     }
-
-    // Remove if already exists
-    parsedData = parsedData.filter((item) => item.id !== product.id);
-
-    // Add current item with timestamp
-    parsedData.unshift({
-      id: product.id,
-      timestamp: now,
-    });
-
-    // Keep only last 10
-    parsedData = parsedData.slice(0, 10);
-
-    localStorage.setItem("Recently-viewed", JSON.stringify(parsedData));
-
-    const slugify = (name) =>
-      name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
-
-    navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
-  }
   };
   const renderCategoryRow = (categoryName = false) => {
     // Combine products for the accessory row (Headphones + Speakers or all Accessories)
@@ -275,9 +275,13 @@ const ProductList = () => {
 
 
     return (
+
+
       <div key={categoryName} className="product-list-container">
+
+
         <div
-          style={{ padding: "20px", position: "relative" }}
+          style={{ padding: "10px", position: "relative", marginTop:'10px' }}
           className="space"
         >
           {/* Custom navigation buttons */}
@@ -402,7 +406,7 @@ const ProductList = () => {
                             ? "Remove from Wishlist"
                             : "Add to Wishlist"
                         }
-                        className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
+                        className={`favourite-icon ${favorites[`${product.id}`] ? "filled" : ""
                           }`}
                         onClick={(event) => handleToggleFavorite(product, event)} // Unified handler
                       >
@@ -508,12 +512,15 @@ const ProductList = () => {
           </Swiper>
         </div>
       </div>
+
     );
   };
 
   // Call renderCategoryRow with appropriate categories
   return (
     <>
+      <h2>Featured Products</h2>
+
       <ToastContainer />
 
       {["Mobiles", "Computers", "CCTV", "Printers"].map((category) =>

@@ -25,7 +25,8 @@
 .careers-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: auto; /* Allows columns to adjust based on content */
+  table-layout: auto;
+  /* Allows columns to adjust based on content */
 }
 
 .careers-table thead {
@@ -33,16 +34,17 @@
   color: white;
 }
 
-.careers-table th, .careers-table td {
+.careers-table th,
+.careers-table td {
   border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
+  padding: 12px;
+  text-align: center;
 }
 
 .careers-table th {
-  background-color: #f2f2f2;
+  background-color: rgb(7, 24, 61);
   font-weight: bold;
-  color: #333;
+  color: white;
 }
 
 .careers-table tr:nth-child(even) {
@@ -69,45 +71,59 @@
 /* Responsive Table Design */
 @media (max-width: 768px) {
   .careers-table-container {
-    margin-left: 0; /* Remove left margin */
-    padding: 10px; /* Add some padding */
+    margin-left: 0;
+    /* Remove left margin */
+    padding: 10px;
+    /* Add some padding */
   }
 
   .careers-table {
     width: 100%;
     overflow-x: auto;
-    display: block; /* Make table scrollable horizontally */
+    display: block;
+    /* Make table scrollable horizontally */
     border-collapse: separate;
-    border-spacing: 0; /* Avoid collapsing borders */
+    border-spacing: 0;
+    /* Avoid collapsing borders */
   }
 
-  .careers-table th, .careers-table td {
+  .careers-table th,
+  .careers-table td {
     padding: 10px 8px;
-    font-size: 14px; /* Reduce font size for smaller screens */
+    font-size: 14px;
+    /* Reduce font size for smaller screens */
   }
 
-  .careers-table th, .careers-table td {
-    white-space: nowrap; /* Prevent text wrapping */
+  .careers-table th,
+  .careers-table td {
+    white-space: nowrap;
+    /* Prevent text wrapping */
   }
 
   .careers-table th {
-    font-size: 14px; /* Reduce header font size */
-    text-transform: none; /* Remove text transformation */
+    font-size: 14px;
+    /* Reduce header font size */
+    text-transform: none;
+    /* Remove text transformation */
   }
 
   .careers-table tr {
-    display: table-row; /* Retain table row structure */
+    display: table-row;
+    /* Retain table row structure */
   }
 
   .careers-table tr:hover {
-    background-color: transparent; /* Remove hover effect on mobile */
+    background-color: transparent;
+    /* Remove hover effect on mobile */
   }
-  
+
   .resume-btn {
-    font-size: 12px; /* Reduce button size */
+    font-size: 12px;
+    /* Reduce button size */
     padding: 6px 10px;
   }
 }
+
 /* Modal styles */
 .modall-overlay {
   position: fixed;
@@ -119,7 +135,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Ensure it appears above other content */
+  z-index: 1000;
+  /* Ensure it appears above other content */
 }
 
 .modall-content {
@@ -127,8 +144,10 @@
   padding: 15px;
   border-radius: 8px;
   position: relative;
-  width: 70%; /* Adjust width for modal */
-  max-width: 800px; /* Adjust max-width for modal */
+  width: 70%;
+  /* Adjust width for modal */
+  max-width: 800px;
+  /* Adjust max-width for modal */
   /* min-height: 500px; */
   margin-left: 200px;
 }
@@ -146,6 +165,7 @@
   width: 23px;
   background-color: red;
 }
+
 .download-btn {
   top: 2px;
   right: 25px;
@@ -160,8 +180,10 @@
 }
 
 .modall-iframe {
-  width: 100%; /* Full width within the modal */
-  height: 600px; /* Adjust height for modal */
+  width: 100%;
+  /* Full width within the modal */
+  height: 600px;
+  /* Adjust height for modal */
   border: none;
   /* margin-left: 100px; */
 }
@@ -169,16 +191,20 @@
 /* Responsive table design */
 @media (max-width: 768px) {
   .modall-content {
-    width: 90%; /* Adjust width for smaller screens */
-    max-width: 100%; /* Full width on smaller screens */
+    width: 90%;
+    /* Adjust width for smaller screens */
+    max-width: 100%;
+    /* Full width on smaller screens */
   }
 
   .modall-iframe {
-    display: none; /* Hide iframe on small screens */
+    display: none;
+    /* Hide iframe on small screens */
   }
 
   .resume-btn {
-    display: inline-block; /* Ensure button is visible */
+    display: inline-block;
+    /* Ensure button is visible */
     color: white;
     border: none;
     padding: 10px 20px;

@@ -115,7 +115,7 @@ const MyOrders = () => {
 
       // Set product details directly from the response
       setProductDetails(productResponse.data);
-      console.log("Payment MOde", productResponse.data)
+      console.log("Payment Mode", productResponse.data)
     } catch (error) {
       console.error("Error fetching product details:", error);
     }

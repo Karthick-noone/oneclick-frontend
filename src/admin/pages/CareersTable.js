@@ -207,7 +207,7 @@ const CareersTable = () => {
       <table className="careers-table">
         <thead>
           <tr>
-            <th>S.No</th>
+            <th>Sl.No</th>
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>

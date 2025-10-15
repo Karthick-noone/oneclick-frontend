@@ -300,6 +300,7 @@ const EditHomePagesAd = () => {
               className="ad-form-input"
             >
               <option value="">Select Category</option>
+              <option value="Home">Home</option>
               <option value="Computers">Computer</option>
               <option value="Mobiles">Mobile</option>
               <option value="Printers">Printers</option>
@@ -425,13 +426,13 @@ const EditHomePagesAd = () => {
                     />
                     <path
                       className="circle"
-                      
+
                       strokeDasharray={`${updateProgress}, 100`}
                       d="M18 2.0845
                     a 15.9155 15.9155 0 0 1 0 31.831
                     a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
-                    
+
                   </g>
                   <text x="18" y="20.35" className="percentage-text">
                     {updateProgress}%
@@ -465,6 +466,7 @@ const EditHomePagesAd = () => {
             className="adminmodal-input"
           >
             <option value="">Select Category</option>
+            <option value="Home">Home</option>
             <option value="Computers">Computer</option>
             <option value="Mobiles">Mobile</option>
             <option value="Printers">Printers</option>

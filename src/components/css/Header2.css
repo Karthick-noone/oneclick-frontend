@@ -284,6 +284,32 @@
   /* Center text */
 }
 
+.cart-item-count {
+  position: absolute;
+  top: -5px;
+  right:0;
+  background-color: red;
+  border: 1px solid white;
+  color: white;
+  padding: 2px;
+  /* Adjust padding as needed */
+  width: 20px;
+  /* Set a fixed width */
+  height: 20px;
+  /* Set a fixed height */
+  border-radius: 50%;
+  /* Make it round */
+  font-size: 12px;
+  display: flex;
+  /* Use flexbox to center the text */
+  align-items: center;
+  /* Center vertically */
+  justify-content: center;
+  /* Center horizontally */
+  text-align: center;
+  /* Center text */
+}
+
 .cart-icon-container {
   position: relative;
   display: inline-block;
@@ -616,7 +642,7 @@
 .sidebarcart-body li {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   border-bottom: 1px solid #ddd;
   padding-bottom: 10px;
 }

@@ -414,9 +414,9 @@
 
 /* Header row styles */
 .styled-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-    color: #333;
+background-color: rgb(7, 24, 61);
+  font-weight: bold;
+  color: white;
 }
 
 .styled-table tr:nth-child(even) {

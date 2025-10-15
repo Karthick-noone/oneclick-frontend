@@ -175,7 +175,7 @@ const Reports = () => {
           <table className="styled-table">
             <thead>
               <tr>
-                <th>S.No</th>
+                <th>Sl.No</th>
                 <th>User Name</th>
                 <th>Total Orders</th>
                 <th>Total Spent (₹)</th>
@@ -218,7 +218,7 @@ const Reports = () => {
                 <table className="styled-table">
                   <thead>
                     <tr>
-                      <th>#</th>
+                      <th>Sl.No</th>
                       <th>Order ID</th>
                       <th>Total Amount</th>
                       <th>Status</th>

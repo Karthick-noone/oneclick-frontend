@@ -253,14 +253,14 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/ComputerAd"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname.startsWith("/computers") ||
+            className={`nav-link ${location.pathname.startsWith("/computers") ||location.pathname.startsWith("/Computers") ||
               location.pathname.startsWith("/ComputerAd")
               ? "active"
               : ""
               }`}
           >
             <FaLaptop
-              className={`fa-icons ${location.pathname.startsWith("/computers") ||
+              className={`fa-icons ${location.pathname.startsWith("/computers") ||location.pathname.startsWith("/Computers") ||
                 location.pathname.startsWith("/ComputerAd")
                 ? "active"
                 : ""
@@ -272,14 +272,14 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/MobileAd"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname.startsWith("/mobiles") ||
+            className={`nav-link ${location.pathname.startsWith("/mobiles") ||location.pathname.startsWith("/Mobiles") ||
               location.pathname.startsWith("/MobileAd")
               ? "active"
               : ""
               }`}
           >
             <FaMobileAlt
-              className={`fa-icons ${location.pathname.startsWith("/mobiles") ||
+              className={`fa-icons ${location.pathname.startsWith("/mobiles") || location.pathname.startsWith("/Mobiles") ||
                 location.pathname.startsWith("/MobileAd")
                 ? "active"
                 : ""
@@ -291,14 +291,14 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/CCTVAd"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname.startsWith("/cctv") ||
+            className={`nav-link ${location.pathname.startsWith("/cctv")|| location.pathname.startsWith("/CCTV") ||
               location.pathname.startsWith("/CCTVAd")
               ? "active"
               : ""
               }`}
           >
             <FaVideo
-              className={`fa-icons ${location.pathname.startsWith("/cctv") ||
+              className={`fa-icons ${location.pathname.startsWith("/cctv") || location.pathname.startsWith("/CCTV") ||
                 location.pathname.startsWith("/CCTVAd")
                 ? "active"
                 : ""
@@ -311,6 +311,16 @@ const Header3 = ({ topOffset }) => {
           <div
             className={`nav-item ${isAudioActive ? "active" : ""} ${showHeadphones ? "show-dropdown" : ""}`}
             onClick={toggleHeadphonesDropdown}
+            // onMouseEnter={() => {
+            //   if (window.innerWidth > 768) { // Only for desktop
+            //     setShowHeadphones(true);
+            //   }
+            // }}
+            // onMouseLeave={() => {
+            //   if (window.innerWidth > 768) { // Only for desktop
+            //     setShowHeadphones(false);
+            //   }
+            // }}
           >
             <span className="activelink">
               <FaHeadphones
@@ -331,13 +341,13 @@ const Header3 = ({ topOffset }) => {
               <Link
                 to="/Headphones"
                 onClick={handleLinkClick}
-                className={`nav-link ${location.pathname === "/Headphones" ? "active" : ""
+                className={`nav-link ${location.pathname === "/Headphones" || location.pathname === "/headphones" ? "active" : ""
                   }`}
               >
                 <FaHeadphones
                   style={{ fontSize: '16px' }}
 
-                  className={`fa-icons ${location.pathname === "/Headphones" ? "active" : ""
+                  className={`fa-icons ${location.pathname === "/Headphones" || location.pathname === "/headphones" ? "active" : ""
                     }`}
                 />{" "}
                 Headphones
@@ -345,13 +355,13 @@ const Header3 = ({ topOffset }) => {
               <Link
                 to="/Speakers"
                 onClick={handleLinkClick}
-                className={`nav-link ${location.pathname === "/Speakers" ? "active" : ""
+                className={`nav-link ${location.pathname === "/Speakers" ||location.pathname === "/speakers" ? "active" : ""
                   }`}
               >
                 <FaVolumeUp
                   style={{ fontSize: '16px' }}
 
-                  className={`fa-icons ${location.pathname === "/Speakers" ? "active" : ""
+                  className={`fa-icons ${location.pathname === "/Speakers" || location.pathname === "/speakers" ? "active" : ""
                     }`}
                 />{" "}
                 Speakers
@@ -361,11 +371,11 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/TV"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname === "/TV" ? "active" : ""
+            className={`nav-link ${location.pathname === "/TV" || location.pathname === "/tv" ? "active" : ""
               }`}
           >
             <FaTv
-              className={`fa-icons ${location.pathname === "/TV" ? "active" : ""
+              className={`fa-icons ${location.pathname === "/TV" || location.pathname === "/tv" ? "active" : ""
                 }`}
             />{" "}
             T.V & Home Cinema
@@ -373,11 +383,11 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/Watch"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname === "/Watch" ? "active" : ""
+            className={`nav-link ${location.pathname === "/Watch" || location.pathname === "/watch" ? "active" : ""
               }`}
           >
             <Watch
-              className={`fa-icons ${location.pathname === "/Watch" ? "active" : ""
+              className={`fa-icons ${location.pathname === "/Watch" || location.pathname === "/watch" ? "active" : ""
                 }`}
             />{" "}
             Wearable Tech
@@ -385,11 +395,11 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/Printers"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname === "/Printers" ? "active" : ""
+            className={`nav-link ${location.pathname === "/Printers" ||location.pathname === "/printers" ? "active" : ""
               }`}
           >
             <FaPrint
-              className={`fa-icons ${location.pathname === "/Printers" ? "active" : ""
+              className={`fa-icons ${location.pathname === "/Printers" ||location.pathname === "/printers" ? "active" : ""
                 }`}
             />{" "}
             Printers
@@ -403,6 +413,16 @@ const Header3 = ({ topOffset }) => {
               e.stopPropagation();
               toggleMoreDropdown();
             }}
+            // onMouseEnter={() => {
+            //   if (window.innerWidth > 768) { // Only for desktop
+            //     setShowMore(true);
+            //   }
+            // }}
+            // onMouseLeave={() => {
+            //   if (window.innerWidth > 768) { // Only for desktop
+            //     setShowMore(false);
+            //   }
+            // }}
           >
             <span className="activelink" style={{ cursor: "pointer" }}>
               <FaCog className={`fa-icons ${isAccessoriesActive ? "active" : ""}`} /> Accessories
@@ -473,11 +493,11 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/Secondhandproducts"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname === "/Secondhandproducts" ? "active" : ""
+            className={`nav-link ${location.pathname === "/Secondhandproducts" || location.pathname === "/secondhandproducts" ? "active" : ""
               }`}
           >
             <FaRecycle
-              className={`fa-icons ${location.pathname === "/Secondhandproducts" ? "active" : ""
+              className={`fa-icons ${location.pathname === "/Secondhandproducts" || location.pathname === "/secondhandproducts" ? "active" : ""
                 }`}
             />{" "}
             Refurbish
