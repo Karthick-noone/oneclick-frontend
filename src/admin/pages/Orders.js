@@ -17,6 +17,10 @@ import {
   FaPrint,
   FaEdit,
   FaCheck,
+  FaTruckMonster,
+  FaTruckMoving,
+  FaTruckPickup,
+  FaTruck,
 } from "react-icons/fa";
 
 // import ReactDOMServer from "react-dom/server"; // Add this import at the top
@@ -880,7 +884,7 @@ const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
                                 className="btn btn-view"
                                 title="View delivery status"
                               >
-                                <FaEye />
+                                <FaTruck />
                               </button>
                             </center>
                             <OrderTrackingModal
@@ -1162,36 +1166,38 @@ const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
               <FaTimes />
             </button>
           </Modal>
-
-          <div className="pagination-controls">
-            <button
-              onClick={handlePrevPage}
-              disabled={currentPage === 1}
-              className="pagination-button"
-            >
-              &lt;
-            </button>
-            {getPaginationPages().map((page, index) => (
+          {totalPages > 10 && (
+            <div className="pagination-controls">
               <button
-                key={index}
-                onClick={() => {
-                  if (page !== "...") handlePageChange(page);
-                }}
-                className={`pagination-button ${currentPage === page ? "active" : ""
-                  }`}
-                disabled={page === "..."}
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className="pagination-button"
               >
-                {page}
+                &lt;
               </button>
-            ))}
-            <button
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-              className="pagination-button"
-            >
-              &gt;
-            </button>
-          </div>
+              {getPaginationPages().map((page, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    if (page !== "...") handlePageChange(page);
+                  }}
+                  className={`pagination-button ${currentPage === page ? "active" : ""
+                    }`}
+                  disabled={page === "..."}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className="pagination-button"
+              >
+                &gt;
+              </button>
+            </div>
+          )}
+
         </div>
       </main>
     </div>

@@ -13,7 +13,8 @@ import {
   // FaAddressBook,
   // FaPowerOff,
   // FaBox,
-  FaChevronDown
+  FaChevronDown,
+  FaCodeBranch
 } from "react-icons/fa";
 import "./../styles.css"; // Adjust path as needed
 import "./css/Header2.css"; // Adjust path as needed
@@ -43,6 +44,7 @@ import defaultUser from "./img/default-picture.png";
 import wishlisticon from "./img/wish-list.png";
 import carticon from "./img/shopping-cart3.png";
 import { SearchIcon } from "lucide-react";
+
 
 const Header2 = ({ header2Ref }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -1415,6 +1417,20 @@ const Header2 = ({ header2Ref }) => {
 
                     <span style={{ fontSize: '16px' }}>Help Center</span>
                   </div>
+                </Link>
+
+                <Link to={"/branch-login"}>
+                <div className={`dropdown-item ${location.pathname === "/HelpCenter" ? "active" : ""}`}
+              
+                >
+                <FaCodeBranch 
+                  style={{
+                  color:'#2A55E5 ',
+                  marginRight:"16px"
+                }}
+                />
+                <span style={{ fontSize: '16px' }}>Branch Login</span>
+                </div>
                 </Link>
               </div>
             )}

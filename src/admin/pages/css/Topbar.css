@@ -1,459 +1,456 @@
-/* Base Styles */
+/* Topbar Container - Always Dark Theme */
 .topbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #001a35;
-    color: rgb(49, 49, 49);
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 17px 20px;
-    z-index: 1000;
-    transition: all 0.3s ease;
-    display: flex;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-
-}
-.user-role{
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.topbar-content {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    justify-content: flex-end;
-}
-
-.topbar-logo {
-    display: none; /* Hide logo if aligning everything to the right */
-}
-
-.menu-toggle {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    display: block;
-    margin-right: 20px; /* Space before actions */
-}
-
-.topbar-search {
-    display: flex;
-    align-items: center;
-    margin-right: 10px;
-}
-
-.topbar-search input {
-    padding: 5px;
-    border: none;
-    border-radius: 5px;
-    outline: none;
-    font-size: 14px; /* Adjust font size for better visibility */
-}
-
-.search-icon {
-    font-size: 18px;
-    color: rgb(53, 50, 50);
-    margin-left: 5px; /* Adjust spacing between input and icon */
-}
-
-.topbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.action-btn {
-    background: none;
-    border: none;
-    color: rgb(41, 40, 40);
-    font-size: 20px;
-    cursor: pointer;
-    margin-right: 20px;
-    padding-top: 11px;
-}
-
-.topbar-menu .menu-item {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Space between icon and text */
-    background: none;
-    border: none;
-    color: rgb(0, 0, 0);
-    padding: 10px 20px;
-    text-align: left;
-    cursor: pointer;
-    
-}
-
-
-.topbar-menu {
-    position: absolute;
-    top: 78px; /* Adjust top position */
-    right: 1; /* Align to the right */
-    background-color: #ffffff;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    width: 180px; /* Adjust width */
-    z-index: 1000; /* Ensure it is above other elements */
-}
-
-.menu-item {
-    background: none;
-    border: none;
-    color: rgb(0, 0, 0);
-    padding: 10px 20px;
-    text-align: left;
-    cursor: pointer;
-    width: 100%;
-    box-sizing: border-box; /* Ensure padding and border do not affect width */
-}
-
-.menu-item:hover {
-    background-color: #555;
-    color: white;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-
-    .notification-box {
-        width: 100%;
-        right: 0;
-      }
-    
-    .topbar-content {
-        flex-direction: row; /* Ensure content is in a single row */
-        align-items: center; /* Center items vertically */
-        justify-content: right; /* Space between items */
-    }
-
-    .menu-toggle {
-        display: block;
-        margin-right: 1%;
-    }
-
-    .action-btn {
-
-        margin-right: 20px;
-
-
-    }
-
-
-    .topbar-search {
-
-margin-right: 1px;    }
-
-    .topbar-actions {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .topbar.menu-open .topbar-actions {
-        display: flex;
-        flex-direction: column;
-        position: absolute;
-        top: 60px;
-        right: 0;
-        background-color: #333;
-        border-radius: 5px;
-        width: 100%;
-        padding: 10px 20px;
-        gap: 10px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-
-    .topbar.menu-open .topbar-menu {
-        display: flex;
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 480px) {
-    .action-btn {
-        font-size: 18px;
-    }
-    
-
-    .search-icon {
-        font-size: 16px;
-    }
-}
-
-
-.profile-section {
-    display: flex;
-    align-items: center;
-    /* margin-bottom: 10px; */
-    padding: 0;
-    
-  }
-  
-  .profile-imagee {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    margin-right: 10px;
-    padding: 2px 2px;
-  }
-  
-  .profile-username {
-    font-size: 18px;
-    font-weight: bold;
-    color: rgb(34, 33, 33);
-  }
-  .userpic{
-    width: 40px;
-    cursor: pointer;
-    border-radius: 50%;
-  }
-  /* .admin{
-    font-size: 10px;
-    color: black;
-  } */
- /* Enhanced Notification Box */
-
- 
- .no-notify{
-  margin-top: 30%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Left Section */
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.sidebar-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+
+/* Right Section */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* User Role Badge */
+.user-role-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.user-role-badge:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.role-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--role-color);
+  box-shadow: 0 0 10px var(--role-color);
+}
+
+.role-text {
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Icon Buttons */
+.icon-btn {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 18px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+/* Profile Avatar */
+.profile-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.profile-avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.profile-avatar:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.05);
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.online-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background: #10b981;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+/* Notification Dropdown - Light Theme */
+.notification-dropdown.light-notifications {
+  position: absolute;
+  top: 100%;
+  right: 120px;
+  width: 380px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  z-index: 1001;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Light Theme Notification Styles */
+.light-notifications .dropdown-header {
+  padding: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
+.light-notifications .dropdown-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 600;
+}
 
-.notification-box {
-  position: absolute;
-  top: 75px;
-  right: 10px;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  width: 300px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+.light-notifications .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.light-notifications .mark-all-btn {
+  color: #667eea;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.light-notifications .mark-all-btn:hover {
+  color: #5a67d8;
+}
+
+.light-notifications .notification-count {
+  background: #667eea;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.light-notifications .notification-list {
   max-height: 400px;
-  min-height: 300px;
+  overflow-y: auto;
+}
+
+.light-notifications .loading-notifications {
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  transition: all 0.3s ease-in-out;
-}
-
-.notification-header {
-  display: flex;
-  justify-content: space-between; /* Distributes space between the two headings */
   align-items: center;
-  background-color: #001a35;
-  color: white;
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
+  gap: 12px;
+  color: #64748b;
 }
 
-.notification-header h4 {
-  font-size: 18px;
+.light-notifications .loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e2e8f0;
+  /* border-left: 2px solid #667eea; */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.light-notifications .empty-state {
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+.light-notifications .empty-state svg {
+  opacity: 0.5;
+}
+
+.light-notifications .notification-item {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.light-notifications .notification-item:hover {
+  background: #f8fafc;
+}
+
+.light-notifications .notification-item.unread {
+  background: #f0f9ff;
+  /* border-left: 3px solid #3b82f6; */
+}
+
+.light-notifications .notification-item.unread .notification-message {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.light-notifications .notification-content {
+  flex: 1;
+}
+
+.light-notifications .notification-message {
+  color: #374151;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.light-notifications .notification-time {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.light-notifications .notification-status {
+  padding-top: 2px;
+}
+
+.light-notifications .read-icon {
+  color: #667eea;
+}
+
+.light-notifications .unread-dot {
+  width: 8px;
+  height: 8px;
+  background: #3b82f6;
+  border-radius: 50%;
+}
+
+/* User Menu Dropdown - Light Theme */
+.user-menu-dropdown.light-menu {
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  width: 280px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  z-index: 1001;
+  animation: slideDown 0.2s ease;
+}
+
+.light-menu .user-profile-section {
+  padding: 24px;
+  text-align: center;
+}
+
+.light-menu .profile-avatar-large {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid #667eea;
+  margin: 0 auto 16px;
+  overflow: hidden;
+}
+
+.light-menu .avatar-image-large {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.light-menu .online-indicator-large {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 14px;
+  height: 14px;
+  background: #10b981;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.light-menu .profile-info h3 {
+  margin: 0 0 4px 0;
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.light-menu .profile-email {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.light-menu .menu-divider {
+  height: 1px;
+  background: #f1f5f9;
   margin: 0;
 }
 
-.notification-header .mark-all-btn {
-  cursor: pointer;
-  font-size: 14px;
-  color: #4CAF50; /* Mark All button color */
+.light-menu .menu-items {
+  padding: 8px;
 }
 
- 
-  
-  /* Notification List */
-  .notification-box ul {
-    list-style-type: none;
-    /* padding-right: 10px;
-    padding-left: 10px; */
-    padding: 10px;
-    margin: 0;
-    overflow-y: auto;
-    flex-grow: 1;
-    /* margin-top: 10px; */
-  }
-  
-  .notification-box ul li {
-    /* display: flex; */
-    justify-content: space-between;
-    align-items: center;
-    /* padding: 5px ; */
-    /* border-bottom: 1px solid #f1f1f1; */
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-  }
-  /* Notification Count Badge */
-.notification-count {
-    position: absolute;
-    top: 15px;
-    right: 75px;
-    background-color: red;
-    color: white;
-    font-size: 12px;
-    /* font-weight: bold; */
-    width: 20px;
-    height: 20px;
-    padding: 3px ;
-    border-radius: 50%;
-    min-width: 18px;
-    text-align: center;
-  }
-  
-  
-  .notification-box ul li:last-child {
-    border-bottom: none;
-  }
-  
-  /* Notification Content */
-  .notification-box ul li .content {
-    flex-grow: 1;
-    margin-right: 10px;
-  }
-  
-  /* Circle Button (Read/Unread) */
- /* Circle Button (Read/Unread) */
-.notification-box ul li .circle-btn-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;  /* Aligns the circle button to the right */
-    flex: 0; /* Prevents the wrapper from taking up extra space */
-    margin-left: auto; /* Ensures that the circle buttons stay on the far right */
-  }
-  
-  .circle-btn {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 1px solid #007bff;
-    background-color: transparent;
-    cursor: pointer;
-  }
-  
-  .circle-btn.unread {
-    background-color: #007bff;
-  }
-  
-  .circle-btn.read {
-    background-color: transparent;
-    border: 1px solid #888;
-  }
-  
-  /* New/Read Notification Styles */
-  .notification-box ul li.new {
-    /* background-color: #e0f7fa;  */
-    font-weight: bold;
-  }
-  
-  .notification-box ul li.read {
-    background-color: transparent; /* Transparent background for read notifications */
-    color: #888; /* Grey color for read notifications */
-  }
-  
-  .notification-box ul li.unread {
-    background-color: #fff; /* White background for unread notifications */
-  }
-  
-  .notification-box ul li .timestamp {
-    font-size: 12px;
-    color: #888;
-    margin-top: 5px;
-    display: block;
-    margin-left: 20px; /* Optional: aligns timestamp with content */
-  }
-  
-  /* Mark All Button */
-  .notification-box .mark-all-btn {
-    margin-top: 10px;
-    align-self: flex-start; /* Align it to the start */
+.light-menu .menu-link {
+  text-decoration: none;
+  display: block;
+}
+
+.light-menu .menu-item {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.light-menu .menu-item:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.light-menu .menu-icon {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.light-menu .logout-item {
+  color: #ef4444;
+}
+
+.light-menu .logout-item:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .topbar {
+    padding: 0 15px;
   }
 
-  /* Notification Item */
-.notification-item {
-    display: flex; /* Use flex to arrange items in a row for message and circle button */
-    flex-direction: column; /* Stack the content vertically */
-    padding: 10px 5px;
-    border-bottom: 1px solid #f1f1f1;
-    font-size: 14px;
-    color: #333;
+  .notification-dropdown.light-notifications {
+    width: 320px;
+    right: 80px;
   }
-  
-  /* Notification Row (Message and Circle Button) */
-  .notification-row {
-    display: flex; /* Arrange message and circle button in the same row */
-    justify-content: space-between; /* Space out the content, push circle to the right */
-    align-items: center; /* Vertically center the items */
-    width: 100%;
-  }
-  
-  /* Circle Button Wrapper */
-  .circle-btn-wrapper {
-    display: flex;
-    justify-content: flex-end; /* Ensure circle button is aligned to the right */
-    flex: 0; /* Prevent wrapper from taking extra space */
-  }
-  
-  /* Circle Button */
-  .circle-btn {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 1px solid #007bff;
-    background-color: transparent;
-    cursor: pointer;
-  }
-  
-  .circle-btn.unread {
-    background-color: #007bff;
-  }
-  
-  .circle-btn.read {
-    background-color: transparent;
-    border: 1px solid #888;
-  }
-  
-  /* Notification Time */
-  .notification-time {
-    font-size: 12px;
-    color: #888;
-    margin-top: 5px; /* Add space above the time */
-  }
-  
-  /* Clear Option */
-  .notification-box .clear {
-    text-align: center;
-    margin-top: 10px;
-    cursor: pointer;
-    font-size: 12px;
-    color: #888;
-  }
-  
-  .notification-box .clear:hover {
-    text-decoration: underline;
-  }
-  
-  /* Marking Read Notifications */
-  .notification-item.read {
-    background-color: transparent; /* Remove background for read notifications */
-  }
-  
-  .notification-item.new {
-    /* background-color: #e0f7fa;  */
-    font-weight: bold;
-  }
-  
-  .notification-item.unread {
-    background-color: #fff;
-  }
-  
-  /* Improved Topbar and Menu Styles */
 
+  .user-role-badge .role-text {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-container {
+    display: none;
+  }
+
+  .notification-dropdown.light-notifications {
+    width: 280px;
+    right: 60px;
+  }
+}

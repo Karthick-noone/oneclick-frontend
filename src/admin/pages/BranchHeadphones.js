@@ -1,35 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
-import ApproveImage from './img/approve.png';
-import ApprovalWaitingImage from './img/approval_waiting.png';
-
 import { ApiUrl } from "./../../components/ApiUrl";
-import { FaEdit, FaTrash, FaEye, FaTimes, FaImages } from "react-icons/fa"; // Import icons
+import { FaEdit, FaTrash, FaEye, FaTimes, FaImages, FaPlusCircle, FaChevronDown } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick"; // Import Slider from react-slick
-import { FaInfoCircle, FaClone, FaPlusCircle, FaChevronDown } from "react-icons/fa"; // Ensure to import any icons you need
+import { FaInfoCircle, FaClone } from "react-icons/fa"; // Ensure to import any icons you need
 import CouponEditPopup from "./CouponEditPopup";
 import EditCouponModal from "./EditCouponModal"; // Import the modal component
 // import CouponImage from './img/coupons.png'
+import ApproveImage from './img/approve.png'
+import ApprovalWaitingImage from './img/approval_waiting.png';
 
-
-// import leftarrow from './img/left.png';
-// import rightarrow from './img/right.png';
 import ActiveCouponImage from './img/Active-coupon.png'
 import ExpiredCouponImage from './img/Expired-coupon.png'
-import { SearchIcon } from "lucide-react";
-import FilterIcon from "./img/filter.png";
+// import leftarrow from './img/left.png';
+// import rightarrow from './img/right.png';
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+import { SearchIcon } from "lucide-react";
+import FilterIcon from "./img/filter.png";
 import { toast, } from "react-toastify";
-
 // Set up the modal root element
 Modal.setAppElement("#root");
 
-const CCTVAccessories = () => {
+const Headphones = () => {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -71,6 +68,12 @@ const CCTVAccessories = () => {
   const [offerEndTime, setOfferEndTime] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
+
+
+
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [modalProductId, setModalProductId] = useState(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [lightboxImages, setLightboxImages] = useState([]);
@@ -106,11 +109,9 @@ const CCTVAccessories = () => {
         });
 
         //  Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
           timeout: 5000,
           params: { branch_id, userRole },
-
-
 
         });
         console.log("Refreshed product list:", refreshedProducts.data);
@@ -158,7 +159,7 @@ const CCTVAccessories = () => {
         });
 
         // Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
           timeout: 5000,
           params: { branch_id, userRole },
 
@@ -199,17 +200,18 @@ const CCTVAccessories = () => {
     }
   };
 
+
   const fetchCouponStatus = async (productId) => {
-    console.log(`[INFO] Checking coupon for product ID: ${productId}`);
+    // console.log(`[INFO] Checking coupon for product ID: ${productId}`);
 
     try {
       const response = await axios.get(`${ApiUrl}/api/couponstatus/${productId}`);
       const { hasCoupon, isExpired } = response.data;
 
-      console.log(`[SUCCESS] Product ${productId}: hasCoupon=${hasCoupon}, isExpired=${isExpired}`);
+      // console.log(`[SUCCESS] Product ${productId}: hasCoupon=${hasCoupon}, isExpired=${isExpired}`);
       return { hasCoupon, isExpired };
     } catch (error) {
-      console.error(`[ERROR] Failed to check coupon for product ${productId}:`, error.message);
+      // console.error(`[ERROR] Failed to check coupon for product ${productId}:`, error.message);
       return { hasCoupon: false, isExpired: false };
     }
   };
@@ -247,10 +249,6 @@ const CCTVAccessories = () => {
       }
     }, 100);
   }, []);
-
-  const [isModalOpen2, setIsModalOpen2] = useState(false);
-  const [modalProductId, setModalProductId] = useState(null);
-
   // Handle opening modal and passing productId
 
   const openProductModal = (productId) => {
@@ -319,7 +317,6 @@ const CCTVAccessories = () => {
       }
     }
   };
-
 
 
 
@@ -434,7 +431,6 @@ const CCTVAccessories = () => {
   const handleCouponUpdated = () => {
     console.log("Coupon updated successfully!");
   };
-
   const MAX_FILES = 5; // Set your file limit
 
   const handleFileChange = (productId, event) => {
@@ -491,7 +487,7 @@ const CCTVAccessories = () => {
     console.log(`Uploading images for product ID ${productId}...`); // Log upload attempt
 
     try {
-      const response = await fetch(`${ApiUrl}/uploadcctvaccessoriesimages`, {
+      const response = await fetch(`${ApiUrl}/uploadheadphonesimages`, {
         method: "POST",
         body: formData,
       });
@@ -556,6 +552,8 @@ const CCTVAccessories = () => {
       navigate("/AdminLogin");
     }
   }, [navigate]);
+
+
   // Fetch products when component mounts
   const branchData = JSON.parse(localStorage.getItem("branch"));
   const branch_id = branchData?.id || null;
@@ -563,28 +561,39 @@ const CCTVAccessories = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+
+        // ✅ correct branch logic
+        const currentBranch = localStorage.getItem("current_branch") || "all";
         const branchData = JSON.parse(localStorage.getItem("branch"));
-        const branch_id = branchData?.id || null;
+        const loginBranchId = branchData?.id || null;
+        const branch_id = currentBranch === "all" ? null : currentBranch;
+
         const userRole = localStorage.getItem("userRole");
-        const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+
+        const response = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
           params: { branch_id, userRole },
         });
+
         let filteredProducts = response.data;
 
-        // Admin → only branchless products
-        if (userRole === "Admin") {
-          filteredProducts = filteredProducts.filter(item => item.branch_id === null);
-          console.log("🟢 Admin Filter Applied → branchless products only");
+        // Admin → ALL
+        if (userRole === "Admin" && branch_id === null) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id !== null);
         }
 
-        // branch admin → only own branch products
-        else if (userRole === "branch_admin" && branch_id) {
-          filteredProducts = filteredProducts.filter(item => item.branch_id === branch_id);
-          console.log("🟢 Branch Admin Filter Applied → branch_id =", branch_id);
+        // Admin → specific branch
+        else if (userRole === "Admin" && branch_id) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id == branch_id);
+        }
+
+        // branch admin → only own branch
+        else if (userRole === "branch_admin" && loginBranchId) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id == loginBranchId);
         }
 
         setProducts(filteredProducts);
         console.log("📌 Final filtered products:", filteredProducts);
+
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -660,7 +669,7 @@ const CCTVAccessories = () => {
     if (selectedFile) {
       formData.append("image", selectedFile);
 
-      fetch(`${ApiUrl}/updatecctvaccessories/image/${productId}?index=${imageIndex}`, {
+      fetch(`${ApiUrl}/updateheadphones/image/${productId}?index=${imageIndex}`, {
         method: "PUT",
         body: formData,
       })
@@ -711,7 +720,7 @@ const CCTVAccessories = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // Make the DELETE request to the backend API
-        fetch(`${ApiUrl}/deletecctvaccessories/image/${productId}?index=${imageIndex}`, {
+        fetch(`${ApiUrl}/deleteheadphones/image/${productId}?index=${imageIndex}`, {
           method: "DELETE",
         })
           .then((response) => response.json())
@@ -799,14 +808,6 @@ const CCTVAccessories = () => {
       return;
     }
 
-    // if (!newProduct.effectiveprice) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Effective Price is required.",
-    //   });
-    //   return;
-    // }
     // Basic validation checks
     if (!newProduct.name.trim()) {
       Swal.fire({
@@ -933,18 +934,24 @@ const CCTVAccessories = () => {
     //     return;
     //   }
     // }
-  
 
-    // Fetch user role from localStorage
+    const branchData = JSON.parse(localStorage.getItem("branch"));
+        const contact_person = branchData.contact_person;
+
+    const savedBranch = localStorage.getItem("current_branch") || "all";
+
+    let branch_id = savedBranch === "all" ? null : savedBranch;
+
+    // logs
+    console.log("📌 Saved Branch in localStorage:", savedBranch);
+    console.log("📌 Final branch_id sent to backend:", branch_id);    // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
-const branchData = JSON.parse(localStorage.getItem("branch"));
-    const branch_id = userRole === "Admin" ? null : (branchData?.id ?? null);
+
     // Set product status based on user role
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
-        if (branch_id !== null) formData.append("branch_id", branch_id);
-
+    if (branch_id !== null) formData.append("branch_id", branch_id);
 
     formData.append("name", newProduct.name);
     formData.append("features", newProduct.features);
@@ -958,7 +965,8 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     // formData.append("coupon_expiry_date", newProduct.coupon_expiry_date);
     // formData.append("coupon", newProduct.coupon);
     formData.append("category", newProduct.category); // Add category here
-
+    formData.append("user_role", userRole);
+    formData.append("contact_person", contact_person);
     // Append each image file to the FormData
     newProduct.images.forEach((image, index) => {
       if (image instanceof File) {
@@ -969,7 +977,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     });
 
     try {
-      await axios.post(`${ApiUrl}/cctvaccessories`, formData, {
+      await axios.post(`${ApiUrl}/headphones`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -980,10 +988,9 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
         title: "Product Added",
         text: "The product has been added successfully!",
       });
-      console.log("Form data", formData)
 
       // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+      const response = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
         params: { branch_id, userRole },
 
       });
@@ -1105,15 +1112,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
       });
       return;
     }
-
-    // if (!editingProduct.effectiveprice) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Effective Price is required.",
-    //   });
-    //   return;
-    // }
     if (!editingProduct.features.trim()) {
       Swal.fire({
         icon: "warning",
@@ -1258,12 +1256,12 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
       // Log the request URL
       console.log(
         "Sending update request to:",
-        `${ApiUrl}/updatecctvaccessories/${editingProduct.id}`
+        `${ApiUrl}/updateheadphones/${editingProduct.id}`
       );
 
       // Send the update request
       const response = await axios.put(
-        `${ApiUrl}/updatecctvaccessories/${editingProduct.id}`,
+        `${ApiUrl}/updateheadphones/${editingProduct.id}`,
         formData,
         {
           headers: {
@@ -1283,7 +1281,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
       });
 
       // Fetch updated list of products
-      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
         params: { branch_id, userRole },
 
       });
@@ -1326,16 +1324,16 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     if (confirmResult.isConfirmed) {
       try {
         // Log before sending delete request
-        console.log("Sending delete request to:", `${ApiUrl}/deletecctvaccessories/${id}`);
+        console.log("Sending delete request to:", `${ApiUrl}/deleteheadphones/${id}`);
 
         // Perform the delete operation
-        const deleteResponse = await axios.delete(`${ApiUrl}/deletecctvaccessories/${id}`);
+        const deleteResponse = await axios.delete(`${ApiUrl}/deleteheadphones/${id}`);
 
         // Log response from delete request
         console.log("Delete response:", deleteResponse.data);
 
         // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        const response = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
           params: { branch_id, userRole },
 
         });
@@ -1587,7 +1585,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
   return (
     <div className="laptops-page">
       <div className="laptops-content">
-        <h2 className="laptops-page-title">Add CCTV Accessories</h2>
+        <h2 className="laptops-page-title">Add  Headphones</h2>
         <div className="laptops-form-container">
           {/* Left Section */}
           <div className="laptops-left-section">
@@ -1614,15 +1612,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
               type="text"
               name="price"
               value={newProduct.price}
-              onChange={handleChange}
-              className="laptops-input"
-            />
-
-            <label className="laptops-label">Effective Price</label>
-            <input
-              type="text"
-              name="effectiveprice"
-              value={newProduct.effectiveprice}
               onChange={handleChange}
               className="laptops-input"
             />
@@ -1693,7 +1682,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
           </div>
         </div>
         <hr className="dotted-divider" />
-        <h2 className="laptops-page-title">CCTV Accessories List</h2>
+        <h2 className="laptops-page-title">Headphones Product List</h2>
 
         {(totalProducts > 0 || inStock > 0 || outOfStock > 0 || withCoupons > 0) && (
           <>
@@ -1767,9 +1756,10 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
             </div>
           </>
         )}
+
         <div className="laptops-products-list">
           {products.length === 0 ? (
-            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some CCTV Accessories.</div>
+            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some Headphones.</div>
           ) : (
             (() => {
               const filteredProducts = products
@@ -1809,13 +1799,13 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                             {product.prod_img.map((img, imgIndex) => (
                               <div key={imgIndex} className="image-wrapper">
                                 <img
-                                  src={`${ApiUrl}/uploads/cctvaccessories/${img}`}
+                                  src={`${ApiUrl}/uploads/headphones/${img}`}
                                   alt={product.prod_name}
                                   className="laptops-product-image"
                                   onClick={() =>
                                     handleImageClick(
                                       imgIndex, // Index of the clicked image in this product
-                                      product.prod_img.map(img => `${ApiUrl}/uploads/cctvaccessories/${img}`) // Only current product's images
+                                      product.prod_img.map(img => `${ApiUrl}/uploads/headphones/${img}`) // Only current product's images
                                     )
                                   }
                                 />
@@ -1840,6 +1830,8 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                             ))}
                           </Slider>
                         </div>
+                        {/* <ToastContainer /> */}
+
                       </div>
 
                       {/* Display product name */}
@@ -1868,9 +1860,10 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                         )}
 
                       </div>
-
                       <div>
                         M.R.P <span style={{ textDecoration: "line-through", color: 'red', fontSize: '14px' }}>₹{product.actual_price}</span>  <span style={{ color: 'green', marginLeft: '5px' }}>₹{product.prod_price}</span>
+
+                        {/* <span>{product.category}</span> */}
                       </div>
                       <div className="product-extras">
                         {couponProducts[product.id]?.hasCoupon && (
@@ -1974,10 +1967,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                                     <p>
                                       <strong>Selling Price</strong>
                                       <span>₹{product.prod_price}</span>
-                                    </p>
-                                    <p>
-                                      <strong>Effective Price</strong>
-                                      <span>₹{product.effectiveprice}</span>
                                     </p>
                                     <p>
                                       <strong>Delivery charge</strong>
@@ -2168,6 +2157,14 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                                       </span>
                                     </p>
 
+                                    <CouponEditPopup
+                                      isOpen={isPopupOpen}
+                                      onClose={closePopup}
+                                      productId={selectedProductId}
+                                      prodPrice={selectedProductPrice}
+                                      onCouponUpdated={handleCouponUpdated}
+                                    />
+
 
                                     <div
                                       className="frequently-buy"
@@ -2181,6 +2178,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                                         className="copy-icon"
                                       />
                                     </div>
+
                                     <div
                                       className={`${product.status === "available" ? "In-stock" : "Out-of-stock"
                                         } status-container`}
@@ -2213,14 +2211,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                         </div>
                       )}
 
-                      <CouponEditPopup
-                        isOpen={isPopupOpen}
-                        onClose={closePopup}
-                        productId={selectedProductId}
-                        prodPrice={selectedProductPrice}
-                        onCouponUpdated={handleCouponUpdated}
-                      />
-
                       {isViewingCoupons && (
                         <div className="pop-overlay">
                           <div className="pop-content">
@@ -2234,7 +2224,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                             <span className="coupon-title-with-image">
                               {product.prod_img?.[0] && (
                                 <img
-                                  src={`${ApiUrl}/uploads/cctvaccessories/${product.prod_img[0]}`}
+                                  src={`${ApiUrl}/uploads/headphones/${product.prod_img[0]}`}
                                   alt={product.prod_name}
                                   className="coupon-product-image"
                                 />
@@ -2435,6 +2425,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
       </Modal>
 
       {/* Modal for editing a product */}
+
       {isOpen && (
         // Sample usage
         <Lightbox
@@ -2539,24 +2530,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
               </div>
 
               <div className="feature-item">
-                <label className="feature-label">Effective Price</label>
-
-                <input
-                  type="text"
-                  name="effectiveprice"
-                  value={editingProduct.effectiveprice}
-                  onChange={(e) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      effectiveprice: e.target.value,
-                    })
-                  }
-                  placeholder="Enter product effectiveprice"
-                  className="adminmodal-input"
-                />
-              </div>
-
-              <div className="feature-item">
                 <label className="feature-label">Offer label</label>
 
                 <input
@@ -2636,7 +2609,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                   </select>
                 </div> */}
 
-                <div className="feature-item">
+                {/* <div className="feature-item">
 
                   <label className="feature-label">Approve or Unapprove</label>
 
@@ -2654,7 +2627,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                     <option value="unapproved">UnApprove</option>
                   </select>
 
-                </div>
+                </div> */}
 
                 <button
                   onClick={handleUpdateProduct}
@@ -2704,4 +2677,4 @@ const SamplePrevArrow = (props) => {
 };
 
 
-export default CCTVAccessories;
+export default Headphones;

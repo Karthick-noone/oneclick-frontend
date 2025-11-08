@@ -282,3 +282,36 @@
     transform: translateY(0);
   }
 }
+
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.dashboard-filter {
+  display: flex;
+  align-items: center;
+}
+
+.branch-select {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.branch-select:hover {
+  border-color: #007bff;
+}
+
+.branch-select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.35);
+}

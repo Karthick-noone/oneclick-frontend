@@ -2,17 +2,29 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminMain from './pages/AdminMain';
 import Computers from './pages/AddComputers';
+import BranchComputers from './pages/BranchComputers';
 import Mobiles from './pages/AddMobiles';
+import BranchMobiles from './pages/BranchMobiles';
 import CCTV from './pages/AddCCTV';
+import BranchCCTV from './pages/BranchCCTV';
 import Headphones from './pages/AddHeadphones';
+import BranchHeadphones from './pages/BranchHeadphones';
 import Speakers from './pages/AddSpeakers';
+import BranchSpeakers from './pages/BranchSpeakers';
 import Tv from './pages/AddTV';
+import BranchTv from './pages/BranchTV';
 import Watch from './pages/AddWatch';
+import BranchWatch from './pages/BranchWatch';
 import Printers from './pages/AddPrinters';
+import BranchPrinters from './pages/BranchPrinters';
 import ComputerAccessories from './pages/AddComputerAccessories';
+import BranchComputerAccessories from './pages/BranchComputerAccessories';
 import MobileAccessories from './pages/AddMobileAccessories';
+import BranchMobileAccessories from './pages/BranchMobileAccessories';
 import CCTVAccessories from './pages/AddCCTVAccessories';
+import BranchCCTVAccessories from './pages/BranchCCTVAccessories';
 import PrinterAccessories from './pages/AddPrinterAccessories';
+import BranchPrinterAccessories from './pages/BranchPrinterAccessories';
 import Orders from './pages/Orders';
 import Customers from './pages/Customers';
 import Reports from './pages/Reports';
@@ -24,6 +36,7 @@ import EditDoubleImageAd from './pages/EditDoubleImageAd';
 import EditSingleImageAd from './pages/EditSingleAdPage';
 import EditLoginpageBG from './pages/EditLoginPageBG';
 import Dashboard from './pages/Dashboard';
+import BranchDashboard from './pages/BranchDashboard';
 import ContactsTable from './pages/ContactsTable';
 import CareersTable from './pages/CareersTable';
 import ComputersAd from './pages/ComputersAd';
@@ -33,6 +46,9 @@ import CCTVAd from './pages/CCTVAd';
 import CouponManager from './pages/CouponManager';
 import StaffManagement from './pages/StaffManagement';
 import Secondhandproducts from './pages/AddSecondhandproducts';
+import BranchSecondhandproducts from './pages/BranchSecondhandProducts';
+import BranchAdminProfile from './pages/BranchAdminProfile';
+import BranchManagement from './pages/BranchManagement';
 import { ThemeProvider } from './ThemeContext';
 import NetworkStatus from '../components/NetworkStatus';
 import { ToastContainer } from "react-toastify";
@@ -119,21 +135,36 @@ function App() {
         <AdminMain>
           <Routes>
             <Route path="/Computers" element={<Computers />} />
+            <Route path="/BranchComputers" element={<BranchComputers />} />
             <Route path="/Mobiles" element={<Mobiles />} />
+            <Route path="/BranchMobiles" element={<BranchMobiles />} />
             <Route path="/CCTV" element={<CCTV />} />
+            <Route path="/BranchCCTV" element={<BranchCCTV />} />
             <Route path="/Headphones" element={<Headphones />} />
+            <Route path="/BranchHeadphones" element={<BranchHeadphones />} />
             <Route path="/Speakers" element={<Speakers />} />
+            <Route path="/BranchSpeakers" element={<BranchSpeakers />} />
             <Route path="/TVHomeCinema" element={<Tv />} />
+            <Route path="/BranchTVHomeCinema" element={<BranchTv />} />
             <Route path="/WearableTech" element={<Watch />} />
+            <Route path="/BranchWearableTech" element={<BranchWatch />} />
             <Route path="/Printers" element={<Printers />} />
+            <Route path="/BranchPrinters" element={<BranchPrinters />} />
             <Route path="/ComputerAccessories" element={<ComputerAccessories />} />
+            <Route path="/BranchComputerAccessories" element={<BranchComputerAccessories />} />
             <Route path="/MobileAccessories" element={<MobileAccessories />} />
+            <Route path="/BranchMobileAccessories" element={<BranchMobileAccessories />} />
             <Route path="/PrinterAccessories" element={<PrinterAccessories />} />
+            <Route path="/BranchPrinterAccessories" element={<BranchPrinterAccessories />} />
             <Route path="/CCTVAccessories" element={<CCTVAccessories />} />
+            <Route path="/BranchCCTVAccessories" element={<BranchCCTVAccessories />} />
             <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
+            <Route path="/BranchSecondhandproducts" element={<BranchSecondhandproducts />} />
+            <Route path="/BranchAdminProfile" element={<BranchAdminProfile />} />
 
             {/* 🔒 Protected Routes */}
             <Route path="/Dashboard" element={<ProtectedRoute element={<Dashboard />} restrictedRoles={['Staff']} />} />
+            <Route path="/BranchDashboard" element={<ProtectedRoute element={<BranchDashboard />} restrictedRoles={['Staff']} />} />
             <Route path="/Orders" element={<ProtectedRoute element={<Orders />} restrictedRoles={['Staff']} />} />
             <Route path="/Customers" element={<ProtectedRoute element={<Customers />} restrictedRoles={['Staff']} />} />
             <Route path="/Reports" element={<ProtectedRoute element={<Reports />} restrictedRoles={['Staff']} />} />
@@ -152,6 +183,7 @@ function App() {
             <Route path="/CCTVAd" element={<ProtectedRoute element={<CCTVAd />} restrictedRoles={['Staff']} />} />
             <Route path="/CouponManager" element={<ProtectedRoute element={<CouponManager />} restrictedRoles={['Staff']} />} />
             <Route path="/StaffManagement" element={<ProtectedRoute element={<StaffManagement />} restrictedRoles={['Staff']} />} />
+            <Route path="/BranchManagement" element={<ProtectedRoute element={<BranchManagement />} restrictedRoles={['Staff']} />} />
             <Route path="*" element={<AdminNotFound />} />
           </Routes>
         </AdminMain>

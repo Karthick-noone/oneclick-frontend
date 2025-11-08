@@ -1,61 +1,125 @@
-import React, { useState, useEffect, useRef, useCallback  } from "react";
-import "./css/Slidebar.css"; // Ensure you create this CSS file
-import {
-  FaHome,
-  FaBriefcase,
-  FaBox,
-  // FaTags,
-  FaUsers,
-  FaBars,
-  FaChartLine,
-  // FaCog,
-  FaEnvelope,
-  FaChevronDown,
-  FaChevronRight,
-  FaEdit,
-  FaTag,
-  FaProductHunt,
-} from "react-icons/fa";
-import logoImage from "./img/oneclick.png"; // Replace with the path to your image
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import "./css/Slidebar.css";
+import { FaBars, FaChevronDown, FaChevronRight } from "react-icons/fa";
+import logoImage from "./img/oneclick.png";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import logo2 from "./img/logo3.png";
+import {
+  BoxIcon, BriefcaseBusiness, ChartColumnIncreasing, Edit, Handshake,
+  Image, LayoutDashboard, ListCheck, MessageCircleMore, MessageSquareDot, MessageSquareMore, PanelLeft, User, Users, Users2
+} from "lucide-react";
 
 const Slidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const [isProductsOpen, setIsProductsOpen] = useState(false);
-  const [isEditPageOpen, setIsEditPageOpen] = useState(false);
-  const [isReportOpen, setIsReportOpen] = useState(false);
-  const [isOfferPageOpen, setIsOfferPageOpen] = useState(false);
-
+  const [openSubmenu, setOpenSubmenu] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const sidebarRef = useRef(null);
 
+  const userRole = localStorage.getItem("userRole");
 
-  useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (
-      sidebarRef.current &&
-      !sidebarRef.current.contains(event.target) &&
-      window.innerWidth <= 768 // Apply only for mobile/tablet views
-    ) {
-      setIsOpen(false);
+  // Helper function to get the correct path based on user role
+  const getPath = (adminPath) => {
+    if (userRole === "Admin" || userRole === "Staff") {
+      return adminPath;
+    } else {
+      // Convert "/Admin/Speakers" to "/Admin/BranchSpeakers"
+      return adminPath.replace("/Admin/", "/Admin/Branch");
     }
   };
 
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
+  // Submenu configuration with role-based paths
+  const submenus = {
+    products: {
+      title: "Products",
+      icon: BoxIcon,
+      items: [
+        { path: "/Admin/Computers", label: "Computers" },
+        { path: "/Admin/Mobiles", label: "Mobiles" },
+        { path: "/Admin/CCTV", label: "CCTV" },
+        { path: "/Admin/Headphones", label: "Headphones" },
+        { path: "/Admin/Speakers", label: "Speakers" },
+        { path: "/Admin/TVHomeCinema", label: "T.V & Home Cinema" },
+        { path: "/Admin/WearableTech", label: "Wearable Tech" },
+        { path: "/Admin/Printers", label: "Printers" },
+        { path: "/Admin/ComputerAccessories", label: "Computer Accessories" },
+        { path: "/Admin/MobileAccessories", label: "Mobile Accessories" },
+        { path: "/Admin/PrinterAccessories", label: "Printer Accessories" },
+        { path: "/Admin/CCTVAccessories", label: "CCTV Accessories" },
+        { path: "/Admin/secondhandproducts", label: "Second hand Products" }
+      ]
+    },
+    editPages: {
+      title: "Edit Pages",
+      icon: Edit,
+      items: [
+        { path: "/Admin/EditHomePage", label: "Edit Home Page Slider" },
+        { path: "/Admin/EditDoubleImageAd", label: "Edit Four Images Ad" },
+        { path: "/Admin/EditSingleImageAd", label: "Edit Single Image Ad" },
+        { path: "/Admin/EditLoginBackgroundImage", label: "Edit Login Page Background Image" },
+        { path: "/Admin/CouponManager", label: "Edit Common Coupon Code" }
+      ]
+    },
+    adPages: {
+      title: "Ad Pages",
+      icon: Image,
+      items: [
+        { path: "/Admin/ComputersAd", label: "Computer Ad Page" },
+        { path: "/Admin/MobileAd", label: "Mobile Ad Page" },
+        { path: "/Admin/CCTVAd", label: "CCTV Ad Page" },
+        { path: "/Admin/ProductDetailPage", label: "Product Detail Page Ad" }
+      ]
+    },
+    reports: {
+      title: "Reports",
+      icon: ChartColumnIncreasing,
+      items: [
+        { path: "/Admin/reports", label: "Order Report" },
+        { path: "/Admin/SalesReport", label: "Sales Report" },
+        { path: "/Admin/CustomerReports", label: "Customer Reports" }
+      ]
+    },
+    branches: {
+      title: "Branch Partners",
+      icon: Handshake,
+      items: [
+        { path: "/Admin/BranchManagement", label: "List Of Branches" },
+        { path: "/Admin/BranchDashboard", label: "All Branch Products" }
+      ]
+    }
   };
-}, []);
 
-// Collapse sidebar on navigation in mobile view
-useEffect(() => {
-  if (window.innerWidth <= 768) {
-    setIsOpen(false);
-  }
-}, [location.pathname]); // Trigger on every route change
+  // Close sidebar on mobile when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target) && window.innerWidth <= 768) {
+        setIsOpen(false);
+      }
+    };
 
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close sidebar on mobile navigation
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      setIsOpen(false);
+    }
+  }, [location.pathname]);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsOpen(window.innerWidth > 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Check authentication
   useEffect(() => {
     const loggedIn = localStorage.getItem("isLoggedIn") === "true";
     if (!loggedIn) {
@@ -63,143 +127,73 @@ useEffect(() => {
     }
   }, [navigate]);
 
-  const toggleSidebar = () => {
-    setIsOpen((prev) => !prev);
-  };
+  // Active link checker
+  const isActive = useCallback((path) => location.pathname === path ? "active" : "", [location.pathname]);
 
-  const toggleProducts = () => {
-    setIsProductsOpen((prev) => {
-      if (!prev) {
-        setIsEditPageOpen(false); // Close Edit Pages submenu
-        setIsOfferPageOpen(false); // Close Offer Pages submenu
-        setIsReportOpen(false); // Close Reports submenu
-      }
-      return !prev;
+  // Check if any item in submenu is active
+  const isSubmenuActive = useCallback((menuItems) => {
+    return menuItems.some(item => {
+      const actualPath = getPath(item.path);
+      return isActive(actualPath);
     });
-  };
+  }, [isActive, userRole]);
 
-  const toggleEditPage = () => {
-    setIsEditPageOpen((prev) => {
-      if (!prev) {
-        setIsProductsOpen(false); // Close Products submenu
-        setIsOfferPageOpen(false); // Close Offer Pages submenu
-        setIsReportOpen(false); // Close Reports submenu
-      }
-      return !prev;
-    });
-  };
-
-  const toggleOfferPage = () => {
-    setIsOfferPageOpen((prev) => {
-      if (!prev) {
-        setIsProductsOpen(false); // Close Products submenu
-        setIsEditPageOpen(false); // Close Edit Pages submenu
-        setIsReportOpen(false); // Close Reports submenu
-      }
-      return !prev;
-    });
-  };
-
-  const toggleReports = () => {
-    setIsReportOpen((prev) => {
-      if (!prev) {
-        setIsProductsOpen(false); // Close Products submenu
-        setIsEditPageOpen(false); // Close Edit Pages submenu
-        setIsOfferPageOpen(false); // Close Offer Pages submenu
-      }
-      return !prev;
-    });
-  };
-
+  // Auto-open submenu based on current route
   useEffect(() => {
-    const handleResize = () => {
-      setIsOpen(window.innerWidth > 768); // Open or close sidebar based on window width
-    };
+    for (const [key, menu] of Object.entries(submenus)) {
+      if (isSubmenuActive(menu.items)) {
+        setOpenSubmenu(key);
+        return;
+      }
+    }
+    setOpenSubmenu(null);
+  }, [location.pathname, isSubmenuActive]);
 
-    handleResize(); // Set initial state
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const toggleSidebar = () => setIsOpen(prev => !prev);
 
- //  Memoize isActive so it doesn't re-create on every render
-const isActive = useCallback(
-  (path) => (location.pathname === path ? "active" : ""),
-  [location.pathname] //  dependency
-);
+  const toggleSubmenu = (submenuKey) => {
+    setOpenSubmenu(prev => prev === submenuKey ? null : submenuKey);
+  };
 
-//  Now these are clean
-const isProductActive = useCallback(() => {
-  return (
-    isActive("/Admin/Computers") ||
-    isActive("/Admin/Mobiles") ||
-    isActive("/Admin/CCTV") ||
-    isActive("/Admin/Headphones") ||
-    isActive("/Admin/Speakers") ||
-    isActive("/Admin/TVHomeCinema") ||
-    isActive("/Admin/WearableTech") ||
-    isActive("/Admin/Printers") ||
-    isActive("/Admin/ComputerAccessories") ||
-    isActive("/Admin/MobileAccessories") ||
-    isActive("/Admin/PrinterAccessories") ||
-    isActive("/Admin/CCTVAccessories") ||
-    isActive("/Admin/secondhandproducts")
-  );
-}, [isActive]);
+  const renderSubmenu = (key, menu) => {
+    const IconComponent = menu.icon;
+    const isSubOpen = openSubmenu === key;
+    const isActiveSubmenu = isSubmenuActive(menu.items);
 
-const isEditPageActive = useCallback(() => {
-  return (
-    isActive("/Admin/EditHomePage") ||
-    isActive("/Admin/EditDoubleImageAd") ||
-    isActive("/Admin/EditLoginBackgroundImage") ||
-    isActive("/Admin/EditSingleImageAd") ||
-    isActive("/Admin/CouponManager")
-  );
-}, [isActive]);
-
-const isOfferPageActive = useCallback(() => {
-  return (
-    isActive("/Admin/ComputersAd") ||
-    isActive("/Admin/MobileAd") ||
-    isActive("/Admin/CCTVAd") ||
-    isActive("/Admin/ProductDetailPage")
-  );
-}, [isActive]);
-
-const isReportActive = useCallback(() => {
-  return (
-    isActive("/Admin/reports") ||
-    isActive("/Admin/SalesReport") ||
-    isActive("/Admin/CustomerReports")
-  );
-}, [isActive]);
-
-
-useEffect(() => {
-  if (isProductActive()) {
-    setIsProductsOpen(true);
-    setIsEditPageOpen(false);
-    setIsOfferPageOpen(false);
-    setIsReportOpen(false);
-  } else if (isEditPageActive()) {
-    setIsEditPageOpen(true);
-    setIsProductsOpen(false);
-    setIsOfferPageOpen(false);
-    setIsReportOpen(false);
-  } else if (isOfferPageActive()) {
-    setIsOfferPageOpen(true);
-    setIsProductsOpen(false);
-    setIsEditPageOpen(false);
-    setIsReportOpen(false);
-  } else if (isReportActive()) {
-    setIsReportOpen(true);
-    setIsProductsOpen(false);
-    setIsEditPageOpen(false);
-    setIsOfferPageOpen(false);
-  }
-}, [isProductActive, isEditPageActive, isOfferPageActive, isReportActive]); //  Added dependencies
-
-
-  const userRole = localStorage.getItem("userRole"); // Assuming "Staff" or "admin"
+    return (
+      <li className={`submenu ${isSubOpen ? "open" : ""}`}>
+        <Link
+          to="#"
+          onClick={() => toggleSubmenu(key)}
+          className={isActiveSubmenu ? "active" : ""}
+        >
+          <IconComponent size={18} className="menu-icon" />
+          {isOpen && menu.title}
+          {isOpen && (isSubOpen ?
+            <FaChevronDown className="submenu-icon" /> :
+            <FaChevronRight className="submenu-icon" />
+          )}
+        </Link>
+        {isOpen && isSubOpen && (
+          <ul className="submenu-items">
+            {menu.items.map((item) => {
+              const actualPath = getPath(item.path);
+              return (
+                <li key={actualPath}>
+                  <Link
+                    to={actualPath}
+                    className={isActive(actualPath)}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </li>
+    );
+  };
 
   return (
     <>
@@ -211,9 +205,8 @@ useEffect(() => {
 
       <div
         className={`slidebar ${isOpen ? "open" : "collapsed"}`}
-        onMouseEnter={() => setIsOpen(true)}
-          ref={sidebarRef}
-
+        onMouseEnter={() => window.innerWidth > 768 && setIsOpen(true)}
+        ref={sidebarRef}
       >
         <div className="slidebar-header">
           <button
@@ -221,7 +214,7 @@ useEffect(() => {
             className="close-button"
             onClick={toggleSidebar}
           >
-            {isOpen ? "◁" : ""}
+            {isOpen ? <PanelLeft size={16} /> : ""}
           </button>
           {isOpen ? (
             <img src={logo2} alt="Logo" width={"175px"} />
@@ -229,354 +222,82 @@ useEffect(() => {
             <img src={logoImage} alt="Logo" className="logo-img" />
           )}
         </div>
+
         <ul className="slidebar-menu">
+          {/* Dashboard */}
           {userRole !== "Staff" && (
-            <>
-              <li>
-                <Link
-                  to="/Admin/Dashboard"
-                  className={isActive("/Admin/Dashboard")}
-                >
-                  <FaHome className="menu-icon" /> {isOpen && "Dashboard"}
-                </Link>
-              </li>
-            </>
-          )}
-          {userRole !== "Staff" && (
-            <>
-              <li>
-                <Link to="/Admin/orders" className={isActive("/Admin/orders")}>
-                  <FaBox className="menu-icon" /> {isOpen && "Orders"}
-                </Link>
-              </li>
-            </>
+            <li>
+              <Link
+                to={userRole === "Admin" ? "/Admin/Dashboard" : "/Admin/BranchDashboard"}
+                className={isActive(userRole === "Admin" ? "/Admin/Dashboard" : "/Admin/BranchDashboard")}
+              >
+                <LayoutDashboard size={18} className="menu-icon" />
+                {isOpen && "Dashboard"}
+              </Link>
+            </li>
           )}
 
-          {/* {userRole !== 'Staff' && ( */}
-          <li className={`submenu ${isProductsOpen ? "open" : ""}`}>
-            <Link
-              to="#"
-              onClick={toggleProducts}
-              className={isProductActive() ? "active" : ""}
-            >
-              <FaProductHunt className="menu-icon" /> {isOpen && "Products"}
-              {isOpen &&
-                (isProductsOpen ? (
-                  <FaChevronDown className="submenu-icon" />
-                ) : (
-                  <FaChevronRight className="submenu-icon" />
-                ))}
-            </Link>
-            {isOpen && isProductsOpen && (
-              <ul className="submenu-items">
-                <li>
-                  <Link
-                    to="/Admin/Computers"
-                    className={isActive("/Admin/Computers")}
-                  >
-                    Computers
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/Mobiles"
-                    className={isActive("/Admin/Mobiles")}
-                  >
-                    Mobiles
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/Admin/CCTV" className={isActive("/Admin/CCTV")}>
-                    CCTV
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/Headphones"
-                    className={isActive("/Admin/Headphones")}
-                  >
-                    Headphones
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/Speakers"
-                    className={isActive("/Admin/Speakers")}
-                  >
-                    Speakers
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/TVHomeCinema"
-                    className={isActive("/Admin/TVHomeCinema")}
-                  >
-                    T.V & Home Cinema
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/WearableTech"
-                    className={isActive("/Admin/WearableTech")}
-                  >
-                    Wearable Tech
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/Printers"
-                    className={isActive("/Admin/Printers")}
-                  >
-                    Printers
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/ComputerAccessories"
-                    className={isActive("/Admin/ComputerAccessories")}
-                  >
-                    Computer Accessories
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/MobileAccessories"
-                    className={isActive("/Admin/MobileAccessories")}
-                  >
-                    Mobile Accessories
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/PrinterAccessories"
-                    className={isActive("/Admin/PrinterAccessories")}
-                  >
-                    Printer Accessories
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/CCTVAccessories"
-                    className={isActive("/Admin/CCTVAccessories")}
-                  >
-                    CCTV Accessories
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Admin/secondhandproducts"
-                    className={isActive("/Admin/secondhandproducts")}
-                  >
-                    {" "}
-                    <span>Second hand Products</span>{" "}
-                  </Link>
-                </li>
-              </ul>
-            )}
-          </li>
-          {/* )} */}
+          {/* Orders */}
           {userRole !== "Staff" && (
+            <li>
+              <Link to="/Admin/orders" className={isActive("/Admin/orders")}>
+                <ListCheck size={18} className="menu-icon" />
+                {isOpen && "Orders"}
+              </Link>
+            </li>
+          )}
+
+
+
+          {/* Products Submenu */}
+          {renderSubmenu("products", submenus.products)}
+
+
+          {/* {userRole === "branch_admin" && (
+            <li>
+              <Link to="/Admin/BranchAdminProfile" className={isActive("/Admin/BranchAdminProfile")}>
+                <User size={18} className="menu-icon" />
+                {isOpen && "Profile"}
+              </Link>
+            </li>
+          )} */}
+          {/* Admin Only Menus */}
+          {userRole === "Admin" && (
             <>
-              <li className={`submenu ${isEditPageOpen ? "open" : ""}`}>
-                <Link
-                  to="#"
-                  onClick={toggleEditPage}
-                  className={isEditPageActive() ? "active" : ""}
-                >
-                  <FaEdit className="menu-icon" /> {isOpen && "Edit Pages"}
-                  {isOpen &&
-                    (isEditPageOpen ? (
-                      <FaChevronDown className="submenu-icon" />
-                    ) : (
-                      <FaChevronRight className="submenu-icon" />
-                    ))}
-                </Link>
-                {isOpen && isEditPageOpen && (
-                  <ul className="submenu-items">
-                    <li>
-                      <Link
-                        to="/Admin/EditHomePage"
-                        className={isActive("/Admin/EditHomePage")}
-                      >
-                        Edit Home Page Slider
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/Admin/EditDoubleImageAd"
-                        className={isActive("/Admin/EditDoubleImageAd")}
-                      >
-                        Edit Four Images Ad
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/Admin/EditSingleImageAd"
-                        className={isActive("/Admin/EditSingleImageAd")}
-                      >
-                        Edit Single Image Ad
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/Admin/EditLoginBackgroundImage"
-                        className={isActive("/Admin/EditLoginBackgroundImage")}
-                      >
-                        Edit Login Page Background Image
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/Admin/CouponManager"
-                        className={isActive("/Admin/CouponManager")}
-                      >
-                        Edit Common Coupon Code
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-              </li>
-              <li className={`submenu ${isOfferPageOpen ? "open" : ""}`}>
-                <Link
-                  to="#"
-                  onClick={toggleOfferPage}
-                  className={isOfferPageActive() ? "active" : ""}
-                >
-                  <FaTag className="menu-icon" /> {isOpen && "Ad Pages"}
-                  {isOpen &&
-                    (isOfferPageOpen ? (
-                      <FaChevronDown className="submenu-icon" />
-                    ) : (
-                      <FaChevronRight className="submenu-icon" />
-                    ))}
-                </Link>
-                {isOpen && isOfferPageOpen && (
-                  <ul className="submenu-items">
-                    <li>
-                      <Link
-                        to="/Admin/ComputersAd"
-                        className={isActive("/Admin/ComputersAd")}
-                      >
-                        Computer Ad Page
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/Admin/MobileAd"
-                        className={isActive("/Admin/MobileAd")}
-                      >
-                        Mobile Ad Page
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/Admin/CCTVAd"
-                        className={isActive("/Admin/CCTVAd")}
-                      >
-                        CCTV Ad Page
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/Admin/ProductDetailPage"
-                        className={isActive("/Admin/ProductDetailPage")}
-                      >
-                        Product Detail Page Ad
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-              </li>
-
-              {/* <li>
-            <Link to="/Admin/reports" className={isActive('/Admin/reports')}>
-              <FaChartLine className="menu-icon" /> {isOpen && 'Reports'}
-            </Link>
-          </li> */}
-
-              <li className={`submenu ${isReportOpen ? "open" : ""}`}>
-                <Link
-                  to="#"
-                  onClick={toggleReports}
-                  className={isReportActive() ? "active" : ""}
-                >
-                  <FaChartLine className="menu-icon" /> {isOpen && "Reports"}
-                  {isOpen &&
-                    (isReportOpen ? (
-                      <FaChevronDown className="submenu-icon" />
-                    ) : (
-                      <FaChevronRight className="submenu-icon" />
-                    ))}
-                </Link>
-                {isOpen && isReportOpen && (
-                  <ul className="submenu-items">
-                    <li>
-                      <Link
-                        to="/Admin/reports"
-                        className={isActive("/Admin/reports")}
-                      >
-                        Order Report
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/Admin/SalesReport"
-                        className={isActive("/Admin/SalesReport")}
-                      >
-                        Sales Report
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/Admin/CustomerReports"
-                        className={isActive("/Admin/CustomerReports")}
-                      >
-                        Customer Reports
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-              </li>
+              {renderSubmenu("editPages", submenus.editPages)}
+              {renderSubmenu("adPages", submenus.adPages)}
+              {renderSubmenu("reports", submenus.reports)}
+              {renderSubmenu("branches", submenus.branches)}
 
               <li>
-                <Link
-                  to="/Admin/customers"
-                  className={isActive("/Admin/customers")}
-                >
-                  <FaUsers className="menu-icon" /> {isOpen && "Customers"}
+                <Link to="/Admin/customers" className={isActive("/Admin/customers")}>
+                  <Users2 size={18} className="menu-icon" />
+                  {isOpen && "Customers"}
                 </Link>
               </li>
 
               <li>
-                <Link
-                  to="/Admin/StaffManagement"
-                  className={isActive("/Admin/StaffManagement")}
-                >
-                  <FaUsers className="menu-icon" />{" "}
+                <Link to="/Admin/StaffManagement" className={isActive("/Admin/StaffManagement")}>
+                  <Users size={18} className="menu-icon" />
                   {isOpen && "Staff Management"}
                 </Link>
               </li>
+
               <li>
-                <Link
-                  to="/Admin/CareersTable"
-                  className={isActive("/Admin/CareersTable")}
-                >
-                  <FaBriefcase className="menu-icon" /> {isOpen && "Careers"}
+                <Link to="/Admin/CareersTable" className={isActive("/Admin/CareersTable")}>
+                  <BriefcaseBusiness size={18} className="menu-icon" />
+                  {isOpen && "Careers"}
                 </Link>
               </li>
-              {/* <li>
-            <Link to="/Admin/Settings" className={isActive('/Admin/Settings')}>
-              <FaCog className="menu-icon" /> {isOpen && 'Settings'}
-            </Link>
-          </li> */}
+
               <li>
-                <Link
-                  to="/Admin/ContactsTable"
-                  className={isActive("/Admin/ContactsTable")}
-                >
-                  <FaEnvelope className="menu-icon" /> {isOpen && "Contact"}
+                <Link to="/Admin/ContactsTable" className={isActive("/Admin/ContactsTable")}>
+                  <MessageSquareMore size={18} className="menu-icon" />
+                  {isOpen && "Contact"}
                 </Link>
               </li>
+
+
             </>
           )}
         </ul>

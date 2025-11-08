@@ -1,0 +1,103 @@
+.collab-banner {
+  position: relative;
+  height: 350px; /* banner size */
+  width: 100%;
+  background: url("https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80")
+    no-repeat center center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 15px;
+  margin: 40px auto;
+  /* max-width: 1200px; */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.collab-banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.55),
+    rgba(0, 0, 0, 0.55)
+  );
+  z-index: 1;
+  border-radius: 15px;
+}
+
+.collab-banner-content {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  text-align: center;
+  max-width: 800px;
+  padding: 20px;
+  animation: fadeUp 1.2s ease-in-out;
+}
+
+.collab-banner-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.collab-banner-title span {
+  color: #00bcd4;
+}
+
+.collab-banner-subtitle {
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  margin-bottom: 25px;
+}
+
+.collab-banner-btn {
+  background: linear-gradient(90deg, #00bcd4, #0288d1);
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.collab-banner-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 188, 212, 0.4);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .collab-banner {
+    height: 280px;
+    border-radius: 10px;
+  }
+
+  .collab-banner-title {
+    font-size: 1.6rem;
+  }
+
+  .collab-banner-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .collab-banner-btn {
+    padding: 10px 22px;
+    font-size: 0.9rem;
+  }
+}

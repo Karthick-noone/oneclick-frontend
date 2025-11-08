@@ -294,12 +294,12 @@ const StaffManagementPage = () => {
             </thead>
             <tbody>
               {currentStaff.map((staff, index) => (
-                <tr key={index} style={{backgroundColor:staff.status === "inactive" ? "#ffdddd" : "",}}>
+                <tr key={index} style={{ backgroundColor: staff.status === "inactive" ? "#ffdddd" : "", }}>
                   <td>{indexOfFirstStaff + index + 1}</td>
-                  <td>{staff.staffname.charAt(0).toUpperCase()+staff.staffname.slice(1).toLowerCase()}</td>
+                  <td>{staff.staffname.charAt(0).toUpperCase() + staff.staffname.slice(1).toLowerCase()}</td>
                   <td>{staff.username}</td>
                   <td>{staff.password}</td>
-                  <td style={{ color: staff.status === "active" ? "green" : "red"}}>{staff.status.charAt(0).toUpperCase()+staff.status.slice(1).toLowerCase()}</td>
+                  <td style={{ color: staff.status === "active" ? "green" : "red" }}>{staff.status.charAt(0).toUpperCase() + staff.status.slice(1).toLowerCase()}</td>
                   <td>
                     {/* <button
                       onClick={() => handleEdit(index)}
@@ -335,17 +335,20 @@ const StaffManagementPage = () => {
           </table>
         </div>
 
-        <div className="pagination">
-          {pageNumbers.map((number) => (
-            <button
-              key={number}
-              onClick={() => handlePageChange(number)}
-              className={`page-btn ${currentPage === number ? "active" : ""}`}
-            >
-              {number}
-            </button>
-          ))}
-        </div>
+        {staffList.length > rowsPerPage && (
+          <div className="pagination">
+            {pageNumbers.map((number) => (
+              <button
+                key={number}
+                onClick={() => handlePageChange(number)}
+                className={`page-btn ${currentPage === number ? "active" : ""}`}
+              >
+                {number}
+              </button>
+            ))}
+          </div>
+        )}
+
       </main>
     </div>
   );

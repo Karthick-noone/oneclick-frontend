@@ -125,7 +125,9 @@ const Computers = () => {
         //  Refresh product list
         const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcomputers`, {
           timeout: 5000,
+          params: { branch_id, userRole },
         });
+
         console.log("Refreshed product list:", refreshedProducts.data);
 
         // Update the product list in state
@@ -174,6 +176,7 @@ const Computers = () => {
         // Refresh product list
         const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcomputers`, {
           timeout: 5000,
+          params: { branch_id, userRole },
         });
         console.log("Refreshed product list:", refreshedProducts.data);
 
@@ -636,19 +639,54 @@ const Computers = () => {
       navigate("/AdminLogin");
     }
   }, [navigate]);
-  // Fetch products when component mounts
+
+  const branchData = JSON.parse(localStorage.getItem("branch"));
+  const branch_id = branchData?.id || null;
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${ApiUrl}/adminfetchcomputers`);
-        setProducts(response.data);
+        const branchData = JSON.parse(localStorage.getItem("branch"));
+        const branch_id = branchData?.id || null;
+        const userRole = localStorage.getItem("userRole");
+
+        console.log("🔍 Fetching products with:", {
+          branch_id,
+          userRole,
+          endpoint: `${ApiUrl}/adminfetchcomputers`,
+        });
+
+        const response = await axios.get(`${ApiUrl}/adminfetchcomputers`, {
+          params: { branch_id, userRole },
+        });
+
+        console.log("✅ Products fetched successfully:", response.data);
+        let filteredProducts = response.data;
+
+        // Admin → only branchless products
+        if (userRole === "Admin") {
+          filteredProducts = filteredProducts.filter(item => item.branch_id === null);
+          console.log("🟢 Admin Filter Applied → branchless products only");
+        }
+
+        // branch admin → only own branch products
+        else if (userRole === "branch_admin" && branch_id) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id === branch_id);
+          console.log("🟢 Branch Admin Filter Applied → branch_id =", branch_id);
+        }
+
+        setProducts(filteredProducts);
+        console.log("📌 Final filtered products:", filteredProducts);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("❌ Error fetching products:", error);
       }
     };
 
     fetchProducts();
   }, []);
+
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -859,23 +897,6 @@ const Computers = () => {
       return;
     }
 
-
-    // if (!newProduct.features.trim()) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Product features are required.",
-    //   });
-    //   return;
-    // }
-    // if (!newProduct.category.trim()) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Product category is required.",
-    //   });
-    //   return;
-    // }
     if (
       !newProduct.price ||
       isNaN(newProduct.price) ||
@@ -920,71 +941,26 @@ const Computers = () => {
       return;
     }
 
-    // Validate coupon code and extract numeric part
-    // const couponCode = newProduct.coupon; // Fetching the coupon code
-
-    // const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
-
-
-    // Check if either coupon code or coupon expiry date is provided
-    // if (
-    //   (couponCode && !couponExpiryDate) ||
-    //   (!couponCode && couponExpiryDate)
-    // ) {
+    // if (!branchData || !branchData.id) {
     //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
+    //     icon: "error",
+    //     title: "Unauthorized",
+    //     text: "Branch information not found. Please login again.",
     //   });
     //   return;
-    // }
-
-    // Check if coupon code is provided and not just spaces
-    // if (couponCode && !couponCode.trim()) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Coupon code cannot be just spaces.",
-    //   });
-    //   return;
-    // }
-
-    // // Extract numeric part from coupon code
-    // const couponValueMatch = couponCode.match(/\d+/); // Regex to find the first numeric part in the coupon code
-    // const couponValue = couponValueMatch ? Number(couponValueMatch[0]) : 0; // Get the number or default to 0 if not found
-
-    // // Ensure the extracted coupon value is less than the product price
-    // if (couponValue >= Number(newProduct.price)) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Coupon discount must be less than the product price.",
-    //   });
-    //   return;
-    // }
-
-    // // Check if the coupon code contains at least one letter and one digit
-    // // const hasLetter = /[a-zA-Z]/.test(couponCode);
-    // if (couponCode && couponExpiryDate) {
-    //   const hasDigit = /\d/.test(couponCode);
-
-    //   if (!hasDigit) {
-    //     Swal.fire({
-    //       icon: "warning",
-    //       title: "Invalid Input",
-    //       text: "Coupon code must contain price value like OFFER599.",
-    //     });
-    //     return;
-    //   }
     // }
 
     // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
-
+    const branchData = JSON.parse(localStorage.getItem("branch"));
+    const branch_id = userRole === "Admin" ? null : (branchData?.id ?? null);
     // Set product status based on user role
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
+    if (branch_id !== null) formData.append("branch_id", branch_id);
+
+
     formData.append("name", newProduct.name);
     // formData.append("features", newProduct.features);
     formData.append("price", newProduct.price);
@@ -1029,7 +1005,9 @@ const Computers = () => {
       });
 
       // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/adminfetchcomputers`);
+      const response = await axios.get(`${ApiUrl}/adminfetchcomputers`, {
+        params: { branch_id, userRole },
+      });
       setProducts(response.data);
       setNewProduct({
         name: "",
@@ -1287,9 +1265,9 @@ const Computers = () => {
           });
 
           // Fetch the updated list of products from the backend
-          const fetchResponse = await axios.get(
-            `${ApiUrl}/adminfetchcomputers`
-          );
+          const fetchResponse = await axios.get(`${ApiUrl}/adminfetchcomputers`, {
+            params: { branch_id, userRole },
+          });
           setProducts(fetchResponse.data);
 
           // Reset the editing state and close the modal
@@ -1359,7 +1337,9 @@ const Computers = () => {
         console.log("Delete response:", deleteResponse.data);
 
         // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/adminfetchcomputers`);
+        const response = await axios.get(`${ApiUrl}/adminfetchcomputers`, {
+          params: { branch_id, userRole },
+        });;
         setProducts(response.data);
 
         // Log the updated product list
@@ -1683,14 +1663,14 @@ const Computers = () => {
         console.log("[INFO] Accessories updated successfully:", data);
 
         Swal.fire({
-          toast:true,
-          position:'top-end',
+          toast: true,
+          position: 'top-end',
           icon: "success",
           // title: "Success",
           text: "Accessories have been updated successfully!",
           confirmButtonColor: "#4caf50",
-          showConfirmButton:false,
-          timer:4000
+          showConfirmButton: false,
+          timer: 4000
         });
       } else {
         const errorData = await response.text();
@@ -2091,7 +2071,7 @@ const Computers = () => {
                           <>
                             <img
                               src={userRole === "Admin" ? ApproveImage : ApprovalWaitingImage}
-                              title={userRole === "Admin" ? "Click to approve this product" : "Product yet to approve"}
+                              title={userRole === "Admin" ? "Click to approve this product" : "Product yet not approved(Contact Admin)"}
                               width={userRole === "Admin" ? "50px" : "60px"}
                               style={{
                                 cursor: userRole === "Admin" ? "pointer" : "not-allowed",
@@ -2678,121 +2658,121 @@ const Computers = () => {
                             </span>
 
                             {coupons.length > 0 ? (
-                                                          <div className="coupons-wrapper">
-                                                            {/* Active Coupons */}
-                                                            {coupons.filter(coupon => {
-                                                              const couponDate = new Date(coupon.expiry_date);
-                                                              const today = new Date();
-                                                              // Normalize both dates to midnight (ignore time zone)
-                                                              couponDate.setHours(0, 0, 0, 0);
-                                                              today.setHours(0, 0, 0, 0);
-                                                              return couponDate >= today;
-                                                            }).length > 0 && (
-                                                                <div className="active-coupons-box">
-                                                                  <h5>Active Coupons</h5>
-                                                                  <ul className="coupons-list active-list">
-                                                                    {coupons
-                                                                      .filter(coupon => {
-                                                                        const couponDate = new Date(coupon.expiry_date);
-                                                                        const today = new Date();
-                                                                        couponDate.setHours(0, 0, 0, 0);
-                                                                        today.setHours(0, 0, 0, 0);
-                                                                        return couponDate >= today;
-                                                                      })
-                                                                      .map((coupon, index) => (
-                                                                        <li key={coupon.coupon_id} className="coupon-item">
-                                                                          <span className="serial-number">{index + 1}. </span>
-                                                                          <span className="coupon-code">{coupon.coupon_code}</span> -
-                                                                          <span className="coupon-code">{coupon.discount_value}</span> -
-                                                                          <span className="expiry-date">
-                                                                            {new Date(coupon.expiry_date).toLocaleDateString("en-GB", {
-                                                                              day: "2-digit",
-                                                                              month: "short",
-                                                                              year: "numeric",
-                                                                            })}
-                                                                          </span>
-                                                                          <FaEdit
-                                                                            className="edit-icon"
-                                                                            title="Edit Expiry Date"
-                                                                            onClick={() => {
-                                                                              handleEditExpiry(coupon.coupon_id);
-                                                                              setIsViewingCoupons(false);
-                                                                            }}
-                                                                          />
-                                                                          <FaTrash
-                                                                            className="delete-icon"
-                                                                            title="Delete Coupon"
-                                                                            onClick={() => handleDeleteCoupon(coupon.coupon_id)}
-                                                                            style={{
-                                                                              marginLeft: "10px",
-                                                                              cursor: "pointer",
-                                                                            }}
-                                                                          />
-                                                                        </li>
-                                                                      ))}
-                                                                  </ul>
-                                                                </div>
-                                                              )}
-                            
-                                                            {/* Expired Coupons */}
-                                                            {coupons.filter(coupon => {
-                                                              const couponDate = new Date(coupon.expiry_date);
-                                                              const today = new Date();
-                                                              // Normalize both dates
-                                                              couponDate.setHours(0, 0, 0, 0);
-                                                              today.setHours(0, 0, 0, 0);
-                                                              return couponDate < today;
-                                                            }).length > 0 && (
-                                                                <div className="expired-coupons-box">
-                                                                  <h5>Expired Coupons</h5>
-                                                                  <ul className="coupons-list expired-list">
-                                                                    {coupons
-                                                                      .filter(coupon => {
-                                                                        const couponDate = new Date(coupon.expiry_date);
-                                                                        const today = new Date();
-                                                                        couponDate.setHours(0, 0, 0, 0);
-                                                                        today.setHours(0, 0, 0, 0);
-                                                                        return couponDate < today;
-                                                                      })
-                                                                      .map((coupon, index) => (
-                                                                        <li key={coupon.coupon_id} className="coupon-item">
-                                                                          <span className="serial-number">{index + 1}. </span>
-                                                                          <span className="coupon-code">{coupon.coupon_code}</span> -
-                                                                          <span className="coupon-code">{coupon.discount_value}</span> -
-                                                                          <span className="expiry-date">
-                                                                            {new Date(coupon.expiry_date).toLocaleDateString("en-GB", {
-                                                                              day: "2-digit",
-                                                                              month: "short",
-                                                                              year: "numeric",
-                                                                            })}
-                                                                          </span>
-                                                                          <FaEdit
-                                                                            className="edit-icon"
-                                                                            title="Edit Expiry Date"
-                                                                            onClick={() => {
-                                                                              handleEditExpiry(coupon.coupon_id);
-                                                                              setIsViewingCoupons(false);
-                                                                            }}
-                                                                          />
-                                                                          <FaTrash
-                                                                            className="delete-icon"
-                                                                            title="Delete Coupon"
-                                                                            onClick={() => handleDeleteCoupon(coupon.coupon_id)}
-                                                                            style={{
-                                                                              marginLeft: "10px",
-                                                                              cursor: "pointer",
-                                                                            }}
-                                                                          />
-                                                                        </li>
-                                                                      ))}
-                                                                  </ul>
-                                                                </div>
-                                                              )}
-                                                          </div>
-                                                        ) : (
-                                                          <p>No coupons available for this product.</p>
-                                                        )}
-                            
+                              <div className="coupons-wrapper">
+                                {/* Active Coupons */}
+                                {coupons.filter(coupon => {
+                                  const couponDate = new Date(coupon.expiry_date);
+                                  const today = new Date();
+                                  // Normalize both dates to midnight (ignore time zone)
+                                  couponDate.setHours(0, 0, 0, 0);
+                                  today.setHours(0, 0, 0, 0);
+                                  return couponDate >= today;
+                                }).length > 0 && (
+                                    <div className="active-coupons-box">
+                                      <h5>Active Coupons</h5>
+                                      <ul className="coupons-list active-list">
+                                        {coupons
+                                          .filter(coupon => {
+                                            const couponDate = new Date(coupon.expiry_date);
+                                            const today = new Date();
+                                            couponDate.setHours(0, 0, 0, 0);
+                                            today.setHours(0, 0, 0, 0);
+                                            return couponDate >= today;
+                                          })
+                                          .map((coupon, index) => (
+                                            <li key={coupon.coupon_id} className="coupon-item">
+                                              <span className="serial-number">{index + 1}. </span>
+                                              <span className="coupon-code">{coupon.coupon_code}</span> -
+                                              <span className="coupon-code">{coupon.discount_value}</span> -
+                                              <span className="expiry-date">
+                                                {new Date(coupon.expiry_date).toLocaleDateString("en-GB", {
+                                                  day: "2-digit",
+                                                  month: "short",
+                                                  year: "numeric",
+                                                })}
+                                              </span>
+                                              <FaEdit
+                                                className="edit-icon"
+                                                title="Edit Expiry Date"
+                                                onClick={() => {
+                                                  handleEditExpiry(coupon.coupon_id);
+                                                  setIsViewingCoupons(false);
+                                                }}
+                                              />
+                                              <FaTrash
+                                                className="delete-icon"
+                                                title="Delete Coupon"
+                                                onClick={() => handleDeleteCoupon(coupon.coupon_id)}
+                                                style={{
+                                                  marginLeft: "10px",
+                                                  cursor: "pointer",
+                                                }}
+                                              />
+                                            </li>
+                                          ))}
+                                      </ul>
+                                    </div>
+                                  )}
+
+                                {/* Expired Coupons */}
+                                {coupons.filter(coupon => {
+                                  const couponDate = new Date(coupon.expiry_date);
+                                  const today = new Date();
+                                  // Normalize both dates
+                                  couponDate.setHours(0, 0, 0, 0);
+                                  today.setHours(0, 0, 0, 0);
+                                  return couponDate < today;
+                                }).length > 0 && (
+                                    <div className="expired-coupons-box">
+                                      <h5>Expired Coupons</h5>
+                                      <ul className="coupons-list expired-list">
+                                        {coupons
+                                          .filter(coupon => {
+                                            const couponDate = new Date(coupon.expiry_date);
+                                            const today = new Date();
+                                            couponDate.setHours(0, 0, 0, 0);
+                                            today.setHours(0, 0, 0, 0);
+                                            return couponDate < today;
+                                          })
+                                          .map((coupon, index) => (
+                                            <li key={coupon.coupon_id} className="coupon-item">
+                                              <span className="serial-number">{index + 1}. </span>
+                                              <span className="coupon-code">{coupon.coupon_code}</span> -
+                                              <span className="coupon-code">{coupon.discount_value}</span> -
+                                              <span className="expiry-date">
+                                                {new Date(coupon.expiry_date).toLocaleDateString("en-GB", {
+                                                  day: "2-digit",
+                                                  month: "short",
+                                                  year: "numeric",
+                                                })}
+                                              </span>
+                                              <FaEdit
+                                                className="edit-icon"
+                                                title="Edit Expiry Date"
+                                                onClick={() => {
+                                                  handleEditExpiry(coupon.coupon_id);
+                                                  setIsViewingCoupons(false);
+                                                }}
+                                              />
+                                              <FaTrash
+                                                className="delete-icon"
+                                                title="Delete Coupon"
+                                                onClick={() => handleDeleteCoupon(coupon.coupon_id)}
+                                                style={{
+                                                  marginLeft: "10px",
+                                                  cursor: "pointer",
+                                                }}
+                                              />
+                                            </li>
+                                          ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                              </div>
+                            ) : (
+                              <p>No coupons available for this product.</p>
+                            )}
+
                           </div>
                         </div>
                       )}
@@ -2898,6 +2878,8 @@ const Computers = () => {
           )}
         </div>
       </div>
+
+
       {/* <table className="product-table">
         <thead> 
           <tr>
@@ -3014,7 +2996,7 @@ const Computers = () => {
             zIndex: 9999,
             display: "flex",
             gap: "16px",
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            backgroundColor: "rgba(83, 15, 15, 0.8)",
             padding: "6px 10px",
             borderRadius: "8px",
             boxShadow: "0 2px 10px rgba(0,0,0,0.1)",

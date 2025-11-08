@@ -13,6 +13,7 @@ import FullAdPage from './components/FullAdPage';
 import BrandsPage from './components/BrandsPage';
 import ProductCategories from './components/ProductCategories';
 import RecentlyViewed from './components/RecentlyViewed';
+import CollaborationAdPage from './components/CollaborationAdPage';
 
 const Main = () => {
     return (
@@ -31,6 +32,7 @@ const Main = () => {
 
             {/* <ProductList /> */}
             <BrandsPage />
+            <CollaborationAdPage />
 
             
             <Footer />

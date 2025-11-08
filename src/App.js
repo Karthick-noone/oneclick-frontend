@@ -57,6 +57,8 @@ import ScrollToTopButton from "./components/ScrollToTopButton"; // Adjust path a
 import UserLogin from "./components/UserLogin"; // Adjust path as needed
 import Login from "./components/Login"; // Adjust path as needed
 import ResetPassword from "./components/ResetPassword"; // Adjust path as needed
+import BranchRegistration from "./components/BranchRegistration"; // Adjust path as needed
+import BranchLogin from "./components/BranchLogin"; // Adjust path as needed
 
 
 
@@ -96,24 +98,29 @@ const AppWrapper = ({ children }) => {
     };
   }, []);
 
-  const location = useLocation();
-  const path = location.pathname.toLowerCase(); // Convert to lowercase
+const location = useLocation();
+let path = location.pathname.toLowerCase();
 
-  const isExcluded =
-    path.startsWith("/admin") ||
-    path === "/login" ||
-    // path === "/signup" ||
-    path === "/admin-login" ||
-    path === "/forgotpassword" ||
-    path === "/reset";
+// Remove trailing slash if present
+if (path.endsWith("/")) path = path.slice(0, -1);
 
-  return (
+const isExcluded =
+  path.startsWith("/admin") ||
+  path === "/login" ||
+  path === "/admin-login" ||
+  path === "/forgotpassword" ||
+  path === "/reset" ||
+  path === "/branch-register" ||
+  path === "/branch-login";
+
+return (
   <>
-  {!isExcluded && <Header2 header2Ref={header2Ref} />}
-  {!isExcluded && <Header3 topOffset={header2Height} />}
-  {children}
-</>
-  );
+    {!isExcluded && <Header2 header2Ref={header2Ref} />}
+    {!isExcluded && <Header3 topOffset={header2Height} />}
+    {children}
+  </>
+);
+
 };
 
 
@@ -171,6 +178,8 @@ const App = () => {
             <Route path="/MobileAd" element={<MobileAdBanner />} />
             <Route path="/FilterBar" element={<FilterBar />} />
             <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
+            <Route path="/branch-register" element={<BranchRegistration />} />
+            <Route path="/branch-login" element={<BranchLogin />} />
             <Route path="/Admin/*" element={<AdminMain />} />
           </Routes>
         </AppWrapper>

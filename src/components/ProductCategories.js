@@ -422,7 +422,7 @@ const ProductList = () => {
                         {product.prod_name}
                       </h3>
                       {product.subtitle && (
-                        <span className="custom-slider-subtitle">
+                        <span title={product.subtitle} className="custom-slider-subtitle">
                           {product.subtitle}
                         </span>
                       )}

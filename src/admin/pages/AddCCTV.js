@@ -123,6 +123,8 @@ const CCTV = () => {
         //  Refresh product list
         const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctv`, {
           timeout: 5000,
+          params: { branch_id, userRole },
+
         });
         console.log("Refreshed product list:", refreshedProducts.data);
 
@@ -171,6 +173,8 @@ const CCTV = () => {
         // Refresh product list
         const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctv`, {
           timeout: 5000,
+          params: { branch_id, userRole },
+
         });
         console.log("Refreshed product list:", refreshedProducts.data);
 
@@ -552,14 +556,14 @@ const CCTV = () => {
         console.log("[INFO] Accessories updated successfully:", data);
 
         Swal.fire({
-          toast:true,
-          position:'top-end',
+          toast: true,
+          position: 'top-end',
           icon: "success",
           // title: "Success",
           text: "Accessories have been updated successfully!",
           confirmButtonColor: "#4caf50",
-          showConfirmButton:false,
-          timer:4000
+          showConfirmButton: false,
+          timer: 4000
         });
       } else {
         const errorData = await response.text();
@@ -762,11 +766,34 @@ const CCTV = () => {
     }
   }, [navigate]);
   // Fetch products when component mounts
+  const branchData = JSON.parse(localStorage.getItem("branch"));
+  const branch_id = branchData?.id || null;
+  // Fetch products when component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${ApiUrl}/adminfetchcctv`);
-        setProducts(response.data);
+        const branchData = JSON.parse(localStorage.getItem("branch"));
+        const branch_id = branchData?.id || null;
+        const userRole = localStorage.getItem("userRole");
+        const response = await axios.get(`${ApiUrl}/adminfetchcctv`, {
+          params: { branch_id, userRole },
+        });
+        let filteredProducts = response.data;
+
+        // Admin → only branchless products
+        if (userRole === "Admin") {
+          filteredProducts = filteredProducts.filter(item => item.branch_id === null);
+          console.log("🟢 Admin Filter Applied → branchless products only");
+        }
+
+        // branch admin → only own branch products
+        else if (userRole === "branch_admin" && branch_id) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id === branch_id);
+          console.log("🟢 Branch Admin Filter Applied → branch_id =", branch_id);
+        }
+
+        setProducts(filteredProducts);
+        console.log("📌 Final filtered products:", filteredProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -774,6 +801,7 @@ const CCTV = () => {
 
     fetchProducts();
   }, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -1052,13 +1080,18 @@ const CCTV = () => {
       return;
     }
 
+
     // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
-
+    const branchData = JSON.parse(localStorage.getItem("branch"));
+    const branch_id = userRole === "Admin" ? null : (branchData?.id ?? null);
     // Set product status based on user role
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
+    if (branch_id !== null) formData.append("branch_id", branch_id);
+
+
     formData.append("name", newProduct.name);
     formData.append("features", newProduct.features);
     formData.append("price", newProduct.price);
@@ -1095,7 +1128,9 @@ const CCTV = () => {
       });
 
       // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/adminfetchcctv`);
+      const response = await axios.get(`${ApiUrl}/adminfetchcctv`, {
+        params: { branch_id, userRole },
+      });
       setProducts(response.data);
       setNewProduct({
         name: "",
@@ -1284,7 +1319,9 @@ const CCTV = () => {
         text: "The product has been updated successfully!",
       });
 
-      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchcctv`);
+      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchcctv`, {
+        params: { branch_id, userRole },
+      });
       setProducts(fetchResponse.data);
 
       setEditingProduct(null);
@@ -1326,7 +1363,9 @@ const CCTV = () => {
         console.log("Delete response:", deleteResponse.data);
 
         // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/adminfetchcctv`);
+        const response = await axios.get(`${ApiUrl}/adminfetchcctv`, {
+          params: { branch_id, userRole },
+        });
         setProducts(response.data);
 
         // Log the updated product list
@@ -1476,7 +1515,7 @@ const CCTV = () => {
     new Date(today.setDate(today.getDate() + 10))
   );
 
-const handleDeleteCoupon = async (couponId) => {
+  const handleDeleteCoupon = async (couponId) => {
     // Show confirmation popup
     const result = await Swal.fire({
       toast: 'true',
@@ -1852,7 +1891,7 @@ const handleDeleteCoupon = async (couponId) => {
                           <>
                             <img
                               src={userRole === "Admin" ? ApproveImage : ApprovalWaitingImage}
-                              title={userRole === "Admin" ? "Click to approve this product" : "Product yet to approve"}
+                              title={userRole === "Admin" ? "Click to approve this product" : "Product yet not approved(Contact Admin)"}
                               width={userRole === "Admin" ? "50px" : "60px"}
                               style={{
                                 cursor: userRole === "Admin" ? "pointer" : "not-allowed",

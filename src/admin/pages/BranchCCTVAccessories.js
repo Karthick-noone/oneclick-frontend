@@ -559,32 +559,42 @@ const CCTVAccessories = () => {
   // Fetch products when component mounts
   const branchData = JSON.parse(localStorage.getItem("branch"));
   const branch_id = branchData?.id || null;
-  // Fetch products when component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+
+        // ✅ correct branch logic
+        const currentBranch = localStorage.getItem("current_branch") || "all";
         const branchData = JSON.parse(localStorage.getItem("branch"));
-        const branch_id = branchData?.id || null;
+        const loginBranchId = branchData?.id || null;
+        const branch_id = currentBranch === "all" ? null : currentBranch;
+
         const userRole = localStorage.getItem("userRole");
+
         const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
           params: { branch_id, userRole },
         });
+
         let filteredProducts = response.data;
 
-        // Admin → only branchless products
-        if (userRole === "Admin") {
-          filteredProducts = filteredProducts.filter(item => item.branch_id === null);
-          console.log("🟢 Admin Filter Applied → branchless products only");
+        // Admin → ALL
+        if (userRole === "Admin" && branch_id === null) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id !== null);
         }
 
-        // branch admin → only own branch products
-        else if (userRole === "branch_admin" && branch_id) {
-          filteredProducts = filteredProducts.filter(item => item.branch_id === branch_id);
-          console.log("🟢 Branch Admin Filter Applied → branch_id =", branch_id);
+        // Admin → specific branch
+        else if (userRole === "Admin" && branch_id) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id == branch_id);
+        }
+
+        // branch admin → only own branch
+        else if (userRole === "branch_admin" && loginBranchId) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id == loginBranchId);
         }
 
         setProducts(filteredProducts);
         console.log("📌 Final filtered products:", filteredProducts);
+
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -592,7 +602,6 @@ const CCTVAccessories = () => {
 
     fetchProducts();
   }, []);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -933,18 +942,25 @@ const CCTVAccessories = () => {
     //     return;
     //   }
     // }
-  
+    const branchData = JSON.parse(localStorage.getItem("branch"));
+    const contact_person = branchData.contact_person;
+
+    const savedBranch = localStorage.getItem("current_branch") || "all";
+
+    let branch_id = savedBranch === "all" ? null : savedBranch;
+
+    // logs
+    console.log("📌 Saved Branch in localStorage:", savedBranch);
+    console.log("📌 Final branch_id sent to backend:", branch_id); console.log("branch id", branch_id)
 
     // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
-const branchData = JSON.parse(localStorage.getItem("branch"));
-    const branch_id = userRole === "Admin" ? null : (branchData?.id ?? null);
+
     // Set product status based on user role
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
-        if (branch_id !== null) formData.append("branch_id", branch_id);
-
+    if (branch_id !== null) formData.append("branch_id", branch_id);
 
     formData.append("name", newProduct.name);
     formData.append("features", newProduct.features);
@@ -958,7 +974,8 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     // formData.append("coupon_expiry_date", newProduct.coupon_expiry_date);
     // formData.append("coupon", newProduct.coupon);
     formData.append("category", newProduct.category); // Add category here
-
+    formData.append("user_role", userRole);
+    formData.append("contact_person", contact_person);
     // Append each image file to the FormData
     newProduct.images.forEach((image, index) => {
       if (image instanceof File) {
@@ -2636,7 +2653,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                   </select>
                 </div> */}
 
-                <div className="feature-item">
+                {/* <div className="feature-item">
 
                   <label className="feature-label">Approve or Unapprove</label>
 
@@ -2654,7 +2671,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                     <option value="unapproved">UnApprove</option>
                   </select>
 
-                </div>
+                </div> */}
 
                 <button
                   onClick={handleUpdateProduct}

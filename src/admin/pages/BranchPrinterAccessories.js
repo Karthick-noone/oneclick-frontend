@@ -29,7 +29,7 @@ import { toast, } from "react-toastify";
 // Set up the modal root element
 Modal.setAppElement("#root");
 
-const CCTVAccessories = () => {
+const PrinterAccessories = () => {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -106,11 +106,9 @@ const CCTVAccessories = () => {
         });
 
         //  Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
           timeout: 5000,
           params: { branch_id, userRole },
-
-
 
         });
         console.log("Refreshed product list:", refreshedProducts.data);
@@ -158,7 +156,7 @@ const CCTVAccessories = () => {
         });
 
         // Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
           timeout: 5000,
           params: { branch_id, userRole },
 
@@ -491,7 +489,7 @@ const CCTVAccessories = () => {
     console.log(`Uploading images for product ID ${productId}...`); // Log upload attempt
 
     try {
-      const response = await fetch(`${ApiUrl}/uploadcctvaccessoriesimages`, {
+      const response = await fetch(`${ApiUrl}/uploadprinteraccessoriesimages`, {
         method: "POST",
         body: formData,
       });
@@ -556,6 +554,7 @@ const CCTVAccessories = () => {
       navigate("/AdminLogin");
     }
   }, [navigate]);
+
   // Fetch products when component mounts
   const branchData = JSON.parse(localStorage.getItem("branch"));
   const branch_id = branchData?.id || null;
@@ -563,28 +562,39 @@ const CCTVAccessories = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+
+        // ✅ correct branch logic
+        const currentBranch = localStorage.getItem("current_branch") || "all";
         const branchData = JSON.parse(localStorage.getItem("branch"));
-        const branch_id = branchData?.id || null;
+        const loginBranchId = branchData?.id || null;
+        const branch_id = currentBranch === "all" ? null : currentBranch;
+
         const userRole = localStorage.getItem("userRole");
-        const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+
+        const response = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
           params: { branch_id, userRole },
         });
+
         let filteredProducts = response.data;
 
-        // Admin → only branchless products
-        if (userRole === "Admin") {
-          filteredProducts = filteredProducts.filter(item => item.branch_id === null);
-          console.log("🟢 Admin Filter Applied → branchless products only");
+        // Admin → ALL
+        if (userRole === "Admin" && branch_id === null) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id !== null);
         }
 
-        // branch admin → only own branch products
-        else if (userRole === "branch_admin" && branch_id) {
-          filteredProducts = filteredProducts.filter(item => item.branch_id === branch_id);
-          console.log("🟢 Branch Admin Filter Applied → branch_id =", branch_id);
+        // Admin → specific branch
+        else if (userRole === "Admin" && branch_id) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id == branch_id);
+        }
+
+        // branch admin → only own branch
+        else if (userRole === "branch_admin" && loginBranchId) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id == loginBranchId);
         }
 
         setProducts(filteredProducts);
         console.log("📌 Final filtered products:", filteredProducts);
+
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -660,7 +670,7 @@ const CCTVAccessories = () => {
     if (selectedFile) {
       formData.append("image", selectedFile);
 
-      fetch(`${ApiUrl}/updatecctvaccessories/image/${productId}?index=${imageIndex}`, {
+      fetch(`${ApiUrl}/updateprinteraccessories/image/${productId}?index=${imageIndex}`, {
         method: "PUT",
         body: formData,
       })
@@ -711,7 +721,7 @@ const CCTVAccessories = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // Make the DELETE request to the backend API
-        fetch(`${ApiUrl}/deletecctvaccessories/image/${productId}?index=${imageIndex}`, {
+        fetch(`${ApiUrl}/deleteprinteraccessories/image/${productId}?index=${imageIndex}`, {
           method: "DELETE",
         })
           .then((response) => response.json())
@@ -933,18 +943,24 @@ const CCTVAccessories = () => {
     //     return;
     //   }
     // }
-  
 
-    // Fetch user role from localStorage
+    const branchData = JSON.parse(localStorage.getItem("branch"));
+        const contact_person = branchData.contact_person;
+
+    const savedBranch = localStorage.getItem("current_branch") || "all";
+
+    let branch_id = savedBranch === "all" ? null : savedBranch;
+
+    // logs
+    console.log("📌 Saved Branch in localStorage:", savedBranch);
+    console.log("📌 Final branch_id sent to backend:", branch_id);    // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
-const branchData = JSON.parse(localStorage.getItem("branch"));
-    const branch_id = userRole === "Admin" ? null : (branchData?.id ?? null);
+
     // Set product status based on user role
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
-        if (branch_id !== null) formData.append("branch_id", branch_id);
-
+    if (branch_id !== null) formData.append("branch_id", branch_id);
 
     formData.append("name", newProduct.name);
     formData.append("features", newProduct.features);
@@ -958,7 +974,8 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     // formData.append("coupon_expiry_date", newProduct.coupon_expiry_date);
     // formData.append("coupon", newProduct.coupon);
     formData.append("category", newProduct.category); // Add category here
-
+    formData.append("user_role", userRole);
+    formData.append("contact_person", contact_person);
     // Append each image file to the FormData
     newProduct.images.forEach((image, index) => {
       if (image instanceof File) {
@@ -969,7 +986,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     });
 
     try {
-      await axios.post(`${ApiUrl}/cctvaccessories`, formData, {
+      await axios.post(`${ApiUrl}/printeraccessories`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -980,10 +997,9 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
         title: "Product Added",
         text: "The product has been added successfully!",
       });
-      console.log("Form data", formData)
 
       // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+      const response = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
         params: { branch_id, userRole },
 
       });
@@ -1258,12 +1274,12 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
       // Log the request URL
       console.log(
         "Sending update request to:",
-        `${ApiUrl}/updatecctvaccessories/${editingProduct.id}`
+        `${ApiUrl}/updateprinteraccessories/${editingProduct.id}`
       );
 
       // Send the update request
       const response = await axios.put(
-        `${ApiUrl}/updatecctvaccessories/${editingProduct.id}`,
+        `${ApiUrl}/updateprinteraccessories/${editingProduct.id}`,
         formData,
         {
           headers: {
@@ -1283,7 +1299,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
       });
 
       // Fetch updated list of products
-      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
         params: { branch_id, userRole },
 
       });
@@ -1326,16 +1342,16 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     if (confirmResult.isConfirmed) {
       try {
         // Log before sending delete request
-        console.log("Sending delete request to:", `${ApiUrl}/deletecctvaccessories/${id}`);
+        console.log("Sending delete request to:", `${ApiUrl}/deleteprinteraccessories/${id}`);
 
         // Perform the delete operation
-        const deleteResponse = await axios.delete(`${ApiUrl}/deletecctvaccessories/${id}`);
+        const deleteResponse = await axios.delete(`${ApiUrl}/deleteprinteraccessories/${id}`);
 
         // Log response from delete request
         console.log("Delete response:", deleteResponse.data);
 
         // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        const response = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
           params: { branch_id, userRole },
 
         });
@@ -1587,7 +1603,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
   return (
     <div className="laptops-page">
       <div className="laptops-content">
-        <h2 className="laptops-page-title">Add CCTV Accessories</h2>
+        <h2 className="laptops-page-title">Add Printer Accessories</h2>
         <div className="laptops-form-container">
           {/* Left Section */}
           <div className="laptops-left-section">
@@ -1693,7 +1709,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
           </div>
         </div>
         <hr className="dotted-divider" />
-        <h2 className="laptops-page-title">CCTV Accessories List</h2>
+        <h2 className="laptops-page-title">Printer Accessories List</h2>
 
         {(totalProducts > 0 || inStock > 0 || outOfStock > 0 || withCoupons > 0) && (
           <>
@@ -1769,7 +1785,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
         )}
         <div className="laptops-products-list">
           {products.length === 0 ? (
-            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some CCTV Accessories.</div>
+            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some printer Accessories.</div>
           ) : (
             (() => {
               const filteredProducts = products
@@ -1809,13 +1825,13 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                             {product.prod_img.map((img, imgIndex) => (
                               <div key={imgIndex} className="image-wrapper">
                                 <img
-                                  src={`${ApiUrl}/uploads/cctvaccessories/${img}`}
+                                  src={`${ApiUrl}/uploads/printeraccessories/${img}`}
                                   alt={product.prod_name}
                                   className="laptops-product-image"
                                   onClick={() =>
                                     handleImageClick(
                                       imgIndex, // Index of the clicked image in this product
-                                      product.prod_img.map(img => `${ApiUrl}/uploads/cctvaccessories/${img}`) // Only current product's images
+                                      product.prod_img.map(img => `${ApiUrl}/uploads/printeraccessories/${img}`) // Only current product's images
                                     )
                                   }
                                 />
@@ -2168,6 +2184,14 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                                       </span>
                                     </p>
 
+                                    <CouponEditPopup
+                                      isOpen={isPopupOpen}
+                                      onClose={closePopup}
+                                      productId={selectedProductId}
+                                      prodPrice={selectedProductPrice}
+                                      onCouponUpdated={handleCouponUpdated}
+                                    />
+
 
                                     <div
                                       className="frequently-buy"
@@ -2213,14 +2237,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                         </div>
                       )}
 
-                      <CouponEditPopup
-                        isOpen={isPopupOpen}
-                        onClose={closePopup}
-                        productId={selectedProductId}
-                        prodPrice={selectedProductPrice}
-                        onCouponUpdated={handleCouponUpdated}
-                      />
-
                       {isViewingCoupons && (
                         <div className="pop-overlay">
                           <div className="pop-content">
@@ -2234,7 +2250,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                             <span className="coupon-title-with-image">
                               {product.prod_img?.[0] && (
                                 <img
-                                  src={`${ApiUrl}/uploads/cctvaccessories/${product.prod_img[0]}`}
+                                  src={`${ApiUrl}/uploads/printeraccessories/${product.prod_img[0]}`}
                                   alt={product.prod_name}
                                   className="coupon-product-image"
                                 />
@@ -2636,7 +2652,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                   </select>
                 </div> */}
 
-                <div className="feature-item">
+                {/* <div className="feature-item">
 
                   <label className="feature-label">Approve or Unapprove</label>
 
@@ -2654,7 +2670,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                     <option value="unapproved">UnApprove</option>
                   </select>
 
-                </div>
+                </div> */}
 
                 <button
                   onClick={handleUpdateProduct}
@@ -2704,4 +2720,4 @@ const SamplePrevArrow = (props) => {
 };
 
 
-export default CCTVAccessories;
+export default PrinterAccessories;

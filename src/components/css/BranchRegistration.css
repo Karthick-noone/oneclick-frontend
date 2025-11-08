@@ -1,0 +1,425 @@
+.branch-container {
+  max-width: 950px;
+  margin: 0px auto;
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.branch-title {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.form-error {
+  color: #e74c3c;
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.branch-form .form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+.branch-form .form-row.two-columns {
+  flex-direction: row;
+  gap: 20px;
+}
+
+.branch-form .form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.branch-form label {
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #333;
+}
+
+.branch-form input,
+.gst-popup input,
+.branch-form textarea,
+.branch-form select {
+  padding: 12px 15px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  outline: none;
+  background: #f9f9f9;
+}
+
+.branch-form input:focus,
+.gst-popup input:focus,
+.branch-form textarea:focus,
+.branch-form select:focus {
+  border-color: #00bcd4;
+  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.25);
+  background: #fff;
+}
+
+.back-to-home-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  background: linear-gradient(90deg, #00bcd4, #0288d1);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.25);
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.branch-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.submit-btn {
+  background: linear-gradient(90deg, #00bcd4, #0288d1);
+  color: #fff;
+  border: none;
+  padding: 15px 35px;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  outline: none;
+}
+
+/* .submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 188, 212, 0.4);
+} */
+.submit-btn:focus {
+  box-shadow: 0 12px 20px rgba(0, 188, 212, 0.4);
+  border: 1px solid #057988;
+
+}
+
+.branch-thanks {
+  text-align: center;
+  padding: 60px 20px;
+  color: #2c3e50;
+}
+
+.branch-thanks h3 {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.branch-thanks p {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .branch-container {
+    padding: 25px;
+  }
+
+  .branch-form .form-row.two-columns {
+    flex-direction: column;
+  }
+}
+
+
+.form-error {
+  color: #e74c3c;
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 0.95rem;
+}
+
+.login-link a {
+  color: #00bcd4;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+
+.branch-welcome-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1100px;
+  margin: 5px auto;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  /* box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); */
+  animation: fadeInUp 0.8s ease;
+  flex-wrap: wrap;
+}
+
+/* Left Section */
+.branch-welcome-left {
+  flex: 1;
+  /* background: linear-gradient(135deg, #e6f0ff, #f5f9ff); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* padding: 20px; */
+}
+
+.welcome-image {
+  width: 100%;
+  max-width: 420px;
+  object-fit: contain;
+  /* animation: float 3s ease-in-out infinite; */
+}
+
+/* Right Section */
+.branch-welcome-right {
+  flex: 1;
+  padding: 70px 60px;
+  background: linear-gradient(135deg, #ffffff, #f8fbff);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  /* border-left: 1px solid #e0e0e0; */
+}
+
+/* Decorative subtle gradient overlay */
+.branch-welcome-right::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(30, 136, 229, 0.15), transparent 70%);
+  z-index: 0;
+}
+
+.branch-welcome-right h2 {
+  position: relative;
+  z-index: 1;
+  color: #1976d2;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(25, 118, 210, 0.1);
+  animation: glowText 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes glowText {
+  from {
+    text-shadow: 0 0 8px rgba(25, 118, 210, 0.4);
+  }
+
+  to {
+    text-shadow: 0 0 18px rgba(25, 118, 210, 0.7);
+  }
+}
+
+.branch-welcome-right p {
+  position: relative;
+  z-index: 1;
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.8;
+  margin-bottom: 10px;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  text-align: justify;
+}
+
+/* Subtle highlight for key phrases */
+.branch-welcome-right p strong {
+  color: #1565c0;
+  font-weight: 600;
+}
+
+/* Add spacing and subtle hover feedback for call-to-action area */
+.welcome-action {
+  margin-top: 40px;
+  position: relative;
+  z-index: 1;
+  padding-top: 10px;
+}
+
+.welcome-action p {
+  font-size: .9rem;
+  color: #555;
+  margin-bottom: 15px;
+  letter-spacing: 0.3px;
+}
+
+/* Call-to-action button refinement */
+.welcome-login-btn {
+  display: inline-block;
+  padding: 13px 30px;
+  background: linear-gradient(135deg, #1e88e5, #1565c0);
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(21, 101, 192, 0.35);
+}
+
+.welcome-login-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  box-shadow: 0 6px 18px rgba(21, 101, 192, 0.5);
+}
+
+.welcome-action {
+  margin-top: 30px;
+  text-align: left;
+}
+
+.welcome-login-btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #1e88e5, #1565c0);
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s ease;
+  box-shadow: 0 4px 10px rgba(21, 101, 192, 0.3);
+}
+
+.welcome-login-btn:hover {
+  background: linear-gradient(135deg, #1565c0, #1e88e5);
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .branch-welcome-container {
+    flex-direction: column;
+  }
+
+  .branch-welcome-right {
+    padding: 40px 25px;
+    text-align: center;
+  }
+
+  .welcome-action {
+    text-align: center;
+  }
+
+  .welcome-image {
+    max-width: 320px;
+  }
+}
+
+.gst-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  overflow-x: hidden;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(5px);
+  /* For Safari support */
+}
+
+.gst-popup {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  width: 320px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.gst-header {
+  margin-top: 10px;
+}
+
+.gst-popup input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.popup-actions button {
+  flex: 1;
+  margin: 0 5px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.popup-actions button:nth-child(2) {
+  background: #777;
+}

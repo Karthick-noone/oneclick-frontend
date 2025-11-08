@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./css/Topbar.css";
-import {  FaUserCircle, FaPowerOff, FaUser } from "react-icons/fa";
+import { FaUserCircle, FaPowerOff, FaUser, FaCog } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import user from "./img/user.jpg";
 import axios from "axios";
 import "nprogress/nprogress.css";
 import NProgress from "nprogress";
 import { ApiUrl } from "../../components/ApiUrl";
-import moment from "moment"; // Moment.js to handle time formatting
+import moment from "moment";
 import { Link } from "react-router-dom";
+import { Bell, Check, CheckCheck, Search, Menu } from "lucide-react";
 
 const Topbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const menuRef = useRef(null);
   const notificationRef = useRef(null);
   const navigate = useNavigate();
@@ -32,53 +34,32 @@ const Topbar = () => {
 
   useEffect(() => {
     fetchNotifications();
-    // Set an interval to delete notifications older than 15 days every hour
     const deleteOldNotificationsInterval = setInterval(
       deleteOldNotifications,
       3600000
-    ); // 1 hour
+    );
     return () => clearInterval(deleteOldNotificationsInterval);
   }, []);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (isNotificationOpen) {
-        setIsNotificationOpen(false);
-      }
+      if (isNotificationOpen) setIsNotificationOpen(false);
+      if (isMenuOpen) setIsMenuOpen(false);
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [isNotificationOpen]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (isMenuOpen) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [isMenuOpen]);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isNotificationOpen, isMenuOpen]);
 
   const fetchNotifications = async () => {
     setLoadingNotifications(true);
     try {
       const response = await axios.get(`${ApiUrl}/notifications`);
       const fetchedNotifications = response.data;
-
-      console.log("fetchedNotifications", fetchedNotifications);
-
-      // Mark any notification as 'read' if it has been marked as read in the backend
       setNotifications(
         fetchedNotifications.map((notification) => ({
           ...notification,
-          read: notification.is_read === 1, // Ensure the read status is correctly reflected
+          read: notification.is_read === 1,
         }))
       );
     } catch (error) {
@@ -123,200 +104,227 @@ const Topbar = () => {
   };
 
   const toggleMenu = () => {
-    setIsMenuOpen((prevState) => {
-      if (prevState) {
-        return false; // If menu is open, close it
-      } else {
-        setIsNotificationOpen(false); // Close notifications if menu is opened
-        return true;
-      }
+    setIsMenuOpen((prev) => {
+      if (prev) return false;
+      setIsNotificationOpen(false);
+      return true;
     });
   };
 
-  // const toggleNotification = () => {
-  //   setIsNotificationOpen((prevState) => {
-  //     if (prevState) {
-  //       return false; // If notification is open, close it
-  //     } else {
-  //       setIsMenuOpen(false); // Close menu if notification is opened
-  //       return true;
-  //     }
-  //   });
-  // };
+  const toggleNotification = () => {
+    setIsNotificationOpen((prev) => {
+      if (prev) return false;
+      setIsMenuOpen(false);
+      return true;
+    });
+  };
 
   const handleClickOutside = (event) => {
-    if (
-      menuRef.current &&
-      !menuRef.current.contains(event.target) &&
-      !event.target.closest(".action-btn")
-    ) {
+    if (menuRef.current && !menuRef.current.contains(event.target) && !event.target.closest(".profile-btn")) {
       setIsMenuOpen(false);
     }
-    if (
-      notificationRef.current &&
-      !notificationRef.current.contains(event.target) &&
-      !event.target.closest(".bell-btn")
-    ) {
+    if (notificationRef.current && !notificationRef.current.contains(event.target) && !event.target.closest(".bell-btn")) {
       setIsNotificationOpen(false);
     }
   };
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
-    navigate("/AdminLogin");
+    navigate("/");
   };
 
-  // Function to format time for notifications
   const formatTimeAgo = (date) => {
     const now = moment();
     const diff = now.diff(moment(date), "minutes");
 
-    if (diff < 60) {
-      return `${diff} minutes ago`;
-    } else if (diff < 1440) {
-      // 24 hours * 60 minutes
-      return `${Math.floor(diff / 60)} hours ago`;
-    } else {
-      return moment(date).format("hh:mm A DD MMM YY");
-    }
+    if (diff < 1) return "Just now";
+    if (diff < 60) return `${diff} minutes ago`;
+    if (diff < 1440) return `${Math.floor(diff / 60)} hours ago`;
+    return moment(date).format("hh:mm A DD MMM YY");
   };
 
   const username = localStorage.getItem("staffname");
   const role = localStorage.getItem("userRole");
-  // const UserName = username+username.slice(1)
+
+  const getRoleDisplay = () => {
+    if (role === "Admin") return "Administrator";
+    if (role === "branch_admin") {
+      const branch = JSON.parse(localStorage.getItem("branch")) || {};
+      return `${branch.branch_name || "Branch"} Admin`;
+    }
+    return `${role} - ${username}`;
+  };
+
+  const getRoleColor = () => {
+    switch (role) {
+      case "Admin": return "#10b981"; // Emerald
+      case "branch_admin": return "#8b5cf6"; // Violet
+      case "Staff": return "#3b82f6"; // Blue
+      default: return "#6b7280"; // Gray
+    }
+  };
 
   return (
     <div className="topbar">
+      <div className="topbar-left">
+        {/* <button className="sidebar-toggle">
+          <Menu size={20} />
+        </button>
+        <div className="search-container">
+          <Search className="search-icon" size={18} />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div> */}
+      </div>
 
-      <div className="topbar-content">
-  {/* Role/Username badge */}
-  <div
-    className="user-info-badge"
-    style={{
-      backgroundColor: role === "Admin" ? "#4CAF50" : "#2196F3", // Green for Admin, Blue for User
-      color: "white",
-      padding: "6px 12px",
-      borderRadius: "20px",
-      fontWeight: "500",
-      fontSize: "14px",
-      boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-      display: "flex",
-      alignItems: "center",
-      gap: "6px",
-      marginTop:'6px',
-      marginRight:'10px'
-    }}
-  >
-    {/* <FaUserCircle style={{ fontSize: "16px" }} /> */}
-    <span className="user-role">{role === "Admin" ? role : `${role} - ${username}`}</span>
-  </div>
+      <div className="topbar-right">
+        {/* Role Badge */}
+        <div 
+          className="user-role-badge"
+          style={{ '--role-color': getRoleColor() }}
+        >
+          <div className="role-dot"></div>
+          <span className="role-text">{getRoleDisplay()}</span>
+        </div>
 
-  {/* Notification Bell */}
-  {/* <button className="action-btn bell-btn" onClick={toggleNotification}>
-    {notifications.filter((notification) => !notification.read).length > 0 && (
-      <span className="notification-count">
-        {notifications.filter((notification) => !notification.read).length}
-      </span>
-    )}
-    <FaBell style={{ fontSize: "24px", color: "white" }} />
-  </button> */}
+        {/* Notification Bell */}
+        {role === "Admin" && (
+          <div className="notification-wrapper">
+            <button className="icon-btn bell-btn" onClick={toggleNotification}>
+              <Bell size={20} />
+              {notifications.filter((notification) => !notification.read).length > 0 && (
+                <span className="notification-badge">
+                  {notifications.filter((notification) => !notification.read).length}
+                </span>
+              )}
+            </button>
+          </div>
+        )}
 
-  {/* Profile Icon */}
-  <button className="action-btn">
-    <FaUserCircle
-      onClick={toggleMenu}
-      style={{ fontSize: "24px", color: "white" }}
-    />
-  </button>
-</div>
+        {/* Profile Button */}
+        <div className="profile-wrapper">
+          <button className="profile-btn" onClick={toggleMenu}>
+            <div className="profile-avatar">
+              <img src={user} alt="Profile" className="avatar-image" />
+              <div className="online-indicator"></div>
+            </div>
+          </button>
+        </div>
+      </div>
 
-
-      {/* Notification Dropdown */}
+      {/* Notification Dropdown - Light Theme */}
       {isNotificationOpen && (
-        <div className="notification-box" ref={notificationRef}>
-          <div className="notification-header">
-            <h4>Notifications</h4>
-            <span className="mark-all-btn" onClick={markAllAsRead}>
-              Mark All as Read
-            </span>
+        <div className="notification-dropdown light-notifications" ref={notificationRef}>
+          <div className="dropdown-header">
+            <h3>Notifications</h3>
+            <div className="header-actions">
+              <span className="mark-all-btn" onClick={markAllAsRead}>
+                Mark all as read
+              </span>
+              <span className="notification-count">
+                {notifications.filter(n => !n.read).length} new
+              </span>
+            </div>
           </div>
 
-          {loadingNotifications ? (
-            <p>Loading...</p>
-          ) : notifications.length === 0 ? (
-            <p className="no-notify">No new notifications</p>
-          ) : (
-            <ul>
-              {notifications.map((notification) => (
-                <li
+          <div className="notification-list">
+            {loadingNotifications ? (
+              <div className="loading-notifications">
+                <div className="loading-spinner"></div>
+                <span>Loading notifications...</span>
+              </div>
+            ) : notifications.length === 0 ? (
+              <div className="empty-state">
+                <Bell size={32} />
+                <span>No notifications</span>
+                <p>You're all caught up!</p>
+              </div>
+            ) : (
+              notifications.map((notification) => (
+                <div
                   key={notification.id}
+                  className={`notification-item ${!notification.read ? "unread" : ""}`}
                   onClick={() => markAsRead(notification.id)}
                 >
-                  <div
-                    className={`notification-item ${
-                      !notification.read ? "new" : ""
-                    }`}
-                  >
-                    <div className="notification-row">
-                      <span>{notification.message}</span>
-                      <div className="circle-btn-wrapper">
-                        <button
-                          className={`circle-btn ${
-                            notification.read ? "read" : "unread"
-                          }`}
-                          disabled // Disable the button to prevent clicking it
-                        ></button>
-                      </div>
+                  <div className="notification-content">
+                    <div className="notification-message">
+                      {notification.message}
                     </div>
-                    <span className="notification-time">
+                    <div className="notification-time">
                       {formatTimeAgo(notification.created_at)}
-                    </span>
+                    </div>
                   </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                  <div className="notification-status">
+                    {notification.read ? (
+                      <CheckCheck size={16} className="read-icon" />
+                    ) : (
+                      <div className="unread-dot"></div>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       )}
 
-      {/* User Menu */}
+      {/* User Menu Dropdown - Light Theme */}
       {isMenuOpen && (
-        <div className="topbar-menu" ref={menuRef}>
-          <div className="profile-section">
-            <img src={user} alt="Profile" className="profile-imagee" />
-            <h3 style={{ color: "black" }} className="profile-username">
-              {role === "Staff" ? username : role}
-            </h3>
+        <div className="user-menu-dropdown light-menu" ref={menuRef}>
+          <div className="user-profile-section">
+            <div className="profile-avatar-large">
+              <img src={user} alt="Profile" className="avatar-image-large" />
+              <div className="online-indicator-large"></div>
+            </div>
+            <div className="profile-info">
+              <h3 className="profile-name">
+                {role === "Admin" ? "Administrator" : 
+                 role === "branch_admin" ? 
+                   (JSON.parse(localStorage.getItem("branch")) || {}).name || "Branch Admin" : 
+                   username}
+              </h3>
+              <p className="profile-email">{getRoleDisplay()}</p>
+            </div>
           </div>
-          <hr />
-          {role !== "Staff" && (
-            <>
-              <Link
-                style={{ textDecoration: "none" }}
-                to="/admin/ChangePassword"
-              >
-                <button className="menu-item" onClick={toggleMenu}>
-                  <FaUser /> Change Password
+
+          <div className="menu-divider"></div>
+
+          <div className="menu-items">
+            {role === "Admin" && (
+              <Link to="/admin/ChangePassword" className="menu-link">
+                <button className="menu-item">
+                  <FaCog className="menu-icon" />
+                  <span>Change Password</span>
                 </button>
               </Link>
-            </>
+            )}
+            
+            {role === "branch_admin" && (
+            <Link to="/Admin/BranchAdminProfile" className="menu-link">
+              <button className="menu-item">
+                <FaUser className="menu-icon" />
+                <span>View Profile</span>
+              </button>
+            </Link>
           )}
-          <button
-            onClick={() => {
-              handleLogout();
-              toggleMenu();
-            }}
-            className="menu-item"
-          >
-            <FaPowerOff /> Logout
-          </button>
+
+            <div className="menu-divider"></div>
+
+            <button className="menu-item logout-item" onClick={handleLogout}>
+              <FaPowerOff className="menu-icon" />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       )}
     </div>

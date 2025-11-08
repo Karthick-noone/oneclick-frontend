@@ -1,0 +1,152 @@
+/* Admin Main Layout */
+.AdminMain {
+  display: grid;
+  grid-template-areas: 
+    "sidebar topbar"
+    "sidebar content";
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 70px 1fr;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Sidebar Open State */
+.AdminMain.sidebar-open {
+  grid-template-columns: 280px 1fr;
+}
+
+/* Sidebar Closed State */
+.AdminMain.sidebar-closed {
+  grid-template-columns: 70px 1fr;
+}
+
+/* Grid Areas */
+.slidebar {
+  grid-area: sidebar;
+}
+
+.topbar {
+  grid-area: topbar;
+}
+
+.content {
+  grid-area: content;
+  padding: 30px;
+  overflow-y: auto;
+  min-height: calc(100vh - 70px);
+  transition: all 0.3s ease;
+}
+
+.content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .AdminMain {
+    grid-template-areas: 
+      "topbar topbar"
+      "content content";
+    grid-template-columns: 1fr;
+    grid-template-rows: 70px 1fr;
+  }
+
+  .AdminMain.sidebar-open {
+    grid-template-areas: 
+      "topbar topbar"
+      "sidebar content";
+    grid-template-columns: 280px 1fr;
+  }
+
+  .AdminMain.sidebar-closed .slidebar {
+    display: none;
+  }
+
+  .content {
+    padding: 20px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .AdminMain.sidebar-open {
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+      "topbar"
+      "sidebar"
+      "content";
+    grid-template-rows: 70px auto 1fr;
+  }
+
+  .content {
+    padding: 15px 10px;
+  }
+}
+
+/* Smooth transitions for all pages */
+.dashboard,
+.orders-page,
+.customers-page,
+.reports-page,
+.products-page {
+  transition: all 0.3s ease;
+}
+
+/* Ensure all pages adapt to sidebar state */
+.page-container {
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+/* Custom scrollbar for content */
+.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.5);
+  border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.7);
+}
+
+/* Loading state */
+.admin-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #94a3b8;
+}
+
+/* Print styles */
+@media print {
+  .AdminMain {
+    grid-template-areas: 
+      "content content"
+      "content content";
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+  
+  .slidebar,
+  .topbar {
+    display: none;
+  }
+  
+  .content {
+    padding: 0;
+    background: white;
+    color: black;
+  }
+}

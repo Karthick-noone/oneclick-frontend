@@ -111,6 +111,7 @@ const Watch = () => {
         //  Refresh product list
         const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchwatch`, {
           timeout: 5000,
+          params: { branch_id, userRole },
         });
         console.log("Refreshed product list:", refreshedProducts.data);
 
@@ -159,6 +160,7 @@ const Watch = () => {
         // Refresh product list
         const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchwatch`, {
           timeout: 5000,
+          params: { branch_id, userRole },
         });
         console.log("Refreshed product list:", refreshedProducts.data);
 
@@ -561,12 +563,34 @@ const Watch = () => {
       navigate("/AdminLogin");
     }
   }, [navigate]);
+  const branchData = JSON.parse(localStorage.getItem("branch"));
+  const branch_id = branchData?.id || null;
   // Fetch products when component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${ApiUrl}/adminfetchwatch`);
-        setProducts(response.data);
+        const branchData = JSON.parse(localStorage.getItem("branch"));
+        const branch_id = branchData?.id || null;
+        const userRole = localStorage.getItem("userRole");
+        const response = await axios.get(`${ApiUrl}/adminfetchwatch`, {
+          params: { branch_id, userRole },
+        });
+        let filteredProducts = response.data;
+
+        // Admin → only branchless products
+        if (userRole === "Admin") {
+          filteredProducts = filteredProducts.filter(item => item.branch_id === null);
+          console.log("🟢 Admin Filter Applied → branchless products only");
+        }
+
+        // branch admin → only own branch products
+        else if (userRole === "branch_admin" && branch_id) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id === branch_id);
+          console.log("🟢 Branch Admin Filter Applied → branch_id =", branch_id);
+        }
+
+        setProducts(filteredProducts);
+        console.log("📌 Final filtered products:", filteredProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -574,6 +598,7 @@ const Watch = () => {
 
     fetchProducts();
   }, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -912,11 +937,14 @@ const Watch = () => {
     // }
     // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
-
+    const branchData = JSON.parse(localStorage.getItem("branch"));
+    const branch_id = userRole === "Admin" ? null : (branchData?.id ?? null);
     // Set product status based on user role
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
+        if (branch_id !== null) formData.append("branch_id", branch_id);
+
     formData.append("name", newProduct.name);
     formData.append("features", newProduct.features);
     formData.append("price", newProduct.price);
@@ -953,7 +981,10 @@ const Watch = () => {
       });
 
       // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/adminfetchwatch`);
+      const response = await axios.get(`${ApiUrl}/adminfetchwatch`, {
+        params: { branch_id, userRole },
+
+      });
       setProducts(response.data);
       setNewProduct({
         name: "",
@@ -1241,7 +1272,10 @@ const Watch = () => {
       });
 
       // Fetch updated list of products
-      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchwatch`);
+      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchwatch`, {
+        params: { branch_id, userRole },
+
+      });
       setProducts(fetchResponse.data);
 
       // Log successful fetch
@@ -1295,7 +1329,10 @@ const Watch = () => {
         console.log("Delete response:", deleteResponse.data);
 
         // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/adminfetchwatch`);
+        const response = await axios.get(`${ApiUrl}/adminfetchwatch`, {
+          params: { branch_id, userRole },
+
+        });
         setProducts(response.data);
 
         // Log the updated product list
@@ -1798,7 +1835,7 @@ const Watch = () => {
                           <>
                             <img
                               src={userRole === "Admin" ? ApproveImage : ApprovalWaitingImage}
-                              title={userRole === "Admin" ? "Click to approve this product" : "Product yet to approve"}
+                              title={userRole === "Admin" ? "Click to approve this product" : "Product yet not approved(Contact Admin)"}
                               width={userRole === "Admin" ? "50px" : "60px"}
                               style={{
                                 cursor: userRole === "Admin" ? "pointer" : "not-allowed",
@@ -2300,7 +2337,7 @@ const Watch = () => {
                             ) : (
                               <p>No coupons available for this product.</p>
                             )}
-                            
+
                           </div>
                         </div>
                       )}

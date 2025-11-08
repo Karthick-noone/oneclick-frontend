@@ -14,22 +14,20 @@ import { FaInfoCircle, FaClone, FaPlusCircle, FaChevronDown } from "react-icons/
 import CouponEditPopup from "./CouponEditPopup";
 import EditCouponModal from "./EditCouponModal"; // Import the modal component
 // import CouponImage from './img/coupons.png'
-
+import ActiveCouponImage from './img/Active-coupon.png'
+import ExpiredCouponImage from './img/Expired-coupon.png'
 
 // import leftarrow from './img/left.png';
 // import rightarrow from './img/right.png';
-import ActiveCouponImage from './img/Active-coupon.png'
-import ExpiredCouponImage from './img/Expired-coupon.png'
-import { SearchIcon } from "lucide-react";
-import FilterIcon from "./img/filter.png";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
-import { toast, } from "react-toastify";
-
+import { SearchIcon } from "lucide-react";
+import FilterIcon from "./img/filter.png";
+import { toast } from "react-toastify";
 // Set up the modal root element
 Modal.setAppElement("#root");
 
-const CCTVAccessories = () => {
+const Secondhandproducts = () => {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -44,6 +42,15 @@ const CCTVAccessories = () => {
     coupon_expiry_date: "",
     actual_price: "", // Add actual price field
     effectiveprice: "", // Add actual price field
+    memory: "",
+    storage: "",
+    display: "",
+    battery: "",
+    camera: "",
+    network: "",
+    processor: "",
+    os: "",
+    others: "",
 
   });
   const fileInputRef = useRef(null);
@@ -71,17 +78,22 @@ const CCTVAccessories = () => {
   const [offerEndTime, setOfferEndTime] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [modalProductId, setModalProductId] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [lightboxImages, setLightboxImages] = useState([]);
+  const [productType, setProductType] = useState("Mobiles");
+
+
   const [couponProducts, setCouponProducts] = useState({});
 
   const [searchTerm, setSearchTerm] = useState("");
   const [showOutOfStockOnly, setShowOutOfStockOnly] = useState(false);
   const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
   // const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
-
   const [, setLoadingProductId] = useState(null);
+
   const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
   const handleStatusChange = async (newStatus, productId) => {
@@ -106,11 +118,9 @@ const CCTVAccessories = () => {
         });
 
         //  Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchsecondhandproducts`, {
           timeout: 5000,
           params: { branch_id, userRole },
-
-
 
         });
         console.log("Refreshed product list:", refreshedProducts.data);
@@ -158,7 +168,7 @@ const CCTVAccessories = () => {
         });
 
         // Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchsecondhandproducts`, {
           timeout: 5000,
           params: { branch_id, userRole },
 
@@ -230,13 +240,11 @@ const CCTVAccessories = () => {
       loadCouponStatuses();
     }
   }, [products]);
-
   const handleImageClick = (index, imageArray) => {
     setPhotoIndex(index); // starting image
     setLightboxImages(imageArray); // all images of this product
     setIsOpen(true); // open lightbox
   };
-
 
   useEffect(() => {
     setTimeout(() => {
@@ -247,10 +255,6 @@ const CCTVAccessories = () => {
       }
     }, 100);
   }, []);
-
-  const [isModalOpen2, setIsModalOpen2] = useState(false);
-  const [modalProductId, setModalProductId] = useState(null);
-
   // Handle opening modal and passing productId
 
   const openProductModal = (productId) => {
@@ -319,7 +323,6 @@ const CCTVAccessories = () => {
       }
     }
   };
-
 
 
 
@@ -434,7 +437,6 @@ const CCTVAccessories = () => {
   const handleCouponUpdated = () => {
     console.log("Coupon updated successfully!");
   };
-
   const MAX_FILES = 5; // Set your file limit
 
   const handleFileChange = (productId, event) => {
@@ -470,6 +472,7 @@ const CCTVAccessories = () => {
     }));
   };
 
+
   const handleUploadImages = async (productId) => {
     if (!newImages[productId] || newImages[productId].length === 0) {
       // If no new images, show an alert and exit
@@ -491,7 +494,7 @@ const CCTVAccessories = () => {
     console.log(`Uploading images for product ID ${productId}...`); // Log upload attempt
 
     try {
-      const response = await fetch(`${ApiUrl}/uploadcctvaccessoriesimages`, {
+      const response = await fetch(`${ApiUrl}/uploadsecondhandproductsimages`, {
         method: "POST",
         body: formData,
       });
@@ -563,28 +566,39 @@ const CCTVAccessories = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+
+        // ✅ correct branch logic
+        const currentBranch = localStorage.getItem("current_branch") || "all";
         const branchData = JSON.parse(localStorage.getItem("branch"));
-        const branch_id = branchData?.id || null;
+        const loginBranchId = branchData?.id || null;
+        const branch_id = currentBranch === "all" ? null : currentBranch;
+
         const userRole = localStorage.getItem("userRole");
-        const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+
+        const response = await axios.get(`${ApiUrl}/adminfetchsecondhandproducts`, {
           params: { branch_id, userRole },
         });
+
         let filteredProducts = response.data;
 
-        // Admin → only branchless products
-        if (userRole === "Admin") {
-          filteredProducts = filteredProducts.filter(item => item.branch_id === null);
-          console.log("🟢 Admin Filter Applied → branchless products only");
+        // Admin → ALL
+        if (userRole === "Admin" && branch_id === null) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id !== null);
         }
 
-        // branch admin → only own branch products
-        else if (userRole === "branch_admin" && branch_id) {
-          filteredProducts = filteredProducts.filter(item => item.branch_id === branch_id);
-          console.log("🟢 Branch Admin Filter Applied → branch_id =", branch_id);
+        // Admin → specific branch
+        else if (userRole === "Admin" && branch_id) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id == branch_id);
+        }
+
+        // branch admin → only own branch
+        else if (userRole === "branch_admin" && loginBranchId) {
+          filteredProducts = filteredProducts.filter(item => item.branch_id == loginBranchId);
         }
 
         setProducts(filteredProducts);
         console.log("📌 Final filtered products:", filteredProducts);
+
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -592,6 +606,7 @@ const CCTVAccessories = () => {
 
     fetchProducts();
   }, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -604,7 +619,7 @@ const CCTVAccessories = () => {
     //     // Optionally show an error message if the input is invalid
     //     Swal.fire({
     //       icon: "warning",
-    //       title: "Invalid Input",
+    //       title: "Validation Error",
     //       text: "Name and Label should only contain letters and spaces.",
     //     });
     //     return; // Prevent updating state if invalid
@@ -618,7 +633,7 @@ const CCTVAccessories = () => {
         // Optionally show an error message if the input is invalid
         Swal.fire({
           icon: "warning",
-          title: "Invalid Input",
+          title: "Validation Error",
           text: "Price should only contain numbers.",
         });
         return; // Prevent updating state if invalid
@@ -653,14 +668,13 @@ const CCTVAccessories = () => {
 
 
 
-
   // Your existing handleImageUpdate function
   const handleImageUpdate = () => {
     const formData = new FormData();
     if (selectedFile) {
       formData.append("image", selectedFile);
 
-      fetch(`${ApiUrl}/updatecctvaccessories/image/${productId}?index=${imageIndex}`, {
+      fetch(`${ApiUrl}/updatesecondhandproducts/image/${productId}?index=${imageIndex}`, {
         method: "PUT",
         body: formData,
       })
@@ -711,7 +725,7 @@ const CCTVAccessories = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // Make the DELETE request to the backend API
-        fetch(`${ApiUrl}/deletecctvaccessories/image/${productId}?index=${imageIndex}`, {
+        fetch(`${ApiUrl}/deletesecondhandproducts/image/${productId}?index=${imageIndex}`, {
           method: "DELETE",
         })
           .then((response) => response.json())
@@ -783,7 +797,7 @@ const CCTVAccessories = () => {
     if (newProduct.label && newProduct.label.replace(/\s/g, "").length > 15) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "Label cannot exceed 30 characters.",
       });
       return;
@@ -793,45 +807,22 @@ const CCTVAccessories = () => {
     if (newProduct.label && !newProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "Label cannot be just spaces.",
       });
       return;
     }
 
-    // if (!newProduct.effectiveprice) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Effective Price is required.",
-    //   });
-    //   return;
-    // }
     // Basic validation checks
     if (!newProduct.name.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "Product name is required.",
       });
       return;
     }
-    if (!newProduct.features.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Invalid Input",
-        text: "Product features are required.",
-      });
-      return;
-    }
-    // if (!newProduct.category.trim()) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Product category is required.",
-    //   });
-    //   return;
-    // }
+
     if (
       !newProduct.price ||
       isNaN(newProduct.price) ||
@@ -839,7 +830,7 @@ const CCTVAccessories = () => {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "A valid product price is required.",
       });
       return;
@@ -851,7 +842,7 @@ const CCTVAccessories = () => {
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "A valid actual price is required.",
       });
       return;
@@ -860,7 +851,7 @@ const CCTVAccessories = () => {
       // Check for images array length
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "At least one product image is required.",
       });
       return;
@@ -870,81 +861,29 @@ const CCTVAccessories = () => {
     if (Number(newProduct.actual_price) <= Number(newProduct.price)) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "Actual price must be greater than the product price.",
       });
       return;
     }
 
-    // Validate coupon code and extract numeric part
-    // const couponCode = newProduct.coupon; // Fetching the coupon code
-
-    // const couponExpiryDate = newProduct.coupon_expiry_date; // Assuming expiry date is stored here
-
-
-    // Check if either coupon code or coupon expiry date is provided
-    // if (
-    //   (couponCode && !couponExpiryDate) ||
-    //   (!couponCode && couponExpiryDate)
-    // ) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
-    //   });
-    //   return;
-    // }
-
-    // Check if coupon code is provided and not just spaces
-    // if (couponCode && !couponCode.trim()) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Coupon code cannot be just spaces.",
-    //   });
-    //   return;
-    // }
-
-    // // Extract numeric part from coupon code
-    // const couponValueMatch = couponCode.match(/\d+/); // Regex to find the first numeric part in the coupon code
-    // const couponValue = couponValueMatch ? Number(couponValueMatch[0]) : 0; // Get the number or default to 0 if not found
-
-    // // Ensure the extracted coupon value is less than the product price
-    // if (couponValue >= Number(newProduct.price)) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Coupon discount must be less than the product price.",
-    //   });
-    //   return;
-    // }
-
-    // // Check if the coupon code contains at least one letter and one digit
-    // // const hasLetter = /[a-zA-Z]/.test(couponCode);
-    // if (couponCode && couponExpiryDate) {
-    //   const hasDigit = /\d/.test(couponCode);
-
-    //   if (!hasDigit) {
-    //     Swal.fire({
-    //       icon: "warning",
-    //       title: "Invalid Input",
-    //       text: "Coupon code must contain price value like OFFER599.",
-    //     });
-    //     return;
-    //   }
-    // }
-  
 
     // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
-const branchData = JSON.parse(localStorage.getItem("branch"));
-    const branch_id = userRole === "Admin" ? null : (branchData?.id ?? null);
-    // Set product status based on user role
+    const branchData = JSON.parse(localStorage.getItem("branch"));
+    const contact_person = branchData.contact_person;
+
+    const savedBranch = localStorage.getItem("current_branch") || "all";
+
+    let branch_id = savedBranch === "all" ? null : savedBranch;
+
+    // logs
+    console.log("📌 Saved Branch in localStorage:", savedBranch);
+    console.log("📌 Final branch_id sent to backend:", branch_id);    // Set product status based on user role
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
-        if (branch_id !== null) formData.append("branch_id", branch_id);
-
+    if (branch_id !== null) formData.append("branch_id", branch_id);
 
     formData.append("name", newProduct.name);
     formData.append("features", newProduct.features);
@@ -955,9 +894,21 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     formData.append("productStatus", productStatus);
     formData.append("subtitle", newProduct.subtitle);
     formData.append("deliverycharge", newProduct.deliverycharge);
+    formData.append("memory", newProduct.memory);
+    formData.append("storage", newProduct.storage);
+    formData.append("camera", newProduct.camera);
+    formData.append("display", newProduct.display);
+    formData.append("network", newProduct.network);
+    formData.append("battery", newProduct.battery);
+    formData.append("os", newProduct.os);
+    formData.append("processor", newProduct.processor);
+    formData.append("others", newProduct.others);
     // formData.append("coupon_expiry_date", newProduct.coupon_expiry_date);
     // formData.append("coupon", newProduct.coupon);
     formData.append("category", newProduct.category); // Add category here
+    formData.append("productType", productType); // Send product type to backend
+    formData.append("user_role", userRole);
+    formData.append("contact_person", contact_person);
 
     // Append each image file to the FormData
     newProduct.images.forEach((image, index) => {
@@ -969,7 +920,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     });
 
     try {
-      await axios.post(`${ApiUrl}/cctvaccessories`, formData, {
+      await axios.post(`${ApiUrl}/secondhandproducts`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -980,10 +931,9 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
         title: "Product Added",
         text: "The product has been added successfully!",
       });
-      console.log("Form data", formData)
 
       // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+      const response = await axios.get(`${ApiUrl}/adminfetchsecondhandproducts`, {
         params: { branch_id, userRole },
 
       });
@@ -997,6 +947,15 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
         label: "",
         subtitle: "",
         deliverycharge: "",
+        memory: "",
+        storage: "",
+        camera: "",
+        battery: "",
+        network: "",
+        display: "",
+        processor: "",
+        os: "",
+        others: "",
         // coupon_expiry_date: "",
         // coupon: "",
         effectiveprice: "",
@@ -1044,6 +1003,16 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
       // coupon_expiry_date: formattedDate,
       // coupon: product.coupon,
       category: product.category,
+      memory: product.memory,
+      storage: product.storage,
+      camera: product.camera,
+      display: product.display,
+      network: product.network,
+      processor: product.processor,
+      battery: product.battery,
+      others: product.others,
+      os: product.os,
+      productType: product.productType || "",
     });
     setModalIsOpen(true);
     openProductModal(false);
@@ -1053,7 +1022,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     if (editingProduct.label && !editingProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "Label cannot be just spaces.Remove space",
       });
       return;
@@ -1062,7 +1031,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     // if (editingProduct.label && /\d/.test(editingProduct.label)) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Invalid Input",
+    //     title: "Validation Error",
     //     text: "Label cannot contain numeric values.",
     //   });
     //   return;
@@ -1071,7 +1040,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     if (editingProduct.label && editingProduct.label.length > 15) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "Label cannot exceed 30 characters.",
       });
       return;
@@ -1081,7 +1050,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     if (editingProduct.label && !editingProduct.label.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "Label cannot be just spaces.",
       });
       return;
@@ -1090,7 +1059,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     if (Number(editingProduct.actual_price) <= Number(editingProduct.price)) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "Actual price must be greater than the product price.",
       });
       return;
@@ -1100,32 +1069,23 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     if (!editingProduct.name.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "Product name is required.",
       });
       return;
     }
-
-    // if (!editingProduct.effectiveprice) {
+    // if (!editingProduct.features.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Effective Price is required.",
+    //     title: "Validation Error",
+    //     text: "Product features are required.",
     //   });
     //   return;
     // }
-    if (!editingProduct.features.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Invalid Input",
-        text: "Product features are required.",
-      });
-      return;
-    }
     // if (!editingProduct.category.trim()) {
     //   Swal.fire({
     //     icon: "warning",
-    //     title: "Invalid Input",
+    //     title: "Validation Error",
     //     text: "Product category is required.",
     //   });
     //   return;
@@ -1137,7 +1097,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "A valid product price is required.",
       });
       return;
@@ -1149,7 +1109,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     ) {
       Swal.fire({
         icon: "warning",
-        title: "Invalid Input",
+        title: "Validation Error",
         text: "A valid product price is required.",
       });
       return;
@@ -1163,65 +1123,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
       return;
     }
 
-    // // Validate coupon code and extract numeric part
-    // const couponCode = editingProduct.coupon
-    //   ? editingProduct.coupon.trim()
-    //   : ""; // Trim coupon code to avoid spaces
-    // const couponExpiryDate =
-    //   editingProduct.coupon_expiry_date &&
-    //   editingProduct.coupon_expiry_date !== "0000-00-00"
-    //     ? editingProduct.coupon_expiry_date.trim()
-    //     : ""; // Treat "0000-00-00" as empty
-
-    // // Check if either coupon code or coupon expiry date is provided
-    // if (
-    //   (couponCode && !couponExpiryDate) ||
-    //   (!couponCode && couponExpiryDate)
-    // ) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Both coupon code and coupon expiry date must be provided together or clear both.",
-    //   });
-    //   return;
-    // }
-
-    // // Check if coupon code is provided and not just spaces
-    // if (couponCode && !couponCode.trim()) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Coupon code cannot be just spaces.",
-    //   });
-    //   return;
-    // }
-
-    // if (couponCode && couponExpiryDate) {
-    //   const hasDigit = /\d/.test(couponCode);
-
-    //   if (!hasDigit) {
-    //     Swal.fire({
-    //       icon: "warning",
-    //       title: "Invalid Input",
-    //       text: "Coupon code must contain price value like OFFER599.",
-    //     });
-    //     return;
-    //   }
-    // }
-
-    // // Extract numeric part from coupon code
-    // const couponValueMatch = couponCode.match(/\d+/); // Regex to find the first numeric part in the coupon code
-    // const couponValue = couponValueMatch ? Number(couponValueMatch[0]) : 0; // Get the number or default to 0 if not found
-
-    // // Ensure the extracted coupon value is less than the product price
-    // if (couponValue >= Number(editingProduct.price)) {
-    //   Swal.fire({
-    //     icon: "warning",
-    //     title: "Invalid Input",
-    //     text: "Coupon discount must be less than the product price.",
-    //   });
-    //   return;
-    // }
 
     // Log the product details that will be sent to the backend
     console.log("Updating product with details:", {
@@ -1250,6 +1151,16 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     // formData.append("coupon_expiry_date", editingProduct.coupon_expiry_date);
     // formData.append("coupon", editingProduct.coupon);
     formData.append("category", editingProduct.category);
+    formData.append("memory", editingProduct.memory);
+    formData.append("storage", editingProduct.storage);
+    formData.append("camera", editingProduct.camera);
+    formData.append("display", editingProduct.display);
+    formData.append("network", editingProduct.network);
+    formData.append("processor", editingProduct.processor);
+    formData.append("battery", editingProduct.battery);
+    formData.append("others", editingProduct.others);
+    formData.append("os", editingProduct.os);
+    formData.append("productType", editingProduct.productType);
     if (editingProduct.image) {
       formData.append("image", editingProduct.image);
     }
@@ -1258,12 +1169,12 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
       // Log the request URL
       console.log(
         "Sending update request to:",
-        `${ApiUrl}/updatecctvaccessories/${editingProduct.id}`
+        `${ApiUrl}/updatesecondhandproducts/${editingProduct.id}`
       );
 
       // Send the update request
       const response = await axios.put(
-        `${ApiUrl}/updatecctvaccessories/${editingProduct.id}`,
+        `${ApiUrl}/updatesecondhandproducts/${editingProduct.id}`,
         formData,
         {
           headers: {
@@ -1283,7 +1194,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
       });
 
       // Fetch updated list of products
-      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchsecondhandproducts`, {
         params: { branch_id, userRole },
 
       });
@@ -1326,16 +1237,16 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
     if (confirmResult.isConfirmed) {
       try {
         // Log before sending delete request
-        console.log("Sending delete request to:", `${ApiUrl}/deletecctvaccessories/${id}`);
+        console.log("Sending delete request to:", `${ApiUrl}/deletesecondhandproducts/${id}`);
 
         // Perform the delete operation
-        const deleteResponse = await axios.delete(`${ApiUrl}/deletecctvaccessories/${id}`);
+        const deleteResponse = await axios.delete(`${ApiUrl}/deletesecondhandproducts/${id}`);
 
         // Log response from delete request
         console.log("Delete response:", deleteResponse.data);
 
         // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        const response = await axios.get(`${ApiUrl}/adminfetchsecondhandproducts`, {
           params: { branch_id, userRole },
 
         });
@@ -1587,8 +1498,43 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
   return (
     <div className="laptops-page">
       <div className="laptops-content">
-        <h2 className="laptops-page-title">Add CCTV Accessories</h2>
-        <div className="laptops-form-container">
+        <h2 className="laptops-page-title">Add Refurbished Product (Second hand products)</h2>
+
+        <div className="filters-container" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          {/* Left side: Product Type Label */}
+
+
+          {/* Right side: Radio buttons */}
+          <div className="custom-radio-buttons">
+            {["Mobiles", "Computers", "Other"].map((type, i) => (
+              <label className="custom-radio-container" key={i}>
+                <input
+                  type="radio"
+                  name="productType"
+                  value={type}
+                  checked={productType === type}
+                  onChange={(e) => setProductType(e.target.value)}
+                />
+                <div className="checkmark"></div>
+                <span className="label-text">
+                  {type === "Other" ? "Other Products" : type}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="product-type-display">
+          {/* <span className="product-type-label">ADD:</span> */}
+          <span className="product-type-value">{productType === "Other" ? "Other Products" : productType}</span>
+        </div>
+        <div
+          className={
+            productType === "Other"
+              ? "secondhand-product-form-container"
+              : "laptops-form-container"
+          }
+        >
           {/* Left Section */}
           <div className="laptops-left-section">
             <label className="laptops-label">Product Name</label>
@@ -1618,15 +1564,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
               className="laptops-input"
             />
 
-            <label className="laptops-label">Effective Price</label>
-            <input
-              type="text"
-              name="effectiveprice"
-              value={newProduct.effectiveprice}
-              onChange={handleChange}
-              className="laptops-input"
-            />
-
             <label className="laptops-label">Label</label>
             <input
               type="text"
@@ -1635,10 +1572,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
               onChange={handleChange}
               className="laptops-input"
             />
-          </div>
 
-          {/* Right Section */}
-          <div className="laptops-right-section">
             <label className="laptops-label">Subtitle</label>
             <input
               type="text"
@@ -1677,23 +1611,167 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                 ? `Selected Images: ${imageCount}`
                 : "Choose Images"}
             </button>
-            <label className="laptops-label">Features</label>
-            <textarea
-              name="features"
-              value={newProduct.features}
-              onChange={handleChange}
-              className="laptops-textarea"
-            ></textarea>
-            <button
-              onClick={() => handleAddProduct(newProduct)}
-              className="laptops-add-btn"
-            >
-              Add
-            </button>
+            {productType === "Other" && (
+              <>
+                <label className="laptops-label">Features</label>
+                <textarea
+                  name="features"
+                  value={newProduct.features}
+                  onChange={handleChange}
+                  className="laptops-textarea"
+                ></textarea>
+              </>
+            )}
+
+            {(productType === "Mobiles") && (
+              <>
+                <label className="laptops-label">Operating System</label>
+                <input
+                  type="text"
+                  name="os"
+                  value={newProduct.os}
+                  onChange={handleChange}
+                  className="laptops-input"
+                />
+              </>
+            )}
+
+            {(productType === "Other") && (
+              <>
+                <button
+                  onClick={() => handleAddProduct(newProduct)}
+                  className="laptops-add-btn"
+                >
+                  Add
+                </button>
+              </>
+            )}
           </div>
+
+
+          {(productType === "Mobiles" || productType === "Computers") && (
+            <>
+              <div className="laptops-right-section">
+
+                {(productType === "Mobiles" || productType === "Computers") && (
+                  <>
+                    <label className="laptops-label">RAM</label>
+                    <input
+                      type="text"
+                      name="memory"
+                      value={newProduct.memory}
+                      onChange={handleChange}
+                      className="laptops-input"
+                    />
+
+                    <label className="laptops-label">ROM</label>
+                    <input
+                      type="text"
+                      name="storage"
+                      value={newProduct.storage}
+                      onChange={handleChange}
+                      className="laptops-input"
+                    />
+
+                    <label className="laptops-label">Display</label>
+                    <input
+                      type="text"
+                      name="display"
+                      value={newProduct.display}
+                      onChange={handleChange}
+                      className="laptops-input"
+                    />
+
+                    {productType === "Mobiles" && (
+                      <>
+                        <label className="laptops-label">Battery</label>
+                        <input
+                          type="text"
+                          name="battery"
+                          value={newProduct.battery}
+                          onChange={handleChange}
+                          className="laptops-input"
+                        />
+
+                        <label className="laptops-label">Camera</label>
+                        <input
+                          type="text"
+                          name="camera"
+                          value={newProduct.camera}
+                          onChange={handleChange}
+                          className="laptops-input"
+                        />
+
+                        <label className="laptops-label">Network</label>
+                        <input
+                          type="text"
+                          name="network"
+                          value={newProduct.network}
+                          onChange={handleChange}
+                          className="laptops-input"
+                        />
+                      </>
+                    )}
+
+
+                  </>
+                )}
+
+                {(productType === "Mobiles" || productType === "Computers") && (
+                  <>
+                    <label className="laptops-label">Processor</label>
+                    <input
+                      type="text"
+                      name="processor"
+                      value={newProduct.processor}
+                      onChange={handleChange}
+                      className="laptops-input"
+                    />
+
+
+
+
+                    {(productType === "Computers") && (
+                      <>
+                        <label className="laptops-label">Operating System</label>
+                        <input
+                          type="text"
+                          name="os"
+                          value={newProduct.os}
+                          onChange={handleChange}
+                          className="laptops-input"
+                        />
+                      </>
+                    )}
+                    <label className="laptops-label">Other Features</label>
+                    <input
+                      type="text"
+                      name="others"
+                      value={newProduct.others}
+                      onChange={handleChange}
+                      className="laptops-input"
+                    />
+                    {(productType === "Computers" || productType === "Mobiles") && (
+                      <>
+                        <button
+                          onClick={() => handleAddProduct(newProduct, productType)}
+                          className="laptops-add-btn"
+                          style={{ marginTop: productType === "Mobiles" ? "" : "30px" }}
+                        >
+                          Add
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+
+
+
+              </div>
+            </>)}
         </div>
         <hr className="dotted-divider" />
-        <h2 className="laptops-page-title">CCTV Accessories List</h2>
+        <h2 className="laptops-page-title">Secondhand Product List</h2>
 
         {(totalProducts > 0 || inStock > 0 || outOfStock > 0 || withCoupons > 0) && (
           <>
@@ -1742,6 +1820,14 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                   Coupon
                 </label>
 
+                {/* <label className="filter-label">
+              <input
+                type="checkbox"
+                checked={showHasAccessoriesOnly}
+                onChange={() => setShowHasAccessoriesOnly(!showHasAccessoriesOnly)}
+              />
+              Frequently Bought Accessories
+            </label> */}
 
                 <div className="filter-search-wrapper">
                   <SearchIcon width={'18px'} className="search-icon-btn" />
@@ -1767,9 +1853,10 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
             </div>
           </>
         )}
+
         <div className="laptops-products-list">
           {products.length === 0 ? (
-            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some CCTV Accessories.</div>
+            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some Secondhand products.</div>
           ) : (
             (() => {
               const filteredProducts = products
@@ -1809,13 +1896,13 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                             {product.prod_img.map((img, imgIndex) => (
                               <div key={imgIndex} className="image-wrapper">
                                 <img
-                                  src={`${ApiUrl}/uploads/cctvaccessories/${img}`}
+                                  src={`${ApiUrl}/uploads/secondhandproducts/${img}`}
                                   alt={product.prod_name}
                                   className="laptops-product-image"
                                   onClick={() =>
                                     handleImageClick(
                                       imgIndex, // Index of the clicked image in this product
-                                      product.prod_img.map(img => `${ApiUrl}/uploads/cctvaccessories/${img}`) // Only current product's images
+                                      product.prod_img.map(img => `${ApiUrl}/uploads/secondhandproducts/${img}`) // Only current product's images
                                     )
                                   }
                                 />
@@ -1866,7 +1953,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                             />
                           </>
                         )}
-
                       </div>
 
                       <div>
@@ -1976,18 +2062,25 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                                       <span>₹{product.prod_price}</span>
                                     </p>
                                     <p>
-                                      <strong>Effective Price</strong>
-                                      <span>₹{product.effectiveprice}</span>
-                                    </p>
-                                    <p>
                                       <strong>Delivery charge</strong>
                                       <span>₹{product.deliverycharge}</span>
                                     </p>
-                                    <p>
 
-                                      <strong>Features</strong>
-                                      <span>{product.prod_features}</span>
-                                    </p>
+                                    {(product.productType === "Mobiles" || product.productType === "Computers") && (
+                                      <>
+                                        <p><strong>RAM</strong><span>{product.memory}</span></p>
+                                        <p><strong>ROM</strong><span>{product.storage}</span></p>
+                                        <p><strong>Camera</strong><span>{product.camera}</span></p>
+                                        <p><strong>Network</strong><span>{product.network}</span></p>
+                                        <p><strong>Display</strong><span>{product.display}</span></p>
+                                        <p><strong>Battery</strong><span>{product.battery}</span></p>
+                                        <p><strong>OS</strong><span>{product.os}</span></p>
+                                        <p><strong>Processor</strong><span>{product.processor}</span></p>
+                                        <p><strong>Other Features</strong><span>{product.others}</span></p>
+                                      </>
+                                    )}
+
+
                                     <div className="laptops-product-actions">
                                       <button
                                         onClick={() => handleEditProduct(product)}
@@ -2168,6 +2261,14 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                                       </span>
                                     </p>
 
+                                    <CouponEditPopup
+                                      isOpen={isPopupOpen}
+                                      onClose={closePopup}
+                                      productId={selectedProductId}
+                                      prodPrice={selectedProductPrice}
+                                      onCouponUpdated={handleCouponUpdated}
+                                    />
+
 
                                     <div
                                       className="frequently-buy"
@@ -2181,6 +2282,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                                         className="copy-icon"
                                       />
                                     </div>
+
                                     <div
                                       className={`${product.status === "available" ? "In-stock" : "Out-of-stock"
                                         } status-container`}
@@ -2213,14 +2315,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                         </div>
                       )}
 
-                      <CouponEditPopup
-                        isOpen={isPopupOpen}
-                        onClose={closePopup}
-                        productId={selectedProductId}
-                        prodPrice={selectedProductPrice}
-                        onCouponUpdated={handleCouponUpdated}
-                      />
-
                       {isViewingCoupons && (
                         <div className="pop-overlay">
                           <div className="pop-content">
@@ -2234,7 +2328,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                             <span className="coupon-title-with-image">
                               {product.prod_img?.[0] && (
                                 <img
-                                  src={`${ApiUrl}/uploads/cctvaccessories/${product.prod_img[0]}`}
+                                  src={`${ApiUrl}/uploads/secondhandproducts/${product.prod_img[0]}`}
                                   alt={product.prod_name}
                                   className="coupon-product-image"
                                 />
@@ -2447,14 +2541,17 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
 
         />
       )}
-      {/* Modal for editing a product */}
+
       {editingProduct && (
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={() => setModalIsOpen(false)}
           contentLabel="Edit Product"
-          className="editmodal"
-          overlayClassName="adminmodal-overlay"
+          className={
+            editingProduct?.productType === "Mobiles" || editingProduct?.productType === "Computers"
+              ? "feature-modal"
+              : "editingmodal"
+          } overlayClassName="adminmodal-overlay"
         >
           <div className="adminmodal-header">
             <h2>Edit Product</h2>
@@ -2539,24 +2636,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
               </div>
 
               <div className="feature-item">
-                <label className="feature-label">Effective Price</label>
-
-                <input
-                  type="text"
-                  name="effectiveprice"
-                  value={editingProduct.effectiveprice}
-                  onChange={(e) =>
-                    setEditingProduct({
-                      ...editingProduct,
-                      effectiveprice: e.target.value,
-                    })
-                  }
-                  placeholder="Enter product effectiveprice"
-                  className="adminmodal-input"
-                />
-              </div>
-
-              <div className="feature-item">
                 <label className="feature-label">Offer label</label>
 
                 <input
@@ -2590,70 +2669,245 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                   className="adminmodal-input"
                 />
               </div>
+              {/* <div className="product-features-container"> */}
+
+              {/* Others (Textarea) */}
+
+
+              {/* <div className="feature-item">
+                <label className="feature-label">
+                  In Stock or Out Of Stock
+                </label>
+
+                <select
+                  name="status"
+                  value={editingProduct.status}
+                  onChange={(e) =>
+                    setEditingProduct({
+                      ...editingProduct,
+                      status: e.target.value,
+                    })
+                  }
+                  className="adminmodal-input5"
+                >
+                  <option value="available">In Stock</option>
+                  <option value="unavailable">Out Of Stock</option>
+                </select>
+              </div> */}
+
+              {/* <div className="feature-item">
+
+                <label className="feature-label">Approve or Unapprove</label>
+
+                <select
+                  disabled={role === 'Staff'}
+
+                  name="productStatus"
+                  value={editingProduct.productStatus}
+                  onChange={(e) =>
+                    setEditingProduct({ ...editingProduct, productStatus: e.target.value })
+                  }
+                  className="adminmodal-input5"
+                >
+                  <option value="approved">Approve</option>
+                  <option value="unapproved">UnApprove</option>
+                </select>
+
+              </div> */}
+
+
+              {(editingProduct.productType !== "Mobiles" && editingProduct.productType !== "Computers") && (
+                <>
+                  <div className="feature-item">
+                    <label className="feature-label">Features</label>
+                    <textarea
+                      name="others"
+                      value={editingProduct.features}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          features: e.target.value,
+                        })
+                      }
+                      placeholder="Enter other features"
+                      className="feature-textarea"
+                      rows="4"
+                    />
+                  </div>
+                </>
+              )}
+
+              {(editingProduct.productType !== "Mobiles" && editingProduct.productType !== "Computers") && (
+                <>
+                  <button
+                    onClick={handleUpdateProduct}
+                    className="adminmodal-update-btn"
+                  >
+                    Update
+                  </button>
+                  <button
+                    onClick={() => setModalIsOpen(false)}
+                    className="adminmodal-cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                </>
+              )}
 
             </div>
+            {/* </div> */}
+            {(editingProduct.productType === "Mobiles" || editingProduct.productType === "Computers") && (
 
-            {/* Features Section */}
-            <div className="part2">
-              <div className="product-features-container">
+              <div className="part2">
 
-                {/* Others (Textarea) */}
                 <div className="feature-item">
-                  <label className="feature-label">Features</label>
-                  <textarea
-                    name="others"
-                    value={editingProduct.features}
+                  <label className="feature-label">RAM</label>
+                  <input
+                    type="text"
+                    name="memory"
+                    value={editingProduct.memory}
                     onChange={(e) =>
                       setEditingProduct({
                         ...editingProduct,
-                        features: e.target.value,
+                        memory: e.target.value,
                       })
                     }
-                    placeholder="Enter other features"
+                    placeholder="Enter RAM"
+                    className="adminmodal-input"
+                  />
+                </div>
+                <div className="feature-item">
+                  <label className="feature-label">ROM</label>
+                  <input
+                    type="text"
+                    name="storage"
+                    value={editingProduct.storage}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        storage: e.target.value,
+                      })
+                    }
+                    placeholder="Enter ROM"
+                    className="adminmodal-input"
+                  />
+                </div>
+                <div className="feature-item">
+                  <label className="feature-label">Display</label>
+                  <input
+                    type="text"
+                    name="display"
+                    value={editingProduct.display}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        display: e.target.value,
+                      })
+                    }
+                    placeholder="Enter Display Ratio"
+                    className="adminmodal-input"
+                  />
+                </div>
+                {(editingProduct.productType === "Mobiles") && (
+                  <>
+                    <div className="feature-item">
+                      <label className="feature-label">Battery</label>
+                      <input
+                        type="text"
+                        name="battery"
+                        value={editingProduct.battery}
+                        onChange={(e) =>
+                          setEditingProduct({
+                            ...editingProduct,
+                            battery: e.target.value,
+                          })
+                        }
+                        placeholder="Enter Battery"
+                        className="adminmodal-input"
+                      />
+                    </div>
+
+                    <div className="feature-item">
+                      <label className="feature-label">Network</label>
+                      <input
+                        type="text"
+                        name="network"
+                        value={editingProduct.network}
+                        onChange={(e) =>
+                          setEditingProduct({
+                            ...editingProduct,
+                            network: e.target.value,
+                          })
+                        }
+                        placeholder="Enter Network(4G/5G)"
+                        className="adminmodal-input"
+                      />
+                    </div>
+                    <div className="feature-item">
+                      <label className="feature-label">Camera</label>
+                      <input
+                        type="text"
+                        name="camera"
+                        value={editingProduct.camera}
+                        onChange={(e) =>
+                          setEditingProduct({
+                            ...editingProduct,
+                            camera: e.target.value,
+                          })
+                        }
+                        placeholder="Enter camera"
+                        className="adminmodal-input"
+                      />
+                    </div>
+                  </>
+                )}
+                <div className="feature-item">
+                  <label className="feature-label">OS</label>
+                  <input
+                    type="text"
+                    name="os"
+                    value={editingProduct.os}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        os: e.target.value,
+                      })
+                    }
+                    placeholder="Enter OS"
+                    className="adminmodal-input"
+                  />
+                </div>
+                <div className="feature-item">
+                  <label className="feature-label">Processor</label>
+                  <input
+                    type="text"
+                    name="processor"
+                    value={editingProduct.processor}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        processor: e.target.value,
+                      })
+                    }
+                    placeholder="Enter Processor"
+                    className="adminmodal-input"
+                  />
+                </div>
+                <div className="feature-item">
+                  <label className="feature-label">Other Features</label>
+                  <textarea
+                    name="others"
+                    value={editingProduct.others}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        others: e.target.value,
+                      })
+                    }
+                    placeholder="Enter Other Features"
                     className="feature-textarea"
                     rows="4"
                   />
-                </div>
-
-                {/* <div className="feature-item">
-                  <label className="feature-label">
-                    In Stock or Out Of Stock
-                  </label>
-
-                  <select
-                    name="status"
-                    value={editingProduct.status}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        status: e.target.value,
-                      })
-                    }
-                    className="adminmodal-input5"
-                  >
-                    <option value="available">In Stock</option>
-                    <option value="unavailable">Out Of Stock</option>
-                  </select>
-                </div> */}
-
-                <div className="feature-item">
-
-                  <label className="feature-label">Approve or Unapprove</label>
-
-                  <select
-                    disabled={role === 'Staff'}
-
-                    name="productStatus"
-                    value={editingProduct.productStatus}
-                    onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, productStatus: e.target.value })
-                    }
-                    className="adminmodal-input5"
-                  >
-                    <option value="approved">Approve</option>
-                    <option value="unapproved">UnApprove</option>
-                  </select>
-
                 </div>
 
                 <button
@@ -2669,7 +2923,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                   Cancel
                 </button>
               </div>
-            </div>
+            )}
           </div>
         </Modal>
       )}
@@ -2694,7 +2948,7 @@ const SamplePrevArrow = (props) => {
   const { className, onClick } = props;
   return (
     <div
-      className={`${className}`}
+      className={`${className} `}
 
       onClick={onClick}
     >
@@ -2704,4 +2958,4 @@ const SamplePrevArrow = (props) => {
 };
 
 
-export default CCTVAccessories;
+export default Secondhandproducts;
