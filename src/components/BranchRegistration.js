@@ -5,6 +5,7 @@ import { ApiUrl } from "./ApiUrl";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Home } from "lucide-react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 const BranchRegistration = () => {
@@ -31,6 +32,11 @@ const BranchRegistration = () => {
     const [showGSTPopup, setShowGSTPopup] = useState(true);
     const [gstNumber, setGstNumber] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const togglePassword = () => setShowPassword(!showPassword);
+    const toggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
 
     const handleChange = (e) => {
@@ -160,7 +166,7 @@ const BranchRegistration = () => {
                             <button onClick={fetchGSTDetails} disabled={loading}>
                                 {loading ? "Fetching..." : "Fetch Details"}
                             </button>
-                            <button onClick={() => setShowGSTPopup(false)}>Skip</button>
+                            {/* <button onClick={() => setShowGSTPopup(false)}>Skip</button> */}
                         </div>
                     </div>
                 </div>
@@ -194,7 +200,7 @@ const BranchRegistration = () => {
                         <div className="welcome-action">
                             <p>Already approved? You can log in below 👇</p>
                             <Link to={"/branch-login"} className="welcome-login-btn">
-                                Go to Branch Login
+                                Go to Business Login
                             </Link>
                         </div>
                     </div>
@@ -207,7 +213,7 @@ const BranchRegistration = () => {
                             <Home size={18} />Home
                         </span>
                     </Link>
-                    <h2 className="branch-title" >Branch Registration</h2>
+                    <h2 className="branch-title" >Business Registration</h2>
                     {/* <h2 className="branch-title" onClick={() => setSubmitted(true)}>Branch Registration</h2> */}
                     {/* <h2 className="branch-title" >Branch Registration</h2> */}
 
@@ -306,22 +312,28 @@ const BranchRegistration = () => {
                                 <div className="form-group">
                                     <label>Password*</label>
                                     <input
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         name="password"
                                         value={form.password}
                                         onChange={handleChange}
                                         required
                                     />
+                                    <span onClick={togglePassword} className="fa-eye-icon">
+                                        {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                    </span>
                                 </div>
                                 <div className="form-group">
                                     <label>Confirm Password*</label>
                                     <input
-                                        type="password"
+                                        type={showConfirmPassword ? "text" : "password"}
                                         name="confirm_password"
                                         value={form.confirm_password}
                                         onChange={handleChange}
                                         required
                                     />
+                                    <span onClick={toggleConfirmPassword} className="fa-eye-icon">
+                                        {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -330,7 +342,7 @@ const BranchRegistration = () => {
 
 
                         <button type="submit" className="submit-btn">
-                            Register Branch
+                            Register Business
                         </button>
 
 

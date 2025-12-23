@@ -26,6 +26,7 @@ import BranchCCTVAccessories from './pages/BranchCCTVAccessories';
 import PrinterAccessories from './pages/AddPrinterAccessories';
 import BranchPrinterAccessories from './pages/BranchPrinterAccessories';
 import Orders from './pages/Orders';
+import BranchOrders from './pages/BranchOrders';
 import Customers from './pages/Customers';
 import Reports from './pages/Reports';
 import SalesReport from './pages/SalesReport';
@@ -49,6 +50,9 @@ import Secondhandproducts from './pages/AddSecondhandproducts';
 import BranchSecondhandproducts from './pages/BranchSecondhandProducts';
 import BranchAdminProfile from './pages/BranchAdminProfile';
 import BranchManagement from './pages/BranchManagement';
+import MarginSettings from './pages/MarginSettings';
+
+
 import { ThemeProvider } from './ThemeContext';
 import NetworkStatus from '../components/NetworkStatus';
 import { ToastContainer } from "react-toastify";
@@ -166,6 +170,7 @@ function App() {
             <Route path="/Dashboard" element={<ProtectedRoute element={<Dashboard />} restrictedRoles={['Staff']} />} />
             <Route path="/BranchDashboard" element={<ProtectedRoute element={<BranchDashboard />} restrictedRoles={['Staff']} />} />
             <Route path="/Orders" element={<ProtectedRoute element={<Orders />} restrictedRoles={['Staff']} />} />
+            <Route path="/BranchOrders" element={<ProtectedRoute element={<BranchOrders />} restrictedRoles={['Staff']} />} />
             <Route path="/Customers" element={<ProtectedRoute element={<Customers />} restrictedRoles={['Staff']} />} />
             <Route path="/Reports" element={<ProtectedRoute element={<Reports />} restrictedRoles={['Staff']} />} />
             <Route path="/SalesReport" element={<ProtectedRoute element={<SalesReport />} restrictedRoles={['Staff']} />} />
@@ -184,6 +189,7 @@ function App() {
             <Route path="/CouponManager" element={<ProtectedRoute element={<CouponManager />} restrictedRoles={['Staff']} />} />
             <Route path="/StaffManagement" element={<ProtectedRoute element={<StaffManagement />} restrictedRoles={['Staff']} />} />
             <Route path="/BranchManagement" element={<ProtectedRoute element={<BranchManagement />} restrictedRoles={['Staff']} />} />
+            <Route path="/MarginSettings" element={<ProtectedRoute element={<MarginSettings />} restrictedRoles={['Staff']} />} />
             <Route path="*" element={<AdminNotFound />} />
           </Routes>
         </AdminMain>

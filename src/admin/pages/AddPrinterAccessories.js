@@ -105,16 +105,17 @@ const PrinterAccessories = () => {
           draggable: true,
         });
 
-        //  Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
-          timeout: 5000,
-          params: { branch_id, userRole },
+        // //  Refresh product list
+        // const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
+        //   timeout: 5000,
+        //   params: { branch_id, userRole },
 
-        });
-        console.log("Refreshed product list:", refreshedProducts.data);
+        // });
+        // console.log("Refreshed product list:", refreshedProducts.data);
 
-        // Update the product list in state
-        setProducts(refreshedProducts.data);
+        // // Update the product list in state
+        // setProducts(refreshedProducts.data);
+    fetchProducts();
 
 
       } else {
@@ -155,16 +156,18 @@ const PrinterAccessories = () => {
           draggable: true,
         });
 
-        // Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
-          timeout: 5000,
-          params: { branch_id, userRole },
+        // // Refresh product list
+        // const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
+        //   timeout: 5000,
+        //   params: { branch_id, userRole },
 
-        });
-        console.log("Refreshed product list:", refreshedProducts.data);
+        // });
+        // console.log("Refreshed product list:", refreshedProducts.data);
 
-        // Update the product list in state
-        setProducts(refreshedProducts.data);
+        // // Update the product list in state
+        // setProducts(refreshedProducts.data);
+            fetchProducts();
+
       } else {
         console.warn(`Failed to update product ${prodId}`);
         toast.error(" Failed to update product status", {
@@ -559,7 +562,6 @@ const PrinterAccessories = () => {
   const branchData = JSON.parse(localStorage.getItem("branch"));
   const branch_id = branchData?.id || null;
   // Fetch products when component mounts
-  useEffect(() => {
     const fetchProducts = async () => {
       try {
         const branchData = JSON.parse(localStorage.getItem("branch"));
@@ -588,6 +590,7 @@ const PrinterAccessories = () => {
         console.error("Error fetching products:", error);
       }
     };
+  useEffect(() => {
 
     fetchProducts();
   }, []);
@@ -980,12 +983,14 @@ const PrinterAccessories = () => {
         text: "The product has been added successfully!",
       });
 
-      // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
-        params: { branch_id, userRole },
+      // // Fetch updated list of products
+      // const response = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
+      //   params: { branch_id, userRole },
 
-      });
-      setProducts(response.data);
+      // });
+      // setProducts(response.data);
+          fetchProducts();
+
       setNewProduct({
         name: "",
         images: [], // Reset images
@@ -1280,15 +1285,16 @@ const PrinterAccessories = () => {
         text: "The product has been updated successfully!",
       });
 
-      // Fetch updated list of products
-      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
-        params: { branch_id, userRole },
+      // // Fetch updated list of products
+      // const fetchResponse = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
+      //   params: { branch_id, userRole },
 
-      });
-      setProducts(fetchResponse.data);
+      // });
+      // setProducts(fetchResponse.data);
 
-      // Log successful fetch
-      console.log("Updated products list:", fetchResponse.data);
+      // // Log successful fetch
+      // console.log("Updated products list:", fetchResponse.data);
+    fetchProducts();
 
       // Close the modal and reset the state
       setEditingProduct(null);
@@ -1332,15 +1338,16 @@ const PrinterAccessories = () => {
         // Log response from delete request
         console.log("Delete response:", deleteResponse.data);
 
-        // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
-          params: { branch_id, userRole },
+        // // Fetch updated list of products
+        // const response = await axios.get(`${ApiUrl}/adminfetchprinteraccessories`, {
+        //   params: { branch_id, userRole },
 
-        });
-        setProducts(response.data);
+        // });
+        // setProducts(response.data);
 
-        // Log the updated product list
-        console.log("Updated products list after deletion:", response.data);
+        // // Log the updated product list
+        // console.log("Updated products list after deletion:", response.data);
+    fetchProducts();
 
         // Show success alert
         Swal.fire({

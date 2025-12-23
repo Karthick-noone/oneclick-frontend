@@ -204,6 +204,13 @@ const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
+      const currentBranch = localStorage.getItem("current_branch") || "all";
+      const branchData = JSON.parse(localStorage.getItem("branch"));
+      const loginBranchId = branchData?.id || null;
+      const branch_id = currentBranch === "all" ? null : currentBranch;
+
+      const userRole = localStorage.getItem("userRole");
+
       const response = await axios.get(`${ApiUrl}/fetchorders`);
       const orders = response.data.reverse();
 
@@ -218,7 +225,25 @@ const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
         })
       );
 
-      setOrders(ordersWithStatus);
+      // ✅ branch filtering here (same as products)
+      let filteredOrders = ordersWithStatus;
+
+      // Admin → ALL
+      if (userRole === "Admin") {
+        filteredOrders = filteredOrders.filter(o => o.branch_id === null);
+      }
+
+      // // Admin → selected branch
+      // else if (userRole === "Admin" && branch_id) {
+      //   filteredOrders = filteredOrders.filter(o => o.branch_id == branch_id);
+      // }
+
+      // // branch_admin → only own branch
+      // else if (userRole === "branch_admin" && loginBranchId) {
+      //   filteredOrders = filteredOrders.filter(o => o.branch_id == loginBranchId);
+      // }
+
+      setOrders(filteredOrders);
     } catch (err) {
       setError("Failed to fetch orders. Please try again later.");
       console.error("Error fetching orders:", err);
@@ -247,6 +272,7 @@ const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
 
   const openModal = async (order) => {
     setSelectedOrder(order);
+    console.log("Order details", order)
     setModalIsOpen(true);
 
     try {
@@ -470,9 +496,11 @@ const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
         console.error("No products found for Order ID:", orderId);
         return []; // Return empty array if no products found
       }
+      console.log("Ordered product details", productResponse.data)
 
       // Return product details from the response
       return productResponse.data;
+
     } catch (error) {
       console.error("Error fetching product details:", error);
       return []; // Return empty array in case of error
@@ -1166,7 +1194,7 @@ const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
               <FaTimes />
             </button>
           </Modal>
-          {totalPages > 10 && (
+          {orders.length > 10 && (
             <div className="pagination-controls">
               <button
                 onClick={handlePrevPage}

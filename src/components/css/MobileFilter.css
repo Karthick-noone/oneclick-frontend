@@ -15,29 +15,6 @@
 }
 
 
-/* Custom Scrollbar */
-.mobile-filter::-webkit-scrollbar {
-    width: 5px; /* Set the width of the scrollbar */
-}
-
-.mobile-filter::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Set the track color */
-    border-radius: 10px; /* Rounded corners for the track */
-}
-
-.mobile-filter::-webkit-scrollbar-thumb {
-    background: #888; /* Set the color of the scrollbar thumb */
-    border-radius: 10px; /* Rounded corners for the thumb */
-    transition: background-color 0.3s; /* Smooth transition */
-}
-
-.mobile-filter::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Darker color on hover */
-}
-
-.mobile-filter::-webkit-scrollbar-button {
-    background: #ccc; /* Button color on the scrollbar */
-}
 
 .mobile-filter h2 {
   font-size: 18px;

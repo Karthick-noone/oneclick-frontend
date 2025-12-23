@@ -105,18 +105,17 @@ const CCTVAccessories = () => {
           draggable: true,
         });
 
-        //  Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
-          timeout: 5000,
-          params: { branch_id, userRole },
+        // //  Refresh product list
+        // const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        //   timeout: 5000,
+        //   params: { branch_id, userRole },
 
+        // });
+        // console.log("Refreshed product list:", refreshedProducts.data);
 
-
-        });
-        console.log("Refreshed product list:", refreshedProducts.data);
-
-        // Update the product list in state
-        setProducts(refreshedProducts.data);
+        // // Update the product list in state
+        // setProducts(refreshedProducts.data);
+    fetchProducts();
 
 
       } else {
@@ -157,16 +156,18 @@ const CCTVAccessories = () => {
           draggable: true,
         });
 
-        // Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
-          timeout: 5000,
-          params: { branch_id, userRole },
+        // // Refresh product list
+        // const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        //   timeout: 5000,
+        //   params: { branch_id, userRole },
 
-        });
-        console.log("Refreshed product list:", refreshedProducts.data);
+        // });
+        // console.log("Refreshed product list:", refreshedProducts.data);
 
-        // Update the product list in state
-        setProducts(refreshedProducts.data);
+        // // Update the product list in state
+        // setProducts(refreshedProducts.data);
+            fetchProducts();
+
       } else {
         console.warn(`Failed to update product ${prodId}`);
         toast.error(" Failed to update product status", {
@@ -556,11 +557,11 @@ const CCTVAccessories = () => {
       navigate("/AdminLogin");
     }
   }, [navigate]);
+
   // Fetch products when component mounts
   const branchData = JSON.parse(localStorage.getItem("branch"));
   const branch_id = branchData?.id || null;
   // Fetch products when component mounts
-  useEffect(() => {
     const fetchProducts = async () => {
       try {
         const branchData = JSON.parse(localStorage.getItem("branch"));
@@ -589,6 +590,7 @@ const CCTVAccessories = () => {
         console.error("Error fetching products:", error);
       }
     };
+  useEffect(() => {
 
     fetchProducts();
   }, []);
@@ -933,18 +935,18 @@ const CCTVAccessories = () => {
     //     return;
     //   }
     // }
-  
 
     // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
-const branchData = JSON.parse(localStorage.getItem("branch"));
+
+    const branchData = JSON.parse(localStorage.getItem("branch"));
     const branch_id = userRole === "Admin" ? null : (branchData?.id ?? null);
+
     // Set product status based on user role
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
-        if (branch_id !== null) formData.append("branch_id", branch_id);
-
+    if (branch_id !== null) formData.append("branch_id", branch_id);
 
     formData.append("name", newProduct.name);
     formData.append("features", newProduct.features);
@@ -980,14 +982,15 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
         title: "Product Added",
         text: "The product has been added successfully!",
       });
-      console.log("Form data", formData)
 
-      // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
-        params: { branch_id, userRole },
+      // // Fetch updated list of products
+      // const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+      //   params: { branch_id, userRole },
 
-      });
-      setProducts(response.data);
+      // });
+      // setProducts(response.data);
+          fetchProducts();
+
       setNewProduct({
         name: "",
         images: [], // Reset images
@@ -1282,15 +1285,16 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
         text: "The product has been updated successfully!",
       });
 
-      // Fetch updated list of products
-      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
-        params: { branch_id, userRole },
+      // // Fetch updated list of products
+      // const fetchResponse = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+      //   params: { branch_id, userRole },
 
-      });
-      setProducts(fetchResponse.data);
+      // });
+      // setProducts(fetchResponse.data);
 
-      // Log successful fetch
-      console.log("Updated products list:", fetchResponse.data);
+      // // Log successful fetch
+      // console.log("Updated products list:", fetchResponse.data);
+    fetchProducts();
 
       // Close the modal and reset the state
       setEditingProduct(null);
@@ -1334,15 +1338,16 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
         // Log response from delete request
         console.log("Delete response:", deleteResponse.data);
 
-        // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
-          params: { branch_id, userRole },
+        // // Fetch updated list of products
+        // const response = await axios.get(`${ApiUrl}/adminfetchcctvaccessories`, {
+        //   params: { branch_id, userRole },
 
-        });
-        setProducts(response.data);
+        // });
+        // setProducts(response.data);
 
-        // Log the updated product list
-        console.log("Updated products list after deletion:", response.data);
+        // // Log the updated product list
+        // console.log("Updated products list after deletion:", response.data);
+    fetchProducts();
 
         // Show success alert
         Swal.fire({
@@ -1769,7 +1774,7 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
         )}
         <div className="laptops-products-list">
           {products.length === 0 ? (
-            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some CCTV Accessories.</div>
+            <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some cctv Accessories.</div>
           ) : (
             (() => {
               const filteredProducts = products
@@ -2168,6 +2173,14 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                                       </span>
                                     </p>
 
+                                    <CouponEditPopup
+                                      isOpen={isPopupOpen}
+                                      onClose={closePopup}
+                                      productId={selectedProductId}
+                                      prodPrice={selectedProductPrice}
+                                      onCouponUpdated={handleCouponUpdated}
+                                    />
+
 
                                     <div
                                       className="frequently-buy"
@@ -2212,14 +2225,6 @@ const branchData = JSON.parse(localStorage.getItem("branch"));
                           </div>
                         </div>
                       )}
-
-                      <CouponEditPopup
-                        isOpen={isPopupOpen}
-                        onClose={closePopup}
-                        productId={selectedProductId}
-                        prodPrice={selectedProductPrice}
-                        onCouponUpdated={handleCouponUpdated}
-                      />
 
                       {isViewingCoupons && (
                         <div className="pop-overlay">

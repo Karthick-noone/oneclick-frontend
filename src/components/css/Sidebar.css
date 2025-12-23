@@ -17,17 +17,17 @@
     position: sticky; /* Makes sidebar stick while scrolling */
     top: 0; /* Stick to the top */
     left: 0;
-    width: 250px;
-    height: 100vh; /* Full height */
+    width: 212px;
+    /* height: 100vh;  */
     background-color: #f8f8f8;
     border-right: 1px solid #ddd;
-    padding: 20px;
+    padding: 10px;
     overflow-y: auto; /* Enable scrolling if content is long */
 }
 
 /* Custom Scrollbar */
 .sidebar::-webkit-scrollbar {
-    width: 5px; /* Set the width of the scrollbar */
+    width: 4px; /* Set the width of the scrollbar */
 }
 
 .sidebar::-webkit-scrollbar-track {
@@ -36,17 +36,17 @@
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-    background: #888; /* Set the color of the scrollbar thumb */
+    background: #f0f0f0; /* Set the color of the scrollbar thumb */
     border-radius: 10px; /* Rounded corners for the thumb */
     transition: background-color 0.3s; /* Smooth transition */
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Darker color on hover */
+    background: #e4e4e4; /* Darker color on hover */
 }
 
 .sidebar::-webkit-scrollbar-button {
-    background: #ccc; /* Button color on the scrollbar */
+    background: #e2e2e2; /* Button color on the scrollbar */
 }
 
 .sidebar.open {

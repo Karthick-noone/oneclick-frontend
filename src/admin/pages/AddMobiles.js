@@ -122,16 +122,17 @@ const Mobiles = () => {
           draggable: true,
         });
 
-        //  Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
-          timeout: 5000,
-          params: { branch_id, userRole },
+        // //  Refresh product list
+        // const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
+        //   timeout: 5000,
+        //   params: { branch_id, userRole },
 
-        });
-        console.log("Refreshed product list:", refreshedProducts.data);
+        // });
+        // console.log("Refreshed product list:", refreshedProducts.data);
+        fetchProducts();
 
         // Update the product list in state
-        setProducts(refreshedProducts.data);
+        // setProducts(refreshedProducts.data);
 
 
       } else {
@@ -172,16 +173,18 @@ const Mobiles = () => {
           draggable: true,
         });
 
-        // Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
-          timeout: 5000,
-          params: { branch_id, userRole },
+        // // Refresh product list
+        // const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
+        //   timeout: 5000,
+        //   params: { branch_id, userRole },
 
-        });
-        console.log("Refreshed product list:", refreshedProducts.data);
+        // });
+        // console.log("Refreshed product list:", refreshedProducts.data);
 
         // Update the product list in state
-        setProducts(refreshedProducts.data);
+        // setProducts(refreshedProducts.data);
+        fetchProducts();
+
       } else {
         console.warn(`Failed to update product ${prodId}`);
         toast.error(" Failed to update product status", {
@@ -628,35 +631,35 @@ const Mobiles = () => {
   const branchData = JSON.parse(localStorage.getItem("branch"));
   const branch_id = branchData?.id || null;
   // Fetch products when component mounts
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const branchData = JSON.parse(localStorage.getItem("branch"));
-        const branch_id = branchData?.id || null;
-        const userRole = localStorage.getItem("userRole");
-        const response = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
-          params: { branch_id, userRole },
-        });
-        let filteredProducts = response.data;
+  const fetchProducts = async () => {
+    try {
+      const branchData = JSON.parse(localStorage.getItem("branch"));
+      const branch_id = branchData?.id || null;
+      const userRole = localStorage.getItem("userRole");
+      const response = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
+        params: { branch_id, userRole },
+      });
+      let filteredProducts = response.data;
 
-        // Admin → only branchless products
-        if (userRole === "Admin") {
-          filteredProducts = filteredProducts.filter(item => item.branch_id === null);
-          console.log("🟢 Admin Filter Applied → branchless products only");
-        }
-
-        // branch admin → only own branch products
-        else if (userRole === "branch_admin" && branch_id) {
-          filteredProducts = filteredProducts.filter(item => item.branch_id == branch_id);
-          console.log("🟢 Branch Admin Filter Applied → branch_id =", branch_id);
-        }
-
-        setProducts(filteredProducts);
-        console.log("📌 Final filtered products:", filteredProducts);
-      } catch (error) {
-        console.error("Error fetching products:", error);
+      // Admin → only branchless products
+      if (userRole === "Admin") {
+        filteredProducts = filteredProducts.filter(item => item.branch_id === null);
+        console.log("🟢 Admin Filter Applied → branchless products only");
       }
-    };
+
+      // branch admin → only own branch products
+      else if (userRole === "branch_admin" && branch_id) {
+        filteredProducts = filteredProducts.filter(item => item.branch_id == branch_id);
+        console.log("🟢 Branch Admin Filter Applied → branch_id =", branch_id);
+      }
+
+      setProducts(filteredProducts);
+      console.log("📌 Final filtered products:", filteredProducts);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+  useEffect(() => {
 
     fetchProducts();
   }, []);
@@ -1008,7 +1011,7 @@ const Mobiles = () => {
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
-        if (branch_id !== null) formData.append("branch_id", branch_id);
+    if (branch_id !== null) formData.append("branch_id", branch_id);
 
 
     formData.append("name", newProduct.name);
@@ -1054,12 +1057,14 @@ const Mobiles = () => {
         text: "The product has been added successfully!",
       });
 
-      // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
-        params: { branch_id, userRole },
+      // // Fetch updated list of products
+      // const response = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
+      //   params: { branch_id, userRole },
 
-      });
-      setProducts(response.data);
+      // });
+      // setProducts(response.data);
+      fetchProducts();
+
       setNewProduct({
         name: "",
         images: [], // Reset images
@@ -1316,12 +1321,13 @@ const Mobiles = () => {
             text: "The product has been updated successfully!",
           });
 
-          // Fetch the updated list of products from the backend
-          const fetchResponse = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
-            params: { branch_id, userRole },
+          // // Fetch the updated list of products from the backend
+          // const fetchResponse = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
+          //   params: { branch_id, userRole },
 
-          });
-          setProducts(fetchResponse.data);
+          // });
+          // setProducts(fetchResponse.data);
+          fetchProducts();
 
           // Reset the editing state and close the modal
           setEditingProduct(null);
@@ -1389,15 +1395,16 @@ const Mobiles = () => {
         // Log response from delete request
         console.log("Delete response:", deleteResponse.data);
 
-        // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
-          params: { branch_id, userRole },
+        // // Fetch updated list of products
+        // const response = await axios.get(`${ApiUrl}/adminfetchmobiles`, {
+        //   params: { branch_id, userRole },
 
-        });
-        setProducts(response.data);
+        // });
+        // setProducts(response.data);
+        fetchProducts();
 
         // Log the updated product list
-        console.log("Updated products list after deletion:", response.data);
+        // console.log("Updated products list after deletion:", response.data);
 
         // Show success alert
         Swal.fire({

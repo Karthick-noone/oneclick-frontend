@@ -84,7 +84,9 @@ const Slidebar = () => {
       icon: Handshake,
       items: [
         { path: "/Admin/BranchManagement", label: "List Of Branches" },
-        { path: "/Admin/BranchDashboard", label: "All Branch Products" }
+        { path: "/Admin/BranchDashboard", label: "All Branch Products" },
+        { path: "/Admin/BranchOrders", label: "All Branch Orders" },
+        { path: "/Admin/MarginSettings", label: "Set Margin" }
       ]
     }
   };
@@ -217,7 +219,7 @@ const Slidebar = () => {
             {isOpen ? <PanelLeft size={16} /> : ""}
           </button>
           {isOpen ? (
-            <img src={logo2} alt="Logo" width={"175px"} />
+            <img src={logo2} alt="Logo" width={"155px"} />
           ) : (
             <img src={logoImage} alt="Logo" className="logo-img" />
           )}
@@ -240,7 +242,10 @@ const Slidebar = () => {
           {/* Orders */}
           {userRole !== "Staff" && (
             <li>
-              <Link to="/Admin/orders" className={isActive("/Admin/orders")}>
+              <Link
+                to={userRole === "Admin" ? "/Admin/orders" : "/Admin/BranchOrders"}
+                className={isActive(userRole === "Admin" ? "/Admin/orders" : "/Admin/BranchOrders")}
+              >
                 <ListCheck size={18} className="menu-icon" />
                 {isOpen && "Orders"}
               </Link>

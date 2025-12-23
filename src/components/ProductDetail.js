@@ -252,6 +252,8 @@ const ProductDetail = () => {
         const productData = response.data;
         setProduct(productData);
 
+        console.log("Product Data:", productData);
+
         // Set the initial selected image
         const prodImages = Array.isArray(productData.prod_img)
           ? productData.prod_img
@@ -868,7 +870,7 @@ const ProductDetail = () => {
       left: `${clampedX}px`,
       width: `${lensWidth}px`,
       height: `${lensHeight}px`,
-      backgroundImage: "radial-gradient(lightblue .3px, transparent .3px)", // Visible dots
+      backgroundImage: "radial-gradient(#57bcff .3px, transparent .3px)", // Visible dots
       backgroundSize: "3px 3px", // Tight spacing
       pointerEvents: "none",
       zIndex: 11,
@@ -881,7 +883,7 @@ const ProductDetail = () => {
 
     setZoomStyle({
       backgroundImage: `url(${ApiUrl}/uploads/${product.category.toLowerCase()}/${images[selectedImage]})`,
-      backgroundSize: "250%", // Higher zoom ratio for more detail
+      backgroundSize: "240%", // Higher zoom ratio for more detail
       backgroundPosition: `${percentX}% ${percentY}%`,
       position: "absolute",
       top: 0,
@@ -1242,11 +1244,16 @@ const ProductDetail = () => {
                   </div>
                 </div>
               </div>
+              <div style={{ position: 'relative' }}>
+                {showZoom && <div className="zoom-box" style={zoomStyle}></div>}
 
+              </div>
               <div className="side-row">
-                <div className="product-main-row">
+
+                <div className="product-main-row" >
+
                   {/* Zoom Preview Box */}
-                  {showZoom && <div className="zoom-box" style={zoomStyle}></div>}
+
                   {/* Product details */}
                   <div className="product-detail-info">
                     {/* Breadcrumb Navigation */}
@@ -1291,7 +1298,7 @@ const ProductDetail = () => {
                       )}
                     </span>
 
-                    {/* <span>{product.productType}</span> */}
+                    {/* <span>{product.branch_id}ghkghkghkhg</span> */}
 
                     {/* Coupon Section */}
                     {couponCode && couponCode.trim() && (
@@ -1341,6 +1348,8 @@ const ProductDetail = () => {
                           </div>
                         ) : (
                           <span>
+                            {/* <>{product.prod_id}jkljh</> */}
+
                             <span className="product-detail-price">
                               ₹
                               {product.offer_price > 0 &&
@@ -1485,6 +1494,8 @@ const ProductDetail = () => {
                                 </span>
                               )}
                             </div>
+
+
                           </div>
                         </div>
                       </div>

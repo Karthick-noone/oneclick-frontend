@@ -135,6 +135,9 @@ const Topbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("branch");
+    localStorage.removeItem("current_branch");
+    localStorage.removeItem("userRole");
     navigate("/");
   };
 

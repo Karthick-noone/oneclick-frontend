@@ -28,24 +28,26 @@
   top: 10px;
   right: 10px;
 }
-
 .wishlist-sidebar-header {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #818181;
+  padding: 20px 0 15px 0;
+  border-bottom: 1px solid #e0e0e0;
   font-size: 24px;
   font-weight: bold;
   color: #333;
-  margin-top: 17px;
+  background: white;
+  /* position: relative; */
+  /* margin-top: 17px; */
 }
 
 .wishlist-sidebar-body {
+  flex: 1; /* Take remaining space */
   display: flex;
   flex-direction: column;
-  padding: 10px 12px;
-
+  /* padding: 0 12px; */
+  overflow: hidden; /* Contain the scrolling */
 }
 
 .wishlist-sidebar-body p {
@@ -64,12 +66,15 @@
     justify-content: center;
     align-items: center; /* Center vertically if needed */
 }
+/* Wishlist items container with independent scroll */
 .wishlist-sidebar-body ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow-y: auto; /* Only the list scrolls */
+  max-height: calc(100vh - 100px); /* Adjust based on header height */
+  padding-right: 5px; /* Space for scrollbar */
 }
-
 .wishlist-sidebar-body li {
   display: flex;
   align-items: center;
@@ -104,6 +109,25 @@
 }
 
 
+
+/* Custom scrollbar for the list */
+.wishlist-sidebar-body ul::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wishlist-sidebar-body ul::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.wishlist-sidebar-body ul::-webkit-scrollbar-thumb {
+  background: #e4e4e4;
+  border-radius: 10px;
+}
+
+.wishlist-sidebar-body ul::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
 
 
 .add-to-cart-btn, .remove-btn {

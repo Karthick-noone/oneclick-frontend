@@ -28,9 +28,8 @@ const Sidebar = () => {
     }, [location]);  // Re-run when the location changes
 
     return (
-        <div>
-            {/* Sidebar */}
-            <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+        <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+            <aside >
                 <div className="sidebar-content">
                     <div style={{ display: isOpen ? 'block' : 'none' }} className="close-button" onClick={toggleSidebar}>
                         <FaTimes />

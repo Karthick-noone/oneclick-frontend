@@ -1,0 +1,339 @@
+/* MarginSettings.css - Professional Light Theme */
+
+.margin-wrapper {
+  max-width: 1200px;
+  margin: 60px 0 0 270px;
+  padding: 32px 24px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+/* Header Section */
+.margin-title {
+  color: #1a202c;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.025em;
+}
+
+.margin-subtitle {
+  color: #718096;
+  font-size: 1rem;
+  margin-bottom: 32px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Professional Cards */
+.enhanced-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: box-shadow 0.2s ease;
+}
+
+.enhanced-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Input Grid */
+.margin-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
+.margin-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.margin-group label {
+  color: #2d3748;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+}
+
+.margin-group input {
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  color: #1a202c;
+  font-family: inherit;
+}
+
+.margin-group input:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.margin-group input::placeholder {
+  color: #a0aec0;
+}
+
+/* Professional Buttons */
+.enhanced-save {
+  background: #3182ce;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: fit-content;
+  font-family: inherit;
+  letter-spacing: 0.025em;
+}
+
+.enhanced-save:hover:not(:disabled) {
+  background: #2c5aa0;
+  transform: translateY(-1px);
+}
+
+.enhanced-save:active {
+  transform: translateY(0);
+}
+
+.enhanced-save:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button-delete {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.button-delete:hover {
+  background: #c53030;
+}
+
+/* Error States */
+.error-box {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: 1px solid #feb2b2;
+}
+
+/* Professional Table */
+.enhanced-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-size: 0.9rem;
+}
+
+.enhanced-table thead {
+  background: #f7fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.enhanced-table th {
+  color: #4a5568;
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.enhanced-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.15s ease;
+}
+
+.enhanced-table tbody tr:hover {
+  background: #f7fafc;
+}
+
+.enhanced-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.enhanced-table td {
+  padding: 16px 12px;
+  color: #2d3748;
+  font-weight: 400;
+}
+
+.enhanced-table td:first-child {
+  font-weight: 600;
+  color: #3182ce;
+}
+
+/* Empty State */
+.empty-text {
+  text-align: center;
+  color: #718096;
+  font-style: italic;
+  padding: 48px 24px;
+  font-size: 1rem;
+}
+
+/* Confirmation Modal */
+.confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 32, 44, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.confirm-box {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 90%;
+  border: 1px solid #e2e8f0;
+}
+
+.confirm-box h3 {
+  color: #1a202c;
+  margin-bottom: 12px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.confirm-box p {
+  color: #718096;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.button-cancel {
+  background: #ffffff;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.button-cancel:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+.button-confirm {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.button-confirm:hover {
+  background: #c53030;
+}
+
+/* Loading State */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .margin-wrapper {
+    padding: 24px 16px;
+  }
+  
+  .margin-title {
+    font-size: 1.75rem;
+  }
+  
+  .margin-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .enhanced-card {
+    padding: 24px;
+  }
+  
+  .confirm-actions {
+    flex-direction: column;
+  }
+  
+  .button-cancel,
+  .button-confirm {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .enhanced-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .margin-title {
+    font-size: 1.5rem;
+  }
+  
+  .enhanced-card {
+    padding: 20px;
+  }
+}

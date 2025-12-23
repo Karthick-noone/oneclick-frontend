@@ -1,6 +1,16 @@
 .logo-link:focus {
   outline: none;
 }
+
+.oneclick-logo {
+  /* height: auto; */
+  margin-left: 50px;
+  margin-top: 3px;
+  width: 150px;
+  display: flex;
+  align-items: center;
+}
+
 .login-tooltip {
   position: absolute;
   top: 50px;
@@ -14,7 +24,8 @@
   z-index: 1000;
   white-space: nowrap;
 
-  animation: shake-with-pause 4s ease-in-out infinite; /* 4s total: fast shake + long pause */
+  animation: shake-with-pause 4s ease-in-out infinite;
+  /* 4s total: fast shake + long pause */
 }
 
 .login-tooltip::after {
@@ -28,13 +39,38 @@
 }
 
 @keyframes shake-with-pause {
-  0%, 100% { transform: translateX(0); } /* Rest */
-  4%, 8%, 12% { transform: translateX(-5px); } /* Quick Shake Left */
-  6%, 10%, 14% { transform: translateX(5px); }  /* Quick Shake Right */
-  15%, 100% { transform: translateX(0); } /* Long Pause */
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  /* Rest */
+  4%,
+  8%,
+  12% {
+    transform: translateX(-5px);
+  }
+
+  /* Quick Shake Left */
+  6%,
+  10%,
+  14% {
+    transform: translateX(5px);
+  }
+
+  /* Quick Shake Right */
+  15%,
+  100% {
+    transform: translateX(0);
+  }
+
+  /* Long Pause */
 }
+
 .userLogo {
-  position: relative; /* Needed for tooltip positioning */
+  position: relative;
+  /* Needed for tooltip positioning */
 }
 
 
@@ -195,7 +231,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 25px;
+  padding: 2px 25px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -206,43 +242,33 @@
   color: #333;
 }
 
-.header2 .search-box {
-  position: relative;
-  flex-grow: 1;
-  /* margin: 0 15px; */
-  margin-left: 18px;
+
+
+.price-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 5px 20px;
+  color: white;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.total-prices {
-  /* font-size: 16px ; */
-  font-weight: bold;
-  color: #27ae60;
-  /* text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2); */
-  border-radius: 5px;
-  padding: 12px 15px;
-  background: #f8f8f8;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5), -2px -2px 5px rgba(255, 255, 255, 0.9);
-}
-
-.header2 .search-box input {
-  width: 100%;
-  padding: 8px 40px 8px 15px;
-  border: 1px solid #e7e7e7;
-  border-radius: 20px;
+.total-price-label {
   font-size: 14px;
-  /* Reduced font size */
+  opacity: 0.9;
+  /* margin-bottom: 8px; */
+  display: block;
+  font-weight: 500;
 }
 
-.header2 .search-box button {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #333;
-  cursor: pointer;
+.total-price {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
+
 
 .header2 .iconss {
   display: flex;
@@ -287,7 +313,7 @@
 .cart-item-count {
   position: absolute;
   top: -5px;
-  right:0;
+  right: 0;
   background-color: red;
   border: 1px solid white;
   color: white;
@@ -357,6 +383,7 @@
   /* Initially flipped */
   transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
   cursor: pointer;
+  zoom: .9;
 }
 
 .icons2:hover {
@@ -405,6 +432,7 @@
   border: 1px solid rgba(230, 230, 230, 0.396);
   border-radius: 20px;
   padding: 4px 10px;
+  zoom: .9;
 }
 
 
@@ -436,7 +464,7 @@
 
 /* Dropdown content styling */
 .dropdown-menu {
-  min-width: 170px;
+  min-width: 190px;
   padding: 10px 0;
 }
 
@@ -491,9 +519,9 @@
 @media (max-width: 768px) {
   .header2 {
     flex-direction: column;
-    gap: 13px;
+    gap: 10px;
     text-align: center;
-    z-index: 999;
+    z-index: 996;
   }
 
   .userLogo {
@@ -759,6 +787,7 @@
 /* Header2.css */
 .cart-icon-container {
   position: relative;
+  zoom: .9;
 }
 
 /* .cart-count {
@@ -888,201 +917,6 @@
   border-top: 2px solid #333;
 }
 
-/* Container for the search box */
-/* Container for the search box */
-.search-box {
-  position: fixed;
-  /* Ensure dropdown is positioned relative to this container */
-  display: flex;
-  /* Align input and button horizontally */
-  align-items: center;
-  /* Center vertically */
-  max-width: 710px;
-  /* Maximum width for the search box */
-  margin: 0 auto;
-  /* Center the search box in its container */
-  /* border-radius: 5px; */
-  /* Rounded corners for the rectangular shape */
-  overflow: hidden;
-  /* Hide overflow for rounded corners */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  /* Add shadow for depth */
-  background-color: #fff;
-  /* Background color of the search box */
-}
-
-/* Styling for the input field */
-.search-box input[type="text"] {
-  border: none;
-  /* Remove default border */
-  padding: 10px;
-  /* Add padding for spacing */
-  font-size: 1rem;
-  /* Font size */
-  flex: 1;
-  /* Allow input to take up available space */
-  outline: none;
-  /* Remove outline on focus */
-}
-
-/* Container for the search icon */
-.search-box .search-icon-container {
-  display: flex;
-  /* Align items horizontally */
-  align-items: center;
-  /* Center icon vertically */
-  justify-content: center;
-  /* Center icon horizontally */
-  background-color: #031b3440;
-  /* Light orange background for the box */
-  padding: 11px;
-  /* Padding inside the box */
-  cursor: pointer;
-  /* Pointer cursor on hover */
-  /* margin-left: 8px; */
-  /* Space between the input and the icon box */
-}
-
-/* Styling for the search icon */
-.search-box .search-icon {
-  font-size: 1.2rem;
-  /* Adjust size as needed */
-  color: #333;
-  /* Icon color */
-}
-
-.suggestions-dropdown {
-  position: absolute;
-  top: 79.5%;
-  /* Push dropdown below the search box */
-  left: 50.15%;
-  transform: translateX(-50%);
-  /* Center it below the search bar */
-  width: 100%;
-  /* Default: Full width of search box */
-  max-width: 710px;
-  /* Limit width for large screens */
-  background: #fff;
-  /* White background */
-  border: 1px solid #ddd;
-  /* border-radius: 8px; */
-  /* Slightly rounded corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  list-style: none;
-  padding: 2px 0;
-  margin: 0;
-  max-height: 280px;
-  overflow-y: auto;
-  z-index: 1003;
-  transition: all 0.2s ease-in-out;
-}
-
-.suggestions-dropdown li.highlighted {
-  background-color: #031b3440;
-  cursor: pointer;
-  align-items: center;
-}
-.suggestion-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Push text and image apart */
-  gap: 10px;
-  padding: 2px;
-}
-
-.suggestion-content {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex: 1; /* Allows text to take all available space */
-}
-
-.search-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  color: #555;
-}
-
-.suggestion-text {
-  font-size: 16px;
-  color: #333;
-  text-align: justify;
-}
-
-.suggestion-image {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-  border-radius: 6px;
-  flex-shrink: 0;
-}
-
-
-/* Hide dropdown on small screens until search is active */
-@media (max-width: 768px) {
-  .suggestion-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Push text and image apart */
-  gap: 8px;
-  padding: 1px;
-}
-
-.suggestion-content {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex: 1; /* Allows text to take all available space */
-}
-
-.search-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  color: #555;
-}
-
-.suggestion-text {
-  font-size: 14px;
-  color: #333;
-  text-align: justify;
-}
-
-.suggestion-image {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-  border-radius: 6px;
-  flex-shrink: 0;
-}
-
-  .suggestions-dropdown {
-    width: 98%;
-    max-width: 500px;
-    border-radius: 6px;
-    left: 50%;
-    top: 134%;
-    max-height: 250px;
-  }
-
-  /* 1) BACKDROP styles (full‐screen semi-transparent overlay) */
-
-}
-
-/* Hover & Click Effect */
-.suggestions-dropdown li {
-  padding: 10px 15px;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
-  font-size: 16px;
-  color: #333;
-}
-
-.suggestions-dropdown li:hover {
-  background: #f5f5f5;
-}
-
 /* Hide mobile search icon on desktop */
 .mobile-search-icon {
   display: none;
@@ -1093,107 +927,8 @@
 }
 
 
-/* Hide the normal search‐box on mobile */
-@media (max-width: 768px) {
-  .search-box {
-    display: none;
-  }
-
-  .mobile-backdrop {
-    position: fixed;
-    top: 10px;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    /* background: rgba(0, 0, 0, 0.9); */
-    z-index: 1000;
-    /* sits above page content but below the search‐box & dropdown */
-  }
-
-  /* Show only the little search‐icon on mobile nav/header */
-  .mobile-search-icon {
-    display: block;
-    /* you already have this in your code */
-    font-size: 0.5rem;
-    cursor: pointer;
-    color: #333;
-    position: relative;
-    z-index: 999;
-    margin-left: 10px;
-    /* adjust to fit your header layout */
-  }
 
 
-
-
-  /*─────────────────────────────────────────
-    3) “×” close icon on the top‐right of that overlay
-  ─────────────────────────────────────────*/
-
-  .mobile-close-icon {
-    display: block;
-    position: absolute;
-    top: 10px;
-    /* push it upward so it sits at the very top of the overlay box */
-    right: 10px;
-    /* push it right outside the overlay’s rounded corner */
-    font-size: 1.4rem;
-    background: #fff;
-    border-radius: 50%;
-    padding: 2px;
-    color: #333;
-    cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    z-index: 1300;
-    /* above the overlay */
-  }
-}
-
-@media (max-width: 768px) {
-  .search-box.mobile-overlay {
-    position: fixed;
-    top: 121px;
-    left: 50%;
-    transform: translateX(-50%) scale(0.5);
-    transform-origin: 90% 0%;
-    /* Adjust this based on icon's position */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    width: 98%;
-    max-width: 500px;
-    padding: 0;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    align-items: center;
-    z-index: 1000;
-    height: 40px;
-    display: flex !important;
-  }
-
-  .search-box.mobile-overlay.show {
-    transform: translateX(-50%) scale(1);
-    opacity: 1;
-    visibility: visible;
-  }
-
-  /* .clear-icon {
-    margin-right: 70px;
-  } */
-
-  .search-box.mobile-overlay input {
-    flex: 1;
-    font-size: 14px;
-    padding: 8px 10px 8px 70px;
-  }
-
-  .search-box.mobile-overlay .search-icon-container {
-    position: absolute;
-    left: 0px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-}
 
 /* Keep your existing styles for search-box input, icons, etc. */
 
@@ -1259,19 +994,10 @@
 
 }
 
-.search-icon {
+/* .search-icon {
   margin-right: 5px;
-}
+} */
 
-.search-icon:hover {
-  transform: scale(1.2);
-}
-
-/* Button hover effect */
-.search-box button:hover {
-  background-color: #0056b3;
-  /* Darker background on hover */
-}
 
 /* Optional: Add responsive design for smaller screens */
 @media (max-width: 768px) {
@@ -1337,17 +1063,16 @@
   border-radius: 10px;
   /* Rounded corners for the track */
 }
+
 /* Skeleton shimmer effect */
 .skeleton-cart-item .skeleton-product-image,
 .skeleton-cart-item .skeleton-text,
 .skeleton-cart-item .skeleton-quantity,
 .skeleton-cart-item .skeleton-remove-btn {
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 25%,
-    #e0e0e0 37%,
-    #f0f0f0 63%
-  );
+  background: linear-gradient(90deg,
+      #f0f0f0 25%,
+      #e0e0e0 37%,
+      #f0f0f0 63%);
   background-size: 400% 100%;
   animation: skeleton-loading 1.2s ease-in-out infinite;
   border-radius: 4px;
@@ -1357,6 +1082,7 @@
   0% {
     background-position: 100% 0;
   }
+
   100% {
     background-position: -100% 0;
   }
@@ -1389,4 +1115,232 @@
 .skeleton-remove-btn {
   width: 80px;
   height: 20px;
+}
+
+
+/* ---------- SEARCH BOX ---------- */
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 600px;
+  background: #fff;
+  padding: 7px 14px;
+  border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+  transition: all 0.25s ease;
+  z-index: 50;
+  /* font-family: 'Poppins', 'Inter', sans-serif; */
+
+}
+
+.search-box:focus-within {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  /* transform: translateY(-2px); */
+}
+
+.searchboxinput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+  background: transparent;
+  /* font-family: 'Poppins', 'Inter', sans-serif; */
+  font-family: calibri
+
+}
+
+.search-icon-container {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.clear-icon {
+  cursor: pointer;
+  font-size: 18px;
+  color: #777;
+  transition: 0.2s;
+}
+
+.clear-icon:hover {
+  color: #222;
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  width: 100%;
+  max-width: 600px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  list-style: none;
+  padding: 6px 0;
+  margin: 0;
+  z-index: 1002;
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #b5b5b5 transparent;
+}
+
+/* webkit scrollbar */
+.suggestions-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-thumb {
+  background: #b5b5b5;
+  border-radius: 10px;
+}
+
+/* WebKit scrollbar */
+.suggestions-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-thumb {
+  background: #b3b3b3;
+  border-radius: 10px;
+}
+
+/* suggestion items */
+.suggestions-dropdown li {
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.15s ease;
+}
+
+.suggestions-dropdown li:hover,
+.suggestions-dropdown .highlighted {
+  background: #f0f4ff;
+}
+
+/* arrow indicator when highlighted */
+.suggestions-dropdown .highlighted::after {
+  /* content: "➜"; */
+  font-size: 14px;
+  color: #444;
+  margin-left: 10px;
+}
+
+.search-icon {
+  width: 18px;
+  height: 18px;
+  color: #666;
+  flex-shrink: 0;
+
+}
+
+
+/* list items */
+.suggestions-dropdown li {
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+/* hover color */
+.suggestions-dropdown li:hover {
+  background: #eef3ff;
+}
+
+/* keyboard highlight color */
+.suggestions-dropdown .highlighted {
+  background: #dbe5ff !important;
+}
+
+/* icon inside dropdown */
+.suggestion-item .search-icon {
+  width: 18px;
+  height: 18px;
+  color: #444;
+}
+
+
+/* each item */
+.suggestions-dropdown li {
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.15s ease;
+}
+
+.suggestions-dropdown li:hover,
+.suggestions-dropdown .highlighted {
+  background: #f4f7ff;
+}
+
+/* left content */
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.suggestion-text {
+  font-size: 14px;
+  color: #333;
+  text-align: justify;
+  margin-right: 5px;
+}
+
+/* image inside dropdown */
+.suggestion-image {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* empty states */
+.no-suggestionss {
+  padding: 12px 15px;
+  color: #777;
+  text-align: center;
+}
+
+/* ---------- MOBILE OVERLAY ---------- */
+.mobile-overlay {
+  width: 100%;
+}
+
+.mobile-overlay.show {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+
+
+/* Optional: Add responsive design for smaller screens */
+@media (max-width: 768px) {
+  .suggestions-dropdown {
+    z-index: 1003 !important;
+  }
+
+  .oneclick-logo {
+    height: auto;
+    margin-left: 0px;
+  }
+
 }

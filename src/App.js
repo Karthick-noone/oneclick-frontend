@@ -116,7 +116,7 @@ const isExcluded =
 return (
   <>
     {!isExcluded && <Header2 header2Ref={header2Ref} />}
-    {!isExcluded && <Header3 topOffset={header2Height} />}
+    {/* {!isExcluded && <Header3 topOffset={header2Height} />} */}
     {children}
   </>
 );

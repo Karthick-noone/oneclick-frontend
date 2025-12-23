@@ -40,11 +40,11 @@
 
 /* Skeleton Loader */
 .skeleton-product-card {
-  width: calc(25% - 20px);
-  height: 340px;
+  width: calc(20% - 15px);
+  height: 280px;
   background: #f0f0f0;
   border-radius: 8px;
-  padding: 15px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,12 +53,13 @@
 
 .skeleton-image {
   width: 100%;
-  height: 200px;
+  height: 150px; /* Match reduced image height */
   background: linear-gradient(90deg, #e0e0e0 25%, #d6d6d6 50%, #e0e0e0 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   border-radius: 4px;
 }
+
 
 .skeleton-text {
   width: 80%;
@@ -104,65 +105,46 @@
     margin-top: 2px;
   }
   
-  .addToCart,
-  .buy-now {
-    padding: 11px 18px;
-    font-size: 11px;
-    font-weight: bold;
-    /* border-radius: 5px; */
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    background-size: 200% 200%; /* Makes the gradient fill the button */
-  }
-  
-  .addToCart {
-    /* Royal Blue gradient for a premium tech feel */
-    background: linear-gradient(
-      145deg,
-      #ff7f50,
-      #d9534f
-    ); /* Orange to red gradient */    color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 10px 20px;
-    border: none;
-    /* border-radius: 4px; */
-    /* border-radius: 50px; */
+.addToCart,
+.buy-now {
+  padding: 6px 12px;      /* Reduced size */
+  font-size: 10px;        /* Smaller text */
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  background-size: 200% 200%;
+}
 
-    cursor: pointer;
-    /* transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out; */
-  }
-  
-  .addToCart:hover {
-    /* Reverse gradient direction on hover */
-    background: linear-gradient(145deg, #d9534f, #ff7f50);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-  
+.addToCart {
+  background: linear-gradient(145deg, #ff7f50, #d9534f);
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+  padding: 6px 12px;       /* Reduced from 10px 20px */
+}
+.addToCart:hover {
+  background: linear-gradient(145deg, #d9534f, #ff7f50);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
   /* .addToCart:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(0, 71, 171, 0.6);
   }
    */
-  .buy-now {
-    /* Fiery Red-Orange gradient for urgency and action */
-    background: linear-gradient(145deg, #007bff, #0056b3); /* Blue gradient */
-    color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 10px 20px;
-    border: none;
-    /* border-radius: 50px; */
-    cursor: pointer;
-    /* transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out; */
-  }
-  
-  .buy-now:hover {
-    /* Reverse gradient direction on hover */
-    background: linear-gradient(145deg, #0056b3, #007bff);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
+.buy-now {
+  background: linear-gradient(145deg, #007bff, #0056b3);
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+  padding: 6px 12px;
+}
+.buy-now:hover {
+  background: linear-gradient(145deg, #0056b3, #007bff);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
   
   /* .buy-now:focus {
     outline: none;
@@ -219,12 +201,7 @@
 }
 
 
-/* Computers Page Styles */
-.computers-page {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
+
 
 .main-content {
     display: flex;
@@ -268,43 +245,37 @@
     padding: 20px;
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 10px;
 }
-
 .product-card {
   position: relative;
-  width: calc(25% - 20px); /* Ensures 4 cards in a row */
-  height: auto; /* Fixed height for uniformity */
-  max-height: 350px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  width: calc(20% - 10px); /* 5 cards in a row */
+  max-height: 300px;       /* Reduced height */
   background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   text-align: center;
-  /* border-radius: 8px; */
-  margin-bottom: 15px; /* Space below each card */
+  margin-bottom: 15px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between;  */
-  padding: 15px;
+  padding: 12px;
   transition: transform 0.2s ease-in-out;
 }
 
 
-
 .product-image {
   width: 100%;
-  height: 200px;
+  height: 150px;   /* Reduced image height */
   object-fit: contain;
-  /* margin-bottom: 10px; */
 }
 
+
 .product-name {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   color: #333;
-  /* text-align: justify; */
-  /* margin: 1px 0; */
 }
+
 
 .product-subtitle2 {
   font-size: 13px;
@@ -450,4 +421,158 @@
     text-overflow: ellipsis;           /* Show ellipsis when text overflows */
   }
   
-  
+  /* Main Content Layout */
+.main-content {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    height: calc(100vh - 120px); /* Adjust based on your header height */
+    overflow: hidden; /* Prevent main content from scrolling */
+}
+
+/* Mobile Filter - Independent Scroll */
+.mobile-filter {
+    width: 100%;
+    max-width: 210px;
+    padding: 20px 15px 20px 20px;
+    background: #fff;
+    box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    height: 100%; /* Take full height of parent */
+    overflow-y: auto; /* Independent scroll */
+    position: sticky;
+    top: 0;
+    left: 0;
+}
+
+/* Product List - Independent Scroll */
+.product-list {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    height: 100%; /* Take full height of parent */
+    overflow-y: auto; /* Independent scroll */
+    align-content: flex-start; /* Better alignment for wrapped items */
+}
+
+/* Custom Scrollbar for both sections */
+.mobile-filter::-webkit-scrollbar,
+.product-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.mobile-filter::-webkit-scrollbar-track,
+.product-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.mobile-filter::-webkit-scrollbar-thumb,
+.product-list::-webkit-scrollbar-thumb {
+    background: #f8f8f8;
+    border-radius: 10px;
+}
+
+.mobile-filter::-webkit-scrollbar-thumb:hover,
+.product-list::-webkit-scrollbar-thumb:hover {
+    background: #e9e9e9;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .main-content {
+        height: calc(100vh - 100px); /* Adjust for mobile */
+    }
+
+    .mobile-filter {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 80%;
+        max-width: 230px;
+        height: 100vh;
+        background: white;
+        z-index: 1002;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .mobile-filter.show {
+        transform: translateX(0);
+    }
+
+    .product-list {
+        height: calc(100vh - 120px); /* Full viewport minus header/breadcrumb */
+        padding: 15px;
+    }
+}
+
+/* No Products Message */
+.no-products-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    width: 100%;
+    margin-left: 0;
+}
+
+@media (max-width: 768px) {
+    .no-products-message {
+        margin-left: 0;
+        height: 50vh;
+    }
+}
+
+/* Product Card Layout */
+.product-card {
+    position: relative;
+    width: calc(20% - 10px);
+    max-height: 300px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    margin-bottom: 15px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Responsive product cards */
+@media (max-width: 1024px) {
+    .product-card {
+        width: calc(33.33% - 20px);
+    }
+}
+
+@media (max-width: 768px) {
+    .product-card {
+        width: calc(50% - 10px);
+        height: 330px;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-card {
+        width: calc(50% - 5px);
+    }
+}
+
+/* Filter Overlay for Mobile */
+.filter-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    transition: opacity 0.3s ease-in-out;
+}

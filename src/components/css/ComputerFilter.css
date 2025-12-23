@@ -26,13 +26,13 @@
 }
 
 .computer-filter::-webkit-scrollbar-thumb {
-    background: #888; /* Set the color of the scrollbar thumb */
+    background: #e4e4e4; /* Set the color of the scrollbar thumb */
     border-radius: 10px; /* Rounded corners for the thumb */
     transition: background-color 0.3s; /* Smooth transition */
 }
 
 .computer-filter::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Darker color on hover */
+    background: #dadada; /* Darker color on hover */
 }
 
 .computer-filter::-webkit-scrollbar-button {

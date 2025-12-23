@@ -171,39 +171,40 @@ const Computers = () => {
   });
 
   // If no search query, return all products // If no search query, return all products
-const cacheRef = useRef({
-  computers: null,
-});
+  const cacheRef = useRef({
+    computers: null,
+  });
 
-useEffect(() => {
-  const fetchProducts = async () => {
-    // 1. Show cached data immediately (if available)
-    if (cacheRef.current.computers) {
-      setProducts(cacheRef.current.computers);
-    } else {
-      setLoading(true); // Only show loader if no cached data
-    }
-
-    try {
-      // 2. Always fetch fresh data in background
-      const response = await axios.get(`${ApiUrl}/fetchcomputers`);
-      const fetchedProducts = response.data;
-
-      setProducts(fetchedProducts); // Update UI with fresh data
-      cacheRef.current.computers = fetchedProducts; // Update cache
-    } catch (error) {
-      console.error("Error fetching computers:", error);
-      if (!cacheRef.current.computers) {
-        // Only show error if no cached data
-        toast.error("Failed to fetch computers.");
+  useEffect(() => {
+    const fetchProducts = async () => {
+      // 1. Show cached data immediately (if available)
+      if (cacheRef.current.computers) {
+        setProducts(cacheRef.current.computers);
+      } else {
+        setLoading(true); // Only show loader if no cached data
       }
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  fetchProducts();
-}, []);
+      try {
+        // 2. Always fetch fresh data in background
+        const response = await axios.get(`${ApiUrl}/fetchcomputers`);
+        const fetchedProducts = response.data;
+
+        setProducts(fetchedProducts); // Update UI with fresh data
+        console.log("Computers", fetchedProducts)
+        cacheRef.current.computers = fetchedProducts; // Update cache
+      } catch (error) {
+        console.error("Error fetching computers:", error);
+        if (!cacheRef.current.computers) {
+          // Only show error if no cached data
+          toast.error("Failed to fetch computers.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const now = new Date();
@@ -321,6 +322,8 @@ useEffect(() => {
 
       // Keep only last 10
       parsedData = parsedData.slice(0, 10);
+
+      // console.log("Parsed Data", parsedData)
 
       localStorage.setItem("Recently-viewed", JSON.stringify(parsedData));
 
@@ -553,7 +556,7 @@ useEffect(() => {
   // offerPercentage = ((actual_price - prod_price) / actual_price) * 100
 
   return (
-    <div className="computers-page">
+    <div className="Computers-page">
 
       <div className="breadcrumb-wrapper">
         <span className="breadcrumb-text">
@@ -674,6 +677,8 @@ useEffect(() => {
                             ₹{product.actual_price}
                           </span>
                         </span>
+                        {/* {product.branch_id} */}
+
                         <p
                           style={{
                             color: "green",

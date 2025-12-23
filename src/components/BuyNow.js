@@ -501,6 +501,8 @@ const BuyNow = () => {
     }
 
     const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}, ${selectedAddressDetails.phone}`;
+ 
+    console.log("Product details:", product);
 
     // Ensure product exists
     if (!product?.prod_id) {
@@ -515,7 +517,6 @@ const BuyNow = () => {
       return;
     }
 
-    console.log("Product details:", product);
     const enrichedCartItems = [];
 
     // Add main product details
@@ -529,6 +530,8 @@ const BuyNow = () => {
       prod_id: product.prod_id,
       prod_category: product.category,
       is_buy_together: false,
+      branch_id: product.branch_id,
+
     });
 
     // Check if any accessories exist
@@ -820,6 +823,7 @@ const BuyNow = () => {
                         ₹{product.actual_price * quantity}
                       </p>
                       <p>₹{product.prod_price * quantity}</p>
+                      {/* <p>₹{product.branch_id}</p> */}
                     </div>
                   </li>
                   {product.accessories &&

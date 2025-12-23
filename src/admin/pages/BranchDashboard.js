@@ -155,25 +155,51 @@ const BranchDashboard = () => {
   useEffect(() => {
     const fetchPendingPayments = async () => {
       try {
-        const response = await axios.get(`${ApiUrl}/branch/pending-payment`);
-        const payments = response.data;
+        const currentBranch = localStorage.getItem("current_branch");
+        const userRole = localStorage.getItem("userRole");
 
-        // Sum the total amount of pending payments
+        const response = await axios.get(`${ApiUrl}/branch/pending-payment`);
+        let payments = response.data;
+
+        console.log("Raw Pending Payments:", payments);
+
+        // ⭐ ADMIN - ALL BRANCHES
+        if (userRole === "Admin" && currentBranch === "all") {
+          payments = payments.filter(p => p.branch_id !== null);
+        }
+        // ⭐ ADMIN - SPECIFIC BRANCH
+        else if (userRole === "Admin" && currentBranch !== "all") {
+          payments = payments.filter(
+            p => p.branch_id !== null && p.branch_id == currentBranch
+          );
+        }
+        // ⭐ BRANCH ADMIN
+        else if (userRole === "branch_admin") {
+          payments = payments.filter(
+            p => p.branch_id !== null && p.branch_id == currentBranch
+          );
+        }
+
+        console.log("Filtered Pending Payments:", payments);
+
         const totalPendingAmount = payments.reduce(
-          (sum, payment) => sum + payment.total_amount, 0
+          (sum, payment) => sum + (payment.total_amount || 0),
+          0
         );
+
+        console.log("Total Pending Payments Amount:", totalPendingAmount);
 
         setPendingPayments(
-          new Intl.NumberFormat("en-IN").format(totalPendingAmount) // Format the amount
+          new Intl.NumberFormat("en-IN").format(totalPendingAmount)
         );
+
       } catch (error) {
         console.error("Error fetching pending payments:", error);
       }
     };
 
     fetchPendingPayments();
-  }, []);
-
+  }, [selectedBranch]);
 
 
   // Helper function to get last 6 months
@@ -202,120 +228,107 @@ const BranchDashboard = () => {
     fetchSalesReport();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchOrderData = async () => {
-  //     try {
-  //       const ordersResponse = await axios.get(`${ApiUrl}/branch/fetchorders`);
-  //       const ordersData = ordersResponse.data;
-  //       setOrderData(ordersData);
+  // Fetch order status from the backend
+  const fetchOrderStatus = async (orderId) => {
+    try {
+      const response = await fetch(
+        `${ApiUrl}/api/get-order-status?orderId=${orderId}`
+      );
+      const data = await response.json();
+      return data.delivery_status; // Return delivery status from the response
+    } catch (error) {
+      console.error("Error fetching delivery status:", error);
+      return "Unknown"; // Fallback value if there's an error
+    }
+  };
 
-  //       const totalOrders = ordersData.length;
-  //       const totalSales = ordersData.reduce(
-  //         (acc, order) => acc + order.total_amount,
-  //         0
-  //       );
-  //       // const totalCustomers = new Set(ordersData.map(order => order.user_id)).size;
-  //       // const totalCategories = new Set(
-  //       //   ordersData.map((order) => order.shipping_address)
-  //       // ).size;
 
-  //       setTotalOrders(totalOrders);
-  //       setTotalSales(new Intl.NumberFormat("en-IN").format(totalSales)); // Format with commasc
-  //       // setTotalCustomers(totalCustomers);
-  //       // setTotalCategories(totalCategories);
+  useEffect(() => {
+    const loadDashboardOrders = async () => {
+      try {
+        console.log("📌 Dashboard: Fetching orders with branch logic...");
 
-  //       // Calculate monthly sales for the last 6 months
-  //       const monthlySales = getLast6Months().map((month) => {
-  //         const salesForMonth = ordersData
-  //           .filter((order) => {
-  //             const orderDate = new Date(order.order_date); // Ensure you have an 'order_date' field in your orders
-  //             return (
-  //               orderDate.toLocaleString("default", { month: "long" }) === month
-  //             );
-  //           })
-  //           .reduce((acc, order) => acc + order.total_amount, 0);
-  //         return salesForMonth;
-  //       });
-  //       setMonthlySales(monthlySales);
+        const currentBranch = localStorage.getItem("current_branch");
+        const userRole = localStorage.getItem("userRole");
 
-  //       const categorySales = ordersData.reduce((acc, order) => {
-  //         acc[order.shipping_address] =
-  //           (acc[order.shipping_address] || 0) + order.total_amount;
-  //         return acc;
-  //       }, {});
+        // Call your already filtered API
+        const response = await axios.get(`${ApiUrl}/fetchorders`);
+        const orders = response.data.reverse();
 
-  //       setSalesData({
-  //         labels: Object.keys(categorySales),
-  //         datasets: [
-  //           {
-  //             label: "Sales by Category",
-  //             data: Object.values(categorySales),
-  //             backgroundColor: "rgba(75, 192, 192, 0.2)",
-  //             borderColor: "rgba(75, 192, 192, 1)",
-  //             borderWidth: 1,
-  //           },
-  //         ],
-  //       });
+        console.log("📌 Raw orders from API:", orders.length);
 
-  //       const categoriesResponse = await axios.get(
-  //         `${ApiUrl}/branch/fetchproductcategories`
-  //       );
+        // Calculate delivery status just like new page
+        const ordersWithStatus = await Promise.all(
+          orders.map(async (order) => {
+            const deliveryStatus = await fetchOrderStatus(order.unique_id);
+            return {
+              ...order,
+              delivery_status: deliveryStatus,
+              products: order.products || [],
+            };
+          })
+        );
 
-  //       const categoriesData = categoriesResponse.data;
-  //       console.log("categoriesData", categoriesData)
+        // BRANCH FILTERING (same as your new code)
+        let finalOrders = ordersWithStatus;
 
-  //       const filteredCategories = categoriesData.filter(
-  //         (cat) => cat.category && cat.category.trim().toLowerCase() !== "null"
-  //       );
+        if (userRole === "Admin" && selectedBranch === "all") {
+          finalOrders = finalOrders.filter(o => o.branch_id !== null);
+        }
+        else if (userRole === "Admin" && selectedBranch !== "all") {
+          finalOrders = finalOrders.filter(
+            o => o.branch_id !== null && o.branch_id == selectedBranch
+          );
+        }
+        else if (userRole === "branch_admin") {
+          finalOrders = finalOrders.filter(
+            o => o.branch_id !== null && o.branch_id == currentBranch
+          );
+        }
 
-  //       const pieData = {
-  //         labels: filteredCategories.map((cat) => cat.category),
-  //         datasets: [
-  //           {
-  //             label: "Category Distribution",
-  //             data: categoriesData.map((cat) => cat.total_amount),
-  //             backgroundColor: [
-  //               "rgba(255, 99, 132, 0.2)", // Red
-  //               "rgba(54, 162, 235, 0.2)", // Blue
-  //               "rgba(255, 206, 86, 0.2)", // Yellow
-  //               "rgba(75, 192, 192, 0.2)", // Teal
-  //               "rgba(153, 102, 255, 0.2)", // Purple
-  //               "rgba(255, 159, 64, 0.2)", // Orange
-  //               "rgba(199, 199, 199, 0.2)", // Grey
-  //               "rgba(144, 238, 144, 0.2)", // Light Green
-  //               "rgba(240, 128, 128, 0.2)", // Light Coral
-  //               "rgba(135, 206, 250, 0.2)", // Light Sky Blue
-  //               "rgba(221, 160, 221, 0.2)", // Plum
-  //               "rgba(189, 183, 107, 0.2)", // Dark Khaki
-  //             ],
-  //             borderColor: [
-  //               "rgba(255, 99, 132, 1)", // Red
-  //               "rgba(54, 162, 235, 1)", // Blue
-  //               "rgba(255, 206, 86, 1)", // Yellow
-  //               "rgba(75, 192, 192, 1)", // Teal
-  //               "rgba(153, 102, 255, 1)", // Purple
-  //               "rgba(255, 159, 64, 1)", // Orange
-  //               "rgba(199, 199, 199, 1)", // Grey
-  //               "rgba(144, 238, 144, 1)", // Light Green
-  //               "rgba(240, 128, 128, 1)", // Light Coral
-  //               "rgba(135, 206, 250, 1)", // Light Sky Blue
-  //               "rgba(221, 160, 221, 1)", // Plum
-  //               "rgba(189, 183, 107, 1)", // Dark Khaki
-  //             ],
-  //             borderWidth: 1,
-  //           },
-  //         ],
-  //       };
+        console.log("✅ Filtered Orders (Final):", finalOrders.length);
 
-  //       setPieData(pieData);
-  //       console.log("Pie data", pieData)
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
+        // -----------------------------
+        // DASHBOARD CALCULATIONS BELOW
+        // -----------------------------
 
-  //   fetchOrderData();
-  // }, []);
+        // TOTAL ORDERS
+        const totalOrders = finalOrders.length;
+        setTotalOrders(totalOrders);
+        console.log("📊 TOTAL ORDERS:", totalOrders);
+
+        // TOTAL SALES
+        const totalSales = finalOrders.reduce(
+          (acc, order) => acc + (order.total_amount || 0),
+          0
+        );
+        setTotalSales(new Intl.NumberFormat("en-IN").format(totalSales));
+        console.log("💰 TOTAL SALES:", totalSales);
+
+        // MONTHLY SALES
+        const monthlySales = getLast6Months().map(month => {
+          const totalForMonth = finalOrders
+            .filter(order => {
+              const date = new Date(order.order_date);
+              return date.toLocaleString("default", { month: "long" }) === month;
+            })
+            .reduce((acc, order) => acc + (order.total_amount || 0), 0);
+
+          return totalForMonth;
+        });
+
+        setMonthlySales(monthlySales);
+        console.log("📅 MONTHLY SALES:", monthlySales);
+
+      } catch (error) {
+        console.error("❌ Dashboard: Failed loading orders", error);
+      }
+    };
+
+    loadDashboardOrders();
+  }, [selectedBranch]);
+
+
 
   const categoryIcons = {
     Computers: <img src={ComputerImage} alt="Computer" style={{ width: "35px", height: "35px" }} />,
@@ -451,11 +464,34 @@ const BranchDashboard = () => {
                     <div className="summary-icon">{icon}</div>
                     <div className="summary-info">
                       <h3>{label}</h3>
-                      <p style={{ color: count === 0 ? "red" : "#333333" }}>
+                      <p style={{
+                        color: count === 0 ? "#dc2626" : "#1f2937",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        padding: "6px 12px 6px 8px",
+                        borderRadius: "20px",
+                        background: count === 0 ? "#fef2f2" : "#f0f9ff",
+                        border: count === 0 ? "1px solid #fecaca" : "1px solid #bae6fd",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        margin: 0,
+                        position: "relative"
+                      }}>
+                        <span style={{
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          background: count === 0 ? "#dc2626" : unApprovedCount > 0 ? "#f59e0b" : "#10b981",
+                          marginRight: "4px"
+                        }}></span>
                         {count}
-
                         {unApprovedCount > 0 && (
-                          <> (<span style={{ color: "red" }}>{unApprovedCount}</span> pending)</>
+                          <> (<span style={{
+                            color: "#dc2626",
+                            fontWeight: "700",
+                            fontSize: "13px"
+                          }}>{unApprovedCount}</span> pending)</>
                         )}
                       </p>
                     </div>
@@ -473,9 +509,13 @@ const BranchDashboard = () => {
         <h3>Other Reports</h3>
 
         <div className="dashboard-summary">
-          <Link to={"/Admin/orders"}
+          <Link
+            to={"/Admin/BranchOrders"}
             style={{ textDecoration: "none", color: "inherit" }}
-
+            onClick={() => {
+              console.log("Saving current branch:", selectedBranch);
+              localStorage.setItem("current_branch", selectedBranch);
+            }}
           >
             <div className="summary-card">
               <img className="summary-icon" src={Order} alt="Order" style={{ width: "45px", height: "45px" }} />
@@ -485,6 +525,7 @@ const BranchDashboard = () => {
               </div>
             </div>
           </Link>
+
 
           <div className="summary-card">
             <img className="summary-icon" src={Profit} alt="Profit" style={{ width: "45px", height: "45px" }} />
@@ -592,3 +633,4 @@ const BranchDashboard = () => {
 };
 
 export default BranchDashboard;
+

@@ -14,6 +14,20 @@
   border: none;
   cursor: pointer;
 }
+.zoom-box {
+  position: absolute;
+  left: 20px;        /* Push zoom box to the right */
+  top: 0;
+  width: 250px;
+  height: 250px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  overflow: hidden;
+  z-index: 999;
+}
+
 
 .svg-icon {
   stroke: white;
@@ -1902,3 +1916,6 @@
   border: none;
   cursor: pointer;
 }
+
+
+

@@ -155,7 +155,7 @@ const ComputerFilter = ({ showFilters, closeFilters }) => {
     };
 
     return (
-        <div className={`computer-filter ${showFilters ? 'show' : ''}`}>
+        <div className={`mobile-filter ${showFilters ? 'show' : ''}`}>
             <div className="responsive-filter-controls">
                 <button
                     className="filter-close-btn"

@@ -61,3 +61,8 @@ html {
   overflow-x: hidden !important;
 }
 
+:root {
+    --header2-height: 75px;   /* adjust to your real header2 height */
+    --header3-height: 55px;   /* adjust to your real header3 height */
+    --filter-top-offset: calc(var(--header2-height) + var(--header3-height));
+}

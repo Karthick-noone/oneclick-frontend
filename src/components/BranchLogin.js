@@ -5,6 +5,7 @@ import { ApiUrl } from "./ApiUrl";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Home } from "lucide-react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 function BranchLogin() {
@@ -15,6 +16,9 @@ function BranchLogin() {
     const [rememberMe, setRememberMe] = useState(false);
 
     const [error, setError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePassword = () => setShowPassword(!showPassword);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -74,19 +78,18 @@ function BranchLogin() {
         <div className="login-container">
             <div className="login-left">
                 <div className="login-left-content">
-                    <h2>Welcome to OneClick Branches</h2>
+                    <h2>Welcome to OneClick </h2>
                     <p>
-                        Manage your branch efficiently, track sales, and stay connected with
+                        Manage your business efficiently, track sales, and stay connected with
                         the network.
                     </p>
                 </div>
             </div>
             <div className="login-right">
                 <Link to={"/"}>
-                    <span className="back-to-home-button"
-                    ><Home size={18} />Home</span></Link>
+                    <span className="back-to-home-button"><Home size={18} />Home</span></Link>
                 <form className="login-form" onSubmit={handleSubmit}>
-                    <h2>Branch Login</h2>
+                    <h2>Business Login</h2>
                     {error && <p className="form-error">{error}</p>}
 
                     <div className="form-group">
@@ -105,13 +108,16 @@ function BranchLogin() {
                     <div className="form-group">
                         <label>Password</label>
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             name="password"
                             value={form.password}
                             onChange={handleChange}
                             placeholder="Enter Your Password"
                             required
                         />
+                        <span onClick={togglePassword} className="fa-eye-icon">
+                            {showPassword ? <FaEye /> : <FaEyeSlash />}
+                        </span>
                     </div>
 
                     {/* <div className="form-options">
@@ -132,7 +138,7 @@ function BranchLogin() {
                     </button>
 
                     <p className="register-link">
-                        Don't have a branch account? <Link to={"/branch-register"}>Register</Link>
+                        Don't have a business account? <Link to={"/branch-register"}>Register</Link>
                     </p>
                 </form>
             </div>

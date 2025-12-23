@@ -1,3 +1,23 @@
+/* Main product price */
+.product-price {
+  color: green;
+  margin-left: 5px;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+/* Margin badge for Admin users */
+.margin-badge {
+  background-color: rgba(0, 123, 255, 0.12);
+  color: #0056b3;
+  padding: 3px 8px;
+  font-size: 12px;
+  border-radius: 8px;
+  margin-left: 8px;
+  font-weight: 600;
+  border: 1px solid rgba(0, 123, 255, 0.25);
+  display: inline-block;
+}
 
 .dropdown-wrapper {
   position: relative;

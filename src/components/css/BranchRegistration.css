@@ -139,10 +139,23 @@
   }
 
   .branch-form .form-row.two-columns {
-    flex-direction: column;
+    flex-direction: row;
   }
 }
 
+/* Responsive */
+@media (max-width: 768px) {
+  .form-row {
+    display: flex;
+    flex-direction: column;   /* Stack vertically */
+    gap: 20px;                /* Add spacing between sections */
+  }
+
+  .form-left,
+  .form-right {
+    width: 100%;              /* Take full width on mobile */
+  }
+}
 
 .form-error {
   color: #e74c3c;

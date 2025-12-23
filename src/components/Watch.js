@@ -485,16 +485,19 @@ useEffect(() => {
   // offerPercentage = ((actual_price - prod_price) / actual_price) * 100
 
   return (
-    <div className="computers-page">
+    <div className="Computers-page">
       {/* <Header1 /> */}
       {/* <Header2 category={category} /> */}
       {/* <Header3 /> */}
-      <span style={{ marginLeft: "20px", padding: "10px" }}>
+      <div className="breadcrumb-wrapper">
+         
+      <span>
         <Link style={{ textDecoration: "none", color: "black" }} to="/">
           Home{" "}
         </Link>
         &gt; Watch
       </span>
+      </div>
       <div className="main-content">
         <Sidebar />
         <div className="product-list">

@@ -1048,6 +1048,7 @@ const Checkout = () => {
       prod_id: item.prod_id,
       prod_category: item.category, // Map 'prod_category' to 'category'
       is_buy_together: false,
+      branch_id: item.branch_id,
     }));
 
     console.log("enrichedCartItems", enrichedCartItems);

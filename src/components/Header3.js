@@ -16,6 +16,7 @@ import {
   FaInfoCircle,
   FaEnvelope,
   FaQuestionCircle,
+  FaCodeBranch,
   // FaStopwatch,
   // FontAwesomeIcon
 } from "react-icons/fa";
@@ -26,8 +27,8 @@ import listIcon from './img/list.png'
 import { Watch } from 'lucide-react';
 
 
-const Header3 = ({ topOffset }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const Header3 = ({ topOffset, isOpen, setIsOpen }) => {
+  // const [isOpen, setIsOpen] = useState(false);
   const [showHeadphones, setShowHeadphones] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const headphonesRef = useRef(null);
@@ -184,27 +185,12 @@ const Header3 = ({ topOffset }) => {
   return (
     <>
       {/* Show hamburger ☰ only when menu is closed */}
-      {isMobileView && !isOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: "77px",
-            left: "5px",
-            zIndex: 1002,
-            color: "#fff",
-            padding: "8px 12px",
-            borderRadius: "4px",
-            fontSize: "24px",
-            cursor: "pointer",
-            backgroundColor: "transparent",
-          }}
-          className="hamburger"
-          onClick={openMenu}
-        >
-          {/* ☰ */}
-          <img src={listIcon} width={'28px'} alt="list" />
+      {/* {isMobileView && !isOpen && (
+        <div className="hamburger" onClick={openMenu}>
+          <img src={listIcon} width="28px" alt="list" />
         </div>
-      )}
+
+      )} */}
 
       {/* Show close ✖ only when menu is open */}
       {isMobileView && isOpen && (
@@ -231,9 +217,10 @@ const Header3 = ({ topOffset }) => {
 
 
 
-      <header
+      <div
         className="header3"
         ref={headerRef}
+        // style={{ position: "sticky", top: `46px`, zIndex: 999 }}
         style={{ position: "sticky", top: `${topOffset}px`, zIndex: 999 }}
       >
 
@@ -253,14 +240,14 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/ComputerAd"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname.startsWith("/computers") ||location.pathname.startsWith("/Computers") ||
+            className={`nav-link ${location.pathname.startsWith("/computers") || location.pathname.startsWith("/Computers") ||
               location.pathname.startsWith("/ComputerAd")
               ? "active"
               : ""
               }`}
           >
             <FaLaptop
-              className={`fa-icons ${location.pathname.startsWith("/computers") ||location.pathname.startsWith("/Computers") ||
+              className={`fa-icons ${location.pathname.startsWith("/computers") || location.pathname.startsWith("/Computers") ||
                 location.pathname.startsWith("/ComputerAd")
                 ? "active"
                 : ""
@@ -272,7 +259,7 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/MobileAd"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname.startsWith("/mobiles") ||location.pathname.startsWith("/Mobiles") ||
+            className={`nav-link ${location.pathname.startsWith("/mobiles") || location.pathname.startsWith("/Mobiles") ||
               location.pathname.startsWith("/MobileAd")
               ? "active"
               : ""
@@ -291,36 +278,39 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/CCTVAd"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname.startsWith("/cctv")|| location.pathname.startsWith("/CCTV") ||
-              location.pathname.startsWith("/CCTVAd")
-              ? "active"
-              : ""
+            className={`nav-link ${location.pathname === "/CCTV" ||
+                location.pathname === "/cctv" ||
+                location.pathname === "/CCTVAd"
+                ? "active"
+                : ""
               }`}
           >
             <FaVideo
-              className={`fa-icons ${location.pathname.startsWith("/cctv") || location.pathname.startsWith("/CCTV") ||
-                location.pathname.startsWith("/CCTVAd")
-                ? "active"
-                : ""
+              className={`fa-icons ${location.pathname === "/CCTV" ||
+                  location.pathname === "/cctv" ||
+                  location.pathname === "/CCTVAd"
+                  ? "active"
+                  : ""
                 }`}
             />{" "}
             CCTV
           </Link>
 
+
           {/* Parent Audio link */}
           <div
             className={`nav-item ${isAudioActive ? "active" : ""} ${showHeadphones ? "show-dropdown" : ""}`}
             onClick={toggleHeadphonesDropdown}
-            // onMouseEnter={() => {
-            //   if (window.innerWidth > 768) { // Only for desktop
-            //     setShowHeadphones(true);
-            //   }
-            // }}
-            // onMouseLeave={() => {
-            //   if (window.innerWidth > 768) { // Only for desktop
-            //     setShowHeadphones(false);
-            //   }
-            // }}
+          // onMouseEnter={() => {
+          //   if (window.innerWidth > 768) { // Only for desktop
+          //     setShowHeadphones(true);
+          //   }
+          // }}
+          // onMouseLeave={() => {
+          //   if (window.innerWidth > 768) { // Only for desktop
+          //     setShowHeadphones(false);
+          //   }
+          // }}
           >
             <span className="activelink">
               <FaHeadphones
@@ -355,7 +345,7 @@ const Header3 = ({ topOffset }) => {
               <Link
                 to="/Speakers"
                 onClick={handleLinkClick}
-                className={`nav-link ${location.pathname === "/Speakers" ||location.pathname === "/speakers" ? "active" : ""
+                className={`nav-link ${location.pathname === "/Speakers" || location.pathname === "/speakers" ? "active" : ""
                   }`}
               >
                 <FaVolumeUp
@@ -395,11 +385,11 @@ const Header3 = ({ topOffset }) => {
           <Link
             to="/Printers"
             onClick={handleLinkClick}
-            className={`nav-link ${location.pathname === "/Printers" ||location.pathname === "/printers" ? "active" : ""
+            className={`nav-link ${location.pathname === "/Printers" || location.pathname === "/printers" ? "active" : ""
               }`}
           >
             <FaPrint
-              className={`fa-icons ${location.pathname === "/Printers" ||location.pathname === "/printers" ? "active" : ""
+              className={`fa-icons ${location.pathname === "/Printers" || location.pathname === "/printers" ? "active" : ""
                 }`}
             />{" "}
             Printers
@@ -413,16 +403,16 @@ const Header3 = ({ topOffset }) => {
               e.stopPropagation();
               toggleMoreDropdown();
             }}
-            // onMouseEnter={() => {
-            //   if (window.innerWidth > 768) { // Only for desktop
-            //     setShowMore(true);
-            //   }
-            // }}
-            // onMouseLeave={() => {
-            //   if (window.innerWidth > 768) { // Only for desktop
-            //     setShowMore(false);
-            //   }
-            // }}
+          // onMouseEnter={() => {
+          //   if (window.innerWidth > 768) { // Only for desktop
+          //     setShowMore(true);
+          //   }
+          // }}
+          // onMouseLeave={() => {
+          //   if (window.innerWidth > 768) { // Only for desktop
+          //     setShowMore(false);
+          //   }
+          // }}
           >
             <span className="activelink" style={{ cursor: "pointer" }}>
               <FaCog className={`fa-icons ${isAccessoriesActive ? "active" : ""}`} /> Accessories
@@ -549,8 +539,23 @@ const Header3 = ({ topOffset }) => {
             />{" "}
             Help Center
           </Link>
+          <Link
+            to="/branch-login"
+            onClick={handleLinkClick}
+            className={`nav-link ${location.pathname === "/branch-login" ? "active" : ""
+              }`}
+            style={{
+              display: window.innerWidth <= 768 ? "flex" : "none", // Show only on mobile
+            }}
+          >
+            <FaCodeBranch
+              className={`fa-icons ${location.pathname === "/branch-login" ? "active" : ""
+                }`}
+            />{" "}
+            Business Login
+          </Link>
         </nav>
-      </header>
+      </div>
     </>
   );
 };

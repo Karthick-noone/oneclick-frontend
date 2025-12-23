@@ -14,7 +14,7 @@
 .header3 {
     /* background-color: black; */
     background-color: #001a35;
-    padding: 10px 30px;
+    padding: 5px 30px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,6 +23,7 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease-in-out;
     z-index: 999;
+    /* zoom: .9; */
 
 }
 
@@ -52,12 +53,12 @@
 
 .header3 nav a {
     color: white;
-    font-size: 14px;
+    font-size: 13px;
     text-decoration: none;
     text-transform: uppercase;
     font-weight: 500;
     cursor: pointer;
-    padding: 5px 10px;
+    padding: 3px 10px;
     display: flex;
     align-items: center;
     /* background-color: black; */
@@ -122,7 +123,7 @@
     z-index: 1000;
     visibility: hidden;
     padding: 5px;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 
@@ -148,7 +149,7 @@
     z-index: 1000;
     visibility: hidden;
     padding: 5px;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 
@@ -378,7 +379,7 @@
 
 .activelink {
     color: white;
-    font-size: 14px;
+    font-size: 13px;
     text-decoration: none;
     text-transform: uppercase;
     font-weight: 500;
@@ -386,4 +387,23 @@
     padding: 5px 10px;
     display: flex;
     align-items: center;
+}
+
+.hamburger {
+  position: fixed;
+  top: 93px;
+  left: 40px;
+  z-index: 996;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 24px;
+  cursor: pointer;
+  background-color: transparent;
+  transition: transform 0.2s ease;
+}
+
+/* Optional: small hover animation */
+.hamburger:hover {
+  transform: scale(1.05);
 }

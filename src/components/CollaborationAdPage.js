@@ -18,7 +18,7 @@ function CollaborationAdPage() {
           className="collab-banner-btn"
         //   onClick={() => (window.location.href = "/branch-register")}
         >
-          Partner With Us
+          Business With Us
         </button></Link>
       </div>
     </div>

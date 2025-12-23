@@ -89,6 +89,21 @@ const Printers = () => {
   const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
   const [, setLoadingProductId] = useState(null);
   const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+  const [margin, setMargin] = useState([]);   // ⭐ main state for margins
+ const fetchMargins = async () => {
+    try {
+      const response = await axios.get(`${ApiUrl}/api/margins/get-margins`);
+      console.log("Fetched Margins:", response.data);
+      setMargin(response.data || []);
+    } catch (err) {
+      console.error("Error fetching margin rules:", err);
+    }
+  };
+
+  // ⭐ Load margin rules when page loads
+  useEffect(() => {
+    fetchMargins();
+  }, []);
 
   const handleStatusChange = async (newStatus, productId) => {
     try {
@@ -111,17 +126,18 @@ const Printers = () => {
           draggable: true,
         });
 
-        //  Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchprinters`, {
-          timeout: 5000,
-          params: { branch_id, userRole },
+        // //  Refresh product list
+        // const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchprinters`, {
+        //   timeout: 5000,
+        //   params: { branch_id, userRole },
 
-        });
-        console.log("Refreshed product list:", refreshedProducts.data);
+        // });
+        // console.log("Refreshed product list:", refreshedProducts.data);
 
-        // Update the product list in state
-        setProducts(refreshedProducts.data);
+        // // Update the product list in state
+        // setProducts(refreshedProducts.data);
 
+        fetchProducts();
 
       } else {
         //  Show error toast
@@ -161,16 +177,18 @@ const Printers = () => {
           draggable: true,
         });
 
-        // Refresh product list
-        const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchprinters`, {
-          timeout: 5000,
-          params: { branch_id, userRole },
+        // // Refresh product list
+        // const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchprinters`, {
+        //   timeout: 5000,
+        //   params: { branch_id, userRole },
 
-        });
-        console.log("Refreshed product list:", refreshedProducts.data);
+        // });
+        // console.log("Refreshed product list:", refreshedProducts.data);
 
-        // Update the product list in state
-        setProducts(refreshedProducts.data);
+        // // Update the product list in state
+        // setProducts(refreshedProducts.data);
+        fetchProducts();
+
       } else {
         console.warn(`Failed to update product ${prodId}`);
         toast.error(" Failed to update product status", {
@@ -751,46 +769,46 @@ const Printers = () => {
   // Fetch products when component mounts
   const branchData = JSON.parse(localStorage.getItem("branch"));
   const branch_id = branchData?.id || null;
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
+  const fetchProducts = async () => {
+    try {
 
-        // ✅ correct branch logic
-        const currentBranch = localStorage.getItem("current_branch") || "all";
-        const branchData = JSON.parse(localStorage.getItem("branch"));
-        const loginBranchId = branchData?.id || null;
-        const branch_id = currentBranch === "all" ? null : currentBranch;
+      // ✅ correct branch logic
+      const currentBranch = localStorage.getItem("current_branch") || "all";
+      const branchData = JSON.parse(localStorage.getItem("branch"));
+      const loginBranchId = branchData?.id || null;
+      const branch_id = currentBranch === "all" ? null : currentBranch;
 
-        const userRole = localStorage.getItem("userRole");
+      const userRole = localStorage.getItem("userRole");
 
-        const response = await axios.get(`${ApiUrl}/adminfetchprinters`, {
-          params: { branch_id, userRole },
-        });
+      const response = await axios.get(`${ApiUrl}/adminfetchprinters`, {
+        params: { branch_id, userRole },
+      });
 
-        let filteredProducts = response.data;
+      let filteredProducts = response.data;
 
-        // Admin → ALL
-        if (userRole === "Admin" && branch_id === null) {
-          filteredProducts = filteredProducts.filter(item => item.branch_id !== null);
-        }
-
-        // Admin → specific branch
-        else if (userRole === "Admin" && branch_id) {
-          filteredProducts = filteredProducts.filter(item => item.branch_id == branch_id);
-        }
-
-        // branch admin → only own branch
-        else if (userRole === "branch_admin" && loginBranchId) {
-          filteredProducts = filteredProducts.filter(item => item.branch_id == loginBranchId);
-        }
-
-        setProducts(filteredProducts);
-        console.log("📌 Final filtered products:", filteredProducts);
-
-      } catch (error) {
-        console.error("Error fetching products:", error);
+      // Admin → ALL
+      if (userRole === "Admin" && branch_id === null) {
+        filteredProducts = filteredProducts.filter(item => item.branch_id !== null);
       }
-    };
+
+      // Admin → specific branch
+      else if (userRole === "Admin" && branch_id) {
+        filteredProducts = filteredProducts.filter(item => item.branch_id == branch_id);
+      }
+
+      // branch admin → only own branch
+      else if (userRole === "branch_admin" && loginBranchId) {
+        filteredProducts = filteredProducts.filter(item => item.branch_id == loginBranchId);
+      }
+
+      setProducts(filteredProducts);
+      console.log("📌 Final filtered products:", filteredProducts);
+
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+  useEffect(() => {
 
     fetchProducts();
   }, []);
@@ -1077,9 +1095,9 @@ const Printers = () => {
     // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
     const branchData = JSON.parse(localStorage.getItem("branch"));
-        const contact_person = branchData.contact_person;
+    const contact_person = branchData.contact_person;
 
-const savedBranch = localStorage.getItem("current_branch") || "all";
+    const savedBranch = localStorage.getItem("current_branch") || "all";
 
     let branch_id = savedBranch === "all" ? null : savedBranch;
 
@@ -1126,12 +1144,14 @@ const savedBranch = localStorage.getItem("current_branch") || "all";
         text: "The product has been added successfully!",
       });
 
-      // Fetch updated list of products
-      const response = await axios.get(`${ApiUrl}/adminfetchprinters`, {
-        params: { branch_id, userRole },
+      // // Fetch updated list of products
+      // const response = await axios.get(`${ApiUrl}/adminfetchprinters`, {
+      //   params: { branch_id, userRole },
 
-      });
-      setProducts(response.data);
+      // });
+      // setProducts(response.data);
+      fetchProducts();
+
       setNewProduct({
         name: "",
         images: [], // Reset images
@@ -1317,11 +1337,12 @@ const savedBranch = localStorage.getItem("current_branch") || "all";
         text: "The product has been updated successfully!",
       });
 
-      const fetchResponse = await axios.get(`${ApiUrl}/adminfetchprinters`, {
-        params: { branch_id, userRole },
+      // const fetchResponse = await axios.get(`${ApiUrl}/adminfetchprinters`, {
+      //   params: { branch_id, userRole },
 
-      });
-      setProducts(fetchResponse.data);
+      // });
+      // setProducts(fetchResponse.data);
+      fetchProducts();
 
       setEditingProduct(null);
       setModalIsOpen(false);
@@ -1366,15 +1387,16 @@ const savedBranch = localStorage.getItem("current_branch") || "all";
         // Log response from delete request
         console.log("Delete response:", deleteResponse.data);
 
-        // Fetch updated list of products
-        const response = await axios.get(`${ApiUrl}/adminfetchprinters`, {
-          params: { branch_id, userRole },
+        // // Fetch updated list of products
+        // const response = await axios.get(`${ApiUrl}/adminfetchprinters`, {
+        //   params: { branch_id, userRole },
 
-        });
-        setProducts(response.data);
+        // });
+        // setProducts(response.data);
 
-        // Log the updated product list
-        console.log("Updated products list after deletion:", response.data);
+        // // Log the updated product list
+        // console.log("Updated products list after deletion:", response.data);
+        fetchProducts();
 
         // Show success alert
         Swal.fire({
@@ -1617,6 +1639,24 @@ const savedBranch = localStorage.getItem("current_branch") || "all";
 
   const withCoupons = products.filter(p => couponProducts[p.id]?.hasCoupon).length;
   const withAccessories = products.filter(p => accessoryCounts[p.id] > 0).length;
+const getMarginAppliedPrice = (product) => {
+  const basePrice = Number(product.prod_price);
+
+  // 1️⃣ NON-ADMIN → return base price only (no margin)
+  if (userRole !== "Admin") {
+    return { finalPrice: basePrice, marginAdded: 0 };
+  }
+
+  // 2️⃣ ADMIN → apply margin
+  const rule = margin.find(
+    (m) => basePrice >= m.range_from && basePrice <= m.range_to
+  );
+
+  const marginAdded = rule ? Number(rule.margin_amount) : 0;
+  const finalPrice = basePrice + marginAdded;
+
+  return { finalPrice, marginAdded };
+};
 
   return (
     <div className="laptops-page">
@@ -1909,7 +1949,36 @@ const savedBranch = localStorage.getItem("current_branch") || "all";
 
                       </div>
                       <div>
-                        M.R.P <span style={{ textDecoration: "line-through", color: 'red', fontSize: '14px' }}>₹{product.actual_price}</span>  <span style={{ color: 'green', marginLeft: '5px' }}>₹{product.prod_price}</span>
+                        M.R.P <span style={{ textDecoration: "line-through", color: 'red', fontSize: '14px' }}>₹{product.actual_price}</span>
+                        <span className="product-price">
+                          {(() => {
+                            const basePrice = Number(product.prod_price);
+
+                            const { finalPrice, marginAdded } = getMarginAppliedPrice({
+                              prod_price: basePrice,
+                            });
+
+                            // CUSTOMER / NON-ADMIN → show base price only
+                            if (userRole !== "Admin") {
+                              return <>₹{basePrice}</>;
+                            }
+
+                            // ADMIN → show final price + margin badge
+                            return (
+                              <>
+                                ₹{finalPrice}
+
+                                {marginAdded > 0 && (
+                                   <span className="margin-badge">
+                                   ₹{basePrice} +
+                                   <br/>
+                                   ₹{marginAdded} margin
+                                  </span>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </span>
                       </div>
                       <div className="product-extras">
                         {couponProducts[product.id]?.hasCoupon && (
@@ -2868,7 +2937,7 @@ const savedBranch = localStorage.getItem("current_branch") || "all";
                   />
                 </div>
 
-                {/* <div className="feature-item">
+                <div className="feature-item">
                   <label className="feature-label">
                     In Stock or Out Of Stock
                   </label>
@@ -2887,29 +2956,30 @@ const savedBranch = localStorage.getItem("current_branch") || "all";
                     <option value="available">In Stock</option>
                     <option value="unavailable">Out Of Stock</option>
                   </select>
-                </div> */}
+                </div>
+                {userRole === "Admin" && (
 
-                {/* <div className="feature-item">
-                  <label className="feature-label">Approve or Unapprove</label>
+                  <div className="feature-item">
+                    <label className="feature-label">Approve or Unapprove</label>
 
-                  <select
-                    disabled={role === "Staff"}
-                    name="productStatus"
-                    value={editingProduct.productStatus}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        productStatus: e.target.value,
-                      })
-                    }
-                    className="adminmodal-input5"
-                  >
-                    <option value="approved">Approve</option>
-                    <option value="unapproved">UnApprove</option>
-                  </select>
-                </div> */}
+                    <select
+                      disabled={role === "Staff"}
+                      name="productStatus"
+                      value={editingProduct.productStatus}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          productStatus: e.target.value,
+                        })
+                      }
+                      className="adminmodal-input5"
+                    >
+                      <option value="approved">Approve</option>
+                      <option value="unapproved">UnApprove</option>
+                    </select>
+                  </div>
 
-                <button
+                )}                <button
                   onClick={handleUpdateProduct}
                   className="adminmodal-update-btn"
                 >

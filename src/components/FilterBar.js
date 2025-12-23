@@ -28,7 +28,7 @@ const Sidebar = ({ onApplyFilters }) => {
   }, []);
 
   return (
-    <div style={styles.sidebar}>
+    <div style={styles.sidebar} className='filter-sidebar'>
       <h3 style={styles.title}>Filter by Mobile Brand</h3>
       <div style={styles.filterOptions}>
         {['Samsung', 'Apple', 'OnePlus', 'Redmi', 'Vivo', 'Realme', 'Oppo','Poco', 'Infinix', 'Moto', 'IQOO'].map((brand) => (

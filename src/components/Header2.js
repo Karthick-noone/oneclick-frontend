@@ -44,6 +44,8 @@ import defaultUser from "./img/default-picture.png";
 import wishlisticon from "./img/wish-list.png";
 import carticon from "./img/shopping-cart3.png";
 import { SearchIcon } from "lucide-react";
+import listIcon from './img/list.png'
+import Header3 from "./Header3";
 
 
 const Header2 = ({ header2Ref }) => {
@@ -73,8 +75,27 @@ const Header2 = ({ header2Ref }) => {
   // const [cartItems, setCartItems] = useState([]);
   const [cartCount, setCartCount] = useState(0);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [header2Height, setHeader2Height] = useState(0);
+
 
   const tooltipTimerRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openMenuFromHamburger = () => {
+    setIsOpen(true);
+  };
+
+  // Open the menu (☰ icon)
+  const openMenu = () => {
+    console.log("sidebar opened");
+    setIsOpen(true);
+  };
+
+  // Close the menu (✖ icon or link click)
+  const closeMenu = () => {
+    console.log("sidebar closed");
+    setIsOpen(false);
+  };
 
   // Auto show tooltip every 5 mins
   useEffect(() => {
@@ -1081,6 +1102,14 @@ const Header2 = ({ header2Ref }) => {
     navigate(`/shop/${product.id}-${slugify(product.prod_name)}`);
   };
 
+  useEffect(() => {
+    if (header2Ref.current) {
+      const height = header2Ref.current.offsetHeight;
+      setHeader2Height(height);
+    }
+  }, [header2Ref.current, showSuggestions, isDropdownOpen4, isSidebarOpen]);
+
+
   return (
     <>
       <header
@@ -1092,9 +1121,10 @@ const Header2 = ({ header2Ref }) => {
         <Link to="/" className="logo-link">
           <img
             src="/img/logo3.png"
-            width="230px"
-            style={{ marginLeft: "50px" }}
+            // width="150px"
+            // style={{ marginLeft: "50px" }}
             alt="Company Logo"
+            className="oneclick-logo"
           />
         </Link>
 
@@ -1110,49 +1140,47 @@ const Header2 = ({ header2Ref }) => {
           <div className="mobile-backdrop" onClick={closeMobileSearch} />
         )}
         {/* <div > */}
-        <div
+        <div style={{ position: "relative", width: "100%", maxWidth: "600px" }}>
 
-          className={`search-box ${showMobileSearch ? "mobile-overlay show" : "mobile-overlay"}`}
-        >
-          <div className="search-icon-container" onClick={handleSearch}>
-            <FaSearch className="search-icon" />
-          </div>
-          <input
-            type="text"
-            className="searchboxinput"
-            ref={inputRef}
-            value={searchQuery}
-            onChange={handleSearchInputChange}
-            onKeyDown={handleKeyPress}
-            onFocus={() => setShowSuggestions(true)} // 
-            placeholder="Search for products, brands and more"
-            autoComplete="off"
-          />
-          {searchQuery && (
-            <IoMdClose
-              title="Clear"
-              className="clear-icon"
-              onClick={handleClearInput}
+          <div
+            className={`search-box ${showMobileSearch ? "mobile-overlay show" : "mobile-overlay"}`}
+          >
+            <div className="search-icon-container" onClick={handleSearch}>
+              <FaSearch className="search-icon" />
+            </div>
+
+            <input
+              type="text"
+              className="searchboxinput"
+              ref={inputRef}
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+              onKeyDown={handleKeyPress}
+              onFocus={() => setShowSuggestions(true)}
+              placeholder="Search for products, brands and more"
+              autoComplete="off"
             />
-          )}
 
-        </div>
+            {searchQuery && (
+              <IoMdClose title="Clear" className="clear-icon" onClick={handleClearInput} />
+            )}
+          </div>
 
-        {showSuggestions && (
-          <ul ref={dropdownRef} className="suggestions-dropdown">
-            {suggestions.length > 0 ? (
-              suggestions.map((suggestion, index) => {
-                const prodName = suggestion?.prod_name || suggestion;
+          {showSuggestions && (
+            <ul ref={dropdownRef} className="suggestions-dropdown">
+              {/* your mapping code stays same */}
+              {suggestions.length > 0 ? (
+                suggestions.map((suggestion, index) => {
+                  const prodName = suggestion?.prod_name || suggestion;
 
-                return (
-                  <li
-                    key={index}
-                    ref={(el) => (suggestionRefs.current[index] = el)}
-                    onClick={() => handleSelect(prodName)}
-                    className={index === highlightedIndex ? "highlighted" : ""}
-                  >
-                    <div className="suggestion-item">
-                      <div className="suggestion-content">
+                  return (
+                    <li
+                      key={index}
+                      ref={(el) => (suggestionRefs.current[index] = el)}
+                      onClick={() => handleSelect(prodName)}
+                      className={index === highlightedIndex ? "highlighted" : ""}
+                    >
+                      <div className="suggestion-item">
                         <SearchIcon className="search-icon" />
                         <div className="suggestion-text">{prodName}</div>
                       </div>
@@ -1164,20 +1192,18 @@ const Header2 = ({ header2Ref }) => {
                           className="suggestion-image"
                         />
                       )}
-                    </div>
+                    </li>
+                  );
+                })
+              ) : searchQuery.trim() === "" ? (
+                <li className="no-suggestionss">Search your products...</li>
+              ) : (
+                <li className="no-suggestionss">No matches found for “{searchQuery}”</li>
+              )}
+            </ul>
+          )}
+        </div>
 
-                  </li>
-                );
-              })
-            ) : searchQuery.trim() === "" ? (
-              <li className="no-suggestionss">Search your products...</li> // 👈 New message for empty input
-            ) : (
-              <li className="no-suggestionss">
-                No matches found for “{searchQuery}”
-              </li>
-            )}
-          </ul>
-        )}
 
 
         {/* </div> */}
@@ -1187,6 +1213,11 @@ const Header2 = ({ header2Ref }) => {
         <div className="iconss"
 
         >
+
+          <div className="hamburger" onClick={openMenuFromHamburger}>
+            <img src={listIcon} width="28px" alt="list" />
+          </div>
+
 
           <div
             ref={imgRef}
@@ -1420,20 +1451,20 @@ const Header2 = ({ header2Ref }) => {
                 </Link>
 
                 <Link to={"/branch-login"}>
-                <div className={`dropdown-item ${location.pathname === "/HelpCenter" ? "active" : ""}`}
-              
-                >
-                <FaCodeBranch 
-                  style={{
-                  color:'#2A55E5 ',
-                  marginRight:"16px"
-                }}
-                />
-                <span style={{ fontSize: '16px' }}>Branch Login</span>
-                </div>
+                  <div className={`dropdown-item ${location.pathname === "/HelpCenter" ? "active" : ""}`}
+                  >
+                    <FaCodeBranch
+                      style={{
+                        color: '#2A55E5 ',
+                        marginRight: "16px"
+                      }}
+                    />
+                    <span style={{ fontSize: '16px' }}>Business Login</span>
+                  </div>
                 </Link>
               </div>
             )}
+
 
 
             {cartCount > 0 && (
@@ -1632,7 +1663,7 @@ const Header2 = ({ header2Ref }) => {
 
                       <svg
                         className="svg-icon"
-                        
+
                         viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg"
                       >
@@ -1649,7 +1680,10 @@ const Header2 = ({ header2Ref }) => {
                 </Link>
 
                 {calculateTotalPrice() > 0 && (
-                  <p className="total-prices">₹{calculateTotalPrice()}</p>
+                  <div className="price-card">
+                    <span className="total-price-label">Total Amount</span>
+                    <p className="total-price">₹{calculateTotalPrice()}</p>
+                  </div>
                 )}
 
                 {/* <ToastContainer position="top-right" autoClose={3000} /> */}
@@ -1686,7 +1720,11 @@ const Header2 = ({ header2Ref }) => {
       {/* {!isMobileView && <Header3 />} */}
 
       {/* <ToastContainer /> */}
-
+      <Header3
+        topOffset={header2Height}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+      />
     </>
   );
 };
