@@ -68,7 +68,7 @@ const PrinterAccessories = () => {
   const searchQuery = queryParams.get("search");
 
   // Log the raw search query
-    // console.log("Search Query:", searchQuery);
+  // console.log("Search Query:", searchQuery);
 
 
   // Normalize a string by trimming, lowercasing, and removing all spaces
@@ -98,39 +98,39 @@ const PrinterAccessories = () => {
     })
     : products; // If no search query, return all products // If no search query, return all products
 
-const cacheRef = useRef({
-  printeraccessories: null,
-});
+  const cacheRef = useRef({
+    printeraccessories: null,
+  });
 
-useEffect(() => {
-  const fetchProducts = async () => {
-    // 1. Show cached data immediately (if available)
-    if (cacheRef.current.printeraccessories) {
-      setProducts(cacheRef.current.printeraccessories);
-    } else {
-      setLoading(true); // Only show loader if no cached data
-    }
-
-    try {
-      // 2. Always fetch fresh data in background
-      const response = await axios.get(`${ApiUrl}/fetchprinteraccessories`);
-      const fetchedProducts = response.data;
-
-      setProducts(fetchedProducts); // Update UI with fresh data
-      cacheRef.current.printeraccessories = fetchedProducts; // Update cache
-    } catch (error) {
-      console.error("Error fetching printeraccessories:", error);
-      if (!cacheRef.current.printeraccessories) {
-        // Only show error if no cached data
-        toast.error("Failed to fetch printeraccessories.");
+  useEffect(() => {
+    const fetchProducts = async () => {
+      // 1. Show cached data immediately (if available)
+      if (cacheRef.current.printeraccessories) {
+        setProducts(cacheRef.current.printeraccessories);
+      } else {
+        setLoading(true); // Only show loader if no cached data
       }
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  fetchProducts();
-}, []);
+      try {
+        // 2. Always fetch fresh data in background
+        const response = await axios.get(`${ApiUrl}/fetchprinteraccessories`);
+        const fetchedProducts = response.data;
+
+        setProducts(fetchedProducts); // Update UI with fresh data
+        cacheRef.current.printeraccessories = fetchedProducts; // Update cache
+      } catch (error) {
+        console.error("Error fetching printeraccessories:", error);
+        if (!cacheRef.current.printeraccessories) {
+          // Only show error if no cached data
+          toast.error("Failed to fetch printeraccessories.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
 
 
@@ -489,176 +489,176 @@ useEffect(() => {
       {/* <Header3 /> */}
       <div className="breadcrumb-wrapper">
 
-      <span>
-        <Link style={{ textDecoration: "none", color: "black" }} to="/">
-          Home{" "}
-        </Link>
-        &gt; Printer Accessories
-      </span>
+        <span>
+          <Link style={{ textDecoration: "none", color: "black" }} to="/">
+            Home{" "}
+          </Link>
+          &gt; Printer Accessories
+        </span>
       </div>
       <div className="main-content">
         <Sidebar />
         <div className="product-list">
-                  {loading ? (
-                    // Show skeletons while loading
-                    [...Array(8)].map((_, index) => (
-                      <div key={index} className="skeleton-product-card">
-                        <div className="skeleton-image"></div>
-                        <div className="skeleton-text"></div>
-                        <div className="skeleton-text short"></div>
-                        <div className="skeleton-price"></div>
-                        <div className="skeleton-buttons"></div>
-                      </div>
-                    ))
-                  ) : (
-                    <>
-                      {(filteredProducts.length > 0 ? filteredProducts : products).length === 0 ? (
-                        <div className="no-products-message">
-                          <h2>No products here yet...</h2>
-                          <p>In the meantime, you can choose a different category to continue shopping.</p>
-                        </div>
-                      ) : (
-                        (filteredProducts.length > 0 ? filteredProducts : products).map((product) => {
-                          const images = Array.isArray(product.prod_img)
-                            ? product.prod_img
-                            : JSON.parse(product.prod_img || "[]");
-                          const activeIndex =
-                            hoveredProductId === product.id
-                              ? hoverImageIndexes[product.id] || 0
-                              : 0;
-                          const currentImage = images[activeIndex];
-        
-                          return (
-                            <div
-                              key={product.id}
-                              className="product-card"
-                              onClick={() => handleCardClick(product)}
-                            >
-                              {product.offer_label && (
-                                <div className="product-label">{product.offer_label}</div>
-                              )}
-        
-                              <div className="product-actions">
-                                <img
-                                  src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
-                                  alt={product.prod_name}
-                                  className="product-image"
-                                  onMouseEnter={() => setHoveredProductId(product.id)}
-                                  onMouseLeave={() => {
-                                    setHoveredProductId(null);
-                                    setHoverImageIndexes((prev) => ({
-                                      ...prev,
-                                      [product.id]: 0,
-                                    }));
-                                  }}
-                                />
-                                <span
-                                  title={
-                                    favorites[`${product.id}`]
-                                      ? "Remove from Wishlist"
-                                      : "Add to Wishlist"
-                                  }
-                                  className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
-                                    }`}
-                                  onClick={(event) => handleToggleFavorite(product, event)}
-                                >
-                                  {favorites[`${product.id}`] ? (
-                                    <FaHeart style={{ color: "red" }} />
-                                  ) : (
-                                    <FaRegHeart />
-                                  )}
-                                </span>
-                              </div>
-        
-                              <h3 className="product-name" title={product.prod_name}>
-                                {product.prod_name.charAt(0).toUpperCase() +
-                                  product.prod_name.slice(1)}
-                              </h3>
-                              <span
-                                className="product-subtitle2"
-                                title={product.subtitle}
-                              >
-                                {product.subtitle}
-                              </span>
-        
-                              <div>
-                                <span>
-                                  <span className="product-price">
-                                    ₹
-                                    {product.offer_price > 0 && isOfferActive
-                                      ? product.offer_price
-                                      : product.prod_price}
-                                  </span>
-                                  <span style={{ margin: "5px", fontSize: "15px" }}>
-                                    M.R.P
-                                  </span>
-                                  <span
-                                    className="product-actual-price"
-                                    style={{
-                                      textDecoration: "line-through",
-                                      color: "red",
-                                    }}
-                                  >
-                                    ₹{product.actual_price}
-                                  </span>
-                                </span>
-                                <p
-                                  style={{
-                                    color: "green",
-                                    marginLeft: "10px",
-                                    marginBottom: "10px",
-                                  }}
-                                >
-                                  (
-                                  {Math.round(
-                                    ((product.actual_price -
-                                      (product.offer_price > 0 && isOfferActive
-                                        ? product.offer_price
-                                        : product.prod_price)) /
-                                      product.actual_price) *
-                                    100
-                                  )}
-                                  % OFF)
-                                </p>
-                              </div>
-        
-                              {product.status === "unavailable" ? (
-                                <p
-                                  style={{
-                                    color: "red",
-                                    fontWeight: "bold",
-                                    fontSize: "16px",
-                                    textAlign: "center",
-                                  }}
-                                  className="out-of-stock"
-                                >
-                                  Out of Stock
-                                </p>
-                              ) : (
-                                <div className="btn-container">
-                                  <button
-                                    onClick={(event) => handleAddToCart(product, event)}
-                                    className="addToCart"
-                                    title="Add To Cart"
-                                  >
-                                    ADD TO CART
-                                  </button>
-                                  <button
-                                    title="Buy Now"
-                                    onClick={(event) => handleBuyNow(product, event)}
-                                    className="buy-now"
-                                  >
-                                    BUY NOW
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })
-                      )}
-                    </>
-                  )}
+          {loading ? (
+            // Show skeletons while loading
+            [...Array(8)].map((_, index) => (
+              <div key={index} className="skeleton-product-card">
+                <div className="skeleton-image"></div>
+                <div className="skeleton-text"></div>
+                <div className="skeleton-text short"></div>
+                <div className="skeleton-price"></div>
+                <div className="skeleton-buttons"></div>
+              </div>
+            ))
+          ) : (
+            <>
+              {(filteredProducts.length > 0 ? filteredProducts : products).length === 0 ? (
+                <div className="no-products-message">
+                  <h2>No products here yet...</h2>
+                  <p>In the meantime, you can choose a different category to continue shopping.</p>
                 </div>
+              ) : (
+                (filteredProducts.length > 0 ? filteredProducts : products).map((product) => {
+                  const images = Array.isArray(product.prod_img)
+                    ? product.prod_img
+                    : JSON.parse(product.prod_img || "[]");
+                  const activeIndex =
+                    hoveredProductId === product.id
+                      ? hoverImageIndexes[product.id] || 0
+                      : 0;
+                  const currentImage = images[activeIndex];
+
+                  return (
+                    <div
+                      key={product.id}
+                      className="product-card"
+                      onClick={() => handleCardClick(product)}
+                    >
+                      {product.offer_label && (
+                        <div className="product-label">{product.offer_label}</div>
+                      )}
+
+                      <div className="product-actions">
+                        <img
+                          src={`${ApiUrl}/uploads/${product.category.toLowerCase()}/${currentImage}`}
+                          alt={product.prod_name}
+                          className="product-image"
+                          onMouseEnter={() => setHoveredProductId(product.id)}
+                          onMouseLeave={() => {
+                            setHoveredProductId(null);
+                            setHoverImageIndexes((prev) => ({
+                              ...prev,
+                              [product.id]: 0,
+                            }));
+                          }}
+                        />
+                        <span
+                          title={
+                            favorites[`${product.id}`]
+                              ? "Remove from Wishlist"
+                              : "Add to Wishlist"
+                          }
+                          className={`favorite-icon ${favorites[`${product.id}`] ? "filled" : ""
+                            }`}
+                          onClick={(event) => handleToggleFavorite(product, event)}
+                        >
+                          {favorites[`${product.id}`] ? (
+                            <FaHeart style={{ color: "red" }} />
+                          ) : (
+                            <FaRegHeart />
+                          )}
+                        </span>
+                      </div>
+
+                      <h3 className="product-name" title={product.prod_name}>
+                        {product.prod_name.charAt(0).toUpperCase() +
+                          product.prod_name.slice(1)}
+                      </h3>
+                      <span
+                        className="product-subtitle2"
+                        title={product.subtitle}
+                      >
+                        {product.subtitle}
+                      </span>
+
+                      <div>
+                        <span>
+                          <span className="product-price">
+                            ₹
+                            {product.offer_price > 0 && isOfferActive
+                              ? product.offer_price
+                              : product.prod_price}
+                          </span>
+                          <span style={{ margin: "5px", fontSize: "15px" }}>
+                            M.R.P
+                          </span>
+                          <span
+                            className="product-actual-price"
+                            style={{
+                              textDecoration: "line-through",
+                              color: "red",
+                            }}
+                          >
+                            ₹{product.actual_price}
+                          </span>
+                        </span>
+                        <p
+                          style={{
+                            color: "green",
+                            marginLeft: "10px",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          (
+                          {Math.round(
+                            ((product.actual_price -
+                              (product.offer_price > 0 && isOfferActive
+                                ? product.offer_price
+                                : product.prod_price)) /
+                              product.actual_price) *
+                            100
+                          )}
+                          % OFF)
+                        </p>
+                      </div>
+
+                      {product.status === "unavailable" ? (
+                        <p
+                          style={{
+                            color: "red",
+                            fontWeight: "bold",
+                            fontSize: "16px",
+                            textAlign: "center",
+                          }}
+                          className="out-of-stock"
+                        >
+                          Out of Stock
+                        </p>
+                      ) : (
+                        <div className="btn-container">
+                          <button
+                            onClick={(event) => handleAddToCart(product, event)}
+                            className="addToCart"
+                            title="Add To Cart"
+                          >
+                            ADD TO CART
+                          </button>
+                          <button
+                            title="Buy Now"
+                            onClick={(event) => handleBuyNow(product, event)}
+                            className="buy-now"
+                          >
+                            BUY NOW
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       <Footer />

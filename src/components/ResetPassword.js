@@ -7,6 +7,7 @@ const ForgotPassword = () => {
   const [active, setActive] = useState("auth-forgot1");
   const [loading, setLoading] = useState(false);
 
+
   return (
     <div id="auth-container" className={`auth-container ${active}`}>
       {/* FORM SECTION */}

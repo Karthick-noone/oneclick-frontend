@@ -488,6 +488,7 @@ useEffect(() => {
       {/* <Header3 /> */}
       <div className="breadcrumb-wrapper">
 
+
       <span >
         <Link style={{ textDecoration: "none", color: "black" }} to="/">
           Home{" "}
@@ -661,16 +662,7 @@ useEffect(() => {
       </div>
 
       <Footer />
-      {/* {selectedProduct && (
-        <Modal
-          isOpen={true}
-          onClose={handleCloseModal}
-          product={selectedProduct}
-          onNext={handleNextProduct}
-          onPrev={handlePrevProduct}
-          category={category} // Pass the category to the Modal
-        />
-      )} */}
+
       <ToastContainer />
     </div>
   );

@@ -221,7 +221,7 @@ const Reports = () => {
                       <th>Sl.No</th>
                       <th>Order ID</th>
                       <th>Total Amount</th>
-                      <th>Status</th>
+                      <th>Payment Status</th>
                       <th>Order Date</th>
                     </tr>
                   </thead>

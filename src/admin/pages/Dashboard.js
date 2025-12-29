@@ -379,7 +379,8 @@ const Dashboard = () => {
 
           </div>
           <div className="product-summary-card1">
-            <img src={ElectronicDevices} alt="Product Categories" style={{ width: "35px", height: "35px" }} />            <div className="summary-info">
+            <img src={ElectronicDevices} alt="Product Categories" style={{ width: "35px", height: "35px" }} />
+            <div className="summary-info">
               <h3>Product Categories</h3>
               <p>13</p>
             </div>

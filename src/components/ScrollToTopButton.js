@@ -19,6 +19,7 @@ const ScrollToTopButton = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
+
     return isVisible ? (
         <div className="scroll-to-top-button" onClick={scrollToTop} >
             <div className="tooltip-container">

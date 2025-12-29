@@ -94,29 +94,29 @@ const SalesReport = () => {
         <div className="orders-header">
           <h2 className="orders-page-title">Product Sales Report</h2>
           <div className="filters-section">
-  <div className="product-search-wrapper">
-    <span className="product-search-icon">
+            <div className="product-search-wrapper">
+              <span className="product-search-icon">
 
- <SearchIcon width={'18px'} className="search-icon-btn" />
-    </span>
-    <input
-      type="text"
-      placeholder="Search by Product Name "
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      className="product-search-input"
-    />
-    {searchQuery && (
-      <button
-        className="product-clear-btn"
-        onClick={() => setSearchQuery("")}
-        aria-label="Clear search"
-      >
-        ×
-      </button>
-    )}
-  </div>
-</div>
+                <SearchIcon width={'18px'} className="search-icon-btn" />
+              </span>
+              <input
+                type="text"
+                placeholder="Search by Product Name "
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="product-search-input"
+              />
+              {searchQuery && (
+                <button
+                  className="product-clear-btn"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
 
         </div>
         <div className="table-wrapper">
@@ -135,7 +135,7 @@ const SalesReport = () => {
                 currentSales.map((item, index) => (
                   <tr key={index}>
                     <td>{indexOfFirstSalesItem + index + 1}</td>
-                    <td style={{textAlign:'left'}}>{item.product_name}</td>
+                    <td style={{ textAlign: 'left' }}>{item.product_name}</td>
                     <td>{item.category}</td>
                     <td>{item.total_quantity}</td>
                     <td>{item.sales}</td>

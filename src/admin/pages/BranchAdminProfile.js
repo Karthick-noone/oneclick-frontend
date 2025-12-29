@@ -16,7 +16,7 @@ import "./css/BranchAdminProfile.css";
 
 const BranchAdminProfile = () => {
   const [branchDetails, setBranchDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   
   const currentBranchId = localStorage.getItem("current_branch") || "all";
@@ -28,7 +28,7 @@ const BranchAdminProfile = () => {
 
   const fetchBranchDetails = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
       
       const response = await fetch(`${ApiUrl}/api/branch/get-all`);
       const data = await response.json();
@@ -50,20 +50,20 @@ const BranchAdminProfile = () => {
       console.error("Error fetching branch details:", error);
       toast.error("Failed to load branch details");
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="profile-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Loading Branch Profile...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="profile-container">
+  //       <div className="loading-spinner">
+  //         <div className="spinner"></div>
+  //         <p>Loading Branch Profile...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   if (!branchDetails) {
     return (
@@ -71,12 +71,12 @@ const BranchAdminProfile = () => {
         <div className="error-message">
           <h2>Branch Details Not Found</h2>
           <p>Unable to load branch information. Please try again.</p>
-          <button 
+          {/* <button 
             className="back-button"
             onClick={() => navigate("/Admin/BranchDashboard")}
           >
             ← Back to Dashboard
-          </button>
+          </button> */}
         </div>
       </div>
     );
@@ -89,12 +89,12 @@ const BranchAdminProfile = () => {
           <h1>Admin Profile</h1>
           <p>Complete details of your branch information</p>
         </div>
-        <button 
+        {/* <button 
           className="back-button"
           onClick={() => navigate("/Admin/BranchDashboard")}
         >
           ← Back to Dashboard
-        </button>
+        </button> */}
       </div>
 
       <div className="profile-card">

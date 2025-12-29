@@ -767,7 +767,7 @@ const Orders = ({ setYear, setMonth, updateOrderStatus }) => {
                     <th>View/Delete</th>
                     <th>Delivery Status</th>
                     <th>Current Status</th> {/* New Column */}
-                    <th>Print</th>
+                    <th>Invoice</th>
                     <th>Cancel Order</th>
                   </tr>
                 </thead>

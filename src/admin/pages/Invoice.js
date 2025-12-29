@@ -213,16 +213,16 @@ const Invoice = ({ order, productDetails }) => {
           {/* Left Block */}
           <div style={{ flex: "1", textAlign: "left" }}>
             <p style={{ margin: "0 0 5px 0" }}>
-              <strong  style={{marginRight:'5px'}}>Order By:</strong> <span>{order.payment_method}</span>
+              <strong style={{ marginRight: '5px' }}>Order By:</strong> <span>{order.payment_method}</span>
             </p>
             <p style={{ margin: "0 0 5px 0" }}>
-              <strong  style={{marginRight:'5px'}}>Order ID:</strong> <span>#{order.unique_id}</span>
+              <strong style={{ marginRight: '5px' }}>Order ID:</strong> <span>#{order.unique_id}</span>
             </p>
             <p style={{ margin: "0 0 5px 0" }}>
-              <strong  style={{marginRight:'5px'}}>Order Date:</strong> <span>{formatDate(order.order_date)}</span>
+              <strong style={{ marginRight: '5px' }}>Order Date:</strong> <span>{formatDate(order.order_date)}</span>
             </p>
             <p style={{ margin: "0 0 5px 0" }}>
-              <span style={{marginRight:'5px'}}><strong>Total Products:</strong> <span>{totalQuantity}</span> </span>
+              <span style={{ marginRight: '5px' }}><strong>Total Products:</strong> <span>{totalQuantity}</span> </span>
             </p>
           </div>
 
@@ -269,90 +269,90 @@ const Invoice = ({ order, productDetails }) => {
 
 
 
-      <div
-  style={{
-    textAlign: "left",
-    display: "flex",
-    flexDirection: "column",
-    gap: "5px",
-    fontSize: "15px",
-    marginTop: "10px",
-  }}
->
-  {(() => {
-    const accessoriesCategories = [
-      "ComputerAccessories",
-      "MobileAccessories",
-      "PrinterAccessories",
-      "CCTVAccessories",
-    ];
+            <div
+              style={{
+                textAlign: "left",
+                display: "flex",
+                flexDirection: "column",
+                gap: "5px",
+                fontSize: "15px",
+                marginTop: "10px",
+              }}
+            >
+              {(() => {
+                const accessoriesCategories = [
+                  "ComputerAccessories",
+                  "MobileAccessories",
+                  "PrinterAccessories",
+                  "CCTVAccessories",
+                ];
 
-    // Calculate subtotal (products only, without delivery)
-    const subtotal = products.reduce((acc, product) => {
-      const quantity = product.quantity || 1;
-      const isAccessory = accessoriesCategories.includes(product.category);
+                // Calculate subtotal (products only, without delivery)
+                const subtotal = products.reduce((acc, product) => {
+                  const quantity = product.quantity || 1;
+                  const isAccessory = accessoriesCategories.includes(product.category);
 
-      let price;
-      if (isAccessory) {
-        price = product.effectiveprice > 0 ? product.effectiveprice : product.prod_price;
-      } else {
-        price = product.prod_price;
-      }
+                  let price;
+                  if (isAccessory) {
+                    price = product.effectiveprice > 0 ? product.effectiveprice : product.prod_price;
+                  } else {
+                    price = product.prod_price;
+                  }
 
-      return acc + price * quantity;
-    }, 0);
+                  return acc + price * quantity;
+                }, 0);
 
-    // GST is included in subtotal
-    const cgst = subtotal * 0.09;
-    const sgst = subtotal * 0.09;
+                // GST is included in subtotal
+                const cgst = subtotal * 0.09;
+                const sgst = subtotal * 0.09;
 
-    // Delivery Charge
-    const deliveryTotal = products.reduce(
-      (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
-      0
-    );
+                // Delivery Charge
+                const deliveryTotal = products.reduce(
+                  (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
+                  0
+                );
 
-    // Grand Total = subtotal + delivery (GST already included in subtotal)
-    const grandTotal = subtotal + deliveryTotal;
+                // Grand Total = subtotal + delivery (GST already included in subtotal)
+                const grandTotal = subtotal + deliveryTotal;
 
-    return (
-      <>
-        {/* GST Split (within subtotal) */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span><strong>CGST (9%):</strong></span>
-          <span>₹{Math.round(cgst).toLocaleString("en-IN")}</span>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span><strong>SGST (9%):</strong></span>
-          <span>₹{Math.round(sgst).toLocaleString("en-IN")}</span>
-        </div>
+                return (
+                  <>
+                    {/* GST Split (within subtotal) */}
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span><strong>CGST (9%):</strong></span>
+                      <span>₹{Math.round(cgst).toLocaleString("en-IN")}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span><strong>SGST (9%):</strong></span>
+                      <span>₹{Math.round(sgst).toLocaleString("en-IN")}</span>
+                    </div>
 
-        {/* Delivery Charge */}
-        {deliveryTotal > 0 && (
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span><strong>Delivery Charge:</strong></span>
-            <span>₹{deliveryTotal.toLocaleString("en-IN")}</span>
-          </div>
-        )}
+                    {/* Delivery Charge */}
+                    {deliveryTotal > 0 && (
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span><strong>Delivery Charge:</strong></span>
+                        <span>₹{deliveryTotal.toLocaleString("en-IN")}</span>
+                      </div>
+                    )}
 
-        {/* Grand Total */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontWeight: "bold",
-            borderTop: "1px solid #333",
-            paddingTop: "5px",
-            marginTop: "5px",
-          }}
-        >
-          <span><strong>Grand Total:</strong></span>
-          <span>₹{Math.round(grandTotal).toLocaleString("en-IN")}</span>
-        </div>
-      </>
-    );
-  })()}
-</div>
+                    {/* Grand Total */}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontWeight: "bold",
+                        borderTop: "1px solid #333",
+                        paddingTop: "5px",
+                        marginTop: "5px",
+                      }}
+                    >
+                      <span><strong>Grand Total:</strong></span>
+                      <span>₹{Math.round(grandTotal).toLocaleString("en-IN")}</span>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
 
 
           </div>
@@ -619,89 +619,89 @@ const Invoice = ({ order, productDetails }) => {
 
             {/* Grand Total */}
             <div
-  style={{
-    textAlign: "left",
-    display: "flex",
-    flexDirection: "column",
-    gap: "5px",
-    fontSize: "15px",
-    marginTop: "10px",
-  }}
->
-  {(() => {
-    const accessoriesCategories = [
-      "ComputerAccessories",
-      "MobileAccessories",
-      "PrinterAccessories",
-      "CCTVAccessories",
-    ];
+              style={{
+                textAlign: "left",
+                display: "flex",
+                flexDirection: "column",
+                gap: "5px",
+                fontSize: "15px",
+                marginTop: "10px",
+              }}
+            >
+              {(() => {
+                const accessoriesCategories = [
+                  "ComputerAccessories",
+                  "MobileAccessories",
+                  "PrinterAccessories",
+                  "CCTVAccessories",
+                ];
 
-    // Calculate subtotal (products only, without delivery)
-    const subtotal = products.reduce((acc, product) => {
-      const quantity = product.quantity || 1;
-      const isAccessory = accessoriesCategories.includes(product.category);
+                // Calculate subtotal (products only, without delivery)
+                const subtotal = products.reduce((acc, product) => {
+                  const quantity = product.quantity || 1;
+                  const isAccessory = accessoriesCategories.includes(product.category);
 
-      let price;
-      if (isAccessory) {
-        price = product.effectiveprice > 0 ? product.effectiveprice : product.prod_price;
-      } else {
-        price = product.prod_price;
-      }
+                  let price;
+                  if (isAccessory) {
+                    price = product.effectiveprice > 0 ? product.effectiveprice : product.prod_price;
+                  } else {
+                    price = product.prod_price;
+                  }
 
-      return acc + price * quantity;
-    }, 0);
+                  return acc + price * quantity;
+                }, 0);
 
-    // GST is included in subtotal
-    const cgst = subtotal * 0.09;
-    const sgst = subtotal * 0.09;
+                // GST is included in subtotal
+                const cgst = subtotal * 0.09;
+                const sgst = subtotal * 0.09;
 
-    // Delivery Charge
-    const deliveryTotal = products.reduce(
-      (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
-      0
-    );
+                // Delivery Charge
+                const deliveryTotal = products.reduce(
+                  (acc, product) => acc + (parseInt(product.deliverycharge, 10) || 0),
+                  0
+                );
 
-    // Grand Total = subtotal + delivery (GST already included in subtotal)
-    const grandTotal = subtotal + deliveryTotal;
+                // Grand Total = subtotal + delivery (GST already included in subtotal)
+                const grandTotal = subtotal + deliveryTotal;
 
-    return (
-      <>
-        {/* GST Split (within subtotal) */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span><strong>CGST (9%):</strong></span>
-          <span>₹{Math.round(cgst).toLocaleString("en-IN")}</span>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span><strong>SGST (9%):</strong></span>
-          <span>₹{Math.round(sgst).toLocaleString("en-IN")}</span>
-        </div>
+                return (
+                  <>
+                    {/* GST Split (within subtotal) */}
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span><strong>CGST (9%):</strong></span>
+                      <span>₹{Math.round(cgst).toLocaleString("en-IN")}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span><strong>SGST (9%):</strong></span>
+                      <span>₹{Math.round(sgst).toLocaleString("en-IN")}</span>
+                    </div>
 
-        {/* Delivery Charge */}
-        {deliveryTotal > 0 && (
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span><strong>Delivery Charge:</strong></span>
-            <span>₹{deliveryTotal.toLocaleString("en-IN")}</span>
-          </div>
-        )}
+                    {/* Delivery Charge */}
+                    {deliveryTotal > 0 && (
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span><strong>Delivery Charge:</strong></span>
+                        <span>₹{deliveryTotal.toLocaleString("en-IN")}</span>
+                      </div>
+                    )}
 
-        {/* Grand Total */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontWeight: "bold",
-            borderTop: "1px solid #333",
-            paddingTop: "5px",
-            marginTop: "5px",
-          }}
-        >
-          <span><strong>Grand Total:</strong></span>
-          <span>₹{Math.round(grandTotal).toLocaleString("en-IN")}</span>
-        </div>
-      </>
-    );
-  })()}
-</div>
+                    {/* Grand Total */}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontWeight: "bold",
+                        borderTop: "1px solid #333",
+                        paddingTop: "5px",
+                        marginTop: "5px",
+                      }}
+                    >
+                      <span><strong>Grand Total:</strong></span>
+                      <span>₹{Math.round(grandTotal).toLocaleString("en-IN")}</span>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
 
           </div>
 
