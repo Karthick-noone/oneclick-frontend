@@ -192,7 +192,7 @@ const Topbar = () => {
 
       <div className="topbar-right">
         {/* Role Badge */}
-        <div 
+        <div
           className="user-role-badge"
           style={{ '--role-color': getRoleColor() }}
         >
@@ -234,9 +234,13 @@ const Topbar = () => {
               <span className="mark-all-btn" onClick={markAllAsRead}>
                 Mark all as read
               </span>
-              <span className="notification-count">
-                {notifications.filter(n => !n.read).length} new
-              </span>
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="notification-count">
+                  <span>
+                    {notifications.filter(n => !n.read).length} new
+                  </span>
+
+                </span>)}
             </div>
           </div>
 
@@ -291,10 +295,10 @@ const Topbar = () => {
             </div>
             <div className="profile-info">
               <h3 className="profile-name">
-                {role === "Admin" ? "Administrator" : 
-                 role === "branch_admin" ? 
-                   (JSON.parse(localStorage.getItem("branch")) || {}).name || "Branch Admin" : 
-                   username}
+                {role === "Admin" ? "Administrator" :
+                  role === "branch_admin" ?
+                    (JSON.parse(localStorage.getItem("branch")) || {}).name || "Branch Admin" :
+                    username}
               </h3>
               <p className="profile-email">{getRoleDisplay()}</p>
             </div>
@@ -304,22 +308,28 @@ const Topbar = () => {
 
           <div className="menu-items">
             {role === "Admin" && (
-              <Link to="/admin/ChangePassword" className="menu-link">
+              <Link to="/admin/ChangePassword" className="menu-link"
+                onClick={() => setIsMenuOpen(false)}
+              
+              >
                 <button className="menu-item">
                   <FaCog className="menu-icon" />
                   <span>Change Password</span>
                 </button>
               </Link>
             )}
-            
+
             {role === "branch_admin" && (
-            <Link to="/Admin/BranchAdminProfile" className="menu-link">
-              <button className="menu-item">
-                <FaUser className="menu-icon" />
-                <span>View Profile</span>
-              </button>
-            </Link>
-          )}
+              <Link to="/Admin/BranchAdminProfile" className="menu-link"
+                onClick={() => setIsMenuOpen(false)}
+
+              >
+                <button className="menu-item" >
+                  <FaUser className="menu-icon" />
+                  <span >View Profile</span>
+                </button>
+              </Link>
+            )}
 
             <div className="menu-divider"></div>
 

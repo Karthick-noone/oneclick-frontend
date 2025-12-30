@@ -13,6 +13,23 @@ const MarginSettings = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
+    const [editId, setEditId] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+
+    const handleEdit = (item) => {
+        setEditId(item.id);
+        setRangeFrom(item.range_from);
+        setRangeTo(item.range_to);
+        setMarginAmount(item.margin_amount);
+        setIsEditing(true);
+        setErrorMessage("");
+
+        //  Scroll to top smoothly
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    };
 
     useEffect(() => {
         fetchMargins();
@@ -39,17 +56,24 @@ const MarginSettings = () => {
         if (!from || !to || !margin) {
             return "All fields are required";
         }
+
         if (from < 0 || to < 0 || margin < 0) {
             return "Values cannot be negative";
         }
+
         if (from >= to) {
             return "'Range From' must be less than 'Range To'";
         }
+
         if (margin > to - from) {
             return "Margin cannot exceed the price range gap";
         }
 
         for (let r of ranges) {
+
+            // ✅ Skip current editing record
+            if (isEditing && r.id === editId) continue;
+
             if (
                 (from >= r.range_from && from <= r.range_to) ||
                 (to >= r.range_from && to <= r.range_to) ||
@@ -62,7 +86,8 @@ const MarginSettings = () => {
         return "";
     };
 
-    const handleAddMargin = async () => {
+
+    const handleSaveMargin = async () => {
         const validationError = validateInputs();
         if (validationError) {
             setErrorMessage(validationError);
@@ -73,29 +98,42 @@ const MarginSettings = () => {
             setSaving(true);
             setErrorMessage("");
 
-            await axios.post(`${ApiUrl}/api/margins/add-margin`, {
-                range_from: rangeFrom,
-                range_to: rangeTo,
-                margin_amount: marginAmount,
-            });
+            if (isEditing) {
+                // UPDATE
+                await axios.put(`${ApiUrl}/api/margins/update-margin/${editId}`, {
+                    range_from: rangeFrom,
+                    range_to: rangeTo,
+                    margin_amount: marginAmount,
+                });
+            } else {
+                // ADD
+                await axios.post(`${ApiUrl}/api/margins/add-margin`, {
+                    range_from: rangeFrom,
+                    range_to: rangeTo,
+                    margin_amount: marginAmount,
+                });
+            }
 
+            // Reset form
             setRangeFrom("");
             setRangeTo("");
             setMarginAmount("");
-            setErrorMessage("");
+            setEditId(null);
+            setIsEditing(false);
 
             fetchMargins();
         } catch (error) {
-            console.error("Error adding margin:", error);
-            setErrorMessage("Failed to add margin rule. Please try again.");
+            console.error("Error saving margin:", error);
+            setErrorMessage("Failed to save margin rule.");
         } finally {
             setSaving(false);
         }
     };
 
+
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
-            handleAddMargin();
+            handleSaveMargin();
         }
     };
 
@@ -133,15 +171,15 @@ const MarginSettings = () => {
 
             {/* Input Card */}
             <div className="enhanced-card">
-                <h3 style={{ 
-                    color: '#2d3748', 
-                    marginBottom: '24px', 
+                <h3 style={{
+                    color: '#2d3748',
+                    marginBottom: '24px',
                     fontSize: '1.25rem',
                     fontWeight: '600'
                 }}>
                     Add New Margin Rule
                 </h3>
-                
+
                 <div className="margin-row">
                     <div className="margin-group">
                         <label>Range From (₹)</label>
@@ -149,9 +187,9 @@ const MarginSettings = () => {
                             type="number"
                             value={rangeFrom}
                             onChange={(e) => setRangeFrom(e.target.value)}
-                            onKeyPress={handleKeyPress}
                             placeholder="1000"
-                            min="0"
+                            onKeyPress={handleKeyPress}
+
                         />
                     </div>
 
@@ -161,9 +199,9 @@ const MarginSettings = () => {
                             type="number"
                             value={rangeTo}
                             onChange={(e) => setRangeTo(e.target.value)}
-                            onKeyPress={handleKeyPress}
                             placeholder="2000"
-                            min="0"
+                            onKeyPress={handleKeyPress}
+
                         />
                     </div>
 
@@ -173,27 +211,39 @@ const MarginSettings = () => {
                             type="number"
                             value={marginAmount}
                             onChange={(e) => setMarginAmount(e.target.value)}
-                            onKeyPress={handleKeyPress}
                             placeholder="100"
-                            min="0"
+                            onKeyPress={handleKeyPress}
+
                         />
                     </div>
 
-                    <button
-                        className="enhanced-save"
-                        onClick={handleAddMargin}
-                        disabled={saving}
-                    >
-                        {saving ? (
-                            <>
-                                <span className="loading-spinner"></span>
-                                Adding...
-                            </>
-                        ) : (
-                            "Add Margin"
+                    {/* BUTTON GROUP */}
+                    <div className="margin-actions">
+                        <button
+                            className="enhanced-save-btn"
+                            onClick={handleSaveMargin}
+                            disabled={saving}
+                        >
+                            {saving ? "Saving..." : isEditing ? "Update" : "Add"}
+                        </button>
+
+                        {isEditing && (
+                            <button
+                                className="button-cancel-margin"
+                                onClick={() => {
+                                    setEditId(null);
+                                    setIsEditing(false);
+                                    setRangeFrom("");
+                                    setRangeTo("");
+                                    setMarginAmount("");
+                                }}
+                            >
+                                Cancel
+                            </button>
                         )}
-                    </button>
+                    </div>
                 </div>
+
 
                 {errorMessage && (
                     <div className="error-box">
@@ -204,22 +254,22 @@ const MarginSettings = () => {
 
             {/* Rules List Card */}
             <div className="enhanced-card">
-                <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
                     marginBottom: '24px'
                 }}>
-                    <h3 style={{ 
-                        color: '#2d3748', 
+                    <h3 style={{
+                        color: '#2d3748',
                         fontSize: '1.25rem',
                         fontWeight: '600',
                         margin: 0
                     }}>
                         Current Margin Rules
                     </h3>
-                    <span style={{ 
-                        color: '#718096', 
+                    <span style={{
+                        color: '#718096',
                         fontSize: '0.875rem',
                         background: '#f7fafc',
                         padding: '4px 12px',
@@ -231,14 +281,14 @@ const MarginSettings = () => {
                 </div>
 
                 {loading ? (
-                    <div style={{ 
-                        textAlign: 'center', 
+                    <div style={{
+                        textAlign: 'center',
                         padding: '60px 24px',
                         color: '#718096'
                     }}>
-                        <div style={{ 
-                            width: '32px', 
-                            height: '32px', 
+                        <div style={{
+                            width: '32px',
+                            height: '32px',
                             border: '3px solid #e2e8f0',
                             borderTop: '3px solid #3182ce',
                             borderRadius: '50%',
@@ -283,12 +333,23 @@ const MarginSettings = () => {
                                     </td>
                                     <td>{new Date(item.created_at).toLocaleDateString('en-IN')}</td>
                                     <td>
-                                        <button 
-                                            className="button-delete"
-                                            onClick={() => askDelete(item.id)}
-                                        >
-                                            Delete
-                                        </button>
+                                        <td>
+                                            <button
+                                                className="button-edit-margin"
+                                                onClick={() => handleEdit(item)}
+                                            >
+                                                Edit
+                                            </button>
+
+                                            <button
+                                                className="button-delete"
+                                                onClick={() => askDelete(item.id)}
+                                                style={{ marginLeft: "8px" }}
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+
                                     </td>
                                 </tr>
                             ))}
@@ -303,7 +364,7 @@ const MarginSettings = () => {
                     <div className="confirm-box">
                         <h3>Delete Margin Rule?</h3>
                         <p>
-                            This action cannot be undone. The margin rule will be permanently 
+                            This action cannot be undone. The margin rule will be permanently
                             removed from the system.
                         </p>
                         <div className="confirm-actions">

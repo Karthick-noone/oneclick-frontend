@@ -64,7 +64,7 @@
 }
 
 .margin-group input {
-  padding: 12px 16px;
+  padding: 10px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 0.95rem;
@@ -84,36 +84,80 @@
   color: #a0aec0;
 }
 
-/* Professional Buttons */
-.enhanced-save {
-  background: #3182ce;
+.enhanced-save-btn {
+  background: #2b6cb0;
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  height: fit-content;
   font-family: inherit;
-  letter-spacing: 0.025em;
 }
 
-.enhanced-save:hover:not(:disabled) {
+.enhanced-save-btn:hover {
   background: #2c5aa0;
-  transform: translateY(-1px);
 }
 
-.enhanced-save:active {
-  transform: translateY(0);
-}
-
-.enhanced-save:disabled {
+.enhanced-save-btn:disabled {
   background: #a0aec0;
   cursor: not-allowed;
   transform: none;
 }
+
+.enhanced-save-btn:active {
+  transform: translateY(0);
+}
+
+.enhanced-save-btn:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+  transform: none;
+}
+.margin-actions {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.margin-actions button {
+  height: 40px;
+  white-space: nowrap;
+}
+.button-cancel-margin {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.button-cancel-margin:hover {
+  background-color: #fee2e2;
+}
+
+.button-edit-margin {
+  background: #2b6cb0;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.button-edit-margin:hover {
+  background: #2c5aa0;
+}
+
 
 .button-delete {
   background: #e53e3e;

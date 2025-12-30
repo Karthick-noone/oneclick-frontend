@@ -1753,13 +1753,12 @@ const Secondhandproducts = () => {
                   </>
                 )}
 
-
-
               </div>
-            </>)}
+            </>
+          )}
         </div>
         <hr className="dotted-divider" />
-        <h2 className="laptops-page-title">Secondhand Product List</h2>
+        <h2 className="laptops-page-title">Refurbished Product List</h2>
 
         {(totalProducts > 0 || inStock > 0 || outOfStock > 0 || withCoupons > 0) && (
           <>

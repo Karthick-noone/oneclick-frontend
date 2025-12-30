@@ -266,7 +266,7 @@
 
 .light-notifications .notification-item {
   padding: 16px 20px;
-  border-bottom: 1px solid #f1f5f9;
+  /* border-bottom: 1px solid #f1f5f9; */
   cursor: pointer;
   transition: background 0.3s ease;
   display: flex;
