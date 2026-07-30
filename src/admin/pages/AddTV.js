@@ -566,7 +566,7 @@ const TV = () => {
       let filteredProducts = response.data;
 
       // Admin → only branchless products
-      if (userRole === "Admin") {
+      if (userRole === "Admin" || userRole === "Staff") {
         filteredProducts = filteredProducts.filter(item => item.branch_id === null);
         console.log("🟢 Admin Filter Applied → branchless products only");
       }

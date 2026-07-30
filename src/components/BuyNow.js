@@ -21,6 +21,8 @@ import Footer from "./footer";
 import orderTruck from "./img/order-truck.gif";
 import confetti from "canvas-confetti";
 import { Link } from "react-router-dom";
+import ScratchModal from "./ScratchModal";
+import { ChevronDown } from "lucide-react";
 
 import checkout from "./img/checkout.png";
 
@@ -46,7 +48,7 @@ const BuyNow = () => {
   // const [selectedProductId, setSelectedProductId] = useState(
   //   cartItems.length > 0 ? cartItems[0].id : null
   // ); // Default to first product if available
-  const [newTotalAmount,] = useState(0); // New state for total amount after applying coupon
+  const [newTotalAmount, setNewTotalAmount] = useState(0); // New state for total amount after applying coupon
   const [discountAmount, setDiscountAmount] = useState(0); // New state for storing discount
   const [messageType, setMessageType] = useState(""); // New state to track the message type (success/error)
   const [isCouponApplied, setIsCouponApplied] = useState(false); // New state to track if coupon is applied
@@ -54,6 +56,132 @@ const BuyNow = () => {
   const [couponValue, setCouponValue] = useState(0);
   const [minPurchaseLimit, setMinPurchaseLimit] = useState(0);
   const [isOrdering, setIsOrdering] = useState(false);
+
+  const [showScratch, setShowScratch] = useState(false);
+  const [rewardMessage, setRewardMessage] = useState("");
+  const [availableOffers, setAvailableOffers] = useState([]);
+  const [offersExpanded, setOffersExpanded] = useState(false);
+  const [appliedCouponCode, setAppliedCouponCode] = useState(null);
+  const [appliedRewardId, setAppliedRewardId] = useState(null);
+
+
+  useEffect(() => {
+    const fetchUserRewards = async () => {
+      try {
+        const user_id = localStorage.getItem("user_id");
+        if (!user_id) return;
+
+        const res = await axios.get(
+          `${ApiUrl}/api/user-rewards/${user_id}`
+        );
+
+        const rewards = res.data?.data || [];
+
+        // Only show usable coupons
+        const validCoupons = rewards.filter(
+          (r) =>
+            r.is_used === 0 &&
+            r.is_scratched === 1 &&
+            new Date(r.expiry_date) >= new Date()
+        );
+
+        setAvailableOffers(validCoupons);
+      } catch (err) {
+        console.log("Error fetching coupons", err);
+      }
+    };
+
+    fetchUserRewards();
+  }, []);
+
+  const handleOfferApply = (offer) => {
+
+    // if (cartItems.length === 0) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Cart is Empty",
+    //     text: "Please add items to your cart before applying offer.",
+    //     timer: 3000,
+    //     showConfirmButton: false,
+    //   });
+    //   return;
+    // }
+
+    if (isCouponApplied) {
+      Swal.fire({
+        icon: "info",
+        title: "Coupon Already Applied",
+        text: "You can apply only one coupon at a time.",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    const cartTotal = calculateTotalPrice();
+
+    //  Minimum Order Check (same style as API logic)
+    if (
+      offer.min_order_amount &&
+      cartTotal < offer.min_order_amount
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Minimum Purchase Required",
+        text: `Minimum purchase of ₹${offer.min_order_amount} required to use this offer.`,
+        timer: 5000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    let discount = 0;
+
+    // 🔥 Discount Calculation (exact mirror of backend logic)
+    if (offer.discount_type === "percentage") {
+
+      discount = (cartTotal * offer.discount_value) / 100;
+
+      if (
+        offer.max_discount &&
+        discount > offer.max_discount
+      ) {
+        discount = offer.max_discount;
+      }
+
+    } else {
+      discount = offer.discount_value;
+    }
+
+    const newAmount = Math.max(0, cartTotal - discount);
+
+    // ✅ Update same states used by coupon
+    setDiscountAmount(discount);
+    // setCouponValue(discount);          // keep consistency
+    setTotalAmount(newAmount);
+    setNewTotalAmount(newAmount);
+    setIsCouponApplied(true);
+    setAppliedCouponCode(offer.coupon_code);
+    setAppliedRewardId(offer.user_reward_id);  // 🔥 important for backend
+
+    Swal.fire({
+      title: "🎉 Offer Applied Successfully!",
+      html: `
+      <div style="text-align:center">
+        <p style="font-size:16px;">You saved</p>
+        <h2 style="color:#16a34a;">₹${discount.toFixed(2)}</h2>
+        <p>on this order 🎁</p>
+      </div>
+    `,
+      icon: "success",
+      timer: 4000,
+      showConfirmButton: false,
+      background: "#f0fff4",
+      color: "#155724",
+    });
+
+  };
+
 
   const location = useLocation();
   const { product, } = location.state || {}; // Get product and email
@@ -501,7 +629,7 @@ const BuyNow = () => {
     }
 
     const fullAddress = `${selectedAddressDetails.name}, ${selectedAddressDetails.street}, ${selectedAddressDetails.city}, ${selectedAddressDetails.state}, ${selectedAddressDetails.country}, ${selectedAddressDetails.postal_code}, ${selectedAddressDetails.phone}`;
- 
+
     console.log("Product details:", product);
 
     // Ensure product exists
@@ -566,6 +694,7 @@ const BuyNow = () => {
       shipping_address: fullAddress,
       address_id: addressToUse,
       cartItems: enrichedCartItems, // Keeping the same structure
+      applied_reward_id: appliedRewardId || null,
       payment_method:
         selectedPaymentMethod === "cod"
           ? "COD"
@@ -590,6 +719,9 @@ const BuyNow = () => {
 
         if (response.status === 200) {
           console.log("Order placed successfully");
+          const rewardMessage = response.data?.reward?.message || "🎁 Surprise reward!";
+          setRewardMessage(rewardMessage);
+
           firework();
           Swal.fire({
             title: "🎉 Order Placed Successfully! 🎊",
@@ -605,7 +737,9 @@ const BuyNow = () => {
             },
           }).then(() => {
             window.history.replaceState(null, "", "/MyOrders");
-            navigate("/MyOrders");
+            // navigate("/MyOrders");
+            setShowScratch(true);
+
           });
         } else {
           console.warn("Unexpected response status:", response.status);
@@ -746,7 +880,7 @@ const BuyNow = () => {
                   ))}
                 </ul>
               ) : (
-                <div style={{display:'flex', justifyContent:'space-between'}}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <strong style={{ fontSize: "1.0rem" }}>
                     DELIVERY ADDRESS <FaTimes style={{ color: "red" }} />
                   </strong>
@@ -1007,6 +1141,69 @@ const BuyNow = () => {
                 If you have multiple coupons, apply the one you prefer.
               </span>
             </div>
+            {availableOffers.length > 0 && (
+              <div className="offers-section">
+
+                <div
+                  className="offers-header"
+                  onClick={() => setOffersExpanded(!offersExpanded)}
+                >
+                  <span className="offers-title">
+                    Available Offers ({availableOffers.length})
+                  </span>
+
+                  <ChevronDown
+                    size={20}
+                    className={`chevron-icon ${offersExpanded ? "rotate" : ""
+                      }`}
+                  />
+                </div>
+
+                {offersExpanded && (
+                  <div className="offers-body">
+                    {availableOffers.map((offer, index) => (
+                      <div
+                        key={offer.user_reward_id}
+                        className={`offer-card offer-color-${index % 5}`}
+                      >
+                        <div className="offer-left">
+                          <strong>{offer.coupon_code}</strong>
+                          <p>
+                            {offer.discount_type === "percentage"
+                              ? `${offer.discount_value}% OFF`
+                              : `₹${offer.discount_value} OFF`}
+                          </p>
+
+                          {offer.min_order_amount > 0 && (
+                            <small>
+                              On orders above ₹{offer.min_order_amount}
+                            </small>
+                          )}
+                        </div>
+
+                        <button
+                          className={`offer-apply-btn ${appliedCouponCode === offer.coupon_code
+                            ? "applied"
+                            : ""
+                            }`}
+                          disabled={
+                            appliedCouponCode === offer.coupon_code
+                          }
+                          onClick={() =>
+                            handleOfferApply(offer)
+                          }
+                        >
+                          {appliedCouponCode === offer.coupon_code
+                            ? "Applied"
+                            : "Apply"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+              </div>
+            )}
             {finalAmount > 0 && (
               <div
                 style={{
@@ -1256,6 +1453,23 @@ const BuyNow = () => {
 
           {/* Address Section */}
         </div>
+        <ScratchModal
+          isOpen={showScratch}
+          rewardMessage={rewardMessage}
+          onClose={() => {
+            setShowScratch(false);
+            // clearCart();
+            window.dispatchEvent(new Event("cart-updated"));
+
+            const storedEmail = localStorage.getItem("email");
+            if (storedEmail) {
+              const cartKey = `${storedEmail}-cart`;
+              localStorage.removeItem(cartKey);
+            }
+
+            navigate("/MyOrders");
+          }}
+        />
       </div>
       <Footer />
       <ToastContainer />

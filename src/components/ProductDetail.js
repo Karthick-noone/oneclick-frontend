@@ -1433,7 +1433,7 @@ const ProductDetail = () => {
                     </p>
 
                     {/* Price Table */}
-                    {loading ? (
+                    {/* {loading ? (
                       <Skeleton
                         width={360}
                         height={90}
@@ -1443,7 +1443,6 @@ const ProductDetail = () => {
                       <div className="coupon-box">
                         <div className="price-table">
                           <div className="price-row">
-                            {/* MRP Price */}
                             <div
                               className="price-cell"
                               style={{ backgroundColor: "white" }}
@@ -1458,7 +1457,6 @@ const ProductDetail = () => {
                               )}
                             </div>
 
-                            {/* Discount */}
                             <div
                               className="price-cell"
                               style={{ backgroundColor: "white" }}
@@ -1478,7 +1476,6 @@ const ProductDetail = () => {
                               )}
                             </div>
 
-                            {/* Effective Price */}
                             <div className="price-cell">
                               <span className="price-label">
                                 Effective Price
@@ -1499,7 +1496,7 @@ const ProductDetail = () => {
                           </div>
                         </div>
                       </div>
-                    )}
+                    )} */}
 
                     {/* Add to Cart & Buy Now Buttons */}
                     {loading ? (

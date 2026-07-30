@@ -37,6 +37,7 @@ const CareersTable = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error loading careers: {error.message}</p>;
 
+  
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);

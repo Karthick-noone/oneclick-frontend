@@ -570,7 +570,7 @@ const MobileAccessories = () => {
       let filteredProducts = response.data;
 
       // Admin → only branchless products
-      if (userRole === "Admin") {
+      if (userRole === "Admin" || userRole === "Staff") {
         filteredProducts = filteredProducts.filter(item => item.branch_id === null);
         console.log("🟢 Admin Filter Applied → branchless products only");
       }
@@ -933,10 +933,10 @@ const MobileAccessories = () => {
     //     return;
     //   }
     // }
-    const branchData = JSON.parse(localStorage.getItem("branch"));
-    const branch_id = branchData.id;
-    // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
+
+    const branchData = JSON.parse(localStorage.getItem("branch"));
+    const branch_id = userRole === "Admin" ? null : (branchData?.id ?? null);    // Fetch user role from localStorage
 
     // Set product status based on user role
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";

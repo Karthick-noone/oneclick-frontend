@@ -6,6 +6,7 @@ const Invoice = ({ order, productDetails }) => {
   const products = productDetails || []; // Use productDetails passed as prop
 
   console.log("product", products);
+  console.log("orderrrr ", order);
 
 
   // Calculate total quantity
@@ -360,9 +361,14 @@ const Invoice = ({ order, productDetails }) => {
 
               // Grand total = subtotal + delivery (already final price)
               const grandTotal = subtotal + deliveryTotal;
+              const finalAmount =
+                Number(order?.total_amount || 0) + deliveryTotal;
+
+              const discount = grandTotal - finalAmount;
+
 
               const gstRate = 0.18; // 18%
-              const gstAmount = (subtotal * gstRate) / (1 + gstRate); 
+              const gstAmount = (subtotal * gstRate) / (1 + gstRate);
               const cgst = gstAmount / 2;
               const sgst = gstAmount / 2;
 
@@ -380,6 +386,12 @@ const Invoice = ({ order, productDetails }) => {
                       <strong>Delivery Charge: </strong> ₹{deliveryTotal.toLocaleString("en-IN")}
                     </p>
                   )}
+                  {discount > 0 && (
+                    <p style={{ fontSize: "15px", marginTop: '5px' }}>
+                      <strong>Discount: </strong> -₹
+                      {discount.toLocaleString("en-IN")}
+                    </p>
+                  )}
 
                   <p style={{
                     fontSize: "15px", marginTop: '5px',
@@ -387,7 +399,9 @@ const Invoice = ({ order, productDetails }) => {
                     paddingTop: "5px",
                     marginTop: "5px",
                   }}>
-                    <strong>Grand Total: </strong> ₹{Math.round(grandTotal).toLocaleString("en-IN")}
+                    <strong>Grand Total: </strong>
+                    ₹{finalAmount.toLocaleString("en-IN")}
+
                   </p>
                 </>
               );

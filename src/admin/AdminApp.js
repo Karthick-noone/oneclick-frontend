@@ -51,6 +51,7 @@ import BranchSecondhandproducts from './pages/BranchSecondhandProducts';
 import BranchAdminProfile from './pages/BranchAdminProfile';
 import BranchManagement from './pages/BranchManagement';
 import MarginSettings from './pages/MarginSettings';
+import AdminScratchRewards from './pages/AdminScratchRewards';
 
 
 import { ThemeProvider } from './ThemeContext';
@@ -190,6 +191,7 @@ function App() {
             <Route path="/StaffManagement" element={<ProtectedRoute element={<StaffManagement />} restrictedRoles={['Staff']} />} />
             <Route path="/BranchManagement" element={<ProtectedRoute element={<BranchManagement />} restrictedRoles={['Staff']} />} />
             <Route path="/MarginSettings" element={<ProtectedRoute element={<MarginSettings />} restrictedRoles={['Staff']} />} />
+            <Route path="/AdminScratchRewards" element={<ProtectedRoute element={<AdminScratchRewards />} restrictedRoles={['Staff']} />} />
             <Route path="*" element={<AdminNotFound />} />
           </Routes>
         </AdminMain>

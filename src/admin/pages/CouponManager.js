@@ -9,17 +9,24 @@ const CouponManager = () => {
   const [couponValue, setCouponValue] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [minPurchaseLimit, setMinPurchaseLimit] = useState(""); // State for min purchase limit
-
+  
   const fetchCoupons = async () => {
     try {
       const response = await axios.get(`${ApiUrl}/api/fetchcoupons`);
-      setCoupons(response.data);
-      // console.log("Fetched coupons successfully:", response.data);
+
+      console.log("Coupons API Response:", response.data);
+
+      // ✅ Since backend returns direct array
+      setCoupons(Array.isArray(response.data)
+        ? response.data
+        : []);
+
     } catch (error) {
       console.error("Error fetching coupons:", error);
-      // Swal.fire("Error", "Failed to fetch coupons. Please try again.", "error");
+      setCoupons([]); // safe fallback
     }
   };
+
 
   useEffect(() => {
     fetchCoupons();

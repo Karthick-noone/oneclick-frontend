@@ -1315,6 +1315,7 @@ const Header2 = ({ header2Ref }) => {
 
 
 
+
                 <Link
                   to="/MyOrders"
                   className={location.pathname === "/MyOrders" ? "active" : ""}
@@ -1323,6 +1324,48 @@ const Header2 = ({ header2Ref }) => {
                   {/* <FaBox  className="iicon" />  */}
                   <svg width="24" height="24" fill="none" viewBox="0 0 24 24" ><path d="M20.087 16.153V7.847a.682.682 0 0 0-.346-.59L12.33 3.089a.657.657 0 0 0-.658 0L4.26 7.258a.682.682 0 0 0-.345.59v8.305a.682.682 0 0 0 .345.59l7.412 4.169a.658.658 0 0 0 .658 0l7.412-4.17a.683.683 0 0 0 .346-.59v0Z" stroke="#2A55E5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M16.128 14.064v-4.38L7.957 5.177" stroke="#2A55E5" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20.007 7.502 12.082 12 4.008 7.502M12.076 12 12 20.996" stroke="#2A55E5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                   <span style={{ fontSize: '16px' }}> Orders </span>
+                </Link>
+                <Link
+                  to="/scratchcard"
+                  className={location.pathname === "/scratchcard" ? "active" : ""}
+                  onClick={() => setIsDropdownOpen4(false)}
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7"
+                      stroke="#2A55E5"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M21 8H3v4h18V8Z"
+                      stroke="#2A55E5"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M12 20V8"
+                      stroke="#2A55E5"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M12 8h4a2 2 0 1 0-4-2v2Zm0 0H8a2 2 0 1 1 4-2v2Z"
+                      stroke="#2A55E5"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+
+                  <span style={{ fontSize: '16px' }}> Rewards </span>
                 </Link>
 
                 {/* <Link

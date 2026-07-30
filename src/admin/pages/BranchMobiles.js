@@ -1044,7 +1044,7 @@ const Mobiles = () => {
 
     const formData = new FormData();
     if (branch_id !== null) formData.append("branch_id", branch_id);
-
+    formData.append("branch_name", branchData.branch_name);
     formData.append("name", newProduct.name);
     // formData.append("features", newProduct.features);
     formData.append("price", newProduct.price);
@@ -2248,10 +2248,10 @@ const Mobiles = () => {
                                 ₹{finalPrice}
 
                                 {marginAdded > 0 && (
-                                   <span className="margin-badge">
-                                   ₹{basePrice} +
-                                   <br/>
-                                   ₹{marginAdded} margin
+                                  <span className="margin-badge">
+                                    ₹{basePrice} +
+                                    <br />
+                                    ₹{marginAdded} margin
                                   </span>
                                 )}
                               </>

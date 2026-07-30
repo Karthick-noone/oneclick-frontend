@@ -964,6 +964,7 @@ const Computers = () => {
     }
 
     const branchData = JSON.parse(localStorage.getItem("branch"));
+    console.log("Branch Data from localStorage:", branchData);
     // if (!branchData || !branchData.id) {
     //   Swal.fire({
     //     icon: "error",
@@ -990,6 +991,8 @@ const Computers = () => {
 
     const formData = new FormData();
     if (branch_id !== null) formData.append("branch_id", branch_id);
+    formData.append("branch_name", branchData.branch_name);
+    formData.append("contact_person", branchData.contact_person);
 
     formData.append("name", newProduct.name);
     // formData.append("features", newProduct.features);
@@ -2176,10 +2179,10 @@ const Computers = () => {
                                 ₹{finalPrice}
 
                                 {marginAdded > 0 && (
-                                   <span className="margin-badge">
-                                   ₹{basePrice} +
-                                   <br/>
-                                   ₹{marginAdded} margin
+                                  <span className="margin-badge">
+                                    ₹{basePrice} +
+                                    <br />
+                                    ₹{marginAdded} margin
                                   </span>
                                 )}
                               </>

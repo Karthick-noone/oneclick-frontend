@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./css/AddComputers.css"; // Ensure this CSS file is created for styling
+import ApproveImage from './img/approve.png';
+import ApprovalWaitingImage from './img/approval_waiting.png';
+
 import { ApiUrl } from "./../../components/ApiUrl";
 import { FaEdit, FaTrash, FaEye, FaTimes, FaImages, FaPlusCircle, FaChevronDown } from "react-icons/fa"; // Import icons
 import Modal from "react-modal";
@@ -11,18 +14,15 @@ import { FaInfoCircle, FaClone } from "react-icons/fa"; // Ensure to import any 
 import CouponEditPopup from "./CouponEditPopup";
 import EditCouponModal from "./EditCouponModal"; // Import the modal component
 // import CouponImage from './img/coupons.png'
-import ApproveImage from './img/approve.png'
-import ApprovalWaitingImage from './img/approval_waiting.png';
-
 import ActiveCouponImage from './img/Active-coupon.png'
 import ExpiredCouponImage from './img/Expired-coupon.png'
-// import leftarrow from './img/left.png';
-// import rightarrow from './img/right.png';
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
 import { SearchIcon } from "lucide-react";
 import FilterIcon from "./img/filter.png";
-import { toast, } from "react-toastify";
+// import leftarrow from './img/left.png';
+// import rightarrow from './img/right.png';
+import { toast } from "react-toastify";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 // Set up the modal root element
 Modal.setAppElement("#root");
 
@@ -83,7 +83,6 @@ const Headphones = () => {
   const [showOutOfStockOnly, setShowOutOfStockOnly] = useState(false);
   const [showHasCouponOnly, setShowHasCouponOnly] = useState(false);
   // const [showHasAccessoriesOnly, setShowHasAccessoriesOnly] = useState(false);
-
   const [, setLoadingProductId] = useState(null);
   const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
 
@@ -112,14 +111,13 @@ const Headphones = () => {
         // const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
         //   timeout: 5000,
         //   params: { branch_id, userRole },
-
         // });
         // console.log("Refreshed product list:", refreshedProducts.data);
 
         // // Update the product list in state
         // setProducts(refreshedProducts.data);
-
         fetchProducts();
+
 
       } else {
         //  Show error toast
@@ -163,7 +161,6 @@ const Headphones = () => {
         // const refreshedProducts = await axios.get(`${ApiUrl}/adminfetchheadphones`, {
         //   timeout: 5000,
         //   params: { branch_id, userRole },
-
         // });
         // console.log("Refreshed product list:", refreshedProducts.data);
 
@@ -203,18 +200,17 @@ const Headphones = () => {
     }
   };
 
-
   const fetchCouponStatus = async (productId) => {
-    // console.log(`[INFO] Checking coupon for product ID: ${productId}`);
+    console.log(`[INFO] Checking coupon for product ID: ${productId}`);
 
     try {
       const response = await axios.get(`${ApiUrl}/api/couponstatus/${productId}`);
       const { hasCoupon, isExpired } = response.data;
 
-      // console.log(`[SUCCESS] Product ${productId}: hasCoupon=${hasCoupon}, isExpired=${isExpired}`);
+      console.log(`[SUCCESS] Product ${productId}: hasCoupon=${hasCoupon}, isExpired=${isExpired}`);
       return { hasCoupon, isExpired };
     } catch (error) {
-      // console.error(`[ERROR] Failed to check coupon for product ${productId}:`, error.message);
+      console.error(`[ERROR] Failed to check coupon for product ${productId}:`, error.message);
       return { hasCoupon: false, isExpired: false };
     }
   };
@@ -242,7 +238,6 @@ const Headphones = () => {
     setIsOpen(true); // open lightbox
   };
 
-
   useEffect(() => {
     setTimeout(() => {
       const section = document.querySelector(".dotted-divider");
@@ -252,6 +247,7 @@ const Headphones = () => {
       }
     }, 100);
   }, []);
+
   // Handle opening modal and passing productId
 
   const openProductModal = (productId) => {
@@ -320,6 +316,7 @@ const Headphones = () => {
       }
     }
   };
+
 
 
 
@@ -469,6 +466,7 @@ const Headphones = () => {
     }));
   };
 
+
   const handleUploadImages = async (productId) => {
     if (!newImages[productId] || newImages[productId].length === 0) {
       // If no new images, show an alert and exit
@@ -555,9 +553,6 @@ const Headphones = () => {
       navigate("/AdminLogin");
     }
   }, [navigate]);
-
-
-  // Fetch products when component mounts
   const branchData = JSON.parse(localStorage.getItem("branch"));
   const branch_id = branchData?.id || null;
   // Fetch products when component mounts
@@ -572,7 +567,7 @@ const Headphones = () => {
       let filteredProducts = response.data;
 
       // Admin → only branchless products
-      if (userRole === "Admin") {
+      if (userRole === "Admin" || userRole === "Staff") {
         filteredProducts = filteredProducts.filter(item => item.branch_id === null);
         console.log("🟢 Admin Filter Applied → branchless products only");
       }
@@ -926,18 +921,15 @@ const Headphones = () => {
     //     return;
     //   }
     // }
-
-    const branchData = JSON.parse(localStorage.getItem("branch"));
-    const branch_id = branchData.id;
     // Fetch user role from localStorage
     const userRole = localStorage.getItem("userRole"); // Assuming user role is stored as "admin" or "user"
-
+    const branchData = JSON.parse(localStorage.getItem("branch"));
+    const branch_id = userRole === "Admin" ? null : (branchData?.id ?? null);
     // Set product status based on user role
     const productStatus = userRole === "Admin" ? "approved" : "unapproved";
 
     const formData = new FormData();
     if (branch_id !== null) formData.append("branch_id", branch_id);
-
 
     formData.append("name", newProduct.name);
     formData.append("features", newProduct.features);
@@ -1574,7 +1566,7 @@ const Headphones = () => {
   return (
     <div className="laptops-page">
       <div className="laptops-content">
-        <h2 className="laptops-page-title">Add  Headphones</h2>
+        <h2 className="laptops-page-title">Add Headphones </h2>
         <div className="laptops-form-container">
           {/* Left Section */}
           <div className="laptops-left-section">
@@ -1694,6 +1686,7 @@ const Headphones = () => {
               </div>
 
             </div>
+
             <div className="filters-card2">
               <div className="filters-panel">
                 <div className="filter-label-title">
@@ -1745,7 +1738,6 @@ const Headphones = () => {
             </div>
           </>
         )}
-
         <div className="laptops-products-list">
           {products.length === 0 ? (
             <div className="empty-state-message"><FaInfoCircle /> No products available. Please add some Headphones.</div>
@@ -1819,8 +1811,6 @@ const Headphones = () => {
                             ))}
                           </Slider>
                         </div>
-                        {/* <ToastContainer /> */}
-
                       </div>
 
                       {/* Display product name */}
@@ -1849,10 +1839,9 @@ const Headphones = () => {
                         )}
 
                       </div>
+
                       <div>
                         M.R.P <span style={{ textDecoration: "line-through", color: 'red', fontSize: '14px' }}>₹{product.actual_price}</span>  <span style={{ color: 'green', marginLeft: '5px' }}>₹{product.prod_price}</span>
-
-                        {/* <span>{product.category}</span> */}
                       </div>
                       <div className="product-extras">
                         {couponProducts[product.id]?.hasCoupon && (
@@ -1983,8 +1972,8 @@ const Headphones = () => {
                                       </button>
                                     </div>
                                   </div>
-
                                   <div className="laptops-modal-right-section">
+
                                     {product.status === "available" &&
                                       <div
                                         onClick={() => handleOpenOfferModal(product.id)}
@@ -2072,8 +2061,10 @@ const Headphones = () => {
                                                 ? "Update Offer"
                                                 : "Add Offer"
                                               }
+
                                             </button>
                                           </form>
+
 
                                           {isEditMode && offerStartTime && offerEndTime && offerPrice && (
                                             <button
@@ -2083,9 +2074,11 @@ const Headphones = () => {
                                               Delete Offer
                                             </button>
                                           )}
+
                                         </div>
                                       </div>
                                     )}
+
 
                                     {/* Upload Section */}
                                     <div className="upload-container">
@@ -2414,7 +2407,6 @@ const Headphones = () => {
       </Modal>
 
       {/* Modal for editing a product */}
-
       {isOpen && (
         // Sample usage
         <Lightbox
@@ -2603,7 +2595,7 @@ const Headphones = () => {
                   <label className="feature-label">Approve or Unapprove</label>
 
                   <select
-                    disabled={role === 'Staff'}
+                    disabled={role !== 'Admin'}
 
                     name="productStatus"
                     value={editingProduct.productStatus}

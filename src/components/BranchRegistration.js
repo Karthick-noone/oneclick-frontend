@@ -64,14 +64,25 @@ const BranchRegistration = () => {
         }
 
         setLoading(true);
+
         try {
+            // STEP 1: Check GSTIN already exists in your DB
+            const checkRes = await fetch(`${ApiUrl}/api/branch/check-gstin?gstin=${gstNumber}`);
+            const checkData = await checkRes.json();
+
+            if (checkData.exists) {
+                toast.error("This GSTIN is already registered!");
+                setLoading(false);
+                return; // ❌ STOP here, don't fetch GST details
+            }
+
+            // STEP 2: Only fetch GST details if not exists
             const response = await fetch(`${ApiUrl}/api/gst/gstinfo?gstin=${gstNumber}`);
             const data = await response.json();
 
-            console.log("Gst details", data)
-
             if (response.ok) {
                 toast.success("GST details fetched successfully!");
+
                 setForm((prev) => ({
                     ...prev,
                     gstin: gstNumber,
@@ -85,61 +96,78 @@ const BranchRegistration = () => {
                     branch_name: data.trade_name || "",
                     company: data.trade_name || "",
                 }));
+
                 setShowGSTPopup(false);
             } else {
                 toast.error(data.message || "Invalid GST number");
             }
         } catch (error) {
-            console.error("Error fetching GST:", error);
-            toast.error("Failed to fetch GST details");
+            console.error("Error:", error);
+            toast.error("Something went wrong");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        if (form.password !== form.confirm_password) {
-            toast.error("Passwords do not match!");
-            return;
+    console.log("🟡 Form submit triggered");
+    console.log("🟡 Form data:", form);
+
+    // 1️⃣ Password match check
+    if (form.password !== form.confirm_password) {
+        console.warn("🔴 Password mismatch");
+        toast.error("Passwords do not match!");
+        return;
+    }
+
+    // 2️⃣ Password validation
+    if (!validatePassword(form.password)) {
+        console.warn("🔴 Password validation failed:", form.password);
+        toast.error(
+            "Password must be at least 8 characters with uppercase, lowercase, number, and special character."
+        );
+        return;
+    }
+
+    // 3️⃣ Phone validation
+    if (!validatePhone(form.phone)) {
+        console.warn("🔴 Phone validation failed:", form.phone);
+        toast.error("Phone number must start with 6-9 and be exactly 10 digits.");
+        return;
+    }
+
+    try {
+        console.log("🟡 Sending API request to:", `${ApiUrl}/api/branch/branch-register`);
+
+        const response = await fetch(`${ApiUrl}/api/branch/branch-register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(form),
+        });
+
+        console.log("🟡 Response status:", response.status);
+
+        const result = await response.json();
+        console.log("🟡 Response body:", result);
+
+        if (response.ok) {
+            console.log("🟢 Branch registered successfully");
+            toast.success("Branch registered successfully!");
+            setSubmitted(true);
+        } else {
+            console.error("🔴 Backend error:", result);
+            toast.error(result.message || "Failed to register");
         }
 
-        if (!validatePassword(form.password)) {
-            toast.error(
-                "Password must be at least 8 characters with uppercase, lowercase, number, and special character."
-            );
-            return;
-        }
-
-        if (!validatePhone(form.phone)) {
-            toast.error("Phone number must start with 6-9 and be exactly 10 digits.");
-            return;
-        }
-
-        try {
-            const response = await fetch(`${ApiUrl}/api/branch/branch-register`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(form),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                toast.success("Branch registered successfully!");
-                setSubmitted(true);
-            } else {
-                // Display backend error messages from uniqueness checks (GSTIN, phone, email)
-                toast.error(result.message || "Something went wrong!");
-            }
-        } catch (err) {
-            console.error("Error submitting branch:", err);
-            toast.error("Network error. Please try again.");
-        }
-    };
+    } catch (err) {
+        console.error("🔴 Fetch/network error:", err);
+        toast.error("Network error. Please try again.");
+    }
+};
 
 
 

@@ -59,6 +59,7 @@ import Login from "./components/Login"; // Adjust path as needed
 import ResetPassword from "./components/ResetPassword"; // Adjust path as needed
 import BranchRegistration from "./components/BranchRegistration"; // Adjust path as needed
 import BranchLogin from "./components/BranchLogin"; // Adjust path as needed
+import ScratchCard from "./components/ScratchCard"; // Adjust path as needed
 
 
 
@@ -180,6 +181,7 @@ const App = () => {
             <Route path="/Secondhandproducts" element={<Secondhandproducts />} />
             <Route path="/branch-register" element={<BranchRegistration />} />
             <Route path="/branch-login" element={<BranchLogin />} />
+            <Route path="/ScratchCard" element={<ScratchCard />} />
             <Route path="/Admin/*" element={<AdminMain />} />
           </Routes>
         </AppWrapper>

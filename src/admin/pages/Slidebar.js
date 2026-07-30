@@ -5,7 +5,7 @@ import logoImage from "./img/oneclick.png";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import logo2 from "./img/logo3.png";
 import {
-  BoxIcon, BriefcaseBusiness, ChartColumnIncreasing, Edit, Handshake,
+  BoxIcon, BriefcaseBusiness, ChartColumnIncreasing, Edit, Gift, Handshake,
   Image, LayoutDashboard, ListCheck, MessageCircleMore, MessageSquareDot, MessageSquareMore, PanelLeft, User, Users, Users2
 } from "lucide-react";
 
@@ -299,6 +299,13 @@ const Slidebar = () => {
                 <Link to="/Admin/ContactsTable" className={isActive("/Admin/ContactsTable")}>
                   <MessageSquareMore size={18} className="menu-icon" />
                   {isOpen && "Contact"}
+                </Link>
+              </li>
+
+              <li>
+                <Link to="/Admin/AdminScratchRewards" className={isActive("/Admin/AdminScratchRewards")}>
+                  <Gift size={18} className="menu-icon" />
+                  {isOpen && "Scratch Rewards"}
                 </Link>
               </li>
 

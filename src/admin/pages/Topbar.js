@@ -240,7 +240,8 @@ const Topbar = () => {
                     {notifications.filter(n => !n.read).length} new
                   </span>
 
-                </span>)}
+                </span>
+              )}
             </div>
           </div>
 
@@ -310,7 +311,7 @@ const Topbar = () => {
             {role === "Admin" && (
               <Link to="/admin/ChangePassword" className="menu-link"
                 onClick={() => setIsMenuOpen(false)}
-              
+
               >
                 <button className="menu-item">
                   <FaCog className="menu-icon" />
@@ -318,7 +319,6 @@ const Topbar = () => {
                 </button>
               </Link>
             )}
-
             {role === "branch_admin" && (
               <Link to="/Admin/BranchAdminProfile" className="menu-link"
                 onClick={() => setIsMenuOpen(false)}

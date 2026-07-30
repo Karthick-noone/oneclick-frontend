@@ -29,6 +29,8 @@ import Footer from "./footer";
 import orderTruck from "./img/order-truck.gif";
 import confetti from "canvas-confetti";
 import checkout from "./img/checkout.png"
+import ScratchModal from "./ScratchModal";
+import { ChevronDown } from "lucide-react";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -66,6 +68,120 @@ const Checkout = () => {
 
   const location = useLocation();
   const { isOfferActive, } = location.state || {}; // Ensure it doesn't break if undefined
+  const [showScratch, setShowScratch] = useState(false);
+  const [rewardMessage, setRewardMessage] = useState("");
+  const [availableOffers, setAvailableOffers] = useState([]);
+  const [offersExpanded, setOffersExpanded] = useState(false);
+  const [appliedCouponCode, setAppliedCouponCode] = useState(null);
+  const [appliedRewardId, setAppliedRewardId] = useState(null);
+
+  useEffect(() => {
+    const fetchUserRewards = async () => {
+      try {
+        const user_id = localStorage.getItem("user_id");
+        if (!user_id) return;
+
+        const res = await axios.get(
+          `${ApiUrl}/api/user-rewards/${user_id}`
+        );
+
+        const rewards = res.data?.data || [];
+
+        // Only show usable coupons
+        const validCoupons = rewards.filter(
+          (r) =>
+            r.is_used === 0 &&
+            r.is_scratched === 1 &&
+            new Date(r.expiry_date) >= new Date()
+        );
+
+        setAvailableOffers(validCoupons);
+      } catch (err) {
+        console.log("Error fetching coupons", err);
+      }
+    };
+
+    fetchUserRewards();
+  }, []);
+
+  const handleOfferApply = (offer) => {
+
+    if (cartItems.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Cart is Empty",
+        text: "Please add items to your cart before applying coupon.",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (isCouponApplied) {
+      Swal.fire({
+        icon: "info",
+        title: "Coupon Already Applied",
+        text: "You can apply only one coupon at a time.",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    const cartTotal = calculateTotalPrice();
+
+    // 🔥 Check Minimum Order
+    if (
+      offer.min_order_amount &&
+      cartTotal < offer.min_order_amount
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Minimum Purchase Required",
+        text: `Minimum purchase of ₹${offer.min_order_amount} required to use this offer.`,
+        timer: 5000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    let discount = 0;
+
+    //  Calculate Discount
+    if (offer.discount_type === "percentage") {
+      discount = (cartTotal * offer.discount_value) / 100;
+
+      if (
+        offer.max_discount &&
+        discount > offer.max_discount
+      ) {
+        discount = offer.max_discount;
+      }
+
+    } else {
+      discount = offer.discount_value;
+    }
+
+    const newAmount = Math.max(0, cartTotal - discount);
+
+    // 🔥 Update states
+    setDiscountAmount(discount);
+    setNewTotalAmount(newAmount);
+    setIsCouponApplied(true);
+    setAppliedCouponCode(offer.coupon_code);
+    setAppliedRewardId(offer.user_reward_id);
+
+    Swal.fire({
+      title: "🎉 Offer Applied!",
+      text: `You saved ₹${discount.toFixed(2)} on this order.`,
+      icon: "success",
+      timer: 3000,
+      showConfirmButton: false,
+    });
+
+  };
+
+
 
   // useEffect(() => {
   //   if (item && item.offer_end_time) {
@@ -1062,6 +1178,8 @@ const Checkout = () => {
       shipping_address: fullAddress,
       address_id: addressToUse,
       cartItems: enrichedCartItems,
+      applied_reward_id: appliedRewardId || null,
+
       payment_method:
         selectedPaymentMethod === "cod"
           ? "COD"
@@ -1081,9 +1199,13 @@ const Checkout = () => {
       try {
         // Send the order data and store cart items in the backend
         const response = await axios.post(`${ApiUrl}/place-order`, orderData);
-
+        console.log("Order placement response:", response);
         if (response.status === 200) {
           console.log("Order placed successfully");
+          const rewardMessage = response.data?.reward?.message || "🎁 Surprise reward!";
+          setRewardMessage(rewardMessage);
+
+
           firework();
           Swal.fire({
             title: "🎉 Order Placed Successfully! 🎊",
@@ -1108,6 +1230,7 @@ const Checkout = () => {
 
             clearCart(); // Clear cart in local state
             window.dispatchEvent(new Event("cart-updated"));
+            setShowScratch(true);
 
             const storedEmail = localStorage.getItem("email");
             if (storedEmail) {
@@ -1115,8 +1238,9 @@ const Checkout = () => {
               localStorage.removeItem(cartKey); // Clear local storage cart
             }
 
-            navigate("/MyOrders");
+            // navigate("/MyOrders");
           });
+
         } else {
           console.log("Unexpected response status:", response.status);
           throw new Error("Unexpected response status");
@@ -1145,6 +1269,8 @@ const Checkout = () => {
     setCartItems([]); // Clear the cart items
     // If you are using a global state or context, you might need to update that instead
   };
+
+
 
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -1710,6 +1836,72 @@ const Checkout = () => {
                 If you have multiple coupons, apply the one you prefer.
               </span>
             </div>
+            {availableOffers.length > 0 && (
+              <div className="offers-section">
+
+                <div
+                  className="offers-header"
+                  onClick={() => setOffersExpanded(!offersExpanded)}
+                >
+                  <span className="offers-title">
+                    Available Offers ({availableOffers.length})
+                  </span>
+
+                  <ChevronDown
+                    size={20}
+                    className={`chevron-icon ${offersExpanded ? "rotate" : ""
+                      }`}
+                  />
+                </div>
+
+                {offersExpanded && (
+                  <div className="offers-body">
+                    {availableOffers.map((offer, index) => (
+                      <div
+                        key={offer.user_reward_id}
+                        className={`offer-card offer-color-${index % 5}`}
+                      >
+                        <div className="offer-left">
+                          <strong>{offer.coupon_code}</strong>
+                          <p>
+                            {offer.discount_type === "percentage"
+                              ? `${offer.discount_value}% OFF`
+                              : `₹${offer.discount_value} OFF`}
+                          </p>
+
+                          {offer.min_order_amount > 0 && (
+                            <small>
+                              On orders above ₹{offer.min_order_amount}
+                            </small>
+                          )}
+                        </div>
+
+                        <button
+                          className={`offer-apply-btn ${appliedCouponCode === offer.coupon_code
+                            ? "applied"
+                            : ""
+                            }`}
+                          disabled={
+                            appliedCouponCode === offer.coupon_code
+                          }
+                          onClick={() =>
+                            handleOfferApply(offer)
+                          }
+                        >
+                          {appliedCouponCode === offer.coupon_code
+                            ? "Applied"
+                            : "Apply"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+              </div>
+            )}
+
+
+
             {finalAmount > 0 && (
               <div
                 style={{
@@ -2016,6 +2208,26 @@ const Checkout = () => {
 
           {/* Address Section */}
         </div>
+        <ScratchModal
+          isOpen={showScratch}
+          rewardMessage={rewardMessage}
+          onClose={() => {
+            setShowScratch(false);
+            clearCart();
+            window.dispatchEvent(new Event("cart-updated"));
+
+            const storedEmail = localStorage.getItem("email");
+            if (storedEmail) {
+              const cartKey = `${storedEmail}-cart`;
+              localStorage.removeItem(cartKey);
+            }
+
+            navigate("/MyOrders");
+          }}
+        />
+
+
+
       </div >
       <Footer />
       <ToastContainer />

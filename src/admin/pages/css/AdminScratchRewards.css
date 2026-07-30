@@ -1,0 +1,237 @@
+.oc-scratch-wrapper {
+    padding: 40px;
+    background: linear-gradient(135deg, #eef2ff, #f8fafc);
+    min-height: 100vh;
+    font-family: "Poppins", sans-serif;
+    margin: 40px 0 0 260px;
+}
+
+.oc-scratch-header h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.oc-scratch-header p {
+    margin-top: 6px;
+    color: #6b7280;
+}
+/* Align text + icon in one row */
+.oc-probability-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+/* Remove default p margin */
+.oc-probability-line p {
+  margin: 0;
+}
+
+/* Probability highlight */
+.oc-probability-value {
+  font-weight: 600;
+  color: #4f46e5;
+}
+
+/* Info wrapper */
+.oc-probability-info {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Icon */
+.oc-info-icon {
+  cursor: pointer;
+  color: #6b7280;
+  transition: 0.2s ease;
+}
+
+.oc-info-icon:hover {
+  color: #111827;
+  transform: scale(1.1);
+}
+
+/* Tooltip */
+.oc-tooltip {
+  position: absolute;
+  top: 130%;
+  left: -120px;
+  width: 260px;
+  padding: 12px 14px;
+  font-size: 13px;
+  background: #111827;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.25s ease;
+  z-index: 50;
+  line-height: 1.5;
+}
+
+.oc-probability-info:hover .oc-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.oc-scratch-card {
+    margin-top: 25px;
+    padding: 25px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+    transition: 0.3s ease;
+}
+
+.oc-scratch-card:hover {
+    transform: translateY(-4px);
+}
+
+.oc-scratch-title {
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.oc-scratch-form-grid {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    flex-wrap: nowrap;
+    /* prevent wrapping */
+    overflow-x: auto;
+    /* scroll if needed */
+}
+
+/* Compact field container */
+.oc-scratch-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 140px;
+    /* smaller width */
+    /* max-width: 160px; */
+    /* prevent too wide */
+}
+
+.oc-scratch-field label {
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: #374151;
+}
+
+.oc-scratch-field input,
+.oc-scratch-field select {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    transition: 0.2s ease;
+}
+
+.oc-scratch-field input:focus,
+.oc-scratch-field select:focus {
+    border-color: #6366f1;
+    outline: none;
+}
+
+.oc-scratch-primary-btn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s ease;
+    /* align-self: flex-end; */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+}
+
+.oc-scratch-primary-btn:hover {
+    opacity: 0.9;
+}
+
+.oc-scratch-table-wrapper {
+    overflow-x: auto;
+}
+
+.oc-scratch-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.oc-scratch-table th {
+    text-align: center;
+    padding: 12px;
+    background: #f3f4f6;
+    font-size: 13px;
+}
+
+.oc-scratch-table td {
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+
+}
+
+.oc-scratch-badge-active {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.oc-scratch-badge-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.oc-scratch-toggle-btn {
+    margin-right: 8px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #fbbf24;
+    cursor: pointer;
+}
+
+.oc-scratch-delete-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+}
+
+.oc-scratch-empty {
+    padding: 20px;
+    color: #9ca3af;
+}
+
+.oc-scratch-error {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+    .oc-scratch-wrapper {
+        margin: 30px 0;
+        padding: 20px;
+    }
+
+}

@@ -232,7 +232,7 @@ float: right !important;
   padding: 15px 0;
   text-align: center;
   /* border-bottom: 1.5px solid #e0e0e0; */
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .cart-header h1 {
@@ -916,4 +916,126 @@ margin-left: auto;
 
 .Addtocart-btn:hover {
 background: linear-gradient(145deg, #d9534f, #ff7f50);
+}
+
+.offers-wrapper {
+  margin-top: 10px;
+}
+.offers-section {
+  margin: 12px 0;
+  padding: 8px;
+  border: 1.5px dashed #ff5722;
+  border-radius: 10px;
+  background: #fffaf7;
+
+  /* 🔥 Add these */
+  max-height: 260px;     /* adjust height as you like */
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scroll-behavior: smooth;
+}
+
+/* HEADER */
+.offers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f5f5f5;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.offers-header:hover {
+  background: #eeeeee;
+}
+
+.arrow {
+  transition: 0.3s ease;
+}
+
+.arrow.rotate {
+  transform: rotate(180deg);
+}
+
+/* BODY */
+.offers-body {
+  margin-top: 8px;
+  animation: fadeSlide 0.3s ease;
+}
+/* BASE CARD */
+.offer-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  /* border: 1px dashed #ff5722; */
+  transition: 0.3s ease;
+}
+
+/* LIGHT PASTEL COLORS */
+.offer-color-0 {
+  background: #fff3e0;   /* light orange */
+}
+
+.offer-color-1 {
+  background: #e3f2fd;   /* light blue */
+}
+
+.offer-color-2 {
+  background: #f3e5f5;   /* light purple */
+}
+
+.offer-color-3 {
+  background: #e8f5e9;   /* light green */
+}
+
+.offer-color-4 {
+  background: #fce4ec;   /* light pink */
+}
+
+/* HOVER EFFECT */
+.offer-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+
+
+/* APPLY BUTTON */
+.offer-apply-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  background: #ff5722;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.offer-apply-btn:hover {
+  background: #e64a19;
+}
+
+/* APPLIED STATE */
+.offer-apply-btn.applied {
+  background: #4caf50;
+  cursor: default;
+}
+
+/* ANIMATION */
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

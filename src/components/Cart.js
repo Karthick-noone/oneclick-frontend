@@ -1232,13 +1232,12 @@ useEffect(() => {
               </span>
             </div>
             <hr />
-            <div className="summary-item">
+            {/* <div className="summary-item">
               {save() > 0 &&
                 <span style={{ color: "green" }}>
                   You will save ₹{save()} on this order
                 </span>}
-              {/* <span>₹10000</span> */}
-            </div>
+            </div> */}
             <button
               className="summary-place-order-btn"
               onClick={handleViewCheckout}

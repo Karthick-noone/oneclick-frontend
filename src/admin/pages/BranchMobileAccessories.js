@@ -976,6 +976,7 @@ const MobileAccessories = () => {
 
     const formData = new FormData();
     if (branch_id !== null) formData.append("branch_id", branch_id);
+    formData.append("branch_name", branchData.branch_name);
 
     formData.append("name", newProduct.name);
     formData.append("features", newProduct.features);

@@ -6,6 +6,7 @@ const Invoice = ({ order, productDetails }) => {
   const products = productDetails || []; // Use productDetails passed as prop
 
   console.log("product", products);
+  console.log("order", order);
 
 
   // Calculate total quantity
@@ -314,6 +315,10 @@ const Invoice = ({ order, productDetails }) => {
 
                 // Grand Total = subtotal + delivery (GST already included in subtotal)
                 const grandTotal = subtotal + deliveryTotal;
+                const finalAmount =
+                  Number(order?.total_amount || 0) + deliveryTotal;
+
+                const discount = grandTotal - finalAmount;
 
                 return (
                   <>
@@ -335,6 +340,13 @@ const Invoice = ({ order, productDetails }) => {
                       </div>
                     )}
 
+                    {discount > 0 && (
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span><strong>Discount:</strong></span>
+                        <span>₹{discount.toLocaleString("en-IN")}</span>
+                      </div>
+                    )}
+
                     {/* Grand Total */}
                     <div
                       style={{
@@ -347,7 +359,7 @@ const Invoice = ({ order, productDetails }) => {
                       }}
                     >
                       <span><strong>Grand Total:</strong></span>
-                      <span>₹{Math.round(grandTotal).toLocaleString("en-IN")}</span>
+                      <span>₹{finalAmount.toLocaleString("en-IN")}</span>
                     </div>
                   </>
                 );
@@ -663,6 +675,10 @@ const Invoice = ({ order, productDetails }) => {
 
                 // Grand Total = subtotal + delivery (GST already included in subtotal)
                 const grandTotal = subtotal + deliveryTotal;
+                const finalAmount =
+                  Number(order?.total_amount || 0) + deliveryTotal;
+
+                const discount = grandTotal - finalAmount;
 
                 return (
                   <>
@@ -676,11 +692,19 @@ const Invoice = ({ order, productDetails }) => {
                       <span>₹{Math.round(sgst).toLocaleString("en-IN")}</span>
                     </div>
 
+
                     {/* Delivery Charge */}
                     {deliveryTotal > 0 && (
                       <div style={{ display: "flex", justifyContent: "space-between" }}>
                         <span><strong>Delivery Charge:</strong></span>
                         <span>₹{deliveryTotal.toLocaleString("en-IN")}</span>
+                      </div>
+                    )}
+
+                    {discount > 0 && (
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span><strong>Discount:</strong></span>
+                        <span>₹{discount.toLocaleString("en-IN")}</span>
                       </div>
                     )}
 
@@ -696,7 +720,7 @@ const Invoice = ({ order, productDetails }) => {
                       }}
                     >
                       <span><strong>Grand Total:</strong></span>
-                      <span>₹{Math.round(grandTotal).toLocaleString("en-IN")}</span>
+                      <span>₹{finalAmount.toLocaleString("en-IN")}</span>
                     </div>
                   </>
                 );
